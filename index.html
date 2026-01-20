@@ -13,8 +13,28 @@
         .fixed-header-section { position: fixed; top: 0; width: 100%; z-index: 100; background: #000; border-bottom: 1px solid #1c1c1c; padding-bottom: 10px; }
         .ig-header { padding: 12px 15px 5px 15px; }
         .ig-logo { font-family: 'DM Sans', sans-serif; font-weight: 700; font-style: italic; font-size: 22px; letter-spacing: -0.5px; text-transform: lowercase; cursor: pointer; }
+        
+        /* PERBAIKAN KOLOM PENCARIAN AGAR WARNA TIDAK BERUBAH */
         .search-container { background: #0a0a0a; border-radius: 8px; display: flex; align-items: center; padding: 7px 12px; border: 1px solid #1c1c1c; margin: 0 15px 10px 15px; }
-        .search-container input { background: transparent !important; border: none !important; color: white !important; font-size: 13px; width: 100%; outline: none !important; margin-left: 8px; }
+        .search-container input { 
+            background: transparent !important; 
+            border: none !important; 
+            color: white !important; 
+            font-size: 13px; 
+            width: 100%; 
+            outline: none !important; 
+            margin-left: 8px;
+            box-shadow: none !important;
+        }
+        /* Mengunci warna saat autofill browser aktif */
+        .search-container input:-webkit-autofill,
+        .search-container input:-webkit-autofill:hover, 
+        .search-container input:-webkit-autofill:focus {
+            -webkit-text-fill-color: white !important;
+            -webkit-box-shadow: 0 0 0px 1000px #0a0a0a inset !important;
+            transition: background-color 5000s ease-in-out 0s;
+        }
+
         .category-wrapper { padding: 0 15px; }
         .pill-grid { display: grid; gap: 6px; margin-bottom: 8px; }
         .pill { background: transparent; border: 1px solid #1c1c1c; color: #fff; padding: 7px 0; border-radius: 8px; font-size: 10px; font-weight: 800; text-transform: uppercase; text-align: center; cursor: pointer; }
@@ -23,21 +43,23 @@
         .post-card { position: relative; aspect-ratio: 2/3; background: #0a0a0a; overflow: hidden; }
         .post-card img { width: 100%; height: 100%; object-fit: cover; }
         .badge-rating { position: absolute; top: 6px; left: 6px; padding: 2px 5px; border-radius: 2px; font-size: 7px; font-weight: 900; z-index: 5; background: rgba(255,255,255,0.9); color: #000; }
-        
-        /* Badge Jenis Konten - Sudah Selaras */
         .badge-type { position: absolute; top: 6px; right: 6px; padding: 2px 5px; border-radius: 2px; font-size: 7px; font-weight: 900; z-index: 5; background: rgba(0,0,0,0.7); color: #fff; text-transform: uppercase; border: 0.5px solid rgba(255,255,255,0.3); }
-        
         .filter-dropdown { display: none; position: fixed; background: #121212; border: 1px solid #1c1c1c; border-radius: 12px; z-index: 200; width: 150px; max-height: 300px; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,1); }
+        .dropdown-sticky-header { position: sticky; top: 0; z-index: 10; background: #121212; border-bottom: 1px solid #1c1c1c; }
         .filter-item { padding: 12px; font-size: 11px; text-align: center; border-bottom: 1px solid #1c1c1c; color: #bbb; cursor: pointer; }
-        .filter-item.reset { color: #ff4d4d; font-weight: 800; }
+        .filter-item.reset { color: #fff; font-weight: 800; background: #1c1c1c; }
+        #backToTop { display: none; position: fixed; bottom: 85px; right: 15px; z-index: 99; background: #fff; color: #000; width: 40px; height: 40px; border-radius: 50%; justify-content: center; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.5); cursor: pointer; transition: 0.3s; }
+        .cast-wrapper { display: flex; overflow-x: auto; gap: 15px; padding: 15px 0; scrollbar-width: none; }
+        .cast-item { flex: 0 0 65px; text-align: center; cursor: pointer; }
+        .cast-img-border { width: 64px; height: 64px; border-radius: 50%; padding: 2px; border: 2px solid #333; margin-bottom: 5px; }
+        .cast-img-border img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; background: #1c1c1c; }
+        .cast-name { font-size: 9px; color: #a8a8a8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; width: 100%; }
         .modal-player { display: none; position: fixed; inset: 0; z-index: 400; background: #000; overflow-y: auto; }
         .interaction-icon { font-size: 24px; cursor: pointer; color: #fff; }
-        .server-btn { width: 100%; padding: 14px; border-radius: 12px; font-size: 10px; font-weight: 800; text-transform: uppercase; border: 1px solid #1c1c1c; text-align: center; cursor: pointer; background: #0a0a0a; color: #fff; transition: all 0.2s; }
+        .server-btn { width: 100%; padding: 12px 5px; border-radius: 8px; font-size: 8px; font-weight: 800; text-transform: uppercase; border: 1px solid #1c1c1c; text-align: center; cursor: pointer; background: #0a0a0a; color: #fff; transition: all 0.2s; }
         .server-btn.active-link { border: 2px solid #fff !important; }
-        .btn-main-server { background: #18181b !important; color: #fff; }
         .dl-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 15px; }
         .dl-link-btn { width: 100%; padding: 14px; border-radius: 12px; background: #000; color: #a1a1aa; font-size: 10px; font-weight: 800; text-transform: uppercase; text-align: center; border: 1px solid #1c1c1c; cursor: pointer; }
-        .dl-link-btn.active-link { border: 2px solid #fff !important; color: #fff; }
         .bottom-nav { position: fixed; bottom: 0; width: 100%; background: #000; border-top: 1px solid #1c1c1c; display: flex; justify-content: space-around; padding: 12px 0; z-index: 300; }
         .ig-post-content { padding: 0 15px; margin-top: 5px; }
         .ig-likes-count { font-weight: 700; font-size: 13px; margin-bottom: 5px; color: #fff; display: block; }
@@ -57,14 +79,14 @@
                 <i class="fa-solid fa-circle-check text-[#0095f6] ml-1 text-[10px]"></i>
             </div>
             <div class="flex gap-4">
-                <i id="navLike" class="fa-regular fa-heart text-xl cursor-pointer" onclick="showLibrary('likes', this)"></i>
-                <i id="navBook" class="fa-regular fa-bookmark text-xl cursor-pointer" onclick="showLibrary('bookmarks', this)"></i>
+                <i id="navLike" class="fa-regular fa-heart text-xl cursor-pointer" onclick="showLibrary('likes')"></i>
+                <i id="navBook" class="fa-regular fa-bookmark text-xl cursor-pointer" onclick="showLibrary('bookmarks')"></i>
             </div>
         </header>
 
         <div class="search-container">
             <i class="fa-solid fa-magnifying-glass text-zinc-600 text-[10px]"></i>
-            <input type="text" id="searchInp" placeholder="Cari film, series, anime..." onkeydown="if(event.key==='Enter') searchAction()">
+            <input type="text" id="searchInp" placeholder="Cari film, series, anime..." onkeydown="if(event.key==='Enter') searchAction()" autocomplete="off">
         </div>
 
         <div class="category-wrapper">
@@ -94,6 +116,7 @@
     <div id="yearDropdown" class="filter-dropdown right-[15px] top-[245px] no-scrollbar"></div>
 
     <main id="feedGrid" class="movie-grid"></main>
+    <div id="backToTop" onclick="window.scrollTo({top:0, behavior:'smooth'})"><i class="fa-solid fa-arrow-up"></i></div>
 
     <div id="movieModal" class="modal-player">
         <div class="max-w-xl mx-auto pb-40">
@@ -101,6 +124,9 @@
                 <i class="fa-solid fa-chevron-left text-xl cursor-pointer" onclick="closeModal()"></i>
                 <div class="flex-grow text-center text-[14px] font-bold truncate px-8" id="mTitle"></div>
             </div>
+
+            <div id="castContainer" class="cast-wrapper px-4 no-scrollbar"></div>
+
             <div class="aspect-video bg-zinc-900 w-full relative">
                 <iframe id="videoPlayer" class="w-full h-full" allow="autoplay; fullscreen" allowfullscreen></iframe>
             </div>
@@ -123,13 +149,11 @@
                 <p id="mTranslateBtn" class="text-[11px] text-zinc-500 font-bold mb-2 cursor-pointer hidden">Lihat Terjemahan...</p>
                 <div id="mHashtags" class="ig-hashtags"></div>
                 <div id="mDateDisplay" class="ig-date"></div>
-
                 <div id="seriesControl" class="hidden mt-6 p-4 bg-zinc-950 rounded-2xl border border-zinc-900">
                     <div class="flex justify-between items-center mb-4"><h4 class="text-[9px] font-black text-zinc-400 uppercase">Episode</h4><select id="seasonSel" class="bg-zinc-900 text-white text-[10px] px-2 py-1 rounded" onchange="loadEpisodes()"></select></div>
                     <div id="episodeGrid" class="grid grid-cols-5 gap-2"></div>
                 </div>
-                <div id="serverList" class="grid grid-cols-2 gap-2 mt-6"></div>
-                
+                <div id="serverList" class="grid grid-cols-3 gap-2 mt-6"></div>
                 <div class="dl-grid">
                     <button id="btnDownload1" class="dl-link-btn" onclick="highlightBtn(this); window.open(`https://dl.vidsrc.vip/${window.currentMediaType}/${window.currentMediaId}`)">Download 1</button>
                     <button id="btnDownload2" class="dl-link-btn" onclick="highlightBtn(this); window.open(`https://multiembed.mov/directstream.php?video_id=${window.currentMediaId}&tmdb=1`)">Download 2</button>
@@ -154,59 +178,69 @@
 
         function initFilters() {
             const yD = document.getElementById('yearDropdown');
-            yD.innerHTML = '<div class="filter-item reset" onclick="setYear(\'\')">RESET TAHUN</div>';
+            yD.innerHTML = '<div class="dropdown-sticky-header"><div class="filter-item reset" onclick="setYear(\'\')">Semua Tahun</div></div>';
             for(let y=2026; y>=1900; y--) yD.innerHTML += `<div class="filter-item" onclick="setYear(${y})">${y}</div>`;
             const cD = document.getElementById('countryDropdown');
-            cD.innerHTML = '<div class="filter-item reset" onclick="setCountry(\'\',\'Negara\')">RESET NEGARA</div>';
+            cD.innerHTML = '<div class="dropdown-sticky-header"><div class="filter-item reset" onclick="setCountry(\'\',\'Negara\')">Semua Negara</div></div>';
             [['IN','India'],['TH','Thailand'],['KR','Korea'],['JP','Jepang'],['ID','Indonesia'],['US','USA'],['CN','China'],['FR','Prancis'],['ES','Spanyol']].forEach(c => cD.innerHTML += `<div class="filter-item" onclick="setCountry('${c[0]}','${c[1]}')">${c[1]}</div>`);
             const gD = document.getElementById('genreDropdown');
-            gD.innerHTML = '<div class="filter-item reset" onclick="setGenre(\'\',\'Genre\')">RESET GENRE</div>';
+            gD.innerHTML = '<div class="dropdown-sticky-header"><div class="filter-item reset" onclick="setGenre(\'\',\'Genre\')">Semua Genre</div></div>';
             [[28,'Action'],[12,'Adventure'],[16,'Animasi'],[35,'Comedy'],[80,'Crime'],[99,'Documentary'],[18,'Drama'],[10751,'Family'],[14,'Fantasy'],[36,'History'],[27,'Horror'],[10402,'Music'],[9648,'Mystery'],[10749,'Romance'],[878,'Sci-Fi'],[10770,'TV Movie'],[53,'Thriller'],[10752,'War'],[37,'Western']].forEach(g => gD.innerHTML += `<div class="filter-item" onclick="setGenre('${g[0]}','${g[1]}')">${g[1]}</div>`);
         }
 
         async function loadFeed(isNew = true) {
             if(loading) return; loading = true;
-            if(isNew) { page = 1; document.getElementById('feedGrid').innerHTML = ''; }
+            const grid = document.getElementById('feedGrid');
+            if(isNew) { page = 1; grid.innerHTML = ''; }
+            
             let params = `api_key=${API_KEY}&language=id-ID&page=${page}&include_adult=false`;
             let endpoint = (currentType === 'tv' || currentType === 'anime') ? 'discover/tv' : 'discover/movie';
             let queryUrl = `https://api.themoviedb.org/3/${endpoint}?${params}`;
-            if(currentSchedule === 'popular') queryUrl += `&sort_by=popularity.desc`;
-            else if(currentSchedule === 'now_playing') queryUrl += `&sort_by=release_date.desc`;
-            else if(currentSchedule === 'upcoming') queryUrl += `&sort_by=primary_release_date.asc`;
-            else queryUrl += `&sort_by=trending.desc`;
-            if(currentType === 'anime') queryUrl = `https://api.themoviedb.org/3/discover/tv?${params}&with_genres=16&with_original_language=ja&sort_by=popularity.desc`;
-            if(currentType === 'short') queryUrl = `https://api.themoviedb.org/3/discover/movie?${params}&with_runtime.lte=45&with_runtime.gte=2&sort_by=popularity.desc`;
-            if(currentCountry) {
-                if(currentCountry === 'IN') queryUrl += `&with_origin_country=IN&with_original_language=hi|ta|te|kn|ml`;
-                else queryUrl += `&with_origin_country=${currentCountry}`;
+            
+            const today = new Date().toISOString().split('T')[0];
+            if (currentSchedule === 'trending') queryUrl += `&sort_by=trending.desc`;
+            else if (currentSchedule === 'popular') queryUrl += `&sort_by=popularity.desc`;
+            else if (currentSchedule === 'now_playing') {
+                const sixtyDaysAgo = new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+                queryUrl += `&release_date.gte=${sixtyDaysAgo}&release_date.lte=${today}&sort_by=release_date.desc`;
+            } else if (currentSchedule === 'upcoming') {
+                const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+                queryUrl += `&primary_release_date.gte=${tomorrow}&sort_by=primary_release_date.asc`;
             }
+            
+            if(currentType === 'anime') queryUrl = `https://api.themoviedb.org/3/discover/tv?${params}&with_genres=16&with_original_language=ja&sort_by=popularity.desc`;
+            else if(currentType === 'short') queryUrl = `https://api.themoviedb.org/3/discover/movie?${params}&with_runtime.lte=45&with_runtime.gte=2&sort_by=popularity.desc`;
+            if(currentCountry) queryUrl += (currentCountry === 'IN' ? `&with_origin_country=IN&with_original_language=hi|ta|te|kn|ml` : `&with_origin_country=${currentCountry}`);
             if(currentGenre) queryUrl += `&with_genres=${currentGenre}`;
             if(currentYear) queryUrl += (endpoint.includes('tv') ? `&first_air_date_year=${currentYear}` : `&primary_release_year=${currentYear}`);
             if(searchQuery) queryUrl = `https://api.themoviedb.org/3/search/multi?query=${encodeURIComponent(searchQuery)}&api_key=${API_KEY}&language=en-US&page=${page}`;
-            try {
-                const res = await fetch(queryUrl);
-                const data = await res.json();
-                renderGrid(data.results || []);
+            
+            try { 
+                const res = await fetch(queryUrl); 
+                const data = await res.json(); 
+                renderGrid(data.results || []); 
             } catch (e) { console.error(e); }
             loading = false;
         }
 
         function renderGrid(items) {
+            const grid = document.getElementById('feedGrid');
             items.forEach(m => {
                 if(!m.poster_path) return;
+                if (document.querySelector(`[data-id="${m.id}"]`)) return;
+
                 const mType = m.media_type || (currentType.includes('tv')||currentType==='anime'?'tv':'movie');
-                
-                // --- PENYELARASAN KATA PADA BADGE ---
                 let displayType = 'FILM';
                 if(mType === 'tv') displayType = 'SERIES';
                 if(currentType === 'anime') displayType = 'ANIME';
                 if(currentType === 'short') displayType = 'SHORT';
-
+                
                 const card = document.createElement('div');
                 card.className = 'post-card';
+                card.setAttribute('data-id', m.id);
                 card.onclick = () => openModal(m.id, mType);
                 card.innerHTML = `<div class="badge-rating">★ ${m.vote_average ? m.vote_average.toFixed(1) : '0'}</div><div class="badge-type">${displayType}</div><img src="https://image.tmdb.org/t/p/w342${m.poster_path}">`;
-                document.getElementById('feedGrid').appendChild(card);
+                grid.appendChild(card);
             });
         }
 
@@ -214,45 +248,37 @@
             window.currentMediaId = id; window.currentMediaType = type;
             document.getElementById('movieModal').style.display = 'block';
             document.body.style.overflow = 'hidden';
-            
-            const [rId, rEn] = await Promise.all([
+            const [rId, rEn, rCast] = await Promise.all([
                 fetch(`https://api.themoviedb.org/3/${type}/${id}?api_key=${API_KEY}&language=id-ID&append_to_response=videos`),
-                fetch(`https://api.themoviedb.org/3/${type}/${id}?api_key=${API_KEY}&language=en-US&append_to_response=videos`)
+                fetch(`https://api.themoviedb.org/3/${type}/${id}?api_key=${API_KEY}&language=en-US&append_to_response=videos`),
+                fetch(`https://api.themoviedb.org/3/${type}/${id}/credits?api_key=${API_KEY}`)
             ]);
-            const dId = await rId.json(), dEn = await rEn.json();
-
-            const baseRating = dId.vote_average || 0;
-            const likeSim = Math.floor(baseRating * 1234).toLocaleString('id-ID');
-            document.getElementById('mLikeDisplay').innerText = `${likeSim} suka`;
-
-            const title = dId.title || dId.name || dEn.title || dEn.name;
-            document.getElementById('mTitle').innerText = title;
+            const dId = await rId.json(), dEn = await rEn.json(), dCast = await rCast.json();
+            const castCont = document.getElementById('castContainer');
+            castCont.innerHTML = (dCast.cast || []).slice(0, 10).map(c => `
+                <div class="cast-item" onclick="searchActorMovies(${c.id}, '${c.name.replace(/'/g, "\\'")}')">
+                    <div class="cast-img-border"><img src="${c.profile_path ? 'https://image.tmdb.org/t/p/w185' + c.profile_path : 'https://www.themoviedb.org/assets/2/v4/glyphicons/basic/glyphicons-basic-4-user-3245c3f3347706a035c9744ffaa5d174e48be3b860667e406723f3bc8160f47e.svg'}"></div>
+                    <span class="cast-name">${c.name}</span>
+                </div>
+            `).join('');
+            document.getElementById('mLikeDisplay').innerText = `${Math.floor((dId.vote_average || 0) * 1234).toLocaleString('id-ID')} suka`;
+            document.getElementById('mTitle').innerText = dId.title || dId.name || dEn.title || dEn.name;
             globalFullDesc = dId.overview || dEn.overview || "Sinopsis tidak tersedia.";
-            isExpanded = false;
-            renderSynopsis();
-
-            const releaseDate = dId.release_date || dId.first_air_date || "";
-            const year = releaseDate ? releaseDate.split('-')[0] : "";
-            const genresArr = (dId.genres || []).slice(0, 2);
-            const genres = genresArr.map(g => "#" + g.name.replace(/\s+/g, '')).join(" ");
-            
-            // --- PENYELARASAN KATA PADA HASHTAG ---
-            let categoryLabel = "#Film";
-            if(type === 'tv') categoryLabel = currentType === 'anime' ? "#Anime" : "#Series";
-            if(currentType === 'short') categoryLabel = "#ShortFilm";
-
-            document.getElementById('mHashtags').innerText = `#${title.replace(/\s+/g, '')} #${year} ${genres} ${categoryLabel}`;
-            document.getElementById('mDateDisplay').innerText = releaseDate ? new Date(releaseDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+            isExpanded = false; renderSynopsis();
             const btnT = document.getElementById('mTranslateBtn');
             btnT.classList.toggle('hidden', dId.overview || !dEn.overview);
             btnT.onclick = () => window.open(`https://translate.google.com/?sl=en&tl=id&text=${encodeURIComponent(dEn.overview)}&op=translate`);
+            const rel = dId.release_date || dId.first_air_date || "";
+            const genresArr = (dId.genres || []).slice(0, 2);
+            document.getElementById('mHashtags').innerText = `#${(dId.title||dId.name||"").replace(/\s+/g, '')} #${rel.split('-')[0]} ${genresArr.map(g => "#" + g.name.replace(/\s+/g, '')).join(" ")}`;
+            document.getElementById('mDateDisplay').innerText = rel ? new Date(rel).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
             const vids = [...(dId.videos?.results || []), ...(dEn.videos?.results || [])];
             const tr = vids.find(v => v.type === 'Trailer') || vids[0];
             document.getElementById('videoPlayer').src = tr ? `https://www.youtube.com/embed/${tr.key}?autoplay=1&rel=0` : `https://vidrock.net/embed/${type}/${id}${type==='tv'?'/1/1':''}`;
             document.getElementById('serverList').innerHTML = `
-                <button class="server-btn btn-main-server" onclick="playVid('https://vidrock.net/embed/${type}/${id}${type==='tv'?'/1/1':''}', this)">Server Utama</button>
+                <button class="server-btn btn-main-server" onclick="playVid('https://vidrock.net/embed/${type}/${id}${type==='tv'?'/1/1':''}', this)">Server 1</button>
                 <button class="server-btn" onclick="playVid('https://vidsrc.me/embed/${type}?tmdb=${id}', this)">Server 2</button>
-                <button class="server-btn col-span-2" onclick="playVid('https://embed.smashystream.com/playere.php?tmdb=${id}', this)">Server 3</button>`;
+                <button class="server-btn" onclick="playVid('https://embed.smashystream.com/playere.php?tmdb=${id}', this)">Server 3</button>`;
             if(type === 'tv') {
                 document.getElementById('seriesControl').classList.remove('hidden');
                 document.getElementById('seasonSel').innerHTML = (dId.seasons||[]).filter(s=>s.season_number>0).map(s=>`<option value="${s.season_number}">Season ${s.season_number}</option>`).join('');
@@ -261,58 +287,77 @@
             updateLibButtons(id);
         }
 
+        async function searchActorMovies(actorId, name) {
+            closeModal();
+            document.getElementById('searchInp').value = name;
+            searchQuery = ""; loading = true; page = 1;
+            document.getElementById('feedGrid').innerHTML = '';
+            try {
+                const res = await fetch(`https://api.themoviedb.org/3/person/${actorId}/combined_credits?api_key=${API_KEY}&language=id-ID`);
+                const data = await res.json();
+                const filtered = (data.cast || []).filter(m => m.poster_path);
+                const sorted = filtered.sort((a, b) => (b.popularity || 0) - (a.popularity || 0));
+                renderGrid(sorted.slice(0, 60)); 
+                window.scrollTo({top: 0, behavior: 'smooth'});
+            } catch (e) { console.error(e); }
+            loading = false;
+        }
+
         function renderSynopsis() {
             const descEl = document.getElementById('mDesc');
             const toggleBtn = document.getElementById('mToggleBtn');
             if (globalFullDesc.length > 90) {
                 toggleBtn.classList.remove('hidden');
-                if (isExpanded) { descEl.innerText = globalFullDesc; toggleBtn.innerText = "ringkas"; }
-                else { descEl.innerText = globalFullDesc.substring(0, 90) + "..."; toggleBtn.innerText = "selengkapnya"; }
+                descEl.innerText = isExpanded ? globalFullDesc : globalFullDesc.substring(0, 90) + "...";
+                toggleBtn.innerText = isExpanded ? "ringkas" : "selengkapnya";
             } else { descEl.innerText = globalFullDesc; toggleBtn.classList.add('hidden'); }
         }
+
+        window.onscroll = () => {
+            const btt = document.getElementById('backToTop');
+            btt.style.display = window.scrollY > 500 ? 'flex' : 'none';
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 1000 && !loading) { 
+                if(searchQuery !== "" || currentGenre !== "" || currentYear !== "" || currentCountry !== "") {
+                    page++; loadFeed(false); 
+                }
+            }
+        };
+
         function handleToggleDesc() { isExpanded = !isExpanded; renderSynopsis(); }
         function playVid(url, el) { document.getElementById('videoPlayer').src = url; highlightBtn(el); }
         function highlightBtn(el) { document.querySelectorAll('.server-btn, .dl-link-btn').forEach(b => b.classList.remove('active-link')); el.classList.add('active-link'); }
-        async function loadEpisodes() {
-            const s = document.getElementById('seasonSel').value;
-            const res = await fetch(`https://api.themoviedb.org/3/tv/${window.currentMediaId}/season/${s}?api_key=${API_KEY}`);
-            const d = await res.json();
-            document.getElementById('episodeGrid').innerHTML = (d.episodes||[]).map(e => `<div class="pill text-[10px]" onclick="playVid('https://vidrock.net/embed/tv/${window.currentMediaId}/${s}/${e.episode_number}', this)">${e.episode_number}</div>`).join('');
-        }
+        async function loadEpisodes() { const s = document.getElementById('seasonSel').value; const res = await fetch(`https://api.themoviedb.org/3/tv/${window.currentMediaId}/season/${s}?api_key=${API_KEY}`); const d = await res.json(); document.getElementById('episodeGrid').innerHTML = (d.episodes||[]).map(e => `<div class="pill text-[10px]" onclick="playVid('https://vidrock.net/embed/tv/${window.currentMediaId}/${s}/${e.episode_number}', this)">${e.episode_number}</div>`).join(''); }
         function closeModal() { document.getElementById('movieModal').style.display = 'none'; document.getElementById('videoPlayer').src = ''; document.body.style.overflow = 'auto'; }
         function setFilter(t, v, el) { currentType = v; updatePill(el); loadFeed(true); }
         function setSchedule(v, el) { updatePill(el); currentSchedule=v; loadFeed(true); }
         function updatePill(el) { el.parentElement.querySelectorAll('.pill').forEach(p=>p.classList.remove('active')); el.classList.add('active'); }
-        function toggleFilter(id) { document.querySelectorAll('.filter-dropdown').forEach(x=>x.style.display='none'); document.getElementById(id).style.display='block'; }
+        function toggleFilter(id) { closeD(); document.getElementById(id).style.display='block'; }
         function setYear(y) { currentYear=y; document.getElementById('yearBtn').innerText=y || 'Tahun'; closeD(); loadFeed(true); }
         function setCountry(c, n) { currentCountry=c; document.getElementById('btnCountry').innerText=n; closeD(); loadFeed(true); }
         function setGenre(g, n) { currentGenre=g; document.getElementById('btnGenre').innerText=n; closeD(); loadFeed(true); }
         function closeD() { document.querySelectorAll('.filter-dropdown').forEach(d=>d.style.display='none'); }
         function searchAction() { searchQuery = document.getElementById('searchInp').value; loadFeed(true); }
-        function toggleLib(k) {
-            let items = JSON.parse(localStorage.getItem(k) || '[]');
-            const idx = items.findIndex(x => x.id == window.currentMediaId);
-            idx > -1 ? items.splice(idx,1) : items.push({id: window.currentMediaId, type: window.currentMediaType});
-            localStorage.setItem(k, JSON.stringify(items)); updateLibButtons(window.currentMediaId);
-        }
-        function updateLibButtons(id) {
-            const isL = JSON.parse(localStorage.getItem('likes') || '[]').some(x=>x.id==id);
-            const isB = JSON.parse(localStorage.getItem('bookmarks') || '[]').some(x=>x.id==id);
-            document.getElementById('btnLikeModal').className = isL ? 'fa-solid fa-heart text-red-500 interaction-icon' : 'fa-regular fa-heart interaction-icon';
-            document.getElementById('btnBookModal').className = isB ? 'fa-solid fa-bookmark text-white interaction-icon' : 'fa-regular fa-bookmark interaction-icon';
-            document.getElementById('btnLikeModal').onclick = () => toggleLib('likes');
-            document.getElementById('btnBookModal').onclick = () => toggleLib('bookmarks');
-        }
-        async function showLibrary(k, el) {
+        function toggleLib(k) { let items = JSON.parse(localStorage.getItem(k) || '[]'); const idx = items.findIndex(x => x.id == window.currentMediaId); idx > -1 ? items.splice(idx,1) : items.push({id: window.currentMediaId, type: window.currentMediaType}); localStorage.setItem(k, JSON.stringify(items)); updateLibButtons(window.currentMediaId); }
+        function updateLibButtons(id) { const isL = JSON.parse(localStorage.getItem('likes') || '[]').some(x=>x.id==id); const isB = JSON.parse(localStorage.getItem('bookmarks') || '[]').some(x=>x.id==id); document.getElementById('btnLikeModal').className = isL ? 'fa-solid fa-heart text-red-500 interaction-icon' : 'fa-regular fa-heart interaction-icon'; document.getElementById('btnBookModal').className = isB ? 'fa-solid fa-bookmark text-white interaction-icon' : 'fa-regular fa-bookmark interaction-icon'; document.getElementById('btnLikeModal').onclick = () => toggleLib('likes'); document.getElementById('btnBookModal').onclick = () => toggleLib('bookmarks'); }
+        
+        async function showLibrary(k) {
+            loading = true;
             const items = JSON.parse(localStorage.getItem(k) || '[]');
             const grid = document.getElementById('feedGrid');
-            grid.innerHTML = items.length ? '' : '<div class="col-span-3 text-center py-20 opacity-40">Daftar Kosong</div>';
-            for (const item of items) {
-                const res = await fetch(`https://api.themoviedb.org/3/${item.type}/${item.id}?api_key=${API_KEY}&language=id-ID`);
-                const m = await res.json(); renderGrid([m]);
+            grid.innerHTML = ''; 
+            window.scrollTo({top: 0, behavior: 'smooth'});
+            
+            if (!items.length) {
+                grid.innerHTML = '<div class="col-span-3 text-center py-20 opacity-40 text-sm">Belum ada daftar di sini.</div>';
+                loading = false;
+                return;
             }
+
+            const promises = items.map(item => fetch(`https://api.themoviedb.org/3/${item.type}/${item.id}?api_key=${API_KEY}&language=id-ID`).then(r => r.json()));
+            const results = await Promise.all(promises);
+            renderGrid(results.filter(m => m.id));
+            loading = false;
         }
-        window.onscroll = () => { if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 1000 && !loading) { page++; loadFeed(false); } };
     </script>
 </body>
 </html>
