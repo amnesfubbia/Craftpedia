@@ -31,6 +31,13 @@
         .server-btn { width: 100%; padding: 14px; border-radius: 12px; font-size: 10px; font-weight: 800; text-transform: uppercase; border: 1px solid #1c1c1c; text-align: center; cursor: pointer; }
         .dl-link-btn { display: block; width: 100%; margin-top: 15px; padding: 14px; border-radius: 12px; background: #000; color: #a1a1aa; font-size: 10px; font-weight: 800; text-transform: uppercase; text-align: center; border: 1px solid #1c1c1c; }
         .bottom-nav { position: fixed; bottom: 0; width: 100%; background: #000; border-top: 1px solid #1c1c1c; display: flex; justify-content: space-around; padding: 12px 0; z-index: 300; }
+        
+        /* GAYA INSTAGRAM BARU */
+        .ig-post-content { padding: 0 15px; margin-top: 5px; }
+        .ig-username { font-weight: 700; font-size: 13px; margin-right: 5px; color: #fff; }
+        .ig-caption { font-size: 13px; line-height: 1.4; color: #fff; font-weight: 400; }
+        .ig-hashtags { color: #e0f1ff; display: block; margin-top: 12px; font-size: 13px; }
+        .ig-date { color: #a8a8a8; font-size: 11px; margin-top: 8px; }
     </style>
 </head>
 <body>
@@ -54,7 +61,7 @@
 
         <div class="category-wrapper">
             <div class="pill-grid grid-cols-5">
-                <button class="pill active" onclick="location.reload()">Semua</button>
+                <button class="pill active" onclick="setFilter('type', 'multi', this)">Semua</button>
                 <button class="pill" onclick="setFilter('type', 'movie', this)">Film</button>
                 <button class="pill" onclick="setFilter('type', 'tv', this)">Series</button>
                 <button class="pill" onclick="setFilter('type', 'short', this)">Short</button>
@@ -93,12 +100,24 @@
                 <div class="flex gap-4">
                     <i id="btnLikeModal" class="interaction-icon"></i>
                     <i class="fa-regular fa-comment interaction-icon"></i>
+                    <i class="fa-regular fa-paper-plane interaction-icon"></i>
                 </div>
                 <i id="btnBookModal" class="interaction-icon"></i>
             </div>
-            <div class="px-4">
-                <p id="mDesc" class="text-[13.5px] leading-relaxed text-zinc-200 mb-1"></p>
-                <p id="mTranslateBtn" class="text-[10px] text-zinc-500 font-bold mb-4 cursor-pointer hidden">Lihat Terjemahan...</p>
+            
+            <div class="ig-post-content">
+                <div class="mb-1">
+                    <span class="ig-username">amnesfubbia.xx1</span>
+                    <span id="mDesc" class="ig-caption"></span>
+                </div>
+                <p id="mTranslateBtn" class="text-[11px] text-zinc-500 font-bold mb-2 cursor-pointer hidden">Lihat Terjemahan...</p>
+                
+                <div class="ig-hashtags">
+                    #MenangkanLangkahKebaikan #WardahRamadan2025 #FilmWardah #FilmWardahViral
+                </div>
+                
+                <div id="mDateDisplay" class="ig-date"></div>
+
                 <div id="seriesControl" class="hidden mt-6 p-4 bg-zinc-950 rounded-2xl border border-zinc-900">
                     <div class="flex justify-between items-center mb-4"><h4 class="text-[9px] font-black text-zinc-400 uppercase">Episode</h4><select id="seasonSel" class="bg-zinc-900 text-white text-[10px] px-2 py-1 rounded" onchange="loadEpisodes()"></select></div>
                     <div id="episodeGrid" class="grid grid-cols-5 gap-2"></div>
@@ -138,45 +157,41 @@
             if(isNew) { page = 1; document.getElementById('feedGrid').innerHTML = ''; }
             
             let params = `api_key=${API_KEY}&language=id-ID&page=${page}&include_adult=false`;
-            let endpoint = (currentType === 'tv' || currentType === 'anime') ? 'tv' : 'movie';
+            let endpoint = 'discover/movie';
             
-            // LOGIKA FILTER KETAT & AKURAT
-            let queryUrl = `https://api.themoviedb.org/3/discover/${endpoint}?${params}`;
+            if(currentType === 'tv' || currentType === 'anime') endpoint = 'discover/tv';
+            
+            let queryUrl = `https://api.themoviedb.org/3/${endpoint}?${params}`;
 
-            if(currentSchedule === 'trending') {
-                queryUrl = `https://api.themoviedb.org/3/trending/${endpoint}/day?${params}`;
-            } else if(currentSchedule === 'popular') {
-                queryUrl = `https://api.themoviedb.org/3/${endpoint}/popular?${params}`;
-            } else if(currentSchedule === 'now_playing') {
-                queryUrl = `https://api.themoviedb.org/3/${endpoint}/${endpoint === 'movie' ? 'now_playing' : 'on_the_air'}?${params}`;
-            } else if(currentSchedule === 'upcoming') {
-                queryUrl = `https://api.themoviedb.org/3/${endpoint}/${endpoint === 'movie' ? 'upcoming' : 'on_the_air'}?${params}`;
-            }
+            if(currentSchedule === 'popular') queryUrl += `&sort_by=popularity.desc`;
+            else if(currentSchedule === 'now_playing') queryUrl += `&sort_by=release_date.desc`;
+            else if(currentSchedule === 'upcoming') queryUrl += `&sort_by=primary_release_date.asc`;
+            else queryUrl += `&sort_by=trending.desc`;
 
             if(currentType === 'anime') {
                 queryUrl = `https://api.themoviedb.org/3/discover/tv?${params}&with_genres=16&with_original_language=ja&sort_by=popularity.desc`;
             }
+
             if(currentType === 'short') {
                 queryUrl = `https://api.themoviedb.org/3/discover/movie?${params}&with_runtime.lte=45&with_runtime.gte=2&sort_by=popularity.desc`;
             }
 
-            // Tambahkan filter jika ada (kecuali pencarian)
-            if(!searchQuery) {
-                if(currentCountry) {
-                    if(currentCountry === 'IN') queryUrl += `&with_origin_country=IN&with_original_language=hi|ta|te|kn|ml`;
-                    else queryUrl += `&with_origin_country=${currentCountry}`;
-                }
-                if(currentGenre) queryUrl += `&with_genres=${currentGenre}`;
-                if(currentYear) queryUrl += (endpoint.includes('tv') ? `&first_air_date_year=${currentYear}` : `&primary_release_year=${currentYear}`);
-            } else {
-                queryUrl = `https://api.themoviedb.org/3/search/multi?query=${encodeURIComponent(searchQuery)}&api_key=${API_KEY}&language=en-US&page=${page}`;
+            if(currentCountry) {
+                if(currentCountry === 'IN') queryUrl += `&with_origin_country=IN&with_original_language=hi|ta|te|kn|ml`;
+                else queryUrl += `&with_origin_country=${currentCountry}`;
             }
+
+            if(currentGenre) queryUrl += `&with_genres=${currentGenre}`;
+            if(currentYear) queryUrl += (endpoint.includes('tv') ? `&first_air_date_year=${currentYear}` : `&primary_release_year=${currentYear}`);
+            
+            if(searchQuery) queryUrl = `https://api.themoviedb.org/3/search/multi?query=${encodeURIComponent(searchQuery)}&api_key=${API_KEY}&language=en-US&page=${page}`;
 
             try {
                 const res = await fetch(queryUrl);
                 const data = await res.json();
                 renderGrid(data.results || []);
             } catch (e) { console.error(e); }
+            
             loading = false;
         }
 
@@ -185,7 +200,7 @@
                 if(!m.poster_path) return;
                 const card = document.createElement('div');
                 card.className = 'post-card';
-                card.onclick = () => openModal(m.id, m.media_type || (currentType === 'tv' || currentType === 'anime' ? 'tv' : 'movie'));
+                card.onclick = () => openModal(m.id, m.media_type || (currentType.includes('tv')||currentType==='anime'?'tv':'movie'));
                 card.innerHTML = `<div class="badge-rating">★ ${m.vote_average ? m.vote_average.toFixed(1) : '0'}</div><img src="https://image.tmdb.org/t/p/w342${m.poster_path}">`;
                 document.getElementById('feedGrid').appendChild(card);
             });
@@ -204,6 +219,12 @@
 
             document.getElementById('mTitle').innerText = dId.title || dId.name || dEn.title || dEn.name;
             document.getElementById('mDesc').innerText = dId.overview || dEn.overview || "Sinopsis tidak tersedia.";
+            
+            // Tampilkan Tanggal ala IG
+            const options = { day: 'numeric', month: 'long', year: 'numeric' };
+            const dt = dId.release_date || dId.first_air_date;
+            document.getElementById('mDateDisplay').innerText = dt ? new Date(dt).toLocaleDateString('id-ID', options) : '';
+
             const btnT = document.getElementById('mTranslateBtn');
             btnT.classList.toggle('hidden', dId.overview || !dEn.overview);
             btnT.onclick = () => window.open(`https://translate.google.com/?sl=en&tl=id&text=${encodeURIComponent(dEn.overview)}&op=translate`);
@@ -236,8 +257,12 @@
         }
         function playEp(s, e) { document.getElementById('videoPlayer').src = `https://vidrock.net/embed/tv/${window.currentMediaId}/${s}/${e}`; }
         function closeModal() { document.getElementById('movieModal').style.display = 'none'; document.getElementById('videoPlayer').src = ''; document.body.style.overflow = 'auto'; }
-        function setFilter(t, v, el) { currentType = v; updatePill(el); loadFeed(true); }
-        function setSchedule(v, el) { currentSchedule = v; updatePill(el); loadFeed(true); }
+        
+        function setFilter(t, v, el) { 
+            currentType = v; 
+            updatePill(el); loadFeed(true); 
+        }
+        function setSchedule(v, el) { updatePill(el); currentSchedule=v; loadFeed(true); }
         function updatePill(el) { el.parentElement.querySelectorAll('.pill').forEach(p=>p.classList.remove('active')); el.classList.add('active'); }
         function toggleFilter(id) { document.querySelectorAll('.filter-dropdown').forEach(x=>x.style.display='none'); document.getElementById(id).style.display='block'; }
         function setYear(y) { currentYear=y; document.getElementById('yearBtn').innerText=y || 'Tahun'; closeD(); loadFeed(true); }
