@@ -14,7 +14,6 @@
         .ig-header { padding: 12px 15px 5px 15px; }
         .ig-logo { font-family: 'DM Sans', sans-serif; font-weight: 700; font-style: italic; font-size: 22px; letter-spacing: -0.5px; text-transform: lowercase; cursor: pointer; }
         
-        /* PERBAIKAN KOLOM PENCARIAN AGAR WARNA TIDAK BERUBAH */
         .search-container { background: #0a0a0a; border-radius: 8px; display: flex; align-items: center; padding: 7px 12px; border: 1px solid #1c1c1c; margin: 0 15px 10px 15px; }
         .search-container input { 
             background: transparent !important; 
@@ -26,7 +25,6 @@
             margin-left: 8px;
             box-shadow: none !important;
         }
-        /* Mengunci warna saat autofill browser aktif */
         .search-container input:-webkit-autofill,
         .search-container input:-webkit-autofill:hover, 
         .search-container input:-webkit-autofill:focus {
@@ -55,6 +53,12 @@
         .cast-img-border img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; background: #1c1c1c; }
         .cast-name { font-size: 9px; color: #a8a8a8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; width: 100%; }
         .modal-player { display: none; position: fixed; inset: 0; z-index: 400; background: #000; overflow-y: auto; }
+
+        /* CSS BARU UNTUK TRAILER SLIDE */
+        .carousel-track { display: flex; transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1); width: 100%; }
+        .carousel-slide { min-width: 100%; aspect-ratio: 16/9; position: relative; }
+        .swipe-overlay { position: absolute; inset: 0; z-index: 10; background: transparent; }
+        
         .interaction-icon { font-size: 24px; cursor: pointer; color: #fff; }
         .server-btn { width: 100%; padding: 12px 5px; border-radius: 8px; font-size: 8px; font-weight: 800; text-transform: uppercase; border: 1px solid #1c1c1c; text-align: center; cursor: pointer; background: #0a0a0a; color: #fff; transition: all 0.2s; }
         .server-btn.active-link { border: 2px solid #fff !important; }
@@ -127,9 +131,12 @@
 
             <div id="castContainer" class="cast-wrapper px-4 no-scrollbar"></div>
 
-            <div class="aspect-video bg-zinc-900 w-full relative">
-                <iframe id="videoPlayer" class="w-full h-full" allow="autoplay; fullscreen" allowfullscreen></iframe>
+            <div class="relative overflow-hidden">
+                <div class="swipe-overlay" id="swipeOverlay"></div>
+                <div class="carousel-track" id="carouselTrack"></div>
+                <div id="carouselDots" class="flex justify-center gap-2 py-3"></div>
             </div>
+
             <div class="px-4 py-3 flex justify-between items-center">
                 <div class="flex gap-4">
                     <i id="btnLikeModal" class="interaction-icon"></i>
@@ -171,10 +178,9 @@
     <script>
         const API_KEY = 'bfa7df5310c9974f62f26c6789a8c00d';
         let page = 1, loading = false, currentType = 'multi', currentGenre = '', currentYear = '', currentCountry = '', currentSchedule = 'trending', searchQuery = '';
-        let isExpanded = false;
-        let globalFullDesc = "";
+        let isExpanded = false, globalFullDesc = "", currentIdx = 0, startX = 0;
 
-        window.onload = () => { initFilters(); loadFeed(); };
+        window.onload = () => { initFilters(); loadFeed(); setupSwipe(); };
 
         function initFilters() {
             const yD = document.getElementById('yearDropdown');
@@ -213,7 +219,7 @@
             if(currentCountry) queryUrl += (currentCountry === 'IN' ? `&with_origin_country=IN&with_original_language=hi|ta|te|kn|ml` : `&with_origin_country=${currentCountry}`);
             if(currentGenre) queryUrl += `&with_genres=${currentGenre}`;
             if(currentYear) queryUrl += (endpoint.includes('tv') ? `&first_air_date_year=${currentYear}` : `&primary_release_year=${currentYear}`);
-            if(searchQuery) queryUrl = `https://api.themoviedb.org/3/search/multi?query=${encodeURIComponent(searchQuery)}&api_key=${API_KEY}&language=en-US&page=${page}`;
+            if(searchQuery) queryUrl = `https://api.themoviedb.org/3/search/multi?query=${encodeURIComponent(searchQuery)}&api_key=${API_KEY}&language=id-ID&page=${page}`;
             
             try { 
                 const res = await fetch(queryUrl); 
@@ -227,8 +233,6 @@
             const grid = document.getElementById('feedGrid');
             items.forEach(m => {
                 if(!m.poster_path) return;
-                if (document.querySelector(`[data-id="${m.id}"]`)) return;
-
                 const mType = m.media_type || (currentType.includes('tv')||currentType==='anime'?'tv':'movie');
                 let displayType = 'FILM';
                 if(mType === 'tv') displayType = 'SERIES';
@@ -237,7 +241,6 @@
                 
                 const card = document.createElement('div');
                 card.className = 'post-card';
-                card.setAttribute('data-id', m.id);
                 card.onclick = () => openModal(m.id, mType);
                 card.innerHTML = `<div class="badge-rating">★ ${m.vote_average ? m.vote_average.toFixed(1) : '0'}</div><div class="badge-type">${displayType}</div><img src="https://image.tmdb.org/t/p/w342${m.poster_path}">`;
                 grid.appendChild(card);
@@ -248,37 +251,57 @@
             window.currentMediaId = id; window.currentMediaType = type;
             document.getElementById('movieModal').style.display = 'block';
             document.body.style.overflow = 'hidden';
+            currentIdx = 0;
+
             const [rId, rEn, rCast] = await Promise.all([
                 fetch(`https://api.themoviedb.org/3/${type}/${id}?api_key=${API_KEY}&language=id-ID&append_to_response=videos`),
                 fetch(`https://api.themoviedb.org/3/${type}/${id}?api_key=${API_KEY}&language=en-US&append_to_response=videos`),
                 fetch(`https://api.themoviedb.org/3/${type}/${id}/credits?api_key=${API_KEY}`)
             ]);
             const dId = await rId.json(), dEn = await rEn.json(), dCast = await rCast.json();
-            const castCont = document.getElementById('castContainer');
-            castCont.innerHTML = (dCast.cast || []).slice(0, 10).map(c => `
+            
+            // TRAILER SLIDE LOGIC
+            const vids = [...(dId.videos?.results || []), ...(dEn.videos?.results || [])].filter(v => v.site === 'YouTube' && (v.type === 'Trailer' || v.type === 'Teaser')).slice(0, 4);
+            const track = document.getElementById('carouselTrack'), dots = document.getElementById('carouselDots');
+            track.innerHTML = ''; dots.innerHTML = ''; track.style.transform = 'translateX(0)';
+
+            if(vids.length > 0) {
+                vids.forEach((v, i) => {
+                    track.innerHTML += `<div class="carousel-slide"><iframe id="yt-${i}" src="https://www.youtube.com/embed/${v.key}?enablejsapi=1&autoplay=${i===0?1:0}&mute=0&rel=0" class="w-full h-full" allow="autoplay; fullscreen"></iframe></div>`;
+                    dots.innerHTML += `<div class="dot w-1.5 h-1.5 rounded-full ${i===0?'bg-blue-500':'bg-zinc-700'}"></div>`;
+                });
+                document.getElementById('swipeOverlay').style.display = 'block';
+            } else {
+                track.innerHTML = `<div class="carousel-slide"><iframe src="https://vidrock.net/embed/${type}/${id}${type==='tv'?'/1/1':''}" class="w-full h-full" allowfullscreen></iframe></div>`;
+                dots.innerHTML = `<div class="dot bg-blue-500 w-1.5 h-1.5 rounded-full"></div>`;
+                document.getElementById('swipeOverlay').style.display = 'none';
+            }
+
+            document.getElementById('castContainer').innerHTML = (dCast.cast || []).slice(0, 10).map(c => `
                 <div class="cast-item" onclick="searchActorMovies(${c.id}, '${c.name.replace(/'/g, "\\'")}')">
                     <div class="cast-img-border"><img src="${c.profile_path ? 'https://image.tmdb.org/t/p/w185' + c.profile_path : 'https://www.themoviedb.org/assets/2/v4/glyphicons/basic/glyphicons-basic-4-user-3245c3f3347706a035c9744ffaa5d174e48be3b860667e406723f3bc8160f47e.svg'}"></div>
                     <span class="cast-name">${c.name}</span>
-                </div>
-            `).join('');
+                </div>`).join('');
+            
             document.getElementById('mLikeDisplay').innerText = `${Math.floor((dId.vote_average || 0) * 1234).toLocaleString('id-ID')} suka`;
             document.getElementById('mTitle').innerText = dId.title || dId.name || dEn.title || dEn.name;
             globalFullDesc = dId.overview || dEn.overview || "Sinopsis tidak tersedia.";
             isExpanded = false; renderSynopsis();
+            
             const btnT = document.getElementById('mTranslateBtn');
             btnT.classList.toggle('hidden', dId.overview || !dEn.overview);
             btnT.onclick = () => window.open(`https://translate.google.com/?sl=en&tl=id&text=${encodeURIComponent(dEn.overview)}&op=translate`);
+            
             const rel = dId.release_date || dId.first_air_date || "";
             const genresArr = (dId.genres || []).slice(0, 2);
             document.getElementById('mHashtags').innerText = `#${(dId.title||dId.name||"").replace(/\s+/g, '')} #${rel.split('-')[0]} ${genresArr.map(g => "#" + g.name.replace(/\s+/g, '')).join(" ")}`;
             document.getElementById('mDateDisplay').innerText = rel ? new Date(rel).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
-            const vids = [...(dId.videos?.results || []), ...(dEn.videos?.results || [])];
-            const tr = vids.find(v => v.type === 'Trailer') || vids[0];
-            document.getElementById('videoPlayer').src = tr ? `https://www.youtube.com/embed/${tr.key}?autoplay=1&rel=0` : `https://vidrock.net/embed/${type}/${id}${type==='tv'?'/1/1':''}`;
+            
             document.getElementById('serverList').innerHTML = `
                 <button class="server-btn btn-main-server" onclick="playVid('https://vidrock.net/embed/${type}/${id}${type==='tv'?'/1/1':''}', this)">Server 1</button>
                 <button class="server-btn" onclick="playVid('https://vidsrc.me/embed/${type}?tmdb=${id}', this)">Server 2</button>
                 <button class="server-btn" onclick="playVid('https://embed.smashystream.com/playere.php?tmdb=${id}', this)">Server 3</button>`;
+            
             if(type === 'tv') {
                 document.getElementById('seriesControl').classList.remove('hidden');
                 document.getElementById('seasonSel').innerHTML = (dId.seasons||[]).filter(s=>s.season_number>0).map(s=>`<option value="${s.season_number}">Season ${s.season_number}</option>`).join('');
@@ -287,47 +310,61 @@
             updateLibButtons(id);
         }
 
+        function setupSwipe() {
+            const overlay = document.getElementById('swipeOverlay');
+            overlay.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, {passive:true});
+            overlay.addEventListener('touchend', e => {
+                let diff = startX - e.changedTouches[0].clientX;
+                const slides = document.querySelectorAll('.carousel-slide');
+                if(Math.abs(diff) > 50 && slides.length > 1) {
+                    let oldIdx = currentIdx;
+                    if(diff > 0 && currentIdx < slides.length - 1) currentIdx++;
+                    else if(diff < 0 && currentIdx > 0) currentIdx--;
+                    document.getElementById('carouselTrack').style.transform = `translateX(-${currentIdx * 100}%)`;
+                    document.querySelectorAll('.dot').forEach((d, i) => { d.className = `dot w-1.5 h-1.5 rounded-full ${i===currentIdx?'bg-blue-500':'bg-zinc-700'}`; });
+                    managePlayback(oldIdx, currentIdx);
+                    overlay.style.display = 'block';
+                } else { overlay.style.display = 'none'; }
+            });
+        }
+
+        function managePlayback(oldI, newI) {
+            const o = document.getElementById(`yt-${oldI}`), n = document.getElementById(`yt-${newI}`);
+            if(o) o.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+            if(n) n.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+        }
+
         async function searchActorMovies(actorId, name) {
-            closeModal();
-            document.getElementById('searchInp').value = name;
-            searchQuery = ""; loading = true; page = 1;
-            document.getElementById('feedGrid').innerHTML = '';
-            try {
-                const res = await fetch(`https://api.themoviedb.org/3/person/${actorId}/combined_credits?api_key=${API_KEY}&language=id-ID`);
-                const data = await res.json();
-                const filtered = (data.cast || []).filter(m => m.poster_path);
-                const sorted = filtered.sort((a, b) => (b.popularity || 0) - (a.popularity || 0));
-                renderGrid(sorted.slice(0, 60)); 
-                window.scrollTo({top: 0, behavior: 'smooth'});
-            } catch (e) { console.error(e); }
-            loading = false;
+            closeModal(); document.getElementById('searchInp').value = name;
+            searchQuery = ""; loading = true; page = 1; document.getElementById('feedGrid').innerHTML = '';
+            const res = await fetch(`https://api.themoviedb.org/3/person/${actorId}/combined_credits?api_key=${API_KEY}&language=id-ID`);
+            const data = await res.json(); renderGrid((data.cast || []).filter(m => m.poster_path).sort((a, b) => (b.popularity || 0) - (a.popularity || 0)).slice(0, 60)); 
+            window.scrollTo({top: 0, behavior: 'smooth'}); loading = false;
         }
 
         function renderSynopsis() {
-            const descEl = document.getElementById('mDesc');
-            const toggleBtn = document.getElementById('mToggleBtn');
+            const descEl = document.getElementById('mDesc'), toggleBtn = document.getElementById('mToggleBtn');
             if (globalFullDesc.length > 90) {
-                toggleBtn.classList.remove('hidden');
-                descEl.innerText = isExpanded ? globalFullDesc : globalFullDesc.substring(0, 90) + "...";
+                toggleBtn.classList.remove('hidden'); descEl.innerText = isExpanded ? globalFullDesc : globalFullDesc.substring(0, 90) + "...";
                 toggleBtn.innerText = isExpanded ? "ringkas" : "selengkapnya";
             } else { descEl.innerText = globalFullDesc; toggleBtn.classList.add('hidden'); }
         }
 
         window.onscroll = () => {
-            const btt = document.getElementById('backToTop');
-            btt.style.display = window.scrollY > 500 ? 'flex' : 'none';
-            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 1000 && !loading) { 
-                if(searchQuery !== "" || currentGenre !== "" || currentYear !== "" || currentCountry !== "") {
-                    page++; loadFeed(false); 
-                }
-            }
+            const btt = document.getElementById('backToTop'); btt.style.display = window.scrollY > 500 ? 'flex' : 'none';
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 1000 && !loading) { page++; loadFeed(false); }
         };
 
         function handleToggleDesc() { isExpanded = !isExpanded; renderSynopsis(); }
-        function playVid(url, el) { document.getElementById('videoPlayer').src = url; highlightBtn(el); }
+        function playVid(url, el) { 
+            const track = document.getElementById('carouselTrack');
+            track.innerHTML = `<div class="carousel-slide"><iframe src="${url}" class="w-full h-full" allowfullscreen></iframe></div>`;
+            document.getElementById('swipeOverlay').style.display = 'none';
+            highlightBtn(el); 
+        }
         function highlightBtn(el) { document.querySelectorAll('.server-btn, .dl-link-btn').forEach(b => b.classList.remove('active-link')); el.classList.add('active-link'); }
         async function loadEpisodes() { const s = document.getElementById('seasonSel').value; const res = await fetch(`https://api.themoviedb.org/3/tv/${window.currentMediaId}/season/${s}?api_key=${API_KEY}`); const d = await res.json(); document.getElementById('episodeGrid').innerHTML = (d.episodes||[]).map(e => `<div class="pill text-[10px]" onclick="playVid('https://vidrock.net/embed/tv/${window.currentMediaId}/${s}/${e.episode_number}', this)">${e.episode_number}</div>`).join(''); }
-        function closeModal() { document.getElementById('movieModal').style.display = 'none'; document.getElementById('videoPlayer').src = ''; document.body.style.overflow = 'auto'; }
+        function closeModal() { document.getElementById('movieModal').style.display = 'none'; document.getElementById('carouselTrack').innerHTML = ''; document.body.style.overflow = 'auto'; }
         function setFilter(t, v, el) { currentType = v; updatePill(el); loadFeed(true); }
         function setSchedule(v, el) { updatePill(el); currentSchedule=v; loadFeed(true); }
         function updatePill(el) { el.parentElement.querySelectorAll('.pill').forEach(p=>p.classList.remove('active')); el.classList.add('active'); }
@@ -341,22 +378,10 @@
         function updateLibButtons(id) { const isL = JSON.parse(localStorage.getItem('likes') || '[]').some(x=>x.id==id); const isB = JSON.parse(localStorage.getItem('bookmarks') || '[]').some(x=>x.id==id); document.getElementById('btnLikeModal').className = isL ? 'fa-solid fa-heart text-red-500 interaction-icon' : 'fa-regular fa-heart interaction-icon'; document.getElementById('btnBookModal').className = isB ? 'fa-solid fa-bookmark text-white interaction-icon' : 'fa-regular fa-bookmark interaction-icon'; document.getElementById('btnLikeModal').onclick = () => toggleLib('likes'); document.getElementById('btnBookModal').onclick = () => toggleLib('bookmarks'); }
         
         async function showLibrary(k) {
-            loading = true;
-            const items = JSON.parse(localStorage.getItem(k) || '[]');
-            const grid = document.getElementById('feedGrid');
-            grid.innerHTML = ''; 
-            window.scrollTo({top: 0, behavior: 'smooth'});
-            
-            if (!items.length) {
-                grid.innerHTML = '<div class="col-span-3 text-center py-20 opacity-40 text-sm">Belum ada daftar di sini.</div>';
-                loading = false;
-                return;
-            }
-
+            loading = true; const items = JSON.parse(localStorage.getItem(k) || '[]'); const grid = document.getElementById('feedGrid'); grid.innerHTML = ''; window.scrollTo({top: 0, behavior: 'smooth'});
+            if (!items.length) { grid.innerHTML = '<div class="col-span-3 text-center py-20 opacity-40 text-sm">Belum ada daftar di sini.</div>'; loading = false; return; }
             const promises = items.map(item => fetch(`https://api.themoviedb.org/3/${item.type}/${item.id}?api_key=${API_KEY}&language=id-ID`).then(r => r.json()));
-            const results = await Promise.all(promises);
-            renderGrid(results.filter(m => m.id));
-            loading = false;
+            const results = await Promise.all(promises); renderGrid(results.filter(m => m.id)); loading = false;
         }
     </script>
 </body>
