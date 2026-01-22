@@ -269,7 +269,7 @@
         async function loadFeed(isNew = true) {
             if(loading) return; loading = true;
             const grid = (searchQuery && !currentCastId) ? document.getElementById('searchGrid') : document.getElementById('feedGrid');
-            if(isNew) { page = 1; grid.innerHTML = ''; window.scrollTo(0,0); }
+            if(isNew) { page = 1; grid.innerHTML = ''; }
             let endpoint = (currentType === 'tv') ? 'discover/tv' : 'discover/movie';
             let url = `https://api.themoviedb.org/3/${endpoint}?api_key=${API_KEY}&language=id-ID&page=${page}&include_adult=false&sort_by=popularity.desc`;
             if(currentSchedule === 'now_playing' || currentSchedule === 'upcoming') { const today = new Date().toISOString().split('T')[0]; if(currentSchedule === 'now_playing') { const prev = new Date(Date.now() - 60*24*60*60*1000).toISOString().split('T')[0]; url += `&primary_release_date.gte=${prev}&primary_release_date.lte=${today}`; } else { url += `&primary_release_date.gte=${today}`; } }
@@ -277,7 +277,7 @@
             if(currentCountry) url += `&with_origin_country=${currentCountry}`;
             if(currentGenre) url += `&with_genres=${currentGenre}`;
             if(currentCompany) url += `&with_companies=${currentCompany}`;
-            if(currentCastId) url += `&with_cast=${currentCastId}`; // Direct Cast Filter
+            if(currentCastId) url += `&with_cast=${currentCastId}`; 
             if(currentYear) url += (endpoint === 'discover/tv' ? `&first_air_date_year=${currentYear}` : `&primary_release_year=${currentYear}`);
             if(searchQuery && !currentCastId) url = `https://api.themoviedb.org/3/search/multi?query=${encodeURIComponent(searchQuery)}&api_key=${API_KEY}&language=id-ID&page=${page}`;
             try { const res = await fetch(url); const data = await res.json(); renderGrid(data.results || [], grid); } catch(e) {}
@@ -289,14 +289,15 @@
         function closeSearch() { document.getElementById('searchOverlay').style.display = 'none'; document.body.style.overflow='auto'; searchQuery=''; }
         function searchAction() { currentLibMode = false; currentCastId = ''; searchQuery = document.getElementById('searchInp').value; loadFeed(true); document.getElementById('smartSearchDropdown').style.display = 'none'; }
         
-        // PERBAIKAN: Direct Cast Filter (Tanpa masuk menu search)
+        // PERBAIKAN UTAMA: Langsung tutup modal dan lari ke grid utama paling atas
         function searchByCast(castId) {
-            closeModal();
+            closeModal(); // Tutup detail film
             currentLibMode = false;
             searchQuery = ''; 
             currentCastId = castId; 
-            currentType = 'movie'; // Default tampilkan film pemeran tersebut
-            loadFeed(true);
+            currentType = 'movie'; 
+            loadFeed(true); // Load film aktor tersebut ke grid utama
+            window.scrollTo({top: 0, behavior: 'smooth'}); // Langsung lari ke atas
         }
 
         function toggleFilterBar() { const b = document.getElementById('filterBar'); b.style.display = b.style.display === 'block' ? 'none' : 'block'; }
@@ -315,11 +316,9 @@
             const track = document.getElementById('carouselTrack'), dots = document.getElementById('carouselDots');
             track.innerHTML = ''; dots.innerHTML = ''; track.style.transform = 'translateX(0)';
             
-            // PERBAIKAN: Auto-Play Fallback jika Trailer tidak ada
             if(vids.length > 0) { 
                 vids.forEach((v, i) => { track.innerHTML += `<div class="carousel-slide"><iframe id="yt-${i}" src="https://www.youtube.com/embed/${v.key}?enablejsapi=1&autoplay=${i===0?1:0}&mute=0&rel=0" class="w-full h-full" allow="autoplay; fullscreen"></iframe></div>`; dots.innerHTML += `<div class="dot w-1.5 h-1.5 rounded-full ${i===0?'bg-blue-500':'bg-zinc-700'}"></div>`; }); document.getElementById('swipeOverlay').style.display = 'block'; 
             } else { 
-                // Jika trailer kosong, langsung panggil server streaming agar tidak kosong
                 track.innerHTML = `<div class="carousel-slide"><iframe src="https://vidrock.net/embed/${type}/${id}${type==='tv'?'/1/1':''}" class="w-full h-full" allowfullscreen></iframe></div>`; dots.innerHTML = `<div class="dot bg-blue-500 w-1.5 h-1.5 rounded-full"></div>`; document.getElementById('swipeOverlay').style.display = 'none'; 
             }
             
