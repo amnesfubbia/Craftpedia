@@ -255,7 +255,7 @@
                 const div = document.createElement('div'); 
                 div.className = 'highlight-item'; 
                 div.onclick = () => { 
-                    currentLibMode = false; currentCastId = ''; currentCountry = h.c || ''; currentGenre = h.g || ''; currentCompany = h.com || ''; currentSchedule = 'trending'; currentType = h.t; loadFeed(true); 
+                    currentLibMode = false; currentCastId = ''; searchQuery = ''; currentCountry = h.c || ''; currentGenre = h.g || ''; currentCompany = h.com || ''; currentSchedule = 'trending'; currentType = h.t; loadFeed(true); 
                 }; 
                 div.innerHTML = `<div class="highlight-circle"><span class="hl-logo">${h.l}</span></div><div class="highlight-text">${h.n}</div>`; 
                 cont.appendChild(div); 
@@ -268,18 +268,25 @@
 
         async function loadFeed(isNew = true) {
             if(loading) return; loading = true;
-            const grid = (searchQuery && !currentCastId) ? document.getElementById('searchGrid') : document.getElementById('feedGrid');
+            const grid = document.getElementById('feedGrid');
             if(isNew) { page = 1; grid.innerHTML = ''; }
+            
             let endpoint = (currentType === 'tv') ? 'discover/tv' : 'discover/movie';
             let url = `https://api.themoviedb.org/3/${endpoint}?api_key=${API_KEY}&language=id-ID&page=${page}&include_adult=false&sort_by=popularity.desc`;
-            if(currentSchedule === 'now_playing' || currentSchedule === 'upcoming') { const today = new Date().toISOString().split('T')[0]; if(currentSchedule === 'now_playing') { const prev = new Date(Date.now() - 60*24*60*60*1000).toISOString().split('T')[0]; url += `&primary_release_date.gte=${prev}&primary_release_date.lte=${today}`; } else { url += `&primary_release_date.gte=${today}`; } }
-            if(currentType === 'short') url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_runtime.lte=40&with_runtime.gte=5&page=${page}`; 
-            if(currentCountry) url += `&with_origin_country=${currentCountry}`;
-            if(currentGenre) url += `&with_genres=${currentGenre}`;
-            if(currentCompany) url += `&with_companies=${currentCompany}`;
-            if(currentCastId) url += `&with_cast=${currentCastId}`; 
-            if(currentYear) url += (endpoint === 'discover/tv' ? `&first_air_date_year=${currentYear}` : `&primary_release_year=${currentYear}`);
-            if(searchQuery && !currentCastId) url = `https://api.themoviedb.org/3/search/multi?query=${encodeURIComponent(searchQuery)}&api_key=${API_KEY}&language=id-ID&page=${page}`;
+            
+            if(currentCastId) {
+                url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=id-ID&page=${page}&with_cast=${currentCastId}&sort_by=popularity.desc`;
+            } else if(searchQuery) {
+                url = `https://api.themoviedb.org/3/search/multi?query=${encodeURIComponent(searchQuery)}&api_key=${API_KEY}&language=id-ID&page=${page}`;
+            } else {
+                if(currentSchedule === 'now_playing' || currentSchedule === 'upcoming') { const today = new Date().toISOString().split('T')[0]; if(currentSchedule === 'now_playing') { const prev = new Date(Date.now() - 60*24*60*60*1000).toISOString().split('T')[0]; url += `&primary_release_date.gte=${prev}&primary_release_date.lte=${today}`; } else { url += `&primary_release_date.gte=${today}`; } }
+                if(currentType === 'short') url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_runtime.lte=40&with_runtime.gte=5&page=${page}`; 
+                if(currentCountry) url += `&with_origin_country=${currentCountry}`;
+                if(currentGenre) url += `&with_genres=${currentGenre}`;
+                if(currentCompany) url += `&with_companies=${currentCompany}`;
+                if(currentYear) url += (endpoint === 'discover/tv' ? `&first_air_date_year=${currentYear}` : `&primary_release_year=${currentYear}`);
+            }
+
             try { const res = await fetch(url); const data = await res.json(); renderGrid(data.results || [], grid); } catch(e) {}
             loading = false;
         }
@@ -287,22 +294,26 @@
         function renderGrid(items, grid) { items.forEach(m => { if(!m.poster_path) return; const mType = m.media_type || (currentType === 'tv' ? 'tv' : 'movie'); const card = document.createElement('div'); card.className = 'post-card'; card.onclick = () => openModal(m.id, mType); card.innerHTML = `<div class="badge-rating">★ ${m.vote_average.toFixed(1)}</div><div class="badge-type">${currentType==='short'?'SHORT':(mType==='tv'?'SERIES':'FILM')}</div><img src="https://image.tmdb.org/t/p/w342${m.poster_path}">`; grid.appendChild(card); }); }
         function openSearch() { document.getElementById('searchOverlay').style.display = 'block'; document.getElementById('searchInp').focus(); document.body.style.overflow='hidden'; }
         function closeSearch() { document.getElementById('searchOverlay').style.display = 'none'; document.body.style.overflow='auto'; searchQuery=''; }
-        function searchAction() { currentLibMode = false; currentCastId = ''; searchQuery = document.getElementById('searchInp').value; loadFeed(true); document.getElementById('smartSearchDropdown').style.display = 'none'; }
+        function searchAction() { 
+            currentLibMode = false; currentCastId = ''; searchQuery = document.getElementById('searchInp').value; 
+            const sGrid = document.getElementById('searchGrid'); sGrid.innerHTML = '';
+            loadFeed(true); 
+            document.getElementById('smartSearchDropdown').style.display = 'none'; 
+        }
         
-        // PERBAIKAN UTAMA: Langsung tutup modal dan lari ke grid utama paling atas
+        // FITUR PEMERAN: Tutup modal dan langsung tampilkan filmnya di feed utama
         function searchByCast(castId) {
-            closeModal(); // Tutup detail film
+            closeModal();
             currentLibMode = false;
-            searchQuery = ''; 
-            currentCastId = castId; 
-            currentType = 'movie'; 
-            loadFeed(true); // Load film aktor tersebut ke grid utama
-            window.scrollTo({top: 0, behavior: 'smooth'}); // Langsung lari ke atas
+            searchQuery = '';
+            currentCastId = castId;
+            loadFeed(true); 
+            window.scrollTo({top: 0, behavior: 'smooth'});
         }
 
         function toggleFilterBar() { const b = document.getElementById('filterBar'); b.style.display = b.style.display === 'block' ? 'none' : 'block'; }
-        function setSchedule(v, el) { currentLibMode = false; currentCastId = ''; document.querySelectorAll('.btn-ig').forEach(b=>b.classList.remove('active')); el.classList.add('active'); currentSchedule=v; currentCompany=''; loadFeed(true); }
-        function setFilter(k, v) { currentLibMode = false; currentCastId = ''; currentType=v; currentCompany=''; loadFeed(true); }
+        function setSchedule(v, el) { currentLibMode = false; currentCastId = ''; searchQuery = ''; document.querySelectorAll('.btn-ig').forEach(b=>b.classList.remove('active')); el.classList.add('active'); currentSchedule=v; currentCompany=''; loadFeed(true); }
+        function setFilter(k, v) { currentLibMode = false; currentCastId = ''; searchQuery = ''; currentType=v; currentCompany=''; loadFeed(true); }
         function setYear(y) { currentYear=y; document.getElementById('yearBtn').innerText=y||'Tahun'; closeD(); loadFeed(true); }
         function setCountry(c, n) { currentCountry=c; document.getElementById('btnCountry').innerText=n; closeD(); loadFeed(true); }
         function setGenre(g, n) { currentGenre=g; document.getElementById('btnGenre').innerText=n; closeD(); loadFeed(true); }
@@ -317,7 +328,7 @@
             track.innerHTML = ''; dots.innerHTML = ''; track.style.transform = 'translateX(0)';
             
             if(vids.length > 0) { 
-                vids.forEach((v, i) => { track.innerHTML += `<div class="carousel-slide"><iframe id="yt-${i}" src="https://www.youtube.com/embed/${v.key}?enablejsapi=1&autoplay=${i===0?1:0}&mute=0&rel=0" class="w-full h-full" allow="autoplay; fullscreen"></iframe></div>`; dots.innerHTML += `<div class="dot w-1.5 h-1.5 rounded-full ${i===0?'bg-blue-500':'bg-zinc-700'}"></div>`; }); document.getElementById('swipeOverlay').style.display = 'block'; 
+                vids.forEach((v, i) => { track.innerHTML += `<div class="carousel-slide"><iframe id="yt-${i}" src="https://www.youtube.com/embed/${v.key}?enablejsapi=1&autoplay=${i===0?1:0}&mute=0&rel=0" class="w-full h-full" allow="autoplay; fullscreen"></iframe></div>`; dots.innerHTML += `<div class="dot w-1.5 h-1.5 rounded-full ${i===currentIdx?'bg-blue-500':'bg-zinc-700'}"></div>`; }); document.getElementById('swipeOverlay').style.display = 'block'; 
             } else { 
                 track.innerHTML = `<div class="carousel-slide"><iframe src="https://vidrock.net/embed/${type}/${id}${type==='tv'?'/1/1':''}" class="w-full h-full" allowfullscreen></iframe></div>`; dots.innerHTML = `<div class="dot bg-blue-500 w-1.5 h-1.5 rounded-full"></div>`; document.getElementById('swipeOverlay').style.display = 'none'; 
             }
@@ -354,7 +365,7 @@
                 currentLibMode = true; 
                 showLibrary(mode); 
             } else { 
-                currentLibMode = false; currentCastId = ''; currentType='movie'; currentSchedule='trending'; currentCompany=''; loadFeed(true); 
+                currentLibMode = false; currentCastId = ''; searchQuery = ''; currentType='movie'; currentSchedule='trending'; currentCompany=''; loadFeed(true); 
             } 
         }
 
