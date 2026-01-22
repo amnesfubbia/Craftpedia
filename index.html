@@ -271,13 +271,10 @@
             const isSearchActive = document.getElementById('searchOverlay').style.display === 'block';
             const grid = isSearchActive ? document.getElementById('searchGrid') : document.getElementById('feedGrid');
             if(isNew) { page = 1; grid.innerHTML = ''; }
-            
             let url;
             if(currentCastId) {
-                // Perbaikan: Gunakan person/combined_credits agar lebih akurat mengambil semua film aktor tersebut
                 url = `https://api.themoviedb.org/3/person/${currentCastId}/combined_credits?api_key=${API_KEY}&language=id-ID`;
             } else if(searchQuery) {
-                // Perbaikan: Search multi seringkali terlimit, kita pastikan ambil semua hasil
                 url = `https://api.themoviedb.org/3/search/multi?query=${encodeURIComponent(searchQuery)}&api_key=${API_KEY}&language=id-ID&page=${page}&include_adult=false`;
             } else {
                 let endpoint = (currentType === 'tv') ? 'discover/tv' : 'discover/movie';
@@ -289,13 +286,10 @@
                 if(currentCompany) url += `&with_companies=${currentCompany}`;
                 if(currentYear) url += (endpoint === 'discover/tv' ? `&first_air_date_year=${currentYear}` : `&primary_release_year=${currentYear}`);
             }
-
             try { 
                 const res = await fetch(url); 
                 const data = await res.json(); 
-                // Jika data berasal dari combined_credits (pemeran), strukturnya berbeda (data.cast)
                 let items = data.results || data.cast || [];
-                // Sortir berdasarkan popularitas jika dari pemeran agar film utama muncul di atas
                 if(currentCastId) items.sort((a,b) => b.popularity - a.popularity);
                 renderGrid(items, grid); 
             } catch(e) {}
@@ -356,7 +350,22 @@
         function closeModal() { document.getElementById('movieModal').style.display = 'none'; document.body.style.overflow = 'auto'; }
         function renderSynopsis() { const descEl = document.getElementById('mDesc'), toggleBtn = document.getElementById('mToggleBtn'); if (globalFullDesc.length > 90) { toggleBtn.classList.remove('hidden'); descEl.innerText = isExpanded ? globalFullDesc : globalFullDesc.substring(0, 90) + "..."; toggleBtn.innerText = isExpanded ? "ringkas" : "selengkapnya"; } else { descEl.innerText = globalFullDesc; toggleBtn.classList.add('hidden'); } }
         function handleToggleDesc() { isExpanded = !isExpanded; renderSynopsis(); }
-        function playVid(url, el) { document.getElementById('carouselTrack').innerHTML = `<div class="carousel-slide"><iframe src="${url}" class="w-full h-full" allowfullscreen></iframe></div>`; document.getElementById('swipeOverlay').style.display = 'none'; highlightBtn(el); }
+        
+        // PERBAIKAN: Fungsi playVid sekarang me-reset sistem slide agar tidak konflik
+        function playVid(url, el) { 
+            const track = document.getElementById('carouselTrack');
+            const dots = document.getElementById('carouselDots');
+            // Ganti isi track menjadi satu slide saja (video streaming)
+            track.innerHTML = `<div class="carousel-slide"><iframe src="${url}" class="w-full h-full" allowfullscreen></iframe></div>`; 
+            // Reset posisi track ke 0
+            track.style.transform = 'translateX(0)';
+            currentIdx = 0;
+            // Sembunyikan titik navigasi dan overlay swipe agar tidak bisa digeser
+            dots.innerHTML = `<div class="dot bg-blue-500 w-1.5 h-1.5 rounded-full"></div>`;
+            document.getElementById('swipeOverlay').style.display = 'none'; 
+            highlightBtn(el); 
+        }
+
         function highlightBtn(el) { document.querySelectorAll('.server-btn').forEach(b => b.classList.remove('active-link')); el.classList.add('active-link'); }
         async function loadEpisodes() { const s = document.getElementById('seasonSel').value; const res = await fetch(`https://api.themoviedb.org/3/tv/${window.currentMediaId}/season/${s}?api_key=${API_KEY}`); const d = await res.json(); document.getElementById('episodeGrid').innerHTML = (d.episodes||[]).map(e => `<div class="pill text-[10px]" onclick="playVid('https://vidrock.net/embed/tv/${window.currentMediaId}/${s}/${e.episode_number}', this)">${e.episode_number}</div>`).join(''); }
         function setupSwipe() { const overlay = document.getElementById('swipeOverlay'); overlay.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, {passive:true}); overlay.addEventListener('touchend', e => { let diff = startX - e.changedTouches[0].clientX; const slides = document.querySelectorAll('.carousel-slide'); if(Math.abs(diff) > 50 && slides.length > 1) { let oldIdx = currentIdx; if(diff > 0 && currentIdx < slides.length - 1) currentIdx++; else if(diff < 0 && currentIdx > 0) currentIdx--; document.getElementById('carouselTrack').style.transform = `translateX(-${currentIdx * 100}%)`; document.querySelectorAll('.dot').forEach((d, i) => { d.className = `dot w-1.5 h-1.5 rounded-full ${i===currentIdx?'bg-blue-500':'bg-zinc-700'}`; }); const oldVid = document.getElementById(`yt-${oldIdx}`), newVid = document.getElementById(`yt-${currentIdx}`); if(oldVid) oldVid.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*'); if(newVid) newVid.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*'); } }); }
