@@ -231,7 +231,7 @@
 
     <script>
         const API_KEY = 'bfa7df5310c9974f62f26c6789a8c00d';
-        let page = 1, loading = false, currentType = 'movie', currentGenre = '', currentYear = '', currentCountry = '', currentSchedule = 'trending', searchQuery = '', currentCompany = '', currentLibMode = false;
+        let page = 1, loading = false, currentType = 'movie', currentGenre = '', currentYear = '', currentCountry = '', currentSchedule = 'trending', searchQuery = '', currentCompany = '', currentLibMode = false, currentCastId = '';
         let isExpanded = false, globalFullDesc = "", globalEnDesc = "", currentIdx = 0, startX = 0;
 
         window.onload = () => { initFilters(); initHighlights(); loadFeed(); setupSwipe(); initSmartSearch(); window.addEventListener('scroll', () => { document.getElementById('backToTop').style.display = window.scrollY > 500 ? 'flex' : 'none'; }); };
@@ -255,7 +255,7 @@
                 const div = document.createElement('div'); 
                 div.className = 'highlight-item'; 
                 div.onclick = () => { 
-                    currentLibMode = false; currentCountry = h.c || ''; currentGenre = h.g || ''; currentCompany = h.com || ''; currentSchedule = 'trending'; currentType = h.t; loadFeed(true); 
+                    currentLibMode = false; currentCastId = ''; currentCountry = h.c || ''; currentGenre = h.g || ''; currentCompany = h.com || ''; currentSchedule = 'trending'; currentType = h.t; loadFeed(true); 
                 }; 
                 div.innerHTML = `<div class="highlight-circle"><span class="hl-logo">${h.l}</span></div><div class="highlight-text">${h.n}</div>`; 
                 cont.appendChild(div); 
@@ -268,8 +268,8 @@
 
         async function loadFeed(isNew = true) {
             if(loading) return; loading = true;
-            const grid = searchQuery ? document.getElementById('searchGrid') : document.getElementById('feedGrid');
-            if(isNew) { page = 1; grid.innerHTML = ''; }
+            const grid = (searchQuery && !currentCastId) ? document.getElementById('searchGrid') : document.getElementById('feedGrid');
+            if(isNew) { page = 1; grid.innerHTML = ''; window.scrollTo(0,0); }
             let endpoint = (currentType === 'tv') ? 'discover/tv' : 'discover/movie';
             let url = `https://api.themoviedb.org/3/${endpoint}?api_key=${API_KEY}&language=id-ID&page=${page}&include_adult=false&sort_by=popularity.desc`;
             if(currentSchedule === 'now_playing' || currentSchedule === 'upcoming') { const today = new Date().toISOString().split('T')[0]; if(currentSchedule === 'now_playing') { const prev = new Date(Date.now() - 60*24*60*60*1000).toISOString().split('T')[0]; url += `&primary_release_date.gte=${prev}&primary_release_date.lte=${today}`; } else { url += `&primary_release_date.gte=${today}`; } }
@@ -277,8 +277,9 @@
             if(currentCountry) url += `&with_origin_country=${currentCountry}`;
             if(currentGenre) url += `&with_genres=${currentGenre}`;
             if(currentCompany) url += `&with_companies=${currentCompany}`;
+            if(currentCastId) url += `&with_cast=${currentCastId}`; // Direct Cast Filter
             if(currentYear) url += (endpoint === 'discover/tv' ? `&first_air_date_year=${currentYear}` : `&primary_release_year=${currentYear}`);
-            if(searchQuery) url = `https://api.themoviedb.org/3/search/multi?query=${encodeURIComponent(searchQuery)}&api_key=${API_KEY}&language=id-ID&page=${page}`;
+            if(searchQuery && !currentCastId) url = `https://api.themoviedb.org/3/search/multi?query=${encodeURIComponent(searchQuery)}&api_key=${API_KEY}&language=id-ID&page=${page}`;
             try { const res = await fetch(url); const data = await res.json(); renderGrid(data.results || [], grid); } catch(e) {}
             loading = false;
         }
@@ -286,21 +287,21 @@
         function renderGrid(items, grid) { items.forEach(m => { if(!m.poster_path) return; const mType = m.media_type || (currentType === 'tv' ? 'tv' : 'movie'); const card = document.createElement('div'); card.className = 'post-card'; card.onclick = () => openModal(m.id, mType); card.innerHTML = `<div class="badge-rating">★ ${m.vote_average.toFixed(1)}</div><div class="badge-type">${currentType==='short'?'SHORT':(mType==='tv'?'SERIES':'FILM')}</div><img src="https://image.tmdb.org/t/p/w342${m.poster_path}">`; grid.appendChild(card); }); }
         function openSearch() { document.getElementById('searchOverlay').style.display = 'block'; document.getElementById('searchInp').focus(); document.body.style.overflow='hidden'; }
         function closeSearch() { document.getElementById('searchOverlay').style.display = 'none'; document.body.style.overflow='auto'; searchQuery=''; }
-        function searchAction() { currentLibMode = false; searchQuery = document.getElementById('searchInp').value; loadFeed(true); document.getElementById('smartSearchDropdown').style.display = 'none'; }
+        function searchAction() { currentLibMode = false; currentCastId = ''; searchQuery = document.getElementById('searchInp').value; loadFeed(true); document.getElementById('smartSearchDropdown').style.display = 'none'; }
         
-        // PERBAIKAN: Fungsi Klik Cast (Pemeran)
-        async function searchByCast(castId, castName) {
+        // PERBAIKAN: Direct Cast Filter (Tanpa masuk menu search)
+        function searchByCast(castId) {
             closeModal();
-            openSearch();
-            document.getElementById('searchInp').value = castName;
             currentLibMode = false;
-            searchQuery = castName;
+            searchQuery = ''; 
+            currentCastId = castId; 
+            currentType = 'movie'; // Default tampilkan film pemeran tersebut
             loadFeed(true);
         }
 
         function toggleFilterBar() { const b = document.getElementById('filterBar'); b.style.display = b.style.display === 'block' ? 'none' : 'block'; }
-        function setSchedule(v, el) { currentLibMode = false; document.querySelectorAll('.btn-ig').forEach(b=>b.classList.remove('active')); el.classList.add('active'); currentSchedule=v; currentCompany=''; loadFeed(true); }
-        function setFilter(k, v) { currentLibMode = false; currentType=v; currentCompany=''; loadFeed(true); }
+        function setSchedule(v, el) { currentLibMode = false; currentCastId = ''; document.querySelectorAll('.btn-ig').forEach(b=>b.classList.remove('active')); el.classList.add('active'); currentSchedule=v; currentCompany=''; loadFeed(true); }
+        function setFilter(k, v) { currentLibMode = false; currentCastId = ''; currentType=v; currentCompany=''; loadFeed(true); }
         function setYear(y) { currentYear=y; document.getElementById('yearBtn').innerText=y||'Tahun'; closeD(); loadFeed(true); }
         function setCountry(c, n) { currentCountry=c; document.getElementById('btnCountry').innerText=n; closeD(); loadFeed(true); }
         function setGenre(g, n) { currentGenre=g; document.getElementById('btnGenre').innerText=n; closeD(); loadFeed(true); }
@@ -313,16 +314,16 @@
             const vids = [...(dId.videos?.results || []), ...(dEn.videos?.results || [])].filter(v => v.site === 'YouTube' && (v.type === 'Trailer' || v.type === 'Teaser')).slice(0, 4);
             const track = document.getElementById('carouselTrack'), dots = document.getElementById('carouselDots');
             track.innerHTML = ''; dots.innerHTML = ''; track.style.transform = 'translateX(0)';
-            if(vids.length > 0) { vids.forEach((v, i) => { track.innerHTML += `<div class="carousel-slide"><iframe id="yt-${i}" src="https://www.youtube.com/embed/${v.key}?enablejsapi=1&autoplay=${i===0?1:0}&mute=0&rel=0" class="w-full h-full" allow="autoplay; fullscreen"></iframe></div>`; dots.innerHTML += `<div class="dot w-1.5 h-1.5 rounded-full ${i===0?'bg-blue-500':'bg-zinc-700'}"></div>`; }); document.getElementById('swipeOverlay').style.display = 'block'; }
-            else { track.innerHTML = `<div class="carousel-slide"><iframe src="https://vidrock.net/embed/${type}/${id}${type==='tv'?'/1/1':''}" class="w-full h-full" allowfullscreen></iframe></div>`; dots.innerHTML = `<div class="dot bg-blue-500 w-1.5 h-1.5 rounded-full"></div>`; document.getElementById('swipeOverlay').style.display = 'none'; }
             
-            // Render Cast dengan event onclick
-            document.getElementById('castContainer').innerHTML = (dCast.cast || []).slice(0, 10).map(c => `
-                <div class="cast-item" onclick="searchByCast(${c.id}, '${c.name.replace(/'/g, "\\'")}')">
-                    <div class="cast-img-border"><img src="${c.profile_path ? 'https://image.tmdb.org/t/p/w185' + c.profile_path : 'https://www.themoviedb.org/assets/2/v4/glyphicons/basic/glyphicons-basic-4-user-3245c3f3347706a035c9744ffaa5d174e48be3b860667e406723f3bc8160f47e.svg'}"></div>
-                    <span class="cast-name">${c.name}</span>
-                </div>`).join('');
-
+            // PERBAIKAN: Auto-Play Fallback jika Trailer tidak ada
+            if(vids.length > 0) { 
+                vids.forEach((v, i) => { track.innerHTML += `<div class="carousel-slide"><iframe id="yt-${i}" src="https://www.youtube.com/embed/${v.key}?enablejsapi=1&autoplay=${i===0?1:0}&mute=0&rel=0" class="w-full h-full" allow="autoplay; fullscreen"></iframe></div>`; dots.innerHTML += `<div class="dot w-1.5 h-1.5 rounded-full ${i===0?'bg-blue-500':'bg-zinc-700'}"></div>`; }); document.getElementById('swipeOverlay').style.display = 'block'; 
+            } else { 
+                // Jika trailer kosong, langsung panggil server streaming agar tidak kosong
+                track.innerHTML = `<div class="carousel-slide"><iframe src="https://vidrock.net/embed/${type}/${id}${type==='tv'?'/1/1':''}" class="w-full h-full" allowfullscreen></iframe></div>`; dots.innerHTML = `<div class="dot bg-blue-500 w-1.5 h-1.5 rounded-full"></div>`; document.getElementById('swipeOverlay').style.display = 'none'; 
+            }
+            
+            document.getElementById('castContainer').innerHTML = (dCast.cast || []).slice(0, 10).map(c => `<div class="cast-item" onclick="searchByCast(${c.id})"><div class="cast-img-border"><img src="${c.profile_path ? 'https://image.tmdb.org/t/p/w185' + c.profile_path : 'https://www.themoviedb.org/assets/2/v4/glyphicons/basic/glyphicons-basic-4-user-3245c3f3347706a035c9744ffaa5d174e48be3b860667e406723f3bc8160f47e.svg'}"></div><span class="cast-name">${c.name}</span></div>`).join('');
             document.getElementById('mLikeDisplay').innerText = `${Math.floor((dId.vote_average || 0) * 1234).toLocaleString('id-ID')} suka`; document.getElementById('mTitle').innerText = dId.title || dId.name || dEn.title;
             globalFullDesc = dId.overview; globalEnDesc = dEn.overview;
             if(!globalFullDesc && globalEnDesc) { globalFullDesc = globalEnDesc; document.getElementById('mTranslateBtn').classList.remove('hidden'); } else { document.getElementById('mTranslateBtn').classList.add('hidden'); }
@@ -354,7 +355,7 @@
                 currentLibMode = true; 
                 showLibrary(mode); 
             } else { 
-                currentLibMode = false; currentType='movie'; currentSchedule='trending'; currentCompany=''; loadFeed(true); 
+                currentLibMode = false; currentCastId = ''; currentType='movie'; currentSchedule='trending'; currentCompany=''; loadFeed(true); 
             } 
         }
 
