@@ -268,17 +268,17 @@
 
         async function loadFeed(isNew = true) {
             if(loading) return; loading = true;
-            // Menentukan grid mana yang diisi
             const isSearchActive = document.getElementById('searchOverlay').style.display === 'block';
             const grid = isSearchActive ? document.getElementById('searchGrid') : document.getElementById('feedGrid');
-            
             if(isNew) { page = 1; grid.innerHTML = ''; }
             
             let url;
             if(currentCastId) {
-                url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=id-ID&page=${page}&with_cast=${currentCastId}&sort_by=popularity.desc`;
+                // Perbaikan: Gunakan person/combined_credits agar lebih akurat mengambil semua film aktor tersebut
+                url = `https://api.themoviedb.org/3/person/${currentCastId}/combined_credits?api_key=${API_KEY}&language=id-ID`;
             } else if(searchQuery) {
-                url = `https://api.themoviedb.org/3/search/multi?query=${encodeURIComponent(searchQuery)}&api_key=${API_KEY}&language=id-ID&page=${page}`;
+                // Perbaikan: Search multi seringkali terlimit, kita pastikan ambil semua hasil
+                url = `https://api.themoviedb.org/3/search/multi?query=${encodeURIComponent(searchQuery)}&api_key=${API_KEY}&language=id-ID&page=${page}&include_adult=false`;
             } else {
                 let endpoint = (currentType === 'tv') ? 'discover/tv' : 'discover/movie';
                 url = `https://api.themoviedb.org/3/${endpoint}?api_key=${API_KEY}&language=id-ID&page=${page}&include_adult=false&sort_by=popularity.desc`;
@@ -290,45 +290,32 @@
                 if(currentYear) url += (endpoint === 'discover/tv' ? `&first_air_date_year=${currentYear}` : `&primary_release_year=${currentYear}`);
             }
 
-            try { const res = await fetch(url); const data = await res.json(); renderGrid(data.results || [], grid); } catch(e) {}
+            try { 
+                const res = await fetch(url); 
+                const data = await res.json(); 
+                // Jika data berasal dari combined_credits (pemeran), strukturnya berbeda (data.cast)
+                let items = data.results || data.cast || [];
+                // Sortir berdasarkan popularitas jika dari pemeran agar film utama muncul di atas
+                if(currentCastId) items.sort((a,b) => b.popularity - a.popularity);
+                renderGrid(items, grid); 
+            } catch(e) {}
             loading = false;
         }
 
-        function renderGrid(items, grid) { items.forEach(m => { if(!m.poster_path) return; const mType = m.media_type || (currentType === 'tv' ? 'tv' : 'movie'); const card = document.createElement('div'); card.className = 'post-card'; card.onclick = () => openModal(m.id, mType); card.innerHTML = `<div class="badge-rating">★ ${m.vote_average.toFixed(1)}</div><div class="badge-type">${currentType==='short'?'SHORT':(mType==='tv'?'SERIES':'FILM')}</div><img src="https://image.tmdb.org/t/p/w342${m.poster_path}">`; grid.appendChild(card); }); }
+        function renderGrid(items, grid) { items.forEach(m => { if(!m.poster_path) return; const mType = m.media_type || (currentType === 'tv' ? 'tv' : 'movie'); const card = document.createElement('div'); card.className = 'post-card'; card.onclick = () => openModal(m.id, mType); card.innerHTML = `<div class="badge-rating">★ ${(m.vote_average||0).toFixed(1)}</div><div class="badge-type">${currentType==='short'?'SHORT':(mType==='tv'?'SERIES':'FILM')}</div><img src="https://image.tmdb.org/t/p/w342${m.poster_path}">`; grid.appendChild(card); }); }
         
-        function openSearch() { 
-            document.getElementById('searchOverlay').style.display = 'block'; 
-            document.getElementById('searchInp').focus(); 
-            document.body.style.overflow='hidden'; 
-            // Pastikan grid pencarian bersih saat dibuka manual
-            if(!currentCastId) document.getElementById('searchGrid').innerHTML = '';
-        }
-
-        function closeSearch() { 
-            document.getElementById('searchOverlay').style.display = 'none'; 
-            document.body.style.overflow='auto'; 
-            searchQuery=''; 
-            currentCastId=''; // Reset pencarian pemeran saat overlay ditutup
-        }
-
-        function searchAction() { 
-            currentLibMode = false; currentCastId = ''; searchQuery = document.getElementById('searchInp').value; 
-            loadFeed(true); 
-            document.getElementById('smartSearchDropdown').style.display = 'none'; 
-        }
+        function openSearch() { document.getElementById('searchOverlay').style.display = 'block'; document.getElementById('searchInp').focus(); document.body.style.overflow='hidden'; if(!currentCastId) document.getElementById('searchGrid').innerHTML = ''; }
+        function closeSearch() { document.getElementById('searchOverlay').style.display = 'none'; document.body.style.overflow='auto'; searchQuery=''; currentCastId=''; }
+        function searchAction() { currentLibMode = false; currentCastId = ''; searchQuery = document.getElementById('searchInp').value; loadFeed(true); document.getElementById('smartSearchDropdown').style.display = 'none'; }
         
-        // FITUR UTAMA: Membuka overlay pencarian dan langsung memuat film pemeran
         function searchByCast(castId) {
-            closeModal(); // Tutup detail film sebelumnya
+            closeModal();
             currentCastId = castId;
-            searchQuery = ''; // Kosongkan query teks
-            document.getElementById('searchInp').value = ''; // Kosongkan input bar
-            
-            // Buka Overlay Pencarian secara paksa
+            searchQuery = '';
+            document.getElementById('searchInp').value = ''; 
             document.getElementById('searchOverlay').style.display = 'block';
             document.body.style.overflow='hidden';
-            
-            loadFeed(true); // Muat hasil film ke searchGrid
+            loadFeed(true); 
         }
 
         function toggleFilterBar() { const b = document.getElementById('filterBar'); b.style.display = b.style.display === 'block' ? 'none' : 'block'; }
