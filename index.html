@@ -13,10 +13,15 @@
         
         /* SPLASH SCREEN */
         #splashScreen { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .splash-logo { width: 80px; height: 80px; margin-bottom: 20px; border-radius: 50%; border: 1px solid #333; }
-        .splash-footer { position: absolute; bottom: 40px; text-align: center; }
+        .splash-content { display: flex; flex-direction: column; align-items: center; animation: splashScale 0.8s ease-out; }
+        .splash-logo { width: 80px; height: 80px; margin-bottom: 5px; }
+        .splash-name { font-size: 18px; font-weight: 700; color: #fff; letter-spacing: -0.5px; opacity: 0; animation: fadeIn 0.5s ease forwards; animation-delay: 0.3s; margin-top: -8px; }
+        .splash-footer { position: absolute; bottom: 40px; text-align: center; opacity: 0; animation: fadeIn 0.5s ease forwards; animation-delay: 0.8s; }
         .from-text { font-size: 12px; color: #8e8e8e; letter-spacing: 1px; margin-bottom: 5px; }
         .brand-text { font-size: 16px; font-weight: 700; letter-spacing: 2px; background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        @keyframes splashScale { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes fadeIn { to { opacity: 1; } }
 
         /* HEADER & PROFILE */
         .profile-header { padding: 15px 15px 0 15px; background: #000; }
@@ -25,22 +30,22 @@
         .ig-logo { font-family: 'Inter', sans-serif; font-weight: 700; font-size: 18px; letter-spacing: -0.5px; }
         .dot-notify { width: 7px; height: 7px; background-color: #ff3b30; border-radius: 50%; display: inline-block; margin-left: 2px; }
         
-        .profile-info { display: flex; align-items: center; gap: 20px; margin-bottom: 15px; }
-        .profile-pic-container { position: relative; width: 68px; height: 68px; } /* Diperkecil */
-        .profile-pic-logo { width: 65px; height: 65px; border-radius: 50%; border: 1px solid #333; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #000; }
+        .profile-info { display: flex; align-items: center; gap: 20px; margin-bottom: 12px; }
+        .profile-pic-container { position: relative; width: 77px; height: 77px; }
+        .profile-pic-logo { width: 77px; height: 77px; border-radius: 50%; border: 1px solid #333; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #000; }
         .profile-pic-logo img { width: 100%; height: 100%; object-fit: cover; }
-        .add-story-btn { position: absolute; bottom: 1px; right: 1px; width: 20px; height: 20px; background: #0095f6; border: 2px solid #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: bold; color: #fff; z-index: 10; }
+        .add-story-btn { position: absolute; bottom: 1px; right: 1px; width: 22px; height: 22px; background: #0095f6; border: 2px solid #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: #fff; z-index: 10; }
 
         .stats { display: flex; flex-grow: 1; justify-content: space-around; text-align: center; }
-        .stat-val { font-weight: 700; font-size: 15px; display: block; }
-        .stat-label { font-size: 11px; color: #a8a8a8; }
+        .stat-val { font-weight: 700; font-size: 15px; display: block; color: #fff; line-height: 1; }
+        .stat-label { font-size: 12px; color: #fff; font-weight: 400; margin-top: 4px; display: block; }
         
         .bio { font-size: 13px; line-height: 1.4; margin-bottom: 15px; padding-top: 5px; }
         .bio-name-wrapper { display: flex; align-items: center; gap: 5px; margin-bottom: 2px; }
-        .bio-name { font-weight: 700; font-size: 14px; display: block; }
+        .bio-name { font-weight: 600; font-size: 14px; display: block; }
 
         .action-buttons { display: flex; gap: 6px; margin-bottom: 10px; }
-        .btn-ig { flex: 1; background: #1c1c1c; border-radius: 8px; padding: 7px; font-size: 13px; font-weight: 600; text-align: center; cursor: pointer; color: #fff; }
+        .btn-ig { flex: 1; background: #1c1c1c; border-radius: 8px; padding: 6px; font-size: 12px; font-weight: 600; text-align: center; cursor: pointer; color: #fff; }
         .btn-ig.active { background: #363636; }
         .btn-icon-sq { width: 34px; background: #1c1c1c; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
 
@@ -94,22 +99,23 @@
         .server-btn.active-link { border: 2px solid #fff !important; }
         .dl-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 15px; }
         .dl-link-btn { width: 100%; padding: 14px; border-radius: 12px; background: #000; color: #a1a1aa; font-size: 10px; font-weight: 800; text-transform: uppercase; text-align: center; border: 1px solid #1c1c1c; }
+        
         .cast-wrapper { display: flex; overflow-x: auto; gap: 15px; padding: 15px 0; scrollbar-width: none; }
         .cast-item { flex: 0 0 65px; text-align: center; cursor: pointer; }
-        .cast-img-border { width: 64px; height: 64px; border-radius: 50%; padding: 2px; border: 2px solid #333; margin-bottom: 5px; }
-        .cast-img-border img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+        .cast-img-border { width: 64px; height: 64px; border-radius: 50%; padding: 2.5px; background: linear-gradient(45deg, #f9ce34, #ee2a7b, #6228d7); margin-bottom: 5px; }
+        .cast-img-border .inner-border { width: 100%; height: 100%; border-radius: 50%; border: 2px solid #000; overflow: hidden; }
+        .cast-img-border img { width: 100%; height: 100%; object-fit: cover; }
         .cast-name { font-size: 9px; font-weight: 500; color: #fff; line-height: 1.2; display: block; margin-top: 4px; }
         
-        /* TIPOGRAFI INSTAGRAM */
         .ig-post-content { padding: 0 15px; margin-top: 5px; }
         .ig-likes-count { font-weight: 700; font-size: 13px; margin-bottom: 5px; display: block; }
         .ig-username { font-weight: 700; font-size: 13px; margin-right: 5px; }
         .ig-caption { font-size: 13px; line-height: 1.4; color: #efefef; }
         
         .toggle-btn { display: block; color: #a8a8a8; cursor: pointer; font-size: 13px; margin-top: 4px; font-weight: 500; }
+        #mTranslateBtn { font-size: 11px; color: #a8a8a8; font-weight: 600; margin-top: 8px; cursor: pointer; display: block; }
         .ig-hashtags { color: #e0f1ff; display: block; margin-top: 10px; font-size: 13px; }
         .ig-date { color: #a8a8a8; font-size: 11px; margin-top: 8px; text-transform: uppercase; }
-        #mTranslateBtn { font-size: 12px; color: #0095f6; font-weight: 700; margin-top: 8px; cursor: pointer; }
         
         .bottom-nav { position: fixed; bottom: 0; width: 100%; background: #000; border-top: 1px solid #1c1c1c; display: flex; justify-content: space-around; padding: 12px 0; z-index: 300; }
     </style>
@@ -117,17 +123,20 @@
 <body>
 
     <div id="splashScreen">
-        <img src="amnesfubbia.png" class="splash-logo" alt="Logo">
+        <div class="splash-content">
+            <img src="amnesfubbia.png" class="splash-logo" alt="Logo">
+            <div class="splash-name">amnesfubbia</div>
+        </div>
         <div class="splash-footer">
             <div class="from-text">from</div>
-            <div class="brand-text">AMNESFUBBIA</div>
+            <div class="brand-text">ANASTEAS</div>
         </div>
     </div>
 
     <div id="mainProfile" style="display: none;">
         <div class="profile-header">
             <div class="top-bar">
-                <div class="ig-logo-wrapper" onclick="location.reload()">
+                <div class="ig-logo-wrapper" onclick="backToHome()">
                     <h1 class="ig-logo">amnesfubbia</h1>
                     <i class="fa-solid fa-chevron-down text-[10px] ml-0.5"></i>
                     <span class="dot-notify"></span>
@@ -151,7 +160,7 @@
             </div>
 
             <div class="bio">
-                <div class="bio-name-wrapper"><span class="bio-name">amnesfubbia</span><i class="fa-solid fa-circle-check text-[#0095f6] text-[13px]"></i></div>
+                <div class="bio-name-wrapper"><span class="bio-name">Amnesfubbia</span><i class="fa-solid fa-circle-check text-[#0095f6] text-[13px]"></i></div>
                 <span>dari indonesia untuk dunia</span><br><span>By Anasteas</span>
             </div>
 
@@ -228,7 +237,7 @@
                         <span id="mToggleBtn" class="toggle-btn hidden" onclick="handleToggleDesc()">selengkapnya</span>
                     </div>
                 </div>
-                <p id="mTranslateBtn" class="hidden" onclick="handleTranslate()">Lihat Terjemahan</p>
+                <p id="mTranslateBtn" class="hidden" onclick="handleTranslate()">Lihat terjemahan</p>
                 <div id="mHashtags" class="ig-hashtags"></div>
                 <div id="mDateDisplay" class="ig-date"></div>
                 <div id="seriesControl" class="hidden mt-6 p-4 bg-zinc-950 rounded-2xl border border-zinc-900">
@@ -245,7 +254,7 @@
     </div>
 
     <nav class="bottom-nav">
-        <i class="fa-solid fa-house cursor-pointer text-xl" onclick="location.reload()"></i>
+        <i class="fa-solid fa-house cursor-pointer text-xl" onclick="backToHome()"></i>
         <i class="fa-solid fa-magnifying-glass cursor-pointer text-xl" onclick="openSearch()"></i>
         <i class="fa-regular fa-bookmark cursor-pointer text-xl" onclick="switchTab('bookmarks', document.getElementById('tabBookmark'))"></i>
     </nav>
@@ -256,19 +265,28 @@
         let isExpanded = false, globalFullDesc = "", globalEnDesc = "", currentIdx = 0, startX = 0;
 
         window.onload = () => {
-            // Handle Splash Screen
             setTimeout(() => {
                 document.getElementById('splashScreen').style.display = 'none';
                 document.getElementById('mainProfile').style.display = 'block';
-            }, 2000);
-
+            }, 2500);
             initFilters(); initHighlights(); loadFeed(); setupSwipe(); initSmartSearch(); 
             window.addEventListener('scroll', () => { 
                 document.getElementById('backToTop').style.display = window.scrollY > 500 ? 'flex' : 'none'; 
             }); 
         };
 
-        // Fungsi-fungsi lain dipertahankan sesuai kode sebelumnya agar tidak merusak fitur yang sudah bagus
+        function backToHome() {
+            closeModal(); closeSearch(); closeD();
+            currentGenre = ''; currentYear = ''; currentCountry = ''; currentSchedule = 'trending'; currentType = 'movie'; searchQuery = ''; currentCastId = ''; currentCompany = '';
+            document.getElementById('btnGenre').innerText = 'Genre';
+            document.getElementById('yearBtn').innerText = 'Tahun';
+            document.getElementById('btnCountry').innerText = 'Negara';
+            document.querySelectorAll('.btn-ig').forEach(b => b.classList.remove('active'));
+            document.getElementById('filterBar').style.display = 'none';
+            switchTab('grid', document.getElementById('tabGrid'));
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
         function initSmartSearch() { const inp = document.getElementById('searchInp'); const drop = document.getElementById('smartSearchDropdown'); let timeout = null; inp.addEventListener('input', () => { clearTimeout(timeout); const q = inp.value.trim(); if(q.length < 2) { drop.style.display = 'none'; return; } timeout = setTimeout(async () => { const res = await fetch(`https://api.themoviedb.org/3/search/multi?query=${encodeURIComponent(q)}&api_key=${API_KEY}&language=id-ID`); const data = await res.json(); const results = (data.results || []).slice(0, 5); if(results.length) { drop.innerHTML = results.map(m => `<div class="smart-item" onclick="openModal(${m.id}, '${m.media_type || 'movie'}')"><img src="https://image.tmdb.org/t/p/w92${m.poster_path || m.profile_path}"><div class="smart-info"><span class="smart-name">${m.title || m.name}</span><span class="smart-meta">${m.media_type === 'tv' ? 'Series' : 'Film'} • ${m.release_date || m.first_air_date || ''}</span></div></div>`).join(''); drop.style.display = 'block'; } else { drop.style.display = 'none'; } }, 300); }); document.addEventListener('click', (e) => { if(!e.target.closest('.search-input-box')) drop.style.display = 'none'; }); }
         function initHighlights() { const hls = [{n: 'Disney', com: '2|6125|3166|34213', l: 'DSNY', t: 'movie'},{n: 'Pixar', com: '3', l: 'PIXR', t: 'movie'},{n: 'Dreamworks', com: '521|7|1778', l: 'DRMW', t: 'movie'},{n: 'Ghibli', com: '10342', l: 'GHBL', t: 'movie'},{n: 'Anime', g: 16, l: 'ANIM', t: 'movie', c: 'JP'},{n: 'Indonesia', c: 'ID', l: 'INDO', t: 'movie'},{n: 'Korea', c: 'KR', l: 'KOR', t: 'movie'},{n: 'India', c: 'IN', l: 'INDI', t: 'movie'},{n: 'Thailand', c: 'TH', l: 'THAI', t: 'movie'}]; const cont = document.getElementById('highlightList'); hls.forEach(h => { const div = document.createElement('div'); div.className = 'highlight-item'; div.onclick = () => { currentLibMode = false; currentCastId = ''; searchQuery = ''; currentCountry = h.c || ''; currentGenre = h.g || ''; currentCompany = h.com || ''; currentSchedule = 'trending'; currentType = h.t; loadFeed(true); }; div.innerHTML = `<div class="highlight-circle"><span class="hl-logo">${h.l}</span></div><div class="highlight-text">${h.n}</div>`; cont.appendChild(div); }); }
         function initFilters() { const yD = document.getElementById('yearDropdown'); let yearHTML = '<div class="filter-item sticky-reset" onclick="setYear(\'\')">Semua Tahun</div>'; for(let y=2026; y>=1900; y--) yearHTML += `<div class="filter-item" onclick="setYear(${y})">${y}</div>`; yD.innerHTML = yearHTML; const countries = [['ID','Indonesia'],['US','USA'],['KR','Korea Selatan'],['JP','Jepang'],['IN','India'],['TH','Thailand'],['CN','China'],['PH','Filipina'],['GB','Inggris'],['FR','Prancis'],['ES','Spanyol'],['IT','Italia'],['TR','Turki'],['DE','Jerman']]; const cD = document.getElementById('countryDropdown'); let countryHTML = '<div class="filter-item sticky-reset" onclick="setCountry(\'\',\'Negara\')">Semua Negara</div>'; countries.forEach(c => countryHTML += `<div class="filter-item" onclick="setCountry('${c[0]}','${c[1]}')">${c[1]}</div>`); cD.innerHTML = countryHTML; const genres = [[28,'Action'],[12,'Adventure'],[16,'Animasi'],[35,'Komedi'],[80,'Crime'],[99,'Dokumenter'],[18,'Drama'],[10751,'Family'],[14,'Fantasy'],[36,'History'],[27,'Horror'],[10402,'Music'],[9648,'Misteri'],[10749,'Romance'],[878,'Sci-Fi'],[53,'Thriller']]; const gD = document.getElementById('genreDropdown'); let genreHTML = '<div class="filter-item sticky-reset" onclick="setGenre(\'\',\'Genre\')">Semua Genre</div>'; genres.forEach(g => genreHTML += `<div class="filter-item" onclick="setGenre('${g[0]}','${g[1]}')">${g[1]}</div>`); gD.innerHTML = genreHTML; }
@@ -286,8 +304,13 @@
             else {
                 let endpoint = (currentType === 'tv') ? 'discover/tv' : 'discover/movie';
                 url = `https://api.themoviedb.org/3/${endpoint}?api_key=${API_KEY}&language=id-ID&page=${page}&include_adult=false&sort_by=popularity.desc`;
+                
+                // REPAIR: STRICT SHORT FILM FILTER
+                if(currentType === 'short') {
+                    url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=id-ID&page=${page}&sort_by=popularity.desc&with_runtime.lte=40&with_runtime.gte=2&without_genres=10770`;
+                }
+
                 if(currentSchedule === 'now_playing' || currentSchedule === 'upcoming') { const today = new Date().toISOString().split('T')[0]; if(currentSchedule === 'now_playing') { const prev = new Date(Date.now() - 60*24*60*60*1000).toISOString().split('T')[0]; url += `&primary_release_date.gte=${prev}&primary_release_date.lte=${today}`; } else { url += `&primary_release_date.gte=${today}`; } }
-                if(currentType === 'short') url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_runtime.lte=40&with_runtime.gte=5&page=${page}`; 
                 if(currentCountry) url += `&with_origin_country=${currentCountry}`;
                 if(currentGenre) url += `&with_genres=${currentGenre}`;
                 if(currentCompany) url += `&with_companies=${currentCompany}`;
@@ -319,7 +342,17 @@
             track.innerHTML = ''; dots.innerHTML = ''; track.style.transform = 'translateX(0)';
             if(vids.length > 0) { vids.forEach((v, i) => { track.innerHTML += `<div class="carousel-slide"><iframe id="yt-${i}" src="https://www.youtube.com/embed/${v.key}?enablejsapi=1&autoplay=${i===0?1:0}&mute=0&rel=0" class="w-full h-full" allow="autoplay; fullscreen"></iframe></div>`; dots.innerHTML += `<div class="dot w-1.5 h-1.5 rounded-full ${i===currentIdx?'bg-blue-500':'bg-zinc-700'}"></div>`; }); document.getElementById('swipeOverlay').style.display = 'block'; }
             else { track.innerHTML = `<div class="carousel-slide"><iframe src="https://vidrock.net/embed/${type}/${id}${type==='tv'?'/1/1':''}" class="w-full h-full" allowfullscreen></iframe></div>`; dots.innerHTML = `<div class="dot bg-blue-500 w-1.5 h-1.5 rounded-full"></div>`; document.getElementById('swipeOverlay').style.display = 'none'; }
-            document.getElementById('castContainer').innerHTML = (dCast.cast || []).slice(0, 10).map(c => `<div class="cast-item" onclick="searchByCast(${c.id})"><div class="cast-img-border"><img src="${c.profile_path ? 'https://image.tmdb.org/t/p/w185' + c.profile_path : 'https://www.themoviedb.org/assets/2/v4/glyphicons/basic/glyphicons-basic-4-user-3245c3f3347706a035c9744ffaa5d174e48be3b860667e406723f3bc8160f47e.svg'}"></div><span class="cast-name">${c.name}</span></div>`).join('');
+            
+            document.getElementById('castContainer').innerHTML = (dCast.cast || []).slice(0, 10).map(c => `
+                <div class="cast-item" onclick="searchByCast(${c.id})">
+                    <div class="cast-img-border">
+                        <div class="inner-border">
+                            <img src="${c.profile_path ? 'https://image.tmdb.org/t/p/w185' + c.profile_path : 'https://www.themoviedb.org/assets/2/v4/glyphicons/basic/glyphicons-basic-4-user-3245c3f3347706a035c9744ffaa5d174e48be3b860667e406723f3bc8160f47e.svg'}">
+                        </div>
+                    </div>
+                    <span class="cast-name">${c.name}</span>
+                </div>`).join('');
+
             document.getElementById('mLikeDisplay').innerText = `${Math.floor((dId.vote_average || 0) * 1234).toLocaleString('id-ID')} suka`; document.getElementById('mTitle').innerText = dId.title || dId.name || dEn.title;
             globalFullDesc = dId.overview; globalEnDesc = dEn.overview;
             if(!globalFullDesc && globalEnDesc) { globalFullDesc = globalEnDesc; document.getElementById('mTranslateBtn').classList.remove('hidden'); } else { document.getElementById('mTranslateBtn').classList.add('hidden'); }
