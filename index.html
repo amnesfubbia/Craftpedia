@@ -11,7 +11,6 @@
         body { background-color: #000; color: #fff; font-family: 'Inter', sans-serif; margin: 0; overflow-x: hidden; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         
-        /* SPLASH SCREEN INSTAGRAM STYLE */
         #splashScreen { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .splash-content { display: flex; flex-direction: column; align-items: center; animation: splashScale 0.8s ease-out; }
         .splash-logo { width: 80px; height: 80px; margin-bottom: 10px; }
@@ -23,7 +22,6 @@
         @keyframes splashScale { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         @keyframes fadeIn { to { opacity: 1; } }
 
-        /* HEADER & PROFILE */
         .profile-header { padding: 15px 15px 0 15px; background: #000; }
         .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .ig-logo-wrapper { display: flex; align-items: center; gap: 4px; position: relative; cursor: pointer; }
@@ -36,18 +34,15 @@
         .profile-pic-logo img { width: 100%; height: 100%; object-fit: cover; }
         .add-story-btn { position: absolute; bottom: 2px; right: 2px; width: 22px; height: 22px; background: #0095f6; border: 2.5px solid #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: #fff; z-index: 10; }
 
-        /* STATS AUDIT - REAL INSTAGRAM STYLE */
         .stats { display: flex; flex-grow: 1; justify-content: space-between; text-align: center; padding-right: 10px; }
         .stat-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
         .stat-val { font-weight: 700; font-size: 16px; color: #fff; line-height: 1; margin-bottom: 2px; }
         .stat-label { font-size: 13px; color: #f5f5f5; font-weight: 400; line-height: 1; }
         
-        /* BIO AUDIT */
         .bio { font-size: 13px; line-height: 1.25; margin-bottom: 15px; }
         .bio-name-wrapper { display: flex; align-items: center; gap: 4px; margin-bottom: 1px; }
         .bio-name { font-weight: 700; font-size: 13px; display: inline-block; }
 
-        /* TOMBOL ACTION */
         .action-buttons { display: flex; gap: 6px; margin-bottom: 15px; }
         .btn-ig { flex: 1; background: #262626; border-radius: 8px; padding: 7px; font-size: 13px; font-weight: 600; text-align: center; cursor: pointer; color: #fff; }
         .btn-ig.active { background: #363636; border: 1px solid #444; }
@@ -57,13 +52,12 @@
         .pill-grid { display: grid; gap: 6px; }
         .pill { background: transparent; border: 1px solid #1c1c1c; color: #fff; padding: 7px 0; border-radius: 8px; font-size: 10px; font-weight: 800; text-transform: uppercase; text-align: center; cursor: pointer; }
         
-        .filter-dropdown { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: #121212; border-radius: 20px 20px 0 0; z-index: 5000; max-height: 60vh; overflow-y: auto; border-top: 1px solid #333; padding-bottom: 20px; animation: slideUp 0.3s ease-out; overscroll-behavior: contain; }
+        .filter-dropdown { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: #121212; border-radius: 20px 20px 0 0; z-index: 8500; max-height: 60vh; overflow-y: auto; border-top: 1px solid #333; padding-bottom: 20px; animation: slideUp 0.3s ease-out; overscroll-behavior: contain; }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
         .sticky-reset { position: sticky; top: 0; background: #1c1c1c; z-index: 10; font-weight: 800 !important; color: #0095f6 !important; border-bottom: 2px solid #333; }
-        #filterOverlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 4000; }
+        #filterOverlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 8400; }
         .filter-item { padding: 16px; font-size: 14px; text-align: center; border-bottom: 1px solid #262626; color: #eee; cursor: pointer; }
 
-        /* HIGHLIGHTS AUDIT */
         .highlights-wrapper { padding: 0 15px 15px 15px; border-bottom: 1px solid #1c1c1c; }
         .highlights-container { display: flex; gap: 18px; overflow-x: auto; }
         .highlight-item { flex: 0 0 62px; text-align: center; cursor: pointer; }
@@ -76,18 +70,18 @@
         .tab-item.active { color: #fff; border-bottom: 1px solid #fff; }
 
         .movie-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; padding-bottom: 80px; }
-        .post-card { position: relative; aspect-ratio: 2/3; background: #0a0a0a; overflow: hidden; }
+        .post-card { position: relative; aspect-ratio: 2/3; background: #0a0a0a; overflow: hidden; cursor: pointer; }
         .post-card img { width: 100%; height: 100%; object-fit: cover; }
         .badge-rating { position: absolute; top: 6px; left: 6px; padding: 2px 5px; border-radius: 2px; font-size: 7px; font-weight: 900; z-index: 5; background: rgba(255,255,255,0.9); color: #000; }
         .badge-type { position: absolute; top: 6px; right: 6px; padding: 2px 5px; border-radius: 2px; font-size: 7px; font-weight: 900; z-index: 5; background: rgba(0,0,0,0.7); color: #fff; text-transform: uppercase; border: 0.5px solid rgba(255,255,255,0.3); }
 
-        #searchOverlay { display: none; position: fixed; inset: 0; background: #000; z-index: 2000; overflow-y: auto; }
+        #searchOverlay { display: none; position: fixed; inset: 0; background: #000; z-index: 4500; overflow-y: auto; }
         .search-header { position: sticky; top: 0; background: #000; display: flex; align-items: center; padding: 10px 15px; gap: 10px; border-bottom: 1px solid #1c1c1c; z-index: 100; }
         .search-input-box { flex-grow: 1; background: #262626; border-radius: 10px; padding: 8px 12px; display: flex; align-items: center; position: relative; }
         .search-input-box input { background: transparent !important; border: none; outline: none; color: #fff !important; font-size: 14px; width: 100%; margin-left: 8px; }
         
         #smartSearchDropdown { position: absolute; top: 100%; left: 0; right: 0; background: #1a1a1a; border-radius: 0 0 10px 10px; border: 1px solid #333; border-top: none; display: none; z-index: 500; max-height: 300px; overflow-y: auto; }
-        .smart-item { display: flex; align-items: center; padding: 10px; gap: 12px; border-bottom: 1px solid #262626; }
+        .smart-item { display: flex; align-items: center; padding: 10px; gap: 12px; border-bottom: 1px solid #262626; cursor: pointer; }
         .smart-item img { width: 35px; height: 50px; object-fit: cover; border-radius: 4px; }
         .smart-info { display: flex; flex-direction: column; }
         .smart-name { font-size: 13px; font-weight: 600; color: #fff; }
@@ -95,9 +89,9 @@
 
         #backToTop { position: fixed; bottom: 85px; right: 20px; background: rgba(255,255,255,0.3); width: 42px; height: 42px; border-radius: 50%; display: none; align-items: center; justify-content: center; z-index: 100; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); }
 
-        .modal-player { display: none; position: fixed; inset: 0; z-index: 3000; background: #000; overflow-y: auto; }
+        .modal-player { display: none; position: fixed; inset: 0; z-index: 8000; background: #000; overflow-y: auto; }
         .carousel-track { display: flex; transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1); width: 100%; }
-        .carousel-slide { min-width: 100%; aspect-ratio: 16/9; position: relative; }
+        .carousel-slide { min-width: 100%; aspect-ratio: 16/9; position: relative; background: #000; }
         .swipe-overlay { position: absolute; inset: 0; z-index: 10; background: transparent; }
         .interaction-icon { font-size: 24px; cursor: pointer; color: #fff; }
         .server-btn { width: 100%; padding: 12px 5px; border-radius: 8px; font-size: 8px; font-weight: 800; text-transform: uppercase; border: 1px solid #1c1c1c; text-align: center; cursor: pointer; background: #0a0a0a; color: #fff; }
@@ -272,6 +266,7 @@
         const API_KEY = 'bfa7df5310c9974f62f26c6789a8c00d';
         let page = 1, loading = false, currentType = 'movie', currentGenre = '', currentYear = '', currentCountry = '', currentSchedule = 'trending', searchQuery = '', currentCompany = '', currentLibMode = false, currentCastId = '';
         let isExpanded = false, globalFullDesc = "", globalEnDesc = "", currentIdx = 0, startX = 0;
+        let abortController = null;
 
         window.onload = () => {
             setTimeout(() => {
@@ -297,14 +292,16 @@
             window.scrollTo({top: 0, behavior: 'smooth'});
         }
 
-        function initSmartSearch() { const inp = document.getElementById('searchInp'); const drop = document.getElementById('smartSearchDropdown'); let timeout = null; inp.addEventListener('input', () => { clearTimeout(timeout); const q = inp.value.trim(); if(q.length < 2) { drop.style.display = 'none'; return; } timeout = setTimeout(async () => { const res = await fetch(`https://api.themoviedb.org/3/search/multi?query=${encodeURIComponent(q)}&api_key=${API_KEY}&language=id-ID`); const data = await res.json(); const results = (data.results || []).slice(0, 5); if(results.length) { drop.innerHTML = results.map(m => `<div class="smart-item" onclick="openModal(${m.id}, '${m.media_type || 'movie'}')"><img src="https://image.tmdb.org/t/p/w92${m.poster_path || m.profile_path}"><div class="smart-info"><span class="smart-name">${m.title || m.name}</span><span class="smart-meta">${m.media_type === 'tv' ? 'Series' : 'Film'} • ${m.release_date || m.first_air_date || ''}</span></div></div>`).join(''); drop.style.display = 'block'; } else { drop.style.display = 'none'; } }, 300); }); document.addEventListener('click', (e) => { if(!e.target.closest('.search-input-box')) drop.style.display = 'none'; }); }
+        function initSmartSearch() { const inp = document.getElementById('searchInp'); const drop = document.getElementById('smartSearchDropdown'); let timeout = null; inp.addEventListener('input', () => { clearTimeout(timeout); const q = inp.value.trim(); if(q.length < 2) { drop.style.display = 'none'; return; } timeout = setTimeout(async () => { try { const res = await fetch(`https://api.themoviedb.org/3/search/multi?query=${encodeURIComponent(q)}&api_key=${API_KEY}&language=id-ID`); const data = await res.json(); const results = (data.results || []).slice(0, 5); if(results.length) { drop.innerHTML = results.map(m => `<div class="smart-item" onclick="openModal(${m.id}, '${m.media_type || 'movie'}')"><img src="https://image.tmdb.org/t/p/w92${m.poster_path || m.profile_path || ''}"><div class="smart-info"><span class="smart-name">${m.title || m.name}</span><span class="smart-meta">${m.media_type === 'tv' ? 'Series' : 'Film'} • ${m.release_date || m.first_air_date || ''}</span></div></div>`).join(''); drop.style.display = 'block'; } else { drop.style.display = 'none'; } } catch(e){} }, 300); }); document.addEventListener('click', (e) => { if(!e.target.closest('.search-input-box')) drop.style.display = 'none'; }); }
         function initHighlights() { const hls = [{n: 'Disney', com: '2|6125|3166|34213', l: 'DSNY', t: 'movie'},{n: 'Pixar', com: '3', l: 'PIXR', t: 'movie'},{n: 'Dreamworks', com: '521|7|1778', l: 'DRMW', t: 'movie'},{n: 'Ghibli', com: '10342', l: 'GHBL', t: 'movie'},{n: 'Anime', g: 16, l: 'ANIM', t: 'movie', c: 'JP'},{n: 'Indonesia', c: 'ID', l: 'INDO', t: 'movie'},{n: 'Korea', c: 'KR', l: 'KOR', t: 'movie'},{n: 'India', c: 'IN', l: 'INDI', t: 'movie'},{n: 'Thailand', c: 'TH', l: 'THAI', t: 'movie'}]; const cont = document.getElementById('highlightList'); hls.forEach(h => { const div = document.createElement('div'); div.className = 'highlight-item'; div.onclick = () => { currentLibMode = false; currentCastId = ''; searchQuery = ''; currentCountry = h.c || ''; currentGenre = h.g || ''; currentCompany = h.com || ''; currentSchedule = 'trending'; currentType = h.t; loadFeed(true); }; div.innerHTML = `<div class="highlight-circle"><span class="hl-logo">${h.l}</span></div><div class="highlight-text">${h.n}</div>`; cont.appendChild(div); }); }
         function initFilters() { const yD = document.getElementById('yearDropdown'); let yearHTML = '<div class="filter-item sticky-reset" onclick="setYear(\'\')">Semua Tahun</div>'; for(let y=2026; y>=1900; y--) yearHTML += `<div class="filter-item" onclick="setYear(${y})">${y}</div>`; yD.innerHTML = yearHTML; const countries = [['ID','Indonesia'],['US','USA'],['KR','Korea Selatan'],['JP','Jepang'],['IN','India'],['TH','Thailand'],['CN','China'],['PH','Filipina'],['GB','Inggris'],['FR','Prancis'],['ES','Spanyol'],['IT','Italia'],['TR','Turki'],['DE','Jerman']]; const cD = document.getElementById('countryDropdown'); let countryHTML = '<div class="filter-item sticky-reset" onclick="setCountry(\'\',\'Negara\')">Semua Negara</div>'; countries.forEach(c => countryHTML += `<div class="filter-item" onclick="setCountry('${c[0]}','${c[1]}')">${c[1]}</div>`); cD.innerHTML = countryHTML; const genres = [[28,'Action'],[12,'Adventure'],[16,'Animasi'],[35,'Komedi'],[80,'Crime'],[99,'Dokumenter'],[18,'Drama'],[10751,'Family'],[14,'Fantasy'],[36,'History'],[27,'Horror'],[10402,'Music'],[9648,'Misteri'],[10749,'Romance'],[878,'Sci-Fi'],[53,'Thriller']]; const gD = document.getElementById('genreDropdown'); let genreHTML = '<div class="filter-item sticky-reset" onclick="setGenre(\'\',\'Genre\')">Semua Genre</div>'; genres.forEach(g => genreHTML += `<div class="filter-item" onclick="setGenre('${g[0]}','${g[1]}')">${g[1]}</div>`); gD.innerHTML = genreHTML; }
         function toggleFilter(e, id) { e.stopPropagation(); const d = document.getElementById(id); const overlay = document.getElementById('filterOverlay'); document.querySelectorAll('.filter-dropdown').forEach(el => el.style.display = 'none'); d.style.display = 'block'; d.scrollTop = 0; overlay.style.display = 'block'; document.body.style.overflow = 'hidden'; }
         function closeD() { document.querySelectorAll('.filter-dropdown').forEach(d => d.style.display = 'none'); document.getElementById('filterOverlay').style.display = 'none'; document.body.style.overflow = 'auto'; }
 
         async function loadFeed(isNew = true) {
-            if(loading) return; loading = true;
+            if(loading && isNew) { if(abortController) abortController.abort(); }
+            if(loading && !isNew) return;
+            loading = true; abortController = new AbortController();
             const isSearchActive = document.getElementById('searchOverlay').style.display === 'block';
             const grid = isSearchActive ? document.getElementById('searchGrid') : document.getElementById('feedGrid');
             if(isNew) { page = 1; grid.innerHTML = ''; }
@@ -315,22 +312,17 @@
                 let endpoint = (currentType === 'tv') ? 'discover/tv' : 'discover/movie';
                 url = `https://api.themoviedb.org/3/${endpoint}?api_key=${API_KEY}&language=id-ID&page=${page}&include_adult=false&sort_by=popularity.desc`;
                 if(currentSchedule === 'now_playing' || currentSchedule === 'upcoming') { const today = new Date().toISOString().split('T')[0]; if(currentSchedule === 'now_playing') { const prev = new Date(Date.now() - 60*24*60*60*1000).toISOString().split('T')[0]; url += `&primary_release_date.gte=${prev}&primary_release_date.lte=${today}`; } else { url += `&primary_release_date.gte=${today}`; } }
-                
-                // Audit Filter Short: Perbaikan Logika agar tidak memasukkan Film Panjang
-                if(currentType === 'short') {
-                    url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_runtime.lte=40&with_runtime.gte=1&page=${page}&sort_by=popularity.desc`;
-                }
-                
+                if(currentType === 'short') { url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_runtime.lte=40&with_runtime.gte=1&page=${page}&sort_by=popularity.desc`; }
                 if(currentCountry) url += `&with_origin_country=${currentCountry}`;
                 if(currentGenre) url += `&with_genres=${currentGenre}`;
                 if(currentCompany) url += `&with_companies=${currentCompany}`;
                 if(currentYear) url += (endpoint === 'discover/tv' ? `&first_air_date_year=${currentYear}` : `&primary_release_year=${currentYear}`);
             }
-            try { const res = await fetch(url); const data = await res.json(); let items = data.results || data.cast || []; if(currentCastId) items.sort((a,b) => b.popularity - a.popularity); renderGrid(items, grid); } catch(e) {}
+            try { const res = await fetch(url, { signal: abortController.signal }); const data = await res.json(); let items = data.results || data.cast || []; if(currentCastId) items.sort((a,b) => b.popularity - a.popularity); renderGrid(items, grid); } catch(e) { if(e.name !== 'AbortError') console.error(e); }
             loading = false;
         }
 
-        function renderGrid(items, grid) { items.forEach(m => { if(!m.poster_path) return; const mType = m.media_type || (currentType === 'tv' ? 'tv' : 'movie'); const card = document.createElement('div'); card.className = 'post-card'; card.onclick = () => openModal(m.id, mType); card.innerHTML = `<div class="badge-rating">★ ${(m.vote_average||0).toFixed(1)}</div><div class="badge-type">${currentType==='short'?'SHORT':(mType==='tv'?'SERIES':'FILM')}</div><img src="https://image.tmdb.org/t/p/w342${m.poster_path}">`; grid.appendChild(card); }); }
+        function renderGrid(items, grid) { items.forEach(m => { if(!m.poster_path) return; const mId = m.id; const mType = m.media_type || (currentType === 'tv' ? 'tv' : 'movie'); const card = document.createElement('div'); card.className = 'post-card'; card.setAttribute('data-id', mId); card.setAttribute('data-type', mType); card.onclick = () => openModal(mId, mType); card.innerHTML = `<div class="badge-rating">★ ${(m.vote_average||0).toFixed(1)}</div><div class="badge-type">${currentType==='short'?'SHORT':(mType==='tv'?'SERIES':'FILM')}</div><img src="https://image.tmdb.org/t/p/w342${m.poster_path}">`; grid.appendChild(card); }); }
         function openSearch() { document.getElementById('searchOverlay').style.display = 'block'; document.getElementById('searchInp').focus(); document.body.style.overflow='hidden'; if(!currentCastId) document.getElementById('searchGrid').innerHTML = ''; }
         function closeSearch() { document.getElementById('searchOverlay').style.display = 'none'; document.body.style.overflow='auto'; searchQuery=''; currentCastId=''; }
         function searchAction() { currentLibMode = false; currentCastId = ''; searchQuery = document.getElementById('searchInp').value; loadFeed(true); document.getElementById('smartSearchDropdown').style.display = 'none'; }
@@ -340,7 +332,7 @@
         function setFilter(k, v) { currentLibMode = false; currentCastId = ''; searchQuery = ''; currentType=v; currentCompany=''; loadFeed(true); }
         function setYear(y) { currentYear=y; document.getElementById('yearBtn').innerText=y||'Tahun'; closeD(); loadFeed(true); }
         function setCountry(c, n) { currentCountry=c; document.getElementById('btnCountry').innerText=n; closeD(); loadFeed(true); }
-        function setGenre(g, n) { currentGenre=g; document.getElementById('btnGenre').innerText=n; loadFeed(true); }
+        function setGenre(g, n) { currentGenre=g; document.getElementById('btnGenre').innerText=n; closeD(); loadFeed(true); }
 
         async function openModal(id, type) {
             window.currentMediaId = id; window.currentMediaType = type;
@@ -352,17 +344,7 @@
             track.innerHTML = ''; dots.innerHTML = ''; track.style.transform = 'translateX(0)';
             if(vids.length > 0) { vids.forEach((v, i) => { track.innerHTML += `<div class="carousel-slide"><iframe id="yt-${i}" src="https://www.youtube.com/embed/${v.key}?enablejsapi=1&autoplay=${i===0?1:0}&mute=0&rel=0" class="w-full h-full" allow="autoplay; fullscreen"></iframe></div>`; dots.innerHTML += `<div class="dot w-1.5 h-1.5 rounded-full ${i===currentIdx?'bg-blue-500':'bg-zinc-700'}"></div>`; }); document.getElementById('swipeOverlay').style.display = 'block'; }
             else { track.innerHTML = `<div class="carousel-slide"><iframe src="https://vidrock.net/embed/${type}/${id}${type==='tv'?'/1/1':''}" class="w-full h-full" allowfullscreen></iframe></div>`; dots.innerHTML = `<div class="dot bg-blue-500 w-1.5 h-1.5 rounded-full"></div>`; document.getElementById('swipeOverlay').style.display = 'none'; }
-            
-            document.getElementById('castContainer').innerHTML = (dCast.cast || []).slice(0, 10).map(c => `
-                <div class="cast-item" onclick="searchByCast(${c.id})">
-                    <div class="cast-img-border">
-                        <div class="inner-border">
-                            <img src="${c.profile_path ? 'https://image.tmdb.org/t/p/w185' + c.profile_path : 'https://www.themoviedb.org/assets/2/v4/glyphicons/basic/glyphicons-basic-4-user-3245c3f3347706a035c9744ffaa5d174e48be3b860667e406723f3bc8160f47e.svg'}">
-                        </div>
-                    </div>
-                    <span class="cast-name">${c.name}</span>
-                </div>`).join('');
-
+            document.getElementById('castContainer').innerHTML = (dCast.cast || []).slice(0, 10).map(c => `<div class="cast-item" onclick="searchByCast(${c.id})"><div class="cast-img-border"><div class="inner-border"><img src="${c.profile_path ? 'https://image.tmdb.org/t/p/w185' + c.profile_path : 'https://www.themoviedb.org/assets/2/v4/glyphicons/basic/glyphicons-basic-4-user-3245c3f3347706a035c9744ffaa5d174e48be3b860667e406723f3bc8160f47e.svg'}"></div></div><span class="cast-name">${c.name}</span></div>`).join('');
             document.getElementById('mLikeDisplay').innerText = `${Math.floor((dId.vote_average || 0) * 1234).toLocaleString('id-ID')} suka`; document.getElementById('mTitle').innerText = dId.title || dId.name || dEn.title;
             globalFullDesc = dId.overview; globalEnDesc = dEn.overview;
             if(!globalFullDesc && globalEnDesc) { globalFullDesc = globalEnDesc; document.getElementById('mTranslateBtn').classList.remove('hidden'); } else { document.getElementById('mTranslateBtn').classList.add('hidden'); }
@@ -375,17 +357,44 @@
         }
 
         async function handleTranslate() { const btn = document.getElementById('mTranslateBtn'); btn.innerText = "Menerjemahkan..."; try { const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=id&dt=t&q=${encodeURIComponent(globalEnDesc)}`); const data = await res.json(); globalFullDesc = data[0].map(x => x[0]).join(''); renderSynopsis(); btn.classList.add('hidden'); } catch(e) { btn.innerText = "Gagal menerjemahkan"; } }
-        function closeModal() { document.getElementById('movieModal').style.display = 'none'; document.body.style.overflow = 'auto'; }
+        
+        // FIXED: Stop Audio by destroying the track content
+        function closeModal() { 
+            const track = document.getElementById('carouselTrack');
+            track.innerHTML = ''; // Force stop all iframes and audio
+            document.getElementById('movieModal').style.display = 'none'; 
+            if(document.getElementById('searchOverlay').style.display !== 'block') document.body.style.overflow = 'auto'; 
+        }
+
         function renderSynopsis() { const descEl = document.getElementById('mDesc'), toggleBtn = document.getElementById('mToggleBtn'); if (globalFullDesc.length > 90) { toggleBtn.classList.remove('hidden'); descEl.innerText = isExpanded ? globalFullDesc : globalFullDesc.substring(0, 90) + "..."; toggleBtn.innerText = isExpanded ? "ringkas" : "selengkapnya"; } else { descEl.innerText = globalFullDesc; toggleBtn.classList.add('hidden'); } }
         function handleToggleDesc() { isExpanded = !isExpanded; renderSynopsis(); }
         function playVid(url, el) { const track = document.getElementById('carouselTrack'); const dots = document.getElementById('carouselDots'); track.innerHTML = `<div class="carousel-slide"><iframe src="${url}" class="w-full h-full" allowfullscreen></iframe></div>`; track.style.transform = 'translateX(0)'; currentIdx = 0; dots.innerHTML = `<div class="dot bg-blue-500 w-1.5 h-1.5 rounded-full"></div>`; document.getElementById('swipeOverlay').style.display = 'none'; highlightBtn(el); }
         function highlightBtn(el) { document.querySelectorAll('.server-btn').forEach(b => b.classList.remove('active-link')); el.classList.add('active-link'); }
         async function loadEpisodes() { const s = document.getElementById('seasonSel').value; const res = await fetch(`https://api.themoviedb.org/3/tv/${window.currentMediaId}/season/${s}?api_key=${API_KEY}`); const d = await res.json(); document.getElementById('episodeGrid').innerHTML = (d.episodes||[]).map(e => `<div class="pill text-[10px]" onclick="playVid('https://vidrock.net/embed/tv/${window.currentMediaId}/${s}/${e.episode_number}', this)">${e.episode_number}</div>`).join(''); }
-        function setupSwipe() { const overlay = document.getElementById('swipeOverlay'); overlay.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, {passive:true}); overlay.addEventListener('touchend', e => { let diff = startX - e.changedTouches[0].clientX; const slides = document.querySelectorAll('.carousel-slide'); if(Math.abs(diff) > 50 && slides.length > 1) { let oldIdx = currentIdx; if(diff > 0 && currentIdx < slides.length - 1) currentIdx++; else if(diff < 0 && currentIdx > 0) currentIdx--; document.getElementById('carouselTrack').style.transform = `translateX(-${currentIdx * 100}%)`; document.querySelectorAll('.dot').forEach((d, i) => { d.className = `dot w-1.5 h-1.5 rounded-full ${i===currentIdx?'bg-blue-500':'bg-zinc-700'}`; }); const oldVid = document.getElementById(`yt-${oldIdx}`), newVid = document.getElementById(`yt-${currentIdx}`); if(oldVid) oldVid.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*'); if(newVid) newVid.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*'); } }); }
+        
+        function setupSwipe() { 
+            const overlay = document.getElementById('swipeOverlay'); 
+            overlay.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, {passive:true}); 
+            overlay.addEventListener('touchend', e => { 
+                let diff = startX - e.changedTouches[0].clientX; 
+                const slides = document.querySelectorAll('.carousel-slide'); 
+                if(Math.abs(diff) > 50 && slides.length > 1) { 
+                    let oldIdx = currentIdx; 
+                    if(diff > 0 && currentIdx < slides.length - 1) currentIdx++; 
+                    else if(diff < 0 && currentIdx > 0) currentIdx--; 
+                    document.getElementById('carouselTrack').style.transform = `translateX(-${currentIdx * 100}%)`; 
+                    document.querySelectorAll('.dot').forEach((d, i) => { d.className = `dot w-1.5 h-1.5 rounded-full ${i===currentIdx?'bg-blue-500':'bg-zinc-700'}`; }); 
+                    const oldVid = document.getElementById(`yt-${oldIdx}`), newVid = document.getElementById(`yt-${currentIdx}`);
+                    if(oldVid) oldVid.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+                    if(newVid) newVid.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+                } 
+            }); 
+        }
+
         function updateLibButtons(id) { const isL = JSON.parse(localStorage.getItem('likes') || '[]').some(x=>x.id==id); const isB = JSON.parse(localStorage.getItem('bookmarks') || '[]').some(x=>x.id==id); document.getElementById('btnLikeModal').className = isL ? 'fa-solid fa-heart text-red-500 interaction-icon' : 'fa-regular fa-heart interaction-icon'; document.getElementById('btnBookModal').className = isB ? 'fa-solid fa-bookmark text-white interaction-icon' : 'fa-regular fa-bookmark interaction-icon'; document.getElementById('btnLikeModal').onclick = () => toggleLib('likes'); document.getElementById('btnBookModal').onclick = () => toggleLib('bookmarks'); }
         function toggleLib(k) { let items = JSON.parse(localStorage.getItem(k) || '[]'); const idx = items.findIndex(x => x.id == window.currentMediaId); idx > -1 ? items.splice(idx,1) : items.push({id: window.currentMediaId, type: window.currentMediaType}); localStorage.setItem(k, JSON.stringify(items)); updateLibButtons(window.currentMediaId); }
         async function switchTab(mode, el) { document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active')); el.classList.add('active'); const grid = document.getElementById('feedGrid'); grid.innerHTML = ''; if(mode === 'likes' || mode === 'bookmarks') { currentLibMode = true; showLibrary(mode); } else { currentLibMode = false; currentCastId = ''; searchQuery = ''; currentType='movie'; currentSchedule='trending'; currentCompany=''; loadFeed(true); } }
-        async function showLibrary(k) { const items = JSON.parse(localStorage.getItem(k) || '[]'); const grid = document.getElementById('feedGrid'); grid.innerHTML = ''; if (!items.length) { grid.innerHTML = '<div class="col-span-3 text-center py-20 text-zinc-500 text-xs">Belum ada konten disimpan</div>'; return; } for(const i of items) { try { const r = await fetch(`https://api.themoviedb.org/3/${i.type}/${i.id}?api_key=${API_KEY}&language=id-ID`); const m = await r.json(); renderGrid([m], grid); } catch(e){} } }
+        async function showLibrary(k) { const items = JSON.parse(localStorage.getItem(k) || '[]'); const grid = document.getElementById('feedGrid'); grid.innerHTML = ''; if (!items.length) { grid.innerHTML = '<div class="col-span-3 text-center py-20 text-zinc-500 text-xs">Belum ada konten disimpan</div>'; return; } const promises = items.map(i => fetch(`https://api.themoviedb.org/3/${i.type}/${i.id}?api_key=${API_KEY}&language=id-ID`).then(r => r.json())); const results = await Promise.all(promises); renderGrid(results.filter(m => m.id), grid); }
         window.onscroll = () => { if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 1000 && !loading && !searchQuery && !currentLibMode) { page++; loadFeed(false); } };
     </script>
 </body>
