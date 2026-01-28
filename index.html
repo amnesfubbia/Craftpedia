@@ -23,15 +23,12 @@
         @keyframes splashScale { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         @keyframes fadeIn { to { opacity: 1; } }
 
-        /* SIDE MENU */
-        #sideMenu { position: fixed; top: 0; right: -100%; width: 85%; max-width: 320px; height: 100%; background: #000; z-index: 9600; transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1); border-left: 1px solid #1c1c1c; padding: 20px; box-shadow: -10px 0 20px rgba(0,0,0,0.5); }
+        /* SIDE MENU (Garis 3) */
+        #sideMenu { position: fixed; top: 0; right: -100%; width: 80%; height: 100%; background: #000; z-index: 9600; transition: 0.3s; border-left: 1px solid #262626; padding: 20px; overflow-y: auto; }
         #sideMenu.open { right: 0; }
-        .menu-item { display: flex; align-items: center; gap: 15px; padding: 15px 0; border-bottom: 1px solid #1a1a1a; font-size: 14px; color: #efefef; }
-        .side-bio-title { font-weight: 800; font-size: 16px; margin-bottom: 12px; color: #fff; }
-        .side-bio-text { font-size: 12px; line-height: 1.6; color: #a8a8a8; margin-bottom: 15px; }
-        .side-footer { position: absolute; bottom: 20px; left: 20px; right: 20px; font-size: 11px; color: #555; text-align: center; }
+        .side-title { font-weight: 800; font-size: 15px; margin-bottom: 10px; color: #fff; }
+        .side-text { font-size: 12px; line-height: 1.6; color: #a8a8a8; margin-bottom: 20px; }
 
-        /* PROFILE HEADER */
         .profile-header { padding: 15px 15px 0 15px; background: #000; }
         .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .ig-logo-wrapper { display: flex; align-items: center; gap: 4px; position: relative; cursor: pointer; }
@@ -50,6 +47,7 @@
         .stat-label { font-size: 13px; font-weight: 400; line-height: 1; }
         .stat-item.active-stat { color: #fff; }
         
+        /* BIO CSS */
         .bio { font-size: 13px; line-height: 1.3; margin-bottom: 15px; margin-top: -8px; }
         .bio-name-wrapper { display: flex; align-items: center; gap: 4px; margin-bottom: 2px; }
         .bio-name { font-weight: 700; font-size: 13px; display: inline-block; }
@@ -102,7 +100,7 @@
 
         #backToTop { position: fixed; bottom: 85px; right: 20px; background: rgba(255,255,255,0.3); width: 42px; height: 42px; border-radius: 50%; display: none; align-items: center; justify-content: center; z-index: 100; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); }
 
-        /* MODAL & CAROUSEL */
+        /* MODAL */
         .modal-player { display: none; position: fixed; inset: 0; z-index: 8000; background: #000; overflow-y: auto; }
         .carousel-track { display: flex; transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1); width: 100%; }
         .carousel-slide { min-width: 100%; aspect-ratio: 16/9; position: relative; background: #000; }
@@ -115,7 +113,11 @@
         
         .cast-wrapper { display: flex; overflow-x: auto; gap: 15px; padding: 15px 0; scrollbar-width: none; }
         .cast-item { flex: 0 0 65px; text-align: center; cursor: pointer; }
-        .cast-img-border { width: 64px; height: 64px; border-radius: 50%; padding: 2.5px; background: linear-gradient(45deg, #f9ce34, #ee2a7b, #6228d7); margin-bottom: 5px; }
+        .cast-img-border { 
+            width: 64px; height: 64px; border-radius: 50%; padding: 2.5px; 
+            background: linear-gradient(45deg, #f9ce34, #ee2a7b, #6228d7); 
+            margin-bottom: 5px; 
+        }
         .cast-img-border .inner-border { width: 100%; height: 100%; border-radius: 50%; border: 2px solid #000; overflow: hidden; background: #000; }
         .cast-img-border img { width: 100%; height: 100%; object-fit: cover; }
         .cast-name { font-size: 9px; font-weight: 500; color: #fff; line-height: 1.2; display: block; margin-top: 4px; }
@@ -150,25 +152,18 @@
 
     <div id="sideMenu">
         <div class="flex justify-between items-center mb-6">
-            <h2 class="font-black text-xl italic">MENU</h2>
-            <i class="fa-solid fa-xmark text-2xl cursor-pointer" onclick="toggleMenu()"></i>
+            <span class="font-black italic text-lg">MENU</span>
+            <i class="fa-solid fa-xmark text-2xl" onclick="toggleMenu()"></i>
         </div>
-        <div class="side-bio-title">About amnesfubbia</div>
-        <div class="side-bio-text">
+        <div class="side-title">About amnesfubbia</div>
+        <div class="side-text">
             amnesfubbia adalah platform katalog sinema digital yang dirancang untuk memberikan pengalaman eksplorasi film dan series tanpa batas.<br><br>
-            <strong>Fitur Utama:</strong><br>
+            <b>Fitur Utama:</b><br>
             🎬 Database Luas: Akses ke lebih dari 25.000+ film dan series global.<br>
             🔍 Smart Search: Cari berdasarkan judul, aktor, hingga studio produksi (Marvel, Disney, dll).<br>
             📥 Personal Archive: Simpan film favoritmu ke dalam koleksi pribadi (Bookmark).<br>
             🌍 Multi-Server: Pilihan server streaming dan download yang stabil.<br><br>
-            Dikembangkan dengan dedikasi untuk para pecinta sinema di seluruh dunia.
-        </div>
-        <div class="mt-8">
-            <div class="menu-item"><i class="fa-solid fa-gear"></i> Pengaturan</div>
-            <div class="menu-item"><i class="fa-solid fa-clock-rotate-left"></i> Aktivitas</div>
-            <div class="menu-item"><i class="fa-solid fa-circle-question"></i> Bantuan</div>
-        </div>
-        <div class="side-footer">
+            Dikembangkan dengan dedikasi untuk para pecinta sinema di seluruh dunia.<br><br>
             Created by Anasteas<br>
             © 2026 amnesfubbia Network
         </div>
@@ -204,7 +199,7 @@
                 <div class="bio-name-wrapper"><span class="bio-name">amnesfubbia</span><i class="fa-solid fa-circle-check text-[#0095f6] text-[13px]"></i></div>
                 <span>🎬 Discover. Watch. Archive.</span><br>
                 <span>Cari film, tonton trailer, & simpan favoritmu.</span><br>
-                <span>🍿 Bioskop dalam genggaman.</span>
+                <span>🍿 Bioskop dalam genggaman</span>
             </div>
 
             <div class="action-buttons">
@@ -316,21 +311,20 @@
                 document.getElementById('mainProfile').style.display = 'block';
             }, 2500);
             initFilters(); initHighlights(); loadFeed(); setupSwipe(); initSmartSearch(); 
-            window.addEventListener('scroll', () => { document.getElementById('backToTop').style.display = window.scrollY > 500 ? 'flex' : 'none'; }); 
+            window.addEventListener('scroll', () => { 
+                document.getElementById('backToTop').style.display = window.scrollY > 500 ? 'flex' : 'none'; 
+            }); 
         };
 
-        /* SIDE MENU LOGIC */
         function toggleMenu() {
             const menu = document.getElementById('sideMenu');
             const overlay = document.getElementById('filterOverlay');
             if(menu.classList.contains('open')) {
                 menu.classList.remove('open');
                 overlay.style.display = 'none';
-                document.body.style.overflow = 'auto';
             } else {
                 menu.classList.add('open');
                 overlay.style.display = 'block';
-                document.body.style.overflow = 'hidden';
             }
         }
 
@@ -368,7 +362,7 @@
                             drop.innerHTML = results.map(m => {
                                 const mType = m.media_type || 'movie';
                                 const clickAction = mType === 'person' ? `searchByCast(${m.id})` : `openModal(${m.id}, '${mType}')`;
-                                return `<div class="smart-item" onclick="${clickAction}"><img src="https://image.tmdb.org/t/p/w92${m.poster_path || m.profile_path || ''}"><div class="smart-info"><span class="smart-name">${m.title || m.name}</span><span class="smart-meta">${mType === 'person' ? 'Aktor' : mType}</span></div></div>`;
+                                return `<div class="smart-item" onclick="${clickAction}"><img src="https://image.tmdb.org/t/p/w92${m.poster_path || m.profile_path || ''}"><div class="smart-info"><span class="smart-name">${m.title || m.name}</span><span class="smart-meta">${mType}</span></div></div>`;
                             }).join(''); 
                             drop.style.display = 'block'; 
                         } else { drop.style.display = 'none'; } 
@@ -459,8 +453,8 @@
 
         async function openModal(id, type) {
             window.currentMediaId = id; window.currentMediaType = type;
-            const modal = document.getElementById('movieModal');
-            modal.style.display = 'block'; modal.scrollTop = 0;
+            document.getElementById('movieModal').style.display = 'block'; 
+            document.getElementById('movieModal').scrollTop = 0;
             document.body.style.overflow = 'hidden'; currentIdx = 0;
             const [rId, rEn, rCast] = await Promise.all([
                 fetch(`https://api.themoviedb.org/3/${type}/${id}?api_key=${API_KEY}&language=id-ID&append_to_response=videos,production_companies`),
@@ -472,10 +466,10 @@
             const track = document.getElementById('carouselTrack'), dots = document.getElementById('carouselDots');
             track.innerHTML = ''; dots.innerHTML = ''; track.style.transform = 'translateX(0)';
             
-            // DINAMIS DOTS: Hanya muncul jika > 1 trailer
             if(vids.length > 0) { 
                 vids.forEach((v, i) => { 
                     track.innerHTML += `<div class="carousel-slide"><iframe id="yt-${i}" src="https://www.youtube.com/embed/${v.key}?enablejsapi=1&autoplay=${i===0?1:0}&rel=0" class="w-full h-full" allow="autoplay; fullscreen"></iframe></div>`; 
+                    // DOTS HANYA MUNCUL JIKA TRAILER LEBIH DARI 1
                     if(vids.length > 1) {
                         dots.innerHTML += `<div class="dot w-1.5 h-1.5 rounded-full ${i===currentIdx?'bg-blue-500':'bg-zinc-700'}"></div>`; 
                     }
@@ -485,26 +479,11 @@
                 track.innerHTML = `<div class="carousel-slide"><iframe src="https://vidrock.net/embed/${type}/${id}${type==='tv'?'/1/1':''}" class="w-full h-full" allowfullscreen></iframe></div>`; 
                 document.getElementById('swipeOverlay').style.display = 'none'; 
             }
-
             document.getElementById('mTitle').innerText = dId.title || dId.name;
             globalFullDesc = dId.overview || dEn.overview || "Sinopsis belum tersedia.";
             renderSynopsis();
             document.getElementById('serverList').innerHTML = `<button class="server-btn" onclick="playVid('https://vidrock.net/embed/${type}/${id}', this)">Server 1</button><button class="server-btn" onclick="playVid('https://vidsrc.me/embed/${type}?tmdb=${id}', this)">Server 2</button>`;
             updateLibButtons(id);
-        }
-
-        function updateSlide() {
-            const track = document.getElementById('carouselTrack');
-            const dots = document.querySelectorAll('.dot');
-            track.style.transform = `translateX(-${currentIdx * 100}%)`;
-            dots.forEach((d, i) => d.className = `dot w-1.5 h-1.5 rounded-full ${i===currentIdx?'bg-blue-500':'bg-zinc-700'}`);
-            
-            // AUTOPLAY: Play yang aktif, pause yang lain
-            const iframes = document.querySelectorAll('.carousel-slide iframe');
-            iframes.forEach((ifr, i) => {
-                if(i === currentIdx) ifr.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
-                else ifr.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
-            });
         }
 
         function setupSwipe() { 
@@ -514,8 +493,10 @@
                 let diff = startX - e.changedTouches[0].clientX; 
                 const slides = document.querySelectorAll('.carousel-slide'); 
                 if(Math.abs(diff) > 50 && slides.length > 1) { 
-                    if(diff > 0 && currentIdx < slides.length - 1) { currentIdx++; updateSlide(); }
-                    else if(diff < 0 && currentIdx > 0) { currentIdx--; updateSlide(); }
+                    if(diff > 0 && currentIdx < slides.length - 1) currentIdx++; 
+                    else if(diff < 0 && currentIdx > 0) currentIdx--; 
+                    document.getElementById('carouselTrack').style.transform = `translateX(-${currentIdx * 100}%)`; 
+                    document.querySelectorAll('.dot').forEach((d, i) => { d.className = `dot w-1.5 h-1.5 rounded-full ${i===currentIdx?'bg-blue-500':'bg-zinc-700'}`; }); 
                 } 
             }); 
         }
@@ -523,10 +504,10 @@
         function closeModal() { document.querySelectorAll('iframe').forEach(f => f.src = ""); document.getElementById('movieModal').style.display = 'none'; document.body.style.overflow = 'auto'; }
         function renderSynopsis() { document.getElementById('mDesc').innerText = globalFullDesc; }
         function playVid(url, el) { document.getElementById('carouselTrack').innerHTML = `<div class="carousel-slide"><iframe src="${url}" class="w-full h-full" allowfullscreen></iframe></div>`; document.getElementById('swipeOverlay').style.display = 'none'; document.getElementById('carouselDots').innerHTML = ''; }
-        function updateLibButtons(id) { /* logic as before */ }
-        function toggleLib(k) { /* logic as before */ }
+        function updateLibButtons(id) { /* ... */ }
+        function toggleLib(k) { /* ... */ }
         async function switchTab(mode, el) { document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active')); el.classList.add('active'); if(mode==='grid') loadFeed(true); else showLibrary(mode); }
-        async function showLibrary(k) { /* logic as before */ }
+        async function showLibrary(k) { /* ... */ }
         window.onscroll = () => { if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 1000 && !loading && !currentLibMode) { page++; loadFeed(false); } };
     </script>
 </body>
