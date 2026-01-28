@@ -10,7 +10,6 @@
         body { background-color: #000; color: #fff; font-family: 'Inter', sans-serif; margin: 0; overflow-x: hidden; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         
-        /* SPLASH SCREEN */
         #splashScreen { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .splash-content { display: flex; flex-direction: column; align-items: center; animation: splashScale 0.8s ease-out; }
         .splash-logo { width: 80px; height: 80px; margin-bottom: 2px; }
@@ -22,82 +21,119 @@
         @keyframes splashScale { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         @keyframes fadeIn { to { opacity: 1; } }
 
-        /* SKELETON */
         .skeleton { background: #1a1a1a; position: relative; overflow: hidden; border-radius: 4px; }
         .skeleton::after { content: ""; position: absolute; top: 0; right: 0; bottom: 0; left: 0; transform: translateX(-100%); background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent); animation: shimmer 1.5s infinite; }
         @keyframes shimmer { 100% { transform: translateX(100%); } }
 
-        /* HEADER */
         .profile-header { padding: 15px 15px 0 15px; background: #000; }
         .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .ig-logo-wrapper { display: flex; align-items: center; gap: 4px; cursor: pointer; }
-        .ig-logo { font-weight: 700; font-size: 19px; letter-spacing: -1px; }
+        .ig-logo-wrapper { display: flex; align-items: center; gap: 4px; position: relative; cursor: pointer; }
+        .ig-logo { font-family: 'Inter', sans-serif; font-weight: 700; font-size: 19px; letter-spacing: -1px; }
         .dot-notify { width: 7px; height: 7px; background-color: #ff3b30; border-radius: 50%; display: inline-block; margin-left: 2px; }
         
         .profile-info { display: flex; align-items: center; gap: 28px; margin-bottom: 15px; }
         .profile-pic-container { position: relative; width: 78px; height: 78px; }
         .profile-pic-logo { width: 74px; height: 74px; border-radius: 50%; border: 1px solid #262626; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #000; padding: 12px; }
         .profile-pic-logo img { width: 100%; height: 100%; object-fit: contain; border-radius: 50%; }
-        .add-story-btn { position: absolute; bottom: 2px; right: 2px; width: 22px; height: 22px; background: #0095f6; border: 2.5px solid #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: #fff; }
+        .add-story-btn { position: absolute; bottom: 2px; right: 2px; width: 22px; height: 22px; background: #0095f6; border: 2.5px solid #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: #fff; z-index: 10; }
 
         .stats { display: flex; flex-grow: 1; justify-content: space-between; text-align: center; padding-right: 10px; }
-        .stat-item { display: flex; flex-direction: column; cursor: pointer; color: #8e8e8e; }
-        .stat-val { font-weight: 700; font-size: 16px; color: #fff; }
-        .stat-label { font-size: 13px; }
+        .stat-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; color: #8e8e8e; }
+        .stat-val { font-weight: 700; font-size: 16px; color: #fff; line-height: 1; margin-bottom: 2px; }
+        .stat-label { font-size: 13px; font-weight: 400; line-height: 1; }
         .stat-item.active-stat { color: #fff; }
         
-        .bio { font-size: 13px; line-height: 1.3; margin-bottom: 15px; }
-        .bio-name { font-weight: 700; }
+        .bio { font-size: 13px; line-height: 1.25; margin-bottom: 15px; margin-top: -8px; }
+        .bio-name-wrapper { display: flex; align-items: center; gap: 4px; margin-bottom: 1px; }
+        .bio-name { font-weight: 700; font-size: 13px; display: inline-block; }
 
-        /* BUTTONS */
         .action-buttons { display: flex; gap: 6px; margin-bottom: 15px; }
-        .btn-ig { flex: 1; background: #262626; border-radius: 8px; padding: 7px; font-size: 13px; font-weight: 600; text-align: center; cursor: pointer; }
+        .btn-ig { flex: 1; background: #262626; border-radius: 8px; padding: 7px; font-size: 13px; font-weight: 600; text-align: center; cursor: pointer; color: #fff; }
         .btn-ig.active { background: #363636; }
         .btn-icon-sq { width: 34px; background: #262626; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
 
-        /* SIDE MENU */
-        #sideMenu { position: fixed; top: 0; right: -100%; width: 280px; height: 100%; background: #000; z-index: 9600; transition: right 0.3s ease; border-left: 1px solid #1c1c1c; padding: 20px; overflow-y: auto; }
+        #sideMenu { position: fixed; top: 0; right: -100%; width: 300px; height: 100%; background: #000; z-index: 9600; transition: right 0.3s ease; border-left: 1px solid #1c1c1c; padding: 20px; overflow-y: auto; }
         #sideMenu.open { right: 0; }
-        .menu-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
-        .menu-title { font-weight: 900; font-size: 18px; }
-        .bio-section { margin-bottom: 25px; }
-        .bio-title { font-size: 14px; font-weight: 700; margin-bottom: 8px; color: #fff; }
-        .bio-text { font-size: 12px; color: #a8a8a8; line-height: 1.5; margin-bottom: 15px; }
-        .feature-item { display: flex; gap: 12px; margin-bottom: 12px; }
-        .feature-content b { display: block; font-size: 12px; color: #fff; }
-        .feature-content span { font-size: 11px; color: #777; }
-        .menu-divider { height: 1px; background: #1a1a1a; margin: 15px 0; }
-        .menu-item { display: flex; align-items: center; gap: 15px; padding: 10px 0; font-size: 14px; cursor: pointer; }
-        .menu-footer { text-align: center; margin-top: 30px; padding-bottom: 20px; }
-        .footer-author { font-size: 12px; font-weight: 700; color: #888; margin-top: 5px; }
-        .footer-copy { font-size: 9px; color: #333; margin-top: 10px; letter-spacing: 1px; }
+        .menu-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 25px; }
+        .menu-title { font-weight: 900; font-size: 20px; letter-spacing: -1px; }
+        .bio-section { margin-bottom: 30px; }
+        .bio-title { font-size: 14px; font-weight: 700; margin-bottom: 10px; color: #fff; }
+        .bio-text { font-size: 12px; color: #a8a8a8; line-height: 1.6; margin-bottom: 15px; }
+        .feature-list { list-style: none; padding: 0; margin: 0; }
+        .feature-item { display: flex; gap: 12px; margin-bottom: 15px; align-items: flex-start; }
+        .feature-content b { display: block; font-size: 12px; color: #fff; margin-bottom: 2px; }
+        .feature-content span { font-size: 11px; color: #777; line-height: 1.4; display: block; }
+        .menu-divider { height: 1px; background: #1a1a1a; margin: 20px 0; }
+        .menu-item { display: flex; align-items: center; gap: 15px; padding: 12px 0; font-size: 14px; color: #eee; cursor: pointer; }
+        .menu-footer { text-align: center; margin-top: 40px; padding-bottom: 20px; }
+        .footer-author { font-size: 12px; font-weight: 700; color: #888; }
+        .footer-copy { font-size: 9px; color: #333; margin-top: 15px; letter-spacing: 1px; }
 
-        /* GRID & TABS */
-        .movie-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; padding-bottom: 80px; }
-        .post-card { position: relative; aspect-ratio: 2/3; background: #0a0a0a; overflow: hidden; }
-        .post-card img { width: 100%; height: 100%; object-fit: cover; }
-        .badge-rating { position: absolute; top: 6px; left: 6px; padding: 2px 4px; border-radius: 2px; font-size: 8px; font-weight: 900; background: rgba(255,255,255,0.9); color: #000; }
+        .highlights-wrapper { padding: 0 15px 15px 15px; border-bottom: 1px solid #1c1c1c; }
+        .highlights-container { display: flex; gap: 18px; overflow-x: auto; }
+        .highlight-item { flex: 0 0 62px; text-align: center; cursor: pointer; }
+        .highlight-circle { width: 62px; height: 62px; border-radius: 50%; border: 0.5px solid #333; margin-bottom: 5px; display: flex; align-items: center; justify-content: center; background: #000; transition: border 0.3s; }
+        .highlight-item.active-hl .highlight-circle { border: 2px solid #fff; }
+        .highlight-circle .hl-logo { font-size: 10px; font-weight: 900; letter-spacing: -0.5px; text-transform: uppercase; color: #fff; text-align: center; line-height: 1; }
+        .highlight-text { font-size: 11px; color: #fff; font-weight: 400; }
+
         .tab-nav { display: flex; border-top: 1px solid #1c1c1c; }
-        .tab-item { flex: 1; text-align: center; padding: 12px 0; color: #a8a8a8; cursor: pointer; }
+        .tab-item { flex: 1; text-align: center; padding: 12px 0; color: #a8a8a8; cursor: pointer; font-size: 18px; }
         .tab-item.active { color: #fff; border-bottom: 1px solid #fff; }
 
-        /* SEARCH */
+        .movie-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; padding-bottom: 80px; }
+        .post-card { position: relative; aspect-ratio: 2/3; background: #0a0a0a; overflow: hidden; cursor: pointer; }
+        .post-card img { width: 100%; height: 100%; object-fit: cover; }
+        .badge-rating { position: absolute; top: 6px; left: 6px; padding: 2px 5px; border-radius: 2px; font-size: 7px; font-weight: 900; z-index: 5; background: rgba(255,255,255,0.9); color: #000; }
+        .badge-type { position: absolute; top: 6px; right: 6px; padding: 2px 5px; border-radius: 2px; font-size: 7px; font-weight: 900; z-index: 5; background: rgba(0,0,0,0.7); color: #fff; text-transform: uppercase; border: 0.5px solid rgba(255,255,255,0.3); }
+
         #searchOverlay { display: none; position: fixed; inset: 0; background: #000; z-index: 4500; overflow-y: auto; }
-        .search-header { position: sticky; top: 0; background: #000; display: flex; align-items: center; padding: 10px 15px; gap: 10px; border-bottom: 1px solid #1c1c1c; }
-        .search-input-box { flex-grow: 1; background: #262626; border-radius: 8px; padding: 8px 12px; display: flex; align-items: center; }
+        .search-header { position: sticky; top: 0; background: #000; display: flex; align-items: center; padding: 10px 15px; gap: 10px; border-bottom: 1px solid #1c1c1c; z-index: 100; }
+        .search-input-box { flex-grow: 1; background: #262626; border-radius: 10px; padding: 8px 12px; display: flex; align-items: center; position: relative; }
         .search-input-box input { background: transparent; border: none; outline: none; color: #fff; font-size: 14px; width: 100%; margin-left: 8px; }
+        
+        #smartSearchDropdown { position: absolute; top: 100%; left: 0; right: 0; background: #1a1a1a; border-radius: 0 0 10px 10px; border: 1px solid #333; border-top: none; display: none; z-index: 500; max-height: 300px; overflow-y: auto; }
+        .smart-item { display: flex; align-items: center; padding: 10px; gap: 12px; border-bottom: 1px solid #262626; cursor: pointer; }
+        .smart-item img { width: 35px; height: 50px; object-fit: cover; border-radius: 4px; }
+        .smart-info { display: flex; flex-direction: column; }
+        .smart-name { font-size: 13px; font-weight: 600; color: #fff; }
+        .smart-meta { font-size: 11px; color: #8e8e8e; }
 
-        /* MODAL & PLAYER */
+        #backToTop { position: fixed; bottom: 85px; right: 20px; background: rgba(255,255,255,0.3); width: 42px; height: 42px; border-radius: 50%; display: none; align-items: center; justify-content: center; z-index: 100; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); }
+
         .modal-player { display: none; position: fixed; inset: 0; z-index: 8000; background: #000; overflow-y: auto; }
-        .carousel-track { display: flex; transition: transform 0.4s ease; width: 100%; }
-        .carousel-slide { min-width: 100%; aspect-ratio: 16/9; position: relative; }
-        .swipe-overlay { position: absolute; inset: 0; z-index: 10; }
-        .server-btn { background: #0a0a0a; border: 1px solid #1c1c1c; color: #fff; padding: 10px; border-radius: 8px; font-size: 10px; font-weight: 800; cursor: pointer; }
-        .server-btn.active-link { border: 2px solid #fff; }
-
-        /* NAVIGATION */
+        .carousel-track { display: flex; transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1); width: 100%; }
+        .carousel-slide { min-width: 100%; aspect-ratio: 16/9; position: relative; background: #000; }
+        .swipe-overlay { position: absolute; inset: 0; z-index: 10; background: transparent; }
+        .interaction-icon { font-size: 24px; cursor: pointer; color: #fff; }
+        .server-btn { width: 100%; padding: 12px 5px; border-radius: 8px; font-size: 8px; font-weight: 800; text-transform: uppercase; border: 1px solid #1c1c1c; text-align: center; cursor: pointer; background: #0a0a0a; color: #fff; }
+        .server-btn.active-link { border: 2px solid #fff !important; }
+        .dl-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 15px; }
+        .dl-link-btn { width: 100%; padding: 14px; border-radius: 12px; background: #000; color: #a1a1aa; font-size: 10px; font-weight: 800; text-transform: uppercase; text-align: center; border: 1px solid #1c1c1c; }
+        
+        .cast-wrapper { display: flex; overflow-x: auto; gap: 15px; padding: 15px 0; scrollbar-width: none; }
+        .cast-item { flex: 0 0 65px; text-align: center; cursor: pointer; }
+        .cast-img-border { 
+            width: 64px; height: 64px; border-radius: 50%; padding: 2.5px; 
+            background: linear-gradient(45deg, #f9ce34, #ee2a7b, #6228d7); 
+            margin-bottom: 5px; 
+        }
+        .cast-img-border .inner-border { width: 100%; height: 100%; border-radius: 50%; border: 2px solid #000; overflow: hidden; background: #000; }
+        .cast-img-border img { width: 100%; height: 100%; object-fit: cover; }
+        .cast-name { font-size: 9px; font-weight: 500; color: #fff; line-height: 1.2; display: block; margin-top: 4px; }
+        
+        .ig-post-content { padding: 0 15px; margin-top: 5px; }
+        .ig-likes-count { font-weight: 700; font-size: 13px; margin-bottom: 5px; display: block; }
+        .ig-username { font-weight: 700; font-size: 13px; margin-right: 8px; }
+        .ig-caption { font-size: 13px; line-height: 1.4; color: #efefef; }
+        
+        .toggle-btn { display: block; color: #a8a8a8; cursor: pointer; font-size: 13px; margin-top: 4px; font-weight: 500; }
+        #mTranslateBtn { font-size: 11px; color: #fff; font-weight: 700; cursor: pointer; display: inline-block; }
+        .ig-hashtags { color: #e0f1ff; display: block; margin-top: 10px; font-size: 13px; line-height: 1.5; }
+        .ig-date { color: #a8a8a8; font-size: 11px; text-transform: uppercase; }
+        
         .bottom-nav { position: fixed; bottom: 0; width: 100%; background: #000; border-top: 1px solid #1c1c1c; display: flex; justify-content: space-around; padding: 12px 0; z-index: 300; }
-        .bottom-nav i { color: #a8a8a8; font-size: 20px; }
+        .bottom-nav i { color: #a8a8a8; transition: color 0.3s; }
         .bottom-nav i.active-nav { color: #fff; }
     </style>
 </head>
@@ -117,28 +153,57 @@
     <div id="sideMenu" class="no-scrollbar">
         <div class="menu-header">
             <span class="menu-title">amnesfubbia</span>
-            <i class="fa-solid fa-xmark" style="font-size: 20px; cursor: pointer;" onclick="toggleSideMenu()"></i>
+            <i class="fa-solid fa-xmark" style="font-size: 24px; cursor: pointer;" onclick="toggleSideMenu()"></i>
         </div>
         
         <div class="bio-section">
             <h3 class="bio-title">About Amnesfubbia</h3>
-            <p class="bio-text">Platform katalog sinema digital untuk pengalaman eksplorasi film tanpa batas.</p>
+            <p class="bio-text">
+                amnesfubbia adalah platform katalog sinema digital yang dirancang untuk memberikan pengalaman eksplorasi film dan series tanpa batas.
+            </p>
             
-            <div class="feature-item">
-                <span>🎬</span>
-                <div class="feature-content"><b>25.000+ Database</b><span>Film & Series Global.</span></div>
-            </div>
-            <div class="feature-item">
-                <span>🔍</span>
-                <div class="feature-content"><b>Smart Search</b><span>Judul, Aktor, & Studio.</span></div>
+            <h4 class="bio-title" style="font-size: 12px; margin-top: 20px;">Fitur Utama:</h4>
+            <div class="feature-list">
+                <div class="feature-item">
+                    <span class="feature-icon">🎬</span>
+                    <div class="feature-content">
+                        <b>Database Luas</b>
+                        <span>Akses ke lebih dari 25.000+ film dan series global.</span>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">🔍</span>
+                    <div class="feature-content">
+                        <b>Smart Search</b>
+                        <span>Cari berdasarkan judul, aktor, hingga studio produksi (Marvel, Disney, dll).</span>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">📥</span>
+                    <div class="feature-content">
+                        <b>Personal Archive</b>
+                        <span>Simpan film favoritmu ke dalam koleksi pribadi (Bookmark).</span>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">🌍</span>
+                    <div class="feature-content">
+                        <b>Multi-Server</b>
+                        <span>Pilihan server streaming dan download yang stabil.</span>
+                    </div>
+                </div>
             </div>
         </div>
 
         <div class="menu-divider"></div>
-        <div class="menu-item"><i class="fa-solid fa-gear"></i> Pengaturan</div>
-        <div class="menu-item" style="color: #ff3b30;"><i class="fa-solid fa-right-from-bracket"></i> Keluar</div>
+
+        <div class="menu-item"><i class="fa-solid fa-gear" style="width: 20px;"></i> Pengaturan</div>
+        <div class="menu-item"><i class="fa-solid fa-clock-rotate-left" style="width: 20px;"></i> Aktivitas</div>
+        <div class="menu-item"><i class="fa-solid fa-circle-question" style="width: 20px;"></i> Bantuan</div>
+        <div class="menu-item" style="color: #ff3b30;"><i class="fa-solid fa-right-from-bracket" style="width: 20px;"></i> Keluar</div>
 
         <div class="menu-footer">
+            <p class="footer-credit">Dikembangkan dengan dedikasi untuk pecinta sinema.</p>
             <p class="footer-author">Created by Anasteas</p>
             <p class="footer-copy">© 2026 Amnesfubbia Network</p>
         </div>
@@ -149,11 +214,12 @@
             <div class="top-bar">
                 <div class="ig-logo-wrapper" onclick="backToHome()">
                     <h1 class="ig-logo">amnesfubbia</h1>
+                    <i class="fa-solid fa-chevron-down" style="font-size: 10px; margin-left: 2px;"></i>
                     <span class="dot-notify"></span>
                 </div>
                 <div style="display: flex; gap: 20px;">
-                    <i class="fa-regular fa-square-plus" style="font-size: 22px;"></i>
-                    <i class="fa-solid fa-bars" style="font-size: 22px; cursor: pointer;" onclick="toggleSideMenu()"></i>
+                    <i class="fa-regular fa-square-plus" style="font-size: 24px;"></i>
+                    <i class="fa-solid fa-bars" style="font-size: 24px; cursor: pointer;" onclick="toggleSideMenu()"></i>
                 </div>
             </div>
 
@@ -165,25 +231,38 @@
                 <div class="stats">
                     <div class="stat-item active-stat" id="stat-movie" onclick="setFilter('type', 'movie', this)"><span class="stat-val">25.4rb</span><span class="stat-label">film</span></div>
                     <div class="stat-item" id="stat-tv" onclick="setFilter('type', 'tv', this)"><span class="stat-val">8.2rb</span><span class="stat-label">series</span></div>
+                    <div class="stat-item" id="stat-short" onclick="setFilter('type', 'short', this)"><span class="stat-val">1.5rb</span><span class="stat-label">short</span></div>
                 </div>
             </div>
 
             <div class="bio">
-                <span class="bio-name">amnesfubbia</span> <i class="fa-solid fa-circle-check" style="color: #0095f6; font-size: 12px;"></i><br>
+                <div class="bio-name-wrapper"><span class="bio-name">amnesfubbia</span><i class="fa-solid fa-circle-check" style="color: #0095f6; font-size: 13px; margin-left: 4px;"></i></div>
                 <span>🎬 Discover. Watch. Archive.</span><br>
+                <span>Cari film, tonton trailer, & simpan favoritmu.</span><br>
                 <span>🍿 Bioskop dalam genggaman.</span>
             </div>
 
             <div class="action-buttons">
                 <div class="btn-ig" id="btnNowPlaying" onclick="setSchedule('now_playing', this)">Sedang Tayang</div>
                 <div class="btn-ig" id="btnUpcoming" onclick="setSchedule('upcoming', this)">Segera Tayang</div>
-                <div class="btn-icon-sq"><i class="fa-solid fa-user-plus"></i></div>
+                <div class="btn-icon-sq" onclick="toggleFilterBar()"><i class="fa-solid fa-user-plus" style="font-size: 14px;"></i></div>
+            </div>
+
+            <div id="filterBar" style="display: none; margin-bottom: 15px;">
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;">
+                    <button class="pill" id="btnCountry" onclick="toggleFilter(event, 'countryDropdown')">Negara <i class="fa-solid fa-caret-down"></i></button>
+                    <button class="pill" id="btnGenre" onclick="toggleFilter(event, 'genreDropdown')">Genre <i class="fa-solid fa-caret-down"></i></button>
+                    <button class="pill" id="yearBtn" onclick="toggleFilter(event, 'yearDropdown')">Tahun <i class="fa-solid fa-caret-down"></i></button>
+                </div>
             </div>
         </div>
 
+        <div class="highlights-wrapper no-scrollbar"><div class="highlights-container no-scrollbar" id="highlightList"></div></div>
+
         <div class="tab-nav">
-            <div class="tab-item active" onclick="switchTab('grid', this)"><i class="fa-solid fa-table-cells" style="font-size: 18px;"></i></div>
-            <div class="tab-item" onclick="switchTab('bookmarks', this)"><i class="fa-regular fa-bookmark" style="font-size: 18px;"></i></div>
+            <div class="tab-item active" id="tabGrid" onclick="switchTab('grid', this)"><i class="fa-solid fa-table-cells"></i></div>
+            <div class="tab-item" id="tabLikes" onclick="switchTab('likes', this)"><i class="fa-regular fa-heart"></i></div>
+            <div class="tab-item" id="tabBookmark" onclick="switchTab('bookmarks', this)"><i class="fa-regular fa-bookmark"></i></div>
         </div>
 
         <main id="feedGrid" class="movie-grid"></main>
@@ -191,36 +270,65 @@
 
     <div id="searchOverlay">
         <div class="search-header">
-            <i class="fa-solid fa-arrow-left" style="color: #fff; font-size: 20px;" onclick="closeSearch()"></i>
+            <i class="fa-solid fa-arrow-left" style="font-size: 20px; color: #fff;" onclick="closeSearch()"></i>
             <div class="search-input-box">
-                <i class="fa-solid fa-magnifying-glass" style="color: #8e8e8e; font-size: 12px;"></i>
-                <input type="text" id="searchInp" placeholder="Cari film..." onkeydown="if(event.key==='Enter') searchAction()">
+                <i class="fa-solid fa-magnifying-glass" style="color: #71717a; font-size: 12px;"></i>
+                <input type="text" id="searchInp" autocomplete="off" placeholder="Cari judul, aktor, studio..." onkeydown="if(event.key==='Enter') searchAction()">
+                <div id="smartSearchDropdown" class="no-scrollbar"></div>
             </div>
         </div>
         <div id="searchGrid" class="movie-grid"></div>
     </div>
 
+    <div id="backToTop" onclick="window.scrollTo({top: 0, behavior: 'smooth'})"><i class="fa-solid fa-arrow-up"></i></div>
+    <div id="filterOverlay" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9400;" onclick="closeAllDrawers()"></div>
+
     <div id="movieModal" class="modal-player">
-        <div style="padding: 15px; display: flex; align-items: center; border-bottom: 1px solid #1a1a1a; position: sticky; top: 0; background: #000; z-index: 50;">
-            <i class="fa-solid fa-chevron-left" style="font-size: 20px;" onclick="closeModal()"></i>
-            <div id="mTitle" style="flex-grow: 1; text-align: center; font-weight: 700;"></div>
+        <div style="max-width: 600px; margin: 0 auto; padding-bottom: 160px;">
+            <div style="padding: 0 16px; height: 54px; display: flex; align-items: center; border-bottom: 1px solid #1a1a1a; position: sticky; top: 0; background: #000; z-index: 50;">
+                <i class="fa-solid fa-chevron-left" style="font-size: 20px; cursor: pointer;" onclick="closeModal()"></i>
+                <div id="mTitle" style="flex-grow: 1; text-align: center; font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 32px;"></div>
+            </div>
+            <div id="castContainer" class="cast-wrapper" style="padding: 0 16px;"></div>
+            <div style="position: relative; overflow: hidden;">
+                <div class="swipe-overlay" id="swipeOverlay"></div>
+                <div class="carousel-track" id="carouselTrack"></div>
+                <div id="carouselDots" style="display: flex; justify-content: center; gap: 8px; padding: 12px 0;"></div>
+            </div>
+            <div style="padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; gap: 16px;">
+                    <i id="btnLikeModal" class="interaction-icon"></i>
+                    <i class="fa-regular fa-comment interaction-icon"></i>
+                    <i class="fa-regular fa-paper-plane interaction-icon"></i>
+                </div>
+                <i id="btnBookModal" class="interaction-icon"></i>
+            </div>
+            <div class="ig-post-content">
+                <span id="mLikeDisplay" class="ig-likes-count"></span>
+                <div style="margin-bottom: 4px;">
+                    <span class="ig-username">amnesfubbia</span>
+                    <span id="mDesc" class="ig-caption"></span>
+                    <div style="margin-top: 4px;"><span id="mToggleBtn" class="toggle-btn" style="display: none;" onclick="handleToggleDesc()">selengkapnya</span></div>
+                </div>
+                <div id="mHashtags" class="ig-hashtags"></div>
+                <div style="display: flex; align-items: center; gap: 8px; margin-top: 8px;">
+                    <div id="mDateDisplay" class="ig-date"></div>
+                    <p id="mTranslateBtn" style="display: none;" onclick="handleTranslate()">Lihat terjemahan</p>
+                </div>
+                <div id="serverList" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 24px;"></div>
+            </div>
         </div>
-        <div style="position: relative; overflow: hidden;">
-            <div class="swipe-overlay" id="swipeOverlay"></div>
-            <div class="carousel-track" id="carouselTrack"></div>
-        </div>
-        <div id="serverList" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 15px;"></div>
     </div>
 
     <nav class="bottom-nav">
         <i class="fa-solid fa-house active-nav" onclick="updateActiveNav(this); backToHome()"></i>
         <i class="fa-solid fa-magnifying-glass" onclick="updateActiveNav(this); openSearch()"></i>
-        <i class="fa-regular fa-bookmark" onclick="updateActiveNav(this); switchTab('bookmarks', this)"></i>
+        <i class="fa-regular fa-bookmark" onclick="updateActiveNav(this); switchTab('bookmarks', document.getElementById('tabBookmark'))"></i>
     </nav>
 
     <script>
         const API_KEY = 'bfa7df5310c9974f62f26c6789a8c00d';
-        let page = 1, loading = false, currentType = 'movie', currentSchedule = 'trending', searchQuery = '';
+        let page = 1, loading = false, currentType = 'movie', searchQuery = '';
 
         window.onload = () => {
             setTimeout(() => {
@@ -232,52 +340,57 @@
 
         function toggleSideMenu() {
             const m = document.getElementById('sideMenu');
-            m.classList.toggle('open');
+            const o = document.getElementById('filterOverlay');
+            if(m.classList.contains('open')) {
+                m.classList.remove('open');
+                o.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            } else {
+                m.classList.add('open');
+                o.style.display = 'block';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeAllDrawers() {
+            document.getElementById('sideMenu').classList.remove('open');
+            document.getElementById('filterOverlay').style.display = 'none';
+            document.body.style.overflow = 'auto';
         }
 
         async function loadFeed(isNew = true) {
             if(loading) return;
             loading = true;
-            const grid = searchQuery ? document.getElementById('searchGrid') : document.getElementById('feedGrid');
+            const grid = document.getElementById('feedGrid');
             if(isNew) { page = 1; grid.innerHTML = ''; }
-            
-            let url = `https://api.themoviedb.org/3/${searchQuery ? 'search/multi' : (currentType === 'tv' ? 'discover/tv' : 'discover/movie')}?api_key=${API_KEY}&language=id-ID&page=${page}`;
-            if(searchQuery) url += `&query=${encodeURIComponent(searchQuery)}`;
-
+            let url = `https://api.themoviedb.org/3/${currentType === 'tv' ? 'discover/tv' : 'discover/movie'}?api_key=${API_KEY}&language=id-ID&page=${page}`;
             try {
                 const res = await fetch(url);
                 const data = await res.json();
-                renderGrid(data.results, grid);
+                data.results.forEach(m => {
+                    if(!m.poster_path) return;
+                    const card = document.createElement('div');
+                    card.className = 'post-card';
+                    card.onclick = () => openModal(m.id, currentType);
+                    card.innerHTML = `<div class="badge-rating">★ ${(m.vote_average||0).toFixed(1)}</div><img src="https://image.tmdb.org/t/p/w342${m.poster_path}">`;
+                    grid.appendChild(card);
+                });
             } catch(e) {}
             loading = false;
-        }
-
-        function renderGrid(items, grid) {
-            items.forEach(m => {
-                if(!m.poster_path) return;
-                const card = document.createElement('div');
-                card.className = 'post-card';
-                card.onclick = () => openModal(m.id, m.media_type || currentType);
-                card.innerHTML = `<div class="badge-rating">★ ${(m.vote_average||0).toFixed(1)}</div><img src="https://image.tmdb.org/t/p/w342${m.poster_path}">`;
-                grid.appendChild(card);
-            });
         }
 
         function openModal(id, type) {
             const m = document.getElementById('movieModal');
             m.style.display = 'block';
             document.getElementById('carouselTrack').innerHTML = `<div class="carousel-slide"><iframe src="https://vidrock.net/embed/${type}/${id}" style="width:100%; height:100%; border:none;" allowfullscreen></iframe></div>`;
-            document.getElementById('serverList').innerHTML = `<button class="server-btn" onclick="highlightBtn(this)">Server 1</button>`;
         }
 
-        function closeModal() { document.getElementById('movieModal').style.display = 'none'; }
+        function closeModal() { document.querySelectorAll('iframe').forEach(f => f.src = ""); document.getElementById('movieModal').style.display = 'none'; }
         function openSearch() { document.getElementById('searchOverlay').style.display = 'block'; }
-        function closeSearch() { document.getElementById('searchOverlay').style.display = 'none'; searchQuery = ''; }
-        function searchAction() { searchQuery = document.getElementById('searchInp').value; loadFeed(true); }
+        function closeSearch() { document.getElementById('searchOverlay').style.display = 'none'; }
         function backToHome() { closeSearch(); closeModal(); loadFeed(true); }
         function updateActiveNav(el) { document.querySelectorAll('.bottom-nav i').forEach(i => i.classList.remove('active-nav')); el.classList.add('active-nav'); }
         function setFilter(k, v, el) { currentType = v; document.querySelectorAll('.stat-item').forEach(s => s.classList.remove('active-stat')); el.classList.add('active-stat'); loadFeed(true); }
-        function setSchedule(v, el) { currentSchedule = v; document.querySelectorAll('.btn-ig').forEach(b => b.classList.remove('active')); el.classList.add('active'); loadFeed(true); }
     </script>
 </body>
 </html>
