@@ -552,6 +552,9 @@
             const dId = await rId.json(), dEn = await rEn.json(), dCast = await rCast.json();
             const vids = [...(dId.videos?.results || []), ...(dEn.videos?.results || [])].filter(v => v.site === 'YouTube' && (v.type === 'Trailer' || v.type === 'Teaser')).slice(0, 4);
             const track = document.getElementById('carouselTrack'), dots = document.getElementById('carouselDots');
+            
+            // CLEANUP BEFORE LOAD
+            track.querySelectorAll('iframe').forEach(f => f.src = "");
             track.innerHTML = ''; dots.innerHTML = ''; track.style.transform = 'translateX(0)';
             
             if(vids.length > 0) { 
@@ -635,12 +638,25 @@
             track.querySelectorAll('iframe').forEach(f => f.src = "");
             track.innerHTML = ''; 
             document.getElementById('movieModal').style.display = 'none'; 
-            if(document.getElementById('searchOverlay').style.display !== 'block') document.body.style.overflow = 'auto'; 
+            document.body.style.overflow = 'auto'; // FIX SCROLL LOCK
         }
 
         function renderSynopsis() { const descEl = document.getElementById('mDesc'), toggleBtn = document.getElementById('mToggleBtn'); if (globalFullDesc.length > 90) { toggleBtn.classList.remove('hidden'); descEl.innerText = isExpanded ? globalFullDesc : globalFullDesc.substring(0, 90) + "..."; toggleBtn.innerText = isExpanded ? "ringkas" : "selengkapnya"; } else { descEl.innerText = globalFullDesc; toggleBtn.classList.add('hidden'); } }
         function handleToggleDesc() { isExpanded = !isExpanded; renderSynopsis(); }
-        function playVid(url, el) { const track = document.getElementById('carouselTrack'); const dots = document.getElementById('carouselDots'); track.innerHTML = `<div class="carousel-slide"><iframe src="${url}" class="w-full h-full" allowfullscreen></iframe></div>`; track.style.transform = 'translateX(0)'; currentIdx = 0; dots.innerHTML = ''; document.getElementById('swipeOverlay').style.display = 'none'; highlightBtn(el); }
+        
+        function playVid(url, el) { 
+            const track = document.getElementById('carouselTrack'); 
+            const dots = document.getElementById('carouselDots'); 
+            // CLEANUP OLD IFRAME FIRST
+            track.querySelectorAll('iframe').forEach(f => f.src = "");
+            track.innerHTML = `<div class="carousel-slide"><iframe src="${url}" class="w-full h-full" allowfullscreen></iframe></div>`; 
+            track.style.transform = 'translateX(0)'; 
+            currentIdx = 0; 
+            dots.innerHTML = ''; 
+            document.getElementById('swipeOverlay').style.display = 'none'; 
+            highlightBtn(el); 
+        }
+        
         function highlightBtn(el) { document.querySelectorAll('.server-btn').forEach(b => b.classList.remove('active-link')); el.classList.add('active-link'); }
         async function loadEpisodes() { const s = document.getElementById('seasonSel').value; const res = await fetch(`https://api.themoviedb.org/3/tv/${window.currentMediaId}/season/${s}?api_key=${API_KEY}`); const d = await res.json(); document.getElementById('episodeGrid').innerHTML = (d.episodes||[]).map(e => `<div class="pill text-[10px]" onclick="playVid('https://vidrock.net/embed/tv/${window.currentMediaId}/${s}/${e.episode_number}', this)">${e.episode_number}</div>`).join(''); }
         
