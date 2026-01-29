@@ -110,10 +110,8 @@
         .interaction-icon { font-size: 24px; cursor: pointer; color: #fff; }
         .server-btn { width: 100%; padding: 12px 5px; border-radius: 8px; font-size: 8px; font-weight: 800; text-transform: uppercase; border: 1px solid #1c1c1c; text-align: center; cursor: pointer; background: #0a0a0a; color: #fff; }
         .server-btn.active-link { border: 2px solid #fff !important; }
-        
-        /* DOWNLOAD GRID DISESUAIKAN MENJADI 3 KOLOM */
-        .dl-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 15px; }
-        .dl-link-btn { width: 100%; padding: 12px 5px; border-radius: 12px; background: #000; color: #a1a1aa; font-size: 8px; font-weight: 800; text-transform: uppercase; text-align: center; border: 1px solid #1c1c1c; }
+        .dl-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 15px; }
+        .dl-link-btn { width: 100%; padding: 14px; border-radius: 12px; background: #000; color: #a1a1aa; font-size: 10px; font-weight: 800; text-transform: uppercase; text-align: center; border: 1px solid #1c1c1c; }
         
         .cast-wrapper { display: flex; overflow-x: auto; gap: 15px; padding: 15px 0; scrollbar-width: none; }
         .cast-item { flex: 0 0 65px; text-align: center; cursor: pointer; }
@@ -304,10 +302,14 @@
                     <div id="episodeGrid" class="grid grid-cols-5 gap-2"></div>
                 </div>
                 <div id="serverList" class="grid grid-cols-3 gap-2 mt-6"></div>
+                
                 <div class="dl-grid">
-                    <button id="btnDownload1" class="dl-link-btn" onclick="highlightBtn(this); window.open(`https://dl.vidsrc.vip/${window.currentMediaType}/${window.currentMediaId}`)">Download 1</button>
-                    <button id="btnDownload2" class="dl-link-btn" onclick="highlightBtn(this); window.open(`https://multiembed.mov/directstream.php?video_id=${window.currentMediaId}&tmdb=1`)">Download 2</button>
-                    <button id="btnDownload3" class="dl-link-btn" onclick="highlightBtn(this); window.open(`https://superembed.xyz/download/${window.currentMediaType}/${window.currentMediaId}`)">Download 3</button>
+                    <button class="dl-link-btn" onclick="highlightBtn(this); handleDownload('vidsrc')">Vidsrc</button>
+                    <button class="dl-link-btn" onclick="highlightBtn(this); handleDownload('multiembed')">MultiEmbed</button>
+                    <button class="dl-link-btn" onclick="highlightBtn(this); handleDownload('superembed')">SuperEmbed</button>
+                    <button class="dl-link-btn" onclick="highlightBtn(this); handleDownload('autoembed')">AutoEmbed</button>
+                    <button class="dl-link-btn" onclick="highlightBtn(this); handleDownload('duappi')">DuaPPI</button>
+                    <button class="dl-link-btn" onclick="highlightBtn(this); handleDownload('multidirect')">MultiDirect</button>
                 </div>
             </div>
         </div>
@@ -707,20 +709,8 @@
             document.getElementById('mHashtags').innerHTML = `#${(dId.title||dId.name||"").replace(/[^a-zA-Z0-9]/g, '')} #${relYear} #${contentKind} <br> ${genresArr} ${studiosArr}`;
             const rel = dId.release_date || dId.first_air_date || ""; 
             document.getElementById('mDateDisplay').innerText = rel ? new Date(rel).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
-            
-            // SERVER STREAMING UTAMA (SERVER 1, 2, 3)
-            document.getElementById('serverList').innerHTML = `
-                <button class="server-btn" onclick="playVid('https://vidsrc.me/embed/${type}?tmdb=${id}', this)">Server 1</button>
-                <button class="server-btn" onclick="playVid('https://vidrock.net/embed/${type}/${id}${type==='tv'?'/1/1':''}', this)">Server 2</button>
-                <button class="server-btn" onclick="playVid('https://embed.smashystream.com/playere.php?tmdb=${id}', this)">Server 3</button>`;
-            
-            if(type === 'tv') { 
-                document.getElementById('seriesControl').classList.remove('hidden'); 
-                document.getElementById('seasonSel').innerHTML = (dId.seasons||[]).filter(s=>s.season_number>0).map(s=>`<option value="${s.season_number}">Season ${s.season_number}</option>`).join(''); 
-                loadEpisodes(); 
-            } else { 
-                document.getElementById('seriesControl').classList.add('hidden'); 
-            }
+            document.getElementById('serverList').innerHTML = `<button class="server-btn" onclick="playVid('https://vidsrc.me/embed/${type}?tmdb=${id}', this)">Server 1</button><button class="server-btn" onclick="playVid('https://vidrock.net/embed/${type}/${id}${type==='tv'?'/1/1':''}', this)">Server 2</button><button class="server-btn" onclick="playVid('https://embed.smashystream.com/playere.php?tmdb=${id}', this)">Server 3</button>`;
+            if(type === 'tv') { document.getElementById('seriesControl').classList.remove('hidden'); document.getElementById('seasonSel').innerHTML = (dId.seasons||[]).filter(s=>s.season_number>0).map(s=>`<option value="${s.season_number}">Season ${s.season_number}</option>`).join(''); loadEpisodes(); } else { document.getElementById('seriesControl').classList.add('hidden'); }
             updateLibButtons(id);
         }
 
@@ -769,12 +759,7 @@
         }
         
         function highlightBtn(el) { document.querySelectorAll('.server-btn').forEach(b => b.classList.remove('active-link')); el.classList.add('active-link'); }
-        async function loadEpisodes() { 
-            const s = document.getElementById('seasonSel').value; 
-            const res = await fetch(`https://api.themoviedb.org/3/tv/${window.currentMediaId}/season/${s}?api_key=${API_KEY}`); 
-            const d = await res.json(); 
-            document.getElementById('episodeGrid').innerHTML = (d.episodes||[]).map(e => `<div class="pill text-[10px]" onclick="playVid('https://vidsrc.me/embed/tv/${window.currentMediaId}/${s}/${e.episode_number}', this)">${e.episode_number}</div>`).join(''); 
-        }
+        async function loadEpisodes() { const s = document.getElementById('seasonSel').value; const res = await fetch(`https://api.themoviedb.org/3/tv/${window.currentMediaId}/season/${s}?api_key=${API_KEY}`); const d = await res.json(); document.getElementById('episodeGrid').innerHTML = (d.episodes||[]).map(e => `<div class="pill text-[10px]" onclick="playVid('https://vidrock.net/embed/tv/${window.currentMediaId}/${s}/${e.episode_number}', this)">${e.episode_number}</div>`).join(''); }
         
         function setupSwipe() { 
             const overlay = document.getElementById('swipeOverlay'); 
@@ -800,6 +785,25 @@
         async function switchTab(mode, el) { document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active')); el.classList.add('active'); const grid = document.getElementById('feedGrid'); grid.innerHTML = ''; if(mode === 'likes' || mode === 'bookmarks') { currentLibMode = true; showLibrary(mode); } else { currentLibMode = false; currentCastId = ''; searchQuery = ''; currentType='multi'; currentSchedule='trending'; currentCompany=''; loadFeed(true); } }
         async function showLibrary(k) { const items = JSON.parse(localStorage.getItem(k) || '[]'); const grid = document.getElementById('feedGrid'); grid.innerHTML = ''; if (!items.length) { grid.innerHTML = '<div class="col-span-3 text-center py-20 text-zinc-500 text-xs">Belum ada konten disimpan</div>'; return; } const promises = items.map(i => fetch(`https://api.themoviedb.org/3/${i.type}/${i.id}?api_key=${API_KEY}&language=id-ID`).then(r => r.json())); const results = await Promise.all(promises); renderGrid(results.filter(m => m.id), grid); }
         window.onscroll = () => { if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 1000 && !loading && !searchQuery && !currentLibMode) { page++; loadFeed(false); } };
+
+        /* FUNGSI DOWNLOAD BARU */
+        function handleDownload(provider) {
+            const id = window.currentMediaId;
+            const type = window.currentMediaType;
+            const s = document.getElementById('seasonSel')?.value || 1;
+            const e = 1; // Default episode 1, bisa dikembangkan jika perlu deteksi klik episode
+
+            let url = "";
+            switch(provider) {
+                case 'vidsrc': url = `https://dl.vidsrc.vip/${type}/${id}`; break;
+                case 'multiembed': url = `https://multiembed.mov/?video_id=${id}&tmdb=1${type==='tv'?`&s=${s}&e=${e}`:''}`; break;
+                case 'superembed': url = `https://multiembed.mov/directstream.php?video_id=${id}&tmdb=1`; break; // Menggunakan link direct multiembed
+                case 'autoembed': url = `https://autoembed.to/download/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`; break;
+                case 'duappi': url = `https://duappi.com/download/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`; break;
+                case 'multidirect': url = `https://multiembed.mov/directstream.php?video_id=${id}&tmdb=1`; break;
+            }
+            window.open(url, '_blank');
+        }
     </script>
 </body>
 </html>
