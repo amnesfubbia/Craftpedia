@@ -59,7 +59,7 @@
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
         .sticky-reset { position: sticky; top: 0; background: #1c1c1c; z-index: 10; font-weight: 800 !important; color: #fff !important; border-bottom: 2px solid #333; }
         #filterOverlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9400; }
-        .filter-item { padding: 16px; font-size: 14px; text-align: center; border-bottom: 1px solid #262626; color: #eee; cursor: pointer; }
+        .filter-item { padding: 166px; font-size: 14px; text-align: center; border-bottom: 1px solid #262626; color: #eee; cursor: pointer; }
 
         .highlights-wrapper { padding: 0 15px 15px 15px; border-bottom: 1px solid #1c1c1c; }
         .highlights-container { display: flex; gap: 18px; overflow-x: auto; }
@@ -327,13 +327,29 @@
         let isExpanded = false, globalFullDesc = "", globalEnDesc = "", currentIdx = 0, startX = 0, isTranslated = false, originalIndoDesc = "";
         let abortController = null;
 
-        window.onload = () => {
-            setTimeout(() => {
-                document.getElementById('splashScreen').style.display = 'none';
-                document.getElementById('mainProfile').style.display = 'block';
-            }, 2500);
+        // PERBAIKAN: Fungsi penutup splash screen lebih aman
+        function closeSplashScreen() {
+            const splash = document.getElementById('splashScreen');
+            const main = document.getElementById('mainProfile');
+            if(splash) splash.style.display = 'none';
+            if(main) main.style.display = 'block';
+        }
 
-            initFilters(); initHighlights(); loadFeed(); setupSwipe(); initSmartSearch(); 
+        window.onload = () => {
+            // Pastikan splash tertutup bagaimanapun kondisinya setelah 2.5 detik
+            setTimeout(closeSplashScreen, 2500);
+
+            // Inisialisasi data
+            try {
+                initFilters(); 
+                initHighlights(); 
+                loadFeed(); 
+                setupSwipe(); 
+                initSmartSearch(); 
+            } catch(e) {
+                console.error("Inisialisasi gagal, tapi splash tetap ditutup", e);
+            }
+
             window.addEventListener('scroll', () => { 
                 document.getElementById('backToTop').style.display = window.scrollY > 500 ? 'flex' : 'none'; 
             }); 
@@ -375,6 +391,7 @@
             const inp = document.getElementById('searchInp'); 
             const drop = document.getElementById('smartSearchDropdown'); 
             let timeout = null; 
+            if(!inp) return;
             inp.addEventListener('input', () => { 
                 clearTimeout(timeout); 
                 const q = inp.value.trim(); 
@@ -478,6 +495,7 @@
                 {n: 'Thailand', c: 'TH', img: 'Thailand.png', t: 'movie', s: false}
             ]; 
             const cont = document.getElementById('highlightList'); 
+            if(!cont) return;
             hls.forEach(h => { 
                 const div = document.createElement('div'); 
                 div.className = 'highlight-item'; 
@@ -494,19 +512,27 @@
 
         function initFilters() { 
             const yD = document.getElementById('yearDropdown'); 
-            let yearHTML = '<div class="filter-item sticky-reset" onclick="setYear(\'\')">Semua Tahun</div>'; 
-            for(let y=2026; y>=1900; y--) yearHTML += `<div class="filter-item" onclick="setYear(${y})">${y}</div>`; 
-            yD.innerHTML = yearHTML; 
+            if(yD) {
+                let yearHTML = '<div class="filter-item sticky-reset" onclick="setYear(\'\')">Semua Tahun</div>'; 
+                for(let y=2026; y>=1900; y--) yearHTML += `<div class="filter-item" onclick="setYear(${y})">${y}</div>`; 
+                yD.innerHTML = yearHTML; 
+            }
+            
             const countries = [['ID','Indonesia'],['US','USA'],['KR','Korea Selatan'],['JP','Jepang'],['IN','India'],['TH','Thailand'],['CN','China'],['PH','Filipina'],['GB','Inggris'],['FR','Prancis'],['ES','Spanyol'],['IT','Italia'],['TR','Turki'],['DE','Jerman']]; 
             const cD = document.getElementById('countryDropdown'); 
-            let countryHTML = '<div class="filter-item sticky-reset" onclick="setCountry(\'\',\'Negara\')">Semua Negara</div>'; 
-            countries.forEach(c => countryHTML += `<div class="filter-item" onclick="setCountry('${c[0]}','${c[1]}')">${c[1]}</div>`); 
-            cD.innerHTML = countryHTML; 
+            if(cD) {
+                let countryHTML = '<div class="filter-item sticky-reset" onclick="setCountry(\'\',\'Negara\')">Semua Negara</div>'; 
+                countries.forEach(c => countryHTML += `<div class="filter-item" onclick="setCountry('${c[0]}','${c[1]}')">${c[1]}</div>`); 
+                cD.innerHTML = countryHTML; 
+            }
+            
             const genres = [[28,'Action'],[12,'Adventure'],[16,'Animasi'],[35,'Komedi'],[80,'Crime'],[99,'Dokumenter'],[18,'Drama'],[10751,'Family'],[14,'Fantasy'],[36,'History'],[27,'Horror'],[10402,'Music'],[9648,'Misteri'],[10749,'Romance'],[878,'Sci-Fi'],[53,'Thriller']]; 
             const gD = document.getElementById('genreDropdown'); 
-            let genreHTML = '<div class="filter-item sticky-reset" onclick="setGenre(\'\',\'Genre\')">Semua Genre</div>'; 
-            genres.forEach(g => genreHTML += `<div class="filter-item" onclick="setGenre('${g[0]}','${g[1]}')">${g[1]}</div>`); 
-            gD.innerHTML = genreHTML; 
+            if(gD) {
+                let genreHTML = '<div class="filter-item sticky-reset" onclick="setGenre(\'\',\'Genre\')">Semua Genre</div>'; 
+                genres.forEach(g => genreHTML += `<div class="filter-item" onclick="setGenre('${g[0]}','${g[1]}')">${g[1]}</div>`); 
+                gD.innerHTML = genreHTML; 
+            }
         }
 
         function toggleFilter(e, id) { e.stopPropagation(); const d = document.getElementById(id); const overlay = document.getElementById('filterOverlay'); document.querySelectorAll('.filter-dropdown').forEach(el => el.style.display = 'none'); d.style.display = 'block'; d.scrollTop = 0; overlay.style.display = 'block'; document.body.style.overflow = 'hidden'; }
@@ -517,6 +543,7 @@
             if(loading && !isNew) return;
             loading = true; abortController = new AbortController();
             const grid = document.getElementById('searchOverlay').style.display === 'block' ? document.getElementById('searchGrid') : document.getElementById('feedGrid');
+            if(!grid) return;
             if(isNew) { page = 1; grid.innerHTML = ''; }
             
             let url;
@@ -576,6 +603,7 @@
 
         function openSearch() { 
             const titleInp = document.getElementById('searchInp');
+            if(!titleInp) return;
             document.getElementById('searchOverlay').style.display = 'block'; 
             titleInp.placeholder = "Cari film, series, atau aktor...";
             titleInp.value = ''; 
@@ -588,12 +616,13 @@
         function searchAction() { 
             currentLibMode = false; 
             currentCastId = ''; 
-            searchQuery = document.getElementById('searchInp').value; 
+            const inp = document.getElementById('searchInp');
+            if(inp) searchQuery = inp.value; 
             document.getElementById('smartSearchDropdown').style.display = 'none'; 
             loadFeed(true); 
         }
 
-        function toggleFilterBar() { const b = document.getElementById('filterBar'); b.style.display = b.style.display === 'block' ? 'none' : 'block'; }
+        function toggleFilterBar() { const b = document.getElementById('filterBar'); if(b) b.style.display = b.style.display === 'block' ? 'none' : 'block'; }
         
         function setSchedule(v, el) { 
             currentLibMode = false; currentCastId = ''; searchQuery = ''; 
@@ -616,8 +645,10 @@
         function setYear(y) { 
             currentYear = y; 
             const btn = document.getElementById('yearBtn');
-            btn.innerText = y || 'Tahun'; 
-            y ? btn.classList.add('active-pill') : btn.classList.remove('active-pill');
+            if(btn) {
+                btn.innerText = y || 'Tahun'; 
+                y ? btn.classList.add('active-pill') : btn.classList.remove('active-pill');
+            }
             if(currentType === 'multi') currentType = 'movie';
             closeD(); loadFeed(true); 
         }
@@ -625,8 +656,10 @@
         function setCountry(c, n) { 
             currentCountry = c; 
             const btn = document.getElementById('btnCountry');
-            btn.innerText = n; 
-            c ? btn.classList.add('active-pill') : btn.classList.remove('active-pill');
+            if(btn) {
+                btn.innerText = n; 
+                c ? btn.classList.add('active-pill') : btn.classList.remove('active-pill');
+            }
             if(currentType === 'multi') currentType = 'movie';
             closeD(); loadFeed(true); 
         }
@@ -634,16 +667,20 @@
         function setGenre(g, n) { 
             currentGenre = g; 
             const btn = document.getElementById('btnGenre');
-            btn.innerText = n; 
-            g ? btn.classList.add('active-pill') : btn.classList.remove('active-pill');
+            if(btn) {
+                btn.innerText = n; 
+                g ? btn.classList.add('active-pill') : btn.classList.remove('active-pill');
+            }
             if(currentType === 'multi') currentType = 'movie';
             closeD(); loadFeed(true); 
         }
 
         async function openModal(id, type) {
             window.currentMediaId = id; window.currentMediaType = type;
-            document.getElementById('movieModal').style.display = 'block'; 
-            document.getElementById('movieModal').scrollTop = 0;
+            const modal = document.getElementById('movieModal');
+            if(!modal) return;
+            modal.style.display = 'block'; 
+            modal.scrollTop = 0;
             document.getElementById('smartSearchDropdown').style.display = 'none'; document.body.style.overflow = 'hidden'; currentIdx = 0; isTranslated = false;
             
             const [rId, rEn, rCast] = await Promise.all([
@@ -656,37 +693,42 @@
             const vids = [...(dId.videos?.results || []), ...(dEn.videos?.results || [])].filter(v => v.site === 'YouTube' && (v.type === 'Trailer' || v.type === 'Teaser')).slice(0, 4);
             const track = document.getElementById('carouselTrack'), dots = document.getElementById('carouselDots');
             
-            track.querySelectorAll('iframe').forEach(f => f.src = "");
-            track.innerHTML = ''; dots.innerHTML = ''; track.style.transform = 'translateX(0)';
-            
-            if(vids.length > 0) { 
-                vids.forEach((v, i) => { 
-                    track.innerHTML += `<div class="carousel-slide"><iframe id="yt-${i}" src="https://www.youtube.com/embed/${v.key}?enablejsapi=1&autoplay=${i===0?1:0}&rel=0" class="w-full h-full" allow="autoplay; fullscreen"></iframe></div>`; 
-                    if(vids.length > 1) {
-                        dots.innerHTML += `<div class="dot w-1.5 h-1.5 rounded-full ${i===currentIdx?'bg-blue-500':'bg-zinc-700'}"></div>`; 
-                    }
-                }); 
-                document.getElementById('swipeOverlay').style.display = vids.length > 1 ? 'block' : 'none'; 
-            } else { 
-                track.innerHTML = `<div class="carousel-slide"><iframe src="https://vidsrc.me/embed/${type}?tmdb=${id}" class="w-full h-full" allowfullscreen></iframe></div>`; 
-                document.getElementById('swipeOverlay').style.display = 'none'; 
+            if(track) {
+                track.querySelectorAll('iframe').forEach(f => f.src = "");
+                track.innerHTML = ''; dots.innerHTML = ''; track.style.transform = 'translateX(0)';
+                
+                if(vids.length > 0) { 
+                    vids.forEach((v, i) => { 
+                        track.innerHTML += `<div class="carousel-slide"><iframe id="yt-${i}" src="https://www.youtube.com/embed/${v.key}?enablejsapi=1&autoplay=${i===0?1:0}&rel=0" class="w-full h-full" allow="autoplay; fullscreen"></iframe></div>`; 
+                        if(vids.length > 1 && dots) {
+                            dots.innerHTML += `<div class="dot w-1.5 h-1.5 rounded-full ${i===currentIdx?'bg-blue-500':'bg-zinc-700'}"></div>`; 
+                        }
+                    }); 
+                    document.getElementById('swipeOverlay').style.display = vids.length > 1 ? 'block' : 'none'; 
+                } else { 
+                    track.innerHTML = `<div class="carousel-slide"><iframe src="https://vidsrc.me/embed/${type}?tmdb=${id}" class="w-full h-full" allowfullscreen></iframe></div>`; 
+                    document.getElementById('swipeOverlay').style.display = 'none'; 
+                }
             }
 
-            document.getElementById('castContainer').innerHTML = (dCast.cast || []).slice(0, 10).map(c => {
-                const profileImg = c.profile_path 
-                    ? `<img src="https://image.tmdb.org/t/p/w185${c.profile_path}" loading="lazy">` 
-                    : `<div style="width:100%; height:100%; background:#000;"></div>`;
-                
-                return `
-                    <div class="cast-item" onclick="searchByCast(${c.id})">
-                        <div class="cast-img-border">
-                            <div class="inner-border">
-                                ${profileImg}
+            const castCont = document.getElementById('castContainer');
+            if(castCont) {
+                castCont.innerHTML = (dCast.cast || []).slice(0, 10).map(c => {
+                    const profileImg = c.profile_path 
+                        ? `<img src="https://image.tmdb.org/t/p/w185${c.profile_path}" loading="lazy">` 
+                        : `<div style="width:100%; height:100%; background:#000;"></div>`;
+                    
+                    return `
+                        <div class="cast-item" onclick="searchByCast(${c.id})">
+                            <div class="cast-img-border">
+                                <div class="inner-border">
+                                    ${profileImg}
+                                </div>
                             </div>
-                        </div>
-                        <span class="cast-name">${c.name}</span>
-                    </div>`;
-            }).join('');
+                            <span class="cast-name">${c.name}</span>
+                        </div>`;
+                }).join('');
+            }
 
             document.getElementById('mLikeDisplay').innerText = `${Math.floor((dId.vote_average || 0) * 1234).toLocaleString('id-ID')} suka`; document.getElementById('mTitle').innerText = dId.title || dId.name || dEn.title;
             
@@ -694,10 +736,13 @@
             globalFullDesc = originalIndoDesc || dEn.overview || "Sinopsis belum tersedia untuk konten ini.";
             globalEnDesc = dEn.overview;
             
+            const transBtn = document.getElementById('mTranslateBtn');
             if(globalEnDesc && globalEnDesc !== originalIndoDesc) { 
-                document.getElementById('mTranslateBtn').classList.remove('hidden'); 
-                document.getElementById('mTranslateBtn').innerText = "Lihat terjemahan"; 
-            } else { document.getElementById('mTranslateBtn').classList.add('hidden'); }
+                if(transBtn) {
+                    transBtn.classList.remove('hidden'); 
+                    transBtn.innerText = "Lihat terjemahan"; 
+                }
+            } else { if(transBtn) transBtn.classList.add('hidden'); }
             
             isExpanded = false; 
             renderSynopsis();
@@ -737,23 +782,27 @@
         
         function closeModal() { 
             const track = document.getElementById('carouselTrack'); 
-            track.querySelectorAll('iframe').forEach(f => f.src = "");
-            track.innerHTML = ''; 
+            if(track) {
+                track.querySelectorAll('iframe').forEach(f => f.src = "");
+                track.innerHTML = ''; 
+            }
             document.getElementById('movieModal').style.display = 'none'; 
             document.body.style.overflow = 'auto';
         }
 
-        function renderSynopsis() { const descEl = document.getElementById('mDesc'), toggleBtn = document.getElementById('mToggleBtn'); if (globalFullDesc.length > 90) { toggleBtn.classList.remove('hidden'); descEl.innerText = isExpanded ? globalFullDesc : globalFullDesc.substring(0, 90) + "..."; toggleBtn.innerText = isExpanded ? "ringkas" : "selengkapnya"; } else { descEl.innerText = globalFullDesc; toggleBtn.classList.add('hidden'); } }
+        function renderSynopsis() { const descEl = document.getElementById('mDesc'), toggleBtn = document.getElementById('mToggleBtn'); if(!descEl) return; if (globalFullDesc.length > 90) { if(toggleBtn) toggleBtn.classList.remove('hidden'); descEl.innerText = isExpanded ? globalFullDesc : globalFullDesc.substring(0, 90) + "..."; if(toggleBtn) toggleBtn.innerText = isExpanded ? "ringkas" : "selengkapnya"; } else { descEl.innerText = globalFullDesc; if(toggleBtn) toggleBtn.classList.add('hidden'); } }
         function handleToggleDesc() { isExpanded = !isExpanded; renderSynopsis(); }
         
         function playVid(url, el) { 
             const track = document.getElementById('carouselTrack'); 
             const dots = document.getElementById('carouselDots'); 
-            track.querySelectorAll('iframe').forEach(f => f.src = "");
-            track.innerHTML = `<div class="carousel-slide"><iframe src="${url}" class="w-full h-full" allowfullscreen></iframe></div>`; 
-            track.style.transform = 'translateX(0)'; 
+            if(track) {
+                track.querySelectorAll('iframe').forEach(f => f.src = "");
+                track.innerHTML = `<div class="carousel-slide"><iframe src="${url}" class="w-full h-full" allowfullscreen></iframe></div>`; 
+                track.style.transform = 'translateX(0)'; 
+            }
             currentIdx = 0; 
-            dots.innerHTML = ''; 
+            if(dots) dots.innerHTML = ''; 
             document.getElementById('swipeOverlay').style.display = 'none'; 
             highlightBtn(el); 
         }
@@ -763,6 +812,7 @@
         
         function setupSwipe() { 
             const overlay = document.getElementById('swipeOverlay'); 
+            if(!overlay) return;
             overlay.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, {passive:true}); 
             overlay.addEventListener('touchend', e => { 
                 let diff = startX - e.changedTouches[0].clientX; 
@@ -771,8 +821,9 @@
                     let oldIdx = currentIdx; 
                     if(diff > 0 && currentIdx < slides.length - 1) currentIdx++; 
                     else if(diff < 0 && currentIdx > 0) currentIdx--; 
-                    document.getElementById('carouselTrack').style.transform = `translateX(-${currentIdx * 100}%)`; 
-                    document.querySelectorAll('.dot').forEach((d, i) => { d.className = `dot w-1.5 h-1.5 rounded-full ${i===currentIdx?'bg-blue-500':'bg-zinc-700'}'; }); 
+                    const track = document.getElementById('carouselTrack');
+                    if(track) track.style.transform = `translateX(-${currentIdx * 100}%)`; 
+                    document.querySelectorAll('.dot').forEach((d, i) => { d.className = `dot w-1.5 h-1.5 rounded-full ${i===currentIdx?'bg-blue-500':'bg-zinc-700'}`; }); 
                     const oldVid = document.getElementById(`yt-${oldIdx}`), newVid = document.getElementById(`yt-${currentIdx}`);
                     if(oldVid) try{oldVid.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');}catch(e){}
                     if(newVid) try{newVid.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');}catch(e){}
@@ -780,10 +831,10 @@
             }); 
         }
 
-        function updateLibButtons(id) { const isL = JSON.parse(localStorage.getItem('likes') || '[]').some(x=>x.id==id); const isB = JSON.parse(localStorage.getItem('bookmarks') || '[]').some(x=>x.id==id); document.getElementById('btnLikeModal').className = isL ? 'fa-solid fa-heart text-red-500 interaction-icon' : 'fa-regular fa-heart interaction-icon'; document.getElementById('btnBookModal').className = isB ? 'fa-solid fa-bookmark text-white interaction-icon' : 'fa-regular fa-bookmark interaction-icon'; document.getElementById('btnLikeModal').onclick = () => toggleLib('likes'); document.getElementById('btnBookModal').onclick = () => toggleLib('bookmarks'); }
+        function updateLibButtons(id) { const isL = JSON.parse(localStorage.getItem('likes') || '[]').some(x=>x.id==id); const isB = JSON.parse(localStorage.getItem('bookmarks') || '[]').some(x=>x.id==id); const lBtn = document.getElementById('btnLikeModal'), bBtn = document.getElementById('btnBookModal'); if(lBtn) lBtn.className = isL ? 'fa-solid fa-heart text-red-500 interaction-icon' : 'fa-regular fa-heart interaction-icon'; if(bBtn) bBtn.className = isB ? 'fa-solid fa-bookmark text-white interaction-icon' : 'fa-regular fa-bookmark interaction-icon'; if(lBtn) lBtn.onclick = () => toggleLib('likes'); if(bBtn) bBtn.onclick = () => toggleLib('bookmarks'); }
         function toggleLib(k) { let items = JSON.parse(localStorage.getItem(k) || '[]'); const idx = items.findIndex(x => x.id == window.currentMediaId); idx > -1 ? items.splice(idx,1) : items.push({id: window.currentMediaId, type: window.currentMediaType}); localStorage.setItem(k, JSON.stringify(items)); updateLibButtons(window.currentMediaId); }
-        async function switchTab(mode, el) { document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active')); el.classList.add('active'); const grid = document.getElementById('feedGrid'); grid.innerHTML = ''; if(mode === 'likes' || mode === 'bookmarks') { currentLibMode = true; showLibrary(mode); } else { currentLibMode = false; currentCastId = ''; searchQuery = ''; currentType='multi'; currentSchedule='trending'; currentCompany=''; loadFeed(true); } }
-        async function showLibrary(k) { const items = JSON.parse(localStorage.getItem(k) || '[]'); const grid = document.getElementById('feedGrid'); grid.innerHTML = ''; if (!items.length) { grid.innerHTML = '<div class="col-span-3 text-center py-20 text-zinc-500 text-xs">Belum ada konten disimpan</div>'; return; } const promises = items.map(i => fetch(`https://api.themoviedb.org/3/${i.type}/${i.id}?api_key=${API_KEY}&language=id-ID`).then(r => r.json())); const results = await Promise.all(promises); renderGrid(results.filter(m => m.id), grid); }
+        async function switchTab(mode, el) { document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active')); el.classList.add('active'); const grid = document.getElementById('feedGrid'); if(!grid) return; grid.innerHTML = ''; if(mode === 'likes' || mode === 'bookmarks') { currentLibMode = true; showLibrary(mode); } else { currentLibMode = false; currentCastId = ''; searchQuery = ''; currentType='multi'; currentSchedule='trending'; currentCompany=''; loadFeed(true); } }
+        async function showLibrary(k) { const items = JSON.parse(localStorage.getItem(k) || '[]'); const grid = document.getElementById('feedGrid'); if(!grid) return; grid.innerHTML = ''; if (!items.length) { grid.innerHTML = '<div class="col-span-3 text-center py-20 text-zinc-500 text-xs">Belum ada konten disimpan</div>'; return; } const promises = items.map(i => fetch(`https://api.themoviedb.org/3/${i.type}/${i.id}?api_key=${API_KEY}&language=id-ID`).then(r => r.json())); const results = await Promise.all(promises); renderGrid(results.filter(m => m.id), grid); }
         window.onscroll = () => { if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 1000 && !loading && !searchQuery && !currentLibMode) { page++; loadFeed(false); } };
     </script>
 </body>
