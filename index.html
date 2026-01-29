@@ -304,12 +304,12 @@
                 <div id="serverList" class="grid grid-cols-3 gap-2 mt-6"></div>
                 <div class="dl-grid">
                     <button id="btnDownload1" class="dl-link-btn" onclick="highlightBtn(this); window.open(`https://dl.vidsrc.vip/${window.currentMediaType}/${window.currentMediaId}`)">Download 1</button>
-                    <button id="btnDownloadIcu" class="dl-link-btn" onclick="highlightBtn(this); window.open(`https://vidsrc.icu/embed/${window.currentMediaType}/${window.currentMediaId}`)">Vidsrc.icu</button>
-                    <button id="btnDownloadVidrock" class="dl-link-btn" onclick="highlightBtn(this); window.open(`https://vidrock.net/embed/${window.currentMediaType}/${window.currentMediaId}`)">Vidrock</button>
-                    <button id="btnDownloadMe" class="dl-link-btn" onclick="highlightBtn(this); window.open(`https://vidsrc.me/embed/${window.currentMediaType}/${window.currentMediaId}`)">Vidsrc.me</button>
-                    <button id="btnDownloadTo" class="dl-link-btn" onclick="highlightBtn(this); window.open(`https://vidsrc.to/embed/${window.currentMediaType}/${window.currentMediaId}`)">Vidsrc.to</button>
-                    <button id="btnDownloadPro" class="dl-link-btn" onclick="highlightBtn(this); window.open(`https://vidsrc.pro/embed/${window.currentMediaType}/${window.currentMediaId}`)">Vidsrc.pro</button>
-                    <button id="btnDownloadSmashy" class="dl-link-btn col-span-2" onclick="highlightBtn(this); window.open(`https://embed.smashystream.com/playere.php?tmdb=${window.currentMediaId}`)">SmashyStream</button>
+                    <button id="btnDownloadIcu" class="dl-link-btn" onclick="highlightBtn(this); window.open(`https://vidsrc.icu/`)">Vidsrc.icu</button>
+                    <button id="btnDownloadVidrock" class="dl-link-btn" onclick="highlightBtn(this); window.open(`https://vidrock.net/`)">Vidrock</button>
+                    <button id="btnDownloadMe" class="dl-link-btn" onclick="highlightBtn(this); window.open(`https://vidsrc.me/`)">Vidsrc.me</button>
+                    <button id="btnDownloadTo" class="dl-link-btn" onclick="highlightBtn(this); window.open(`https://vidsrc.to/`)">Vidsrc.to</button>
+                    <button id="btnDownloadPro" class="dl-link-btn" onclick="highlightBtn(this); window.open(`https://vidsrc.pro/`)">Vidsrc.pro</button>
+                    <button id="btnDownloadSmashy" class="dl-link-btn col-span-2" onclick="highlightBtn(this); window.open(`https://smashystream.com/`)">SmashyStream</button>
                 </div>
             </div>
         </div>
@@ -772,7 +772,7 @@
                     if(diff > 0 && currentIdx < slides.length - 1) currentIdx++; 
                     else if(diff < 0 && currentIdx > 0) currentIdx--; 
                     document.getElementById('carouselTrack').style.transform = `translateX(-${currentIdx * 100}%)`; 
-                    document.querySelectorAll('.dot').forEach((d, i) => { d.className = `dot w-1.5 h-1.5 rounded-full ${i===currentIdx?'bg-blue-500':'bg-zinc-700'}`; }); 
+                    document.querySelectorAll('.dot').forEach((d, i) => { d.className = `dot w-1.5 h-1.5 rounded-full ${i===currentIdx?'bg-blue-500':'bg-zinc-700'}'; }); 
                     const oldVid = document.getElementById(`yt-${oldIdx}`), newVid = document.getElementById(`yt-${currentIdx}`);
                     if(oldVid) try{oldVid.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');}catch(e){}
                     if(newVid) try{newVid.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');}catch(e){}
