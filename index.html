@@ -301,15 +301,14 @@
                     <div class="flex justify-between items-center mb-4"><h4 class="text-[9px] font-black text-zinc-400 uppercase">Episode</h4><select id="seasonSel" class="bg-zinc-900 text-white text-[10px] px-2 py-1 rounded" onchange="loadEpisodes()"></select></div>
                     <div id="episodeGrid" class="grid grid-cols-5 gap-2"></div>
                 </div>
-                <div id="serverList" class="grid grid-cols-3 gap-2 mt-6"></div>
+                
+                <div id="serverList" class="grid grid-cols-4 gap-2 mt-6"></div>
                 
                 <div class="dl-grid">
-                    <button class="dl-link-btn" onclick="highlightBtn(this); handleDownload('vidsrc')">Vidsrc</button>
-                    <button class="dl-link-btn" onclick="highlightBtn(this); handleDownload('multiembed')">MultiEmbed</button>
-                    <button class="dl-link-btn" onclick="highlightBtn(this); handleDownload('superembed')">SuperEmbed</button>
-                    <button class="dl-link-btn" onclick="highlightBtn(this); handleDownload('autoembed')">AutoEmbed</button>
-                    <button class="dl-link-btn" onclick="highlightBtn(this); handleDownload('duappi')">DuaPPI</button>
-                    <button class="dl-link-btn" onclick="highlightBtn(this); handleDownload('multidirect')">MultiDirect</button>
+                    <button class="dl-link-btn" onclick="highlightBtn(this); handleDownload('icu')">Vidsrc ICU</button>
+                    <button class="dl-link-btn" onclick="highlightBtn(this); handleDownload('gidsrc')">Gidsrc / DuaPPI</button>
+                    <button class="dl-link-btn" onclick="highlightBtn(this); handleDownload('filemoon')">FileMoon DL</button>
+                    <button class="dl-link-btn" onclick="highlightBtn(this); handleDownload('vip')">Vidsrc VIP</button>
                 </div>
             </div>
         </div>
@@ -653,6 +652,9 @@
             ]);
             
             const dId = await rId.json(), dEn = await rEn.json(), dCast = await rCast.json();
+            const s = document.getElementById('seasonSel')?.value || 1;
+            const e = 1;
+
             const vids = [...(dId.videos?.results || []), ...(dEn.videos?.results || [])].filter(v => v.site === 'YouTube' && (v.type === 'Trailer' || v.type === 'Teaser')).slice(0, 4);
             const track = document.getElementById('carouselTrack'), dots = document.getElementById('carouselDots');
             
@@ -709,7 +711,15 @@
             document.getElementById('mHashtags').innerHTML = `#${(dId.title||dId.name||"").replace(/[^a-zA-Z0-9]/g, '')} #${relYear} #${contentKind} <br> ${genresArr} ${studiosArr}`;
             const rel = dId.release_date || dId.first_air_date || ""; 
             document.getElementById('mDateDisplay').innerText = rel ? new Date(rel).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
-            document.getElementById('serverList').innerHTML = `<button class="server-btn" onclick="playVid('https://vidsrc.me/embed/${type}?tmdb=${id}', this)">Server 1</button><button class="server-btn" onclick="playVid('https://vidrock.net/embed/${type}/${id}${type==='tv'?'/1/1':''}', this)">Server 2</button><button class="server-btn" onclick="playVid('https://embed.smashystream.com/playere.php?tmdb=${id}', this)">Server 3</button>`;
+            
+            // UPDATE SERVER LIST JADI 4 TOMBOL
+            document.getElementById('serverList').innerHTML = `
+                <button class="server-btn" onclick="playVid('https://vidsrc.me/embed/${type}?tmdb=${id}', this)">Server 1</button>
+                <button class="server-btn" onclick="playVid('https://vidrock.net/embed/${type}/${id}${type==='tv'?'/1/1':''}', this)">Server 2</button>
+                <button class="server-btn" onclick="playVid('https://embed.smashystream.com/playere.php?tmdb=${id}', this)">Server 3</button>
+                <button class="server-btn" onclick="playVid('https://multiembed.mov/?video_id=${id}&tmdb=1${type==='tv'?`&s=${s}&e=${e}`:''}', this)">Server 4</button>
+            `;
+            
             if(type === 'tv') { document.getElementById('seriesControl').classList.remove('hidden'); document.getElementById('seasonSel').innerHTML = (dId.seasons||[]).filter(s=>s.season_number>0).map(s=>`<option value="${s.season_number}">Season ${s.season_number}</option>`).join(''); loadEpisodes(); } else { document.getElementById('seriesControl').classList.add('hidden'); }
             updateLibButtons(id);
         }
@@ -791,16 +801,22 @@
             const id = window.currentMediaId;
             const type = window.currentMediaType;
             const s = document.getElementById('seasonSel')?.value || 1;
-            const e = 1; // Default episode 1, bisa dikembangkan jika perlu deteksi klik episode
+            const e = 1; // Default episode 1
 
             let url = "";
             switch(provider) {
-                case 'vidsrc': url = `https://dl.vidsrc.vip/${type}/${id}`; break;
-                case 'multiembed': url = `https://multiembed.mov/?video_id=${id}&tmdb=1${type==='tv'?`&s=${s}&e=${e}`:''}`; break;
-                case 'superembed': url = `https://multiembed.mov/directstream.php?video_id=${id}&tmdb=1`; break; // Menggunakan link direct multiembed
-                case 'autoembed': url = `https://autoembed.to/download/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`; break;
-                case 'duappi': url = `https://duappi.com/download/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`; break;
-                case 'multidirect': url = `https://multiembed.mov/directstream.php?video_id=${id}&tmdb=1`; break;
+                case 'icu': 
+                    url = `https://vidsrc.icu/embed/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`; 
+                    break;
+                case 'gidsrc': 
+                    url = `https://gidsrc.xyz/embed/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`; 
+                    break;
+                case 'filemoon': 
+                    url = `https://filemoon.sx/e/${id}`; 
+                    break;
+                case 'vip': 
+                    url = `https://vidsrc.vip/embed/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`; 
+                    break;
             }
             window.open(url, '_blank');
         }
