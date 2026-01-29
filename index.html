@@ -303,10 +303,11 @@
                 </div>
                 <div id="serverList" class="grid grid-cols-3 gap-2 mt-6"></div>
                 <div class="dl-grid">
-                    <button class="dl-link-btn" style="border-color:#555; color:#fff;" onclick="handleDownload('main')">Main Download</button>
-                    <button class="dl-link-btn" onclick="handleDownload('pro')">Server PRO</button>
-                    <button class="dl-link-btn" onclick="handleDownload('vip')">Server VIP</button>
-                    <button class="dl-link-btn" onclick="handleDownload('icu')">Server ICU</button>
+                    <button id="btnDownload1" class="dl-link-btn" onclick="highlightBtn(this); window.open(`https://dl.vidsrc.vip/${window.currentMediaType}/${window.currentMediaId}`)">Download 1</button>
+                    <button id="btnDownloadVidsrcPm" class="dl-link-btn" onclick="highlightBtn(this); window.open(`https://vidsrc.pm/download/${window.currentMediaType}/${window.currentMediaId}`)">Vidsrc.pm</button>
+                    <button id="btnDownload2Embed" class="dl-link-btn" onclick="highlightBtn(this); window.open(`https://www.2embed.cc/download/${window.currentMediaId}`)">2Embed</button>
+                    <button id="btnDownloadGdrive" class="dl-link-btn" onclick="highlightBtn(this); window.open(`https://gdriveplayer.to/download/${window.currentMediaType}/${window.currentMediaId}`)">Gdrive Player</button>
+                    <button id="btnDownloadDbGdrive" class="dl-link-btn col-span-2" onclick="highlightBtn(this); window.open(`https://database.gdriveplayer.me/player.php?type=download&tmdb=${window.currentMediaId}`)">Database Gdrive</button>
                 </div>
             </div>
         </div>
@@ -732,19 +733,6 @@
             }
         }
         
-        function handleDownload(provider) {
-            const id = window.currentMediaId; 
-            const type = window.currentMediaType;
-            const s = document.getElementById('seasonSel')?.value || 1;
-            const urls = {
-                main: `https://dl.vidsrc.vip/embed/${type}/${id}${type==='tv'?'/'+s+'/1':''}`,
-                pro: `https://vidsrc.pro/embed/${type}/${id}${type==='tv'?'/'+s+'/1':''}`,
-                vip: `https://vidsrc.vip/embed/${type}/${id}${type==='tv'?'/'+s+'/1':''}`,
-                icu: `https://vidsrc.icu/embed/${type}/${id}${type==='tv'?'/'+s+'/1':''}`
-            };
-            window.open(urls[provider], '_blank');
-        }
-
         function closeModal() { 
             const track = document.getElementById('carouselTrack'); 
             track.querySelectorAll('iframe').forEach(f => f.src = "");
