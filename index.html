@@ -111,7 +111,7 @@
         .server-btn { width: 100%; padding: 12px 5px; border-radius: 8px; font-size: 8px; font-weight: 800; text-transform: uppercase; border: 1px solid #1c1c1c; text-align: center; cursor: pointer; background: #0a0a0a; color: #fff; }
         .server-btn.active-link { border: 2px solid #fff !important; }
         .dl-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 15px; }
-        .dl-link-btn { width: 100%; padding: 14px; border-radius: 12px; background: #000; color: #a1a1aa; font-size: 10px; font-weight: 800; text-transform: uppercase; text-align: center; border: 1px solid #1c1c1c; }
+        .dl-link-btn { width: 100%; padding: 14px; border-radius: 12px; background: #000; color: #a1a1aa; font-size: 10px; font-weight: 800; text-transform: uppercase; text-align: center; border: 1px solid #1c1c1c; cursor: pointer; }
         
         .cast-wrapper { display: flex; overflow-x: auto; gap: 15px; padding: 15px 0; scrollbar-width: none; }
         .cast-item { flex: 0 0 65px; text-align: center; cursor: pointer; }
@@ -302,9 +302,11 @@
                     <div id="episodeGrid" class="grid grid-cols-5 gap-2"></div>
                 </div>
                 <div id="serverList" class="grid grid-cols-3 gap-2 mt-6"></div>
-                <div class="dl-grid">
-                    <button id="btnDownload1" class="dl-link-btn" onclick="highlightBtn(this); window.open(`https://dl.vidsrc.vip/${window.currentMediaType}/${window.currentMediaId}`)">Download 1</button>
-                    <button id="btnDownload2" class="dl-link-btn" onclick="highlightBtn(this); window.open(`https://multiembed.mov/directstream.php?video_id=${window.currentMediaId}&tmdb=1`)">Download 2</button>
+                
+                <div id="downloadContainer" class="mt-6 space-y-2">
+                    <h4 class="text-[9px] font-black text-zinc-400 uppercase tracking-widest px-1">Download Links</h4>
+                    <div class="dl-grid" id="dlGrid">
+                        </div>
                 </div>
             </div>
         </div>
@@ -706,7 +708,26 @@
             document.getElementById('mDateDisplay').innerText = rel ? new Date(rel).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
             document.getElementById('serverList').innerHTML = `<button class="server-btn" onclick="playVid('https://vidsrc.me/embed/${type}?tmdb=${id}', this)">Server 1</button><button class="server-btn" onclick="playVid('https://vidrock.net/embed/${type}/${id}${type==='tv'?'/1/1':''}', this)">Server 2</button><button class="server-btn" onclick="playVid('https://embed.smashystream.com/playere.php?tmdb=${id}', this)">Server 3</button>`;
             if(type === 'tv') { document.getElementById('seriesControl').classList.remove('hidden'); document.getElementById('seasonSel').innerHTML = (dId.seasons||[]).filter(s=>s.season_number>0).map(s=>`<option value="${s.season_number}">Season ${s.season_number}</option>`).join(''); loadEpisodes(); } else { document.getElementById('seriesControl').classList.add('hidden'); }
+            
+            // UPDATE LOGIKA DOWNLOAD LINKS
+            updateDownloadLinks(id, type);
             updateLibButtons(id);
+        }
+
+        function updateDownloadLinks(id, type) {
+            const dlGrid = document.getElementById('dlGrid');
+            const providers = [
+                { name: 'VIDSRC ICU', url: `https://vidsrc.icu/embed/${type}/${id}` },
+                { name: 'VIDROCK NET', url: `https://vidrock.net/embed/${type}/${id}` },
+                { name: 'VIDSRC ME', url: `https://vidsrc.me/embed/${type}?tmdb=${id}` },
+                { name: 'VIDSRC TO', url: `https://vidsrc.to/embed/${type}/${id}` },
+                { name: 'VIDSRC PRO', url: `https://vidsrc.pro/embed/${type}/${id}` },
+                { name: 'SMASHY', url: `https://smashystream.com/embed/${type}/${id}` }
+            ];
+
+            dlGrid.innerHTML = providers.map(p => `
+                <button class="dl-link-btn" onclick="window.open('${p.url}', '_blank')">${p.name}</button>
+            `).join('');
         }
 
         async function handleTranslate() {
