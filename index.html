@@ -304,8 +304,8 @@
                 <div id="serverList" class="grid grid-cols-4 gap-2 mt-6"></div>
                 <div class="dl-grid grid-cols-3">
                     <button id="btnDownload1" class="dl-link-btn" onclick="highlightBtn(this); window.open(`https://dl.vidsrc.vip/${window.currentMediaType}/${window.currentMediaId}`)">Download 1</button>
-                    <button id="btnDownload2" class="dl-link-btn" onclick="highlightBtn(this); window.open(`https://simplemovie.top/api/download/${window.currentMediaType}/${window.currentMediaId}`)">Download 2</button>
-                    <button id="btnDownload3" class="dl-link-btn" onclick="highlightBtn(this); window.open(`https://hydrax.net/watch/${window.currentMediaId}`)">Download 3</button>
+                    <button id="btnDownload2" class="dl-link-btn" onclick="highlightBtn(this); window.open(`https://vidsrc.xyz/embed/${window.currentMediaType}/${window.currentMediaId}`)">Download 2</button>
+                    <button id="btnDownload3" class="dl-link-btn" onclick="highlightBtn(this); window.open(`https://vidsrc.pro/embed/${window.currentMediaType}/${window.currentMediaId}`)">Download 3</button>
                 </div>
             </div>
         </div>
@@ -706,7 +706,6 @@
             const rel = dId.release_date || dId.first_air_date || ""; 
             document.getElementById('mDateDisplay').innerText = rel ? new Date(rel).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
             
-            // UPDATE: Menambahkan Server 4 (MultiEmbed) ke daftar streaming
             document.getElementById('serverList').innerHTML = `
                 <button class="server-btn" onclick="playVid('https://vidsrc.me/embed/${type}?tmdb=${id}', this)">Server 1</button>
                 <button class="server-btn" onclick="playVid('https://vidrock.net/embed/${type}/${id}${type==='tv'?'/1/1':''}', this)">Server 2</button>
