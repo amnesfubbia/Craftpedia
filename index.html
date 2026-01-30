@@ -59,7 +59,7 @@
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
         .sticky-reset { position: sticky; top: 0; background: #1c1c1c; z-index: 10; font-weight: 800 !important; color: #fff !important; border-bottom: 2px solid #333; }
         #filterOverlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9400; }
-        .filter-item { padding: 16px; font-size: 14px; text-align: center; border-bottom: 1px solid #262626; color: #eee; cursor: pointer; }
+        .filter-item { padding: 166px; font-size: 14px; text-align: center; border-bottom: 1px solid #262626; color: #eee; cursor: pointer; }
 
         .highlights-wrapper { padding: 0 15px 15px 15px; border-bottom: 1px solid #1c1c1c; }
         .highlights-container { display: flex; gap: 18px; overflow-x: auto; }
@@ -203,14 +203,14 @@
         <i class="fa-solid fa-xmark side-close" onclick="toggleSideMenu()"></i>
         <div class="about-title">About Amnesfubbia</div>
         <div class="about-content">
-            amnesfubbia adalah platform katalog sinema digital yang dirancang untuk memberikan pengalaman eksplorasi film dan series tanpa batas.
+            amnesfubbia adalah platform katalog sinema digital yang dirancang untuk memberikan pengalaman eksplorasi movie dan tv tanpa batas.
         </div>
         <div class="about-feature">
             <div class="font-bold mb-3 text-white">Fitur Utama:</div>
             <ul class="space-y-3 text-[13px]">
-                <li>🎬 <span class="font-semibold text-white">Database Luas:</span> Akses ke lebih dari 25.000+ film dan series global.</li>
+                <li>🎬 <span class="font-semibold text-white">Database Luas:</span> Akses ke lebih dari 25.000+ movie dan tv global.</li>
                 <li>🔍 <span class="font-semibold text-white">Smart Search:</span> Cari berdasarkan judul, aktor, hingga studio produksi (Marvel, Disney, dll).</li>
-                <li>📥 <span class="font-semibold text-white">Personal Archive:</span> Simpan film favoritmu ke dalam koleksi pribadi (Bookmark).</li>
+                <li>📥 <span class="font-semibold text-white">Personal Archive:</span> Simpan movie favoritmu ke dalam koleksi pribadi (Bookmark).</li>
                 <li>🌍 <span class="font-semibold text-white">Multi-Server:</span> Pilihan server streaming dan download yang stabil.</li>
             </ul>
         </div>
@@ -243,8 +243,8 @@
                     <div class="add-story-btn"><i class="fa-solid fa-plus"></i></div>
                 </div>
                 <div class="stats">
-                    <div class="stat-item" id="stat-movie" onclick="setFilter('type', 'movie', this)"><span class="stat-val">25.4rb</span><span class="stat-label">film</span></div>
-                    <div class="stat-item" id="stat-tv" onclick="setFilter('type', 'tv', this)"><span class="stat-val">8.2rb</span><span class="stat-label">series</span></div>
+                    <div class="stat-item" id="stat-movie" onclick="setFilter('type', 'movie', this)"><span class="stat-val">25.4rb</span><span class="stat-label">movie</span></div>
+                    <div class="stat-item" id="stat-tv" onclick="setFilter('type', 'tv', this)"><span class="stat-val">8.2rb</span><span class="stat-label">tv</span></div>
                     <div class="stat-item" id="stat-short" onclick="setFilter('type', 'short', this)"><span class="stat-val">1.5rb</span><span class="stat-label">short</span></div>
                 </div>
             </div>
@@ -252,7 +252,7 @@
             <div class="bio">
                 <div class="bio-name-wrapper"><span class="bio-name">amnesfubbia</span><i class="fa-solid fa-circle-check text-[#0095f6] text-[13px]"></i></div>
                 <span>🎬 Discover. Watch. Archive.</span><br>
-                <span class="text-zinc-400">Cari film, tonton trailer, simpan & Download film favoritmu.</span>
+                <span class="text-zinc-400">Cari movie, tonton trailer, simpan & Download movie favoritmu.</span>
             </div>
 
             <div class="action-buttons">
@@ -286,7 +286,7 @@
             <i class="fa-solid fa-arrow-left text-xl text-white" onclick="closeSearch()"></i>
             <div class="search-input-box">
                 <i class="fa-solid fa-magnifying-glass text-zinc-500 text-xs"></i>
-                <input type="text" id="searchInp" autocomplete="off" placeholder="Cari film, series, atau aktor..." onkeydown="if(event.key==='Enter') searchAction()">
+                <input type="text" id="searchInp" autocomplete="off" placeholder="Cari movie, tv, atau aktor..." onkeydown="if(event.key==='Enter') searchAction()">
                 <div id="smartSearchDropdown" class="no-scrollbar"></div>
             </div>
         </div>
@@ -339,7 +339,7 @@
                     <div class="flex justify-between items-center mb-4"><h4 class="text-[9px] font-black text-zinc-400 uppercase">Episode</h4><select id="seasonSel" class="bg-zinc-900 text-white text-[10px] px-2 py-1 rounded" onchange="loadEpisodes()"></select></div>
                     <div id="episodeGrid" class="grid grid-cols-5 gap-2"></div>
                 </div>
-                <div id="serverList" class="grid grid-cols-3 gap-2 mt-6"></div>
+                <div id="serverList" class="grid grid-cols-4 gap-2 mt-6"></div>
                 <div class="dl-grid">
                     <button id="btnDownload1" class="dl-link-btn" onclick="highlightBtn(this); window.open(`https://dl.vidsrc.vip/${window.currentMediaType}/${window.currentMediaId}`)">Download 1</button>
                     <button id="btnDownload2" class="dl-link-btn" onclick="highlightBtn(this); window.open(`https://multiembed.mov/directstream.php?video_id=${window.currentMediaId}&tmdb=1`)">Download 2</button>
@@ -385,15 +385,12 @@
             lsTitle.innerText = document.getElementById('mTitle').innerText;
             overlay.style.display = 'block';
             
-            // Clone iframe to landscape
             const newIframe = currentIframe.cloneNode(true);
             newIframe.id = "lsIframe";
-            // Ensure ID is unique and remove existing if any
             const existing = document.getElementById('lsIframe');
             if(existing) existing.remove();
             lsVideoBox.prepend(newIframe);
 
-            // Attempt auto rotation (Browser security might block without user interaction)
             try {
                 if (document.documentElement.requestFullscreen) {
                     await document.documentElement.requestFullscreen();
@@ -444,8 +441,6 @@
             document.getElementById('lsUI').style.display = 'flex';
             document.getElementById('lsLockLayer').style.display = 'none';
         }
-
-        /* --- ORIGINAL FUNCTIONS (RESTORED/UNTOUCHED) --- */
 
         function updateActiveNav(el) { document.querySelectorAll('.bottom-nav i').forEach(i => i.classList.remove('active-nav')); el.classList.add('active-nav'); }
 
@@ -498,7 +493,7 @@
                                 const mId = m.id;
                                 const isPerson = mType === 'person';
                                 const clickAction = isPerson ? `searchByCast(${mId})` : `openModal(${mId}, '${mType}')`;
-                                const meta = isPerson ? 'Pemeran / Aktor' : (mType === 'tv' ? 'Series' : 'Film');
+                                const meta = isPerson ? 'Pemeran / Aktor' : (mType === 'tv' ? 'tv' : 'movie');
                                 const imgPath = m.poster_path || m.profile_path || '';
                                 
                                 return `<div class="smart-item" onclick="${clickAction}; document.getElementById('smartSearchDropdown').style.display='none';">
@@ -521,26 +516,21 @@
             const grid = document.getElementById('searchGrid');
             const overlay = document.getElementById('searchOverlay');
             const titleInp = document.getElementById('searchInp');
-            
             overlay.style.display = 'block';
             titleInp.value = '';
             titleInp.placeholder = "Jadwal Rilis Mendatang...";
             grid.innerHTML = '<div class="col-span-3 text-center py-10 text-zinc-500">Memuat jadwal rilis...</div>';
             document.body.style.overflow = 'hidden';
-
             try {
                 const today = new Date().toISOString().split('T')[0];
                 const res = await fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=id-ID&sort_by=primary_release_date.asc&primary_release_date.gte=${today}`);
                 const data = await res.json();
-                
                 grid.innerHTML = ''; 
-                
                 data.results.forEach(m => {
                     if(!m.release_date) return;
                     const relDate = new Date(m.release_date);
                     const day = relDate.getDate();
                     const month = relDate.toLocaleDateString('id-ID', { month: 'short' });
-
                     const item = document.createElement('div');
                     item.className = 'col-span-3 calendar-item cursor-pointer active:bg-zinc-900';
                     item.onclick = () => openModal(m.id, 'movie');
@@ -557,9 +547,7 @@
                     `;
                     grid.appendChild(item);
                 });
-            } catch (e) {
-                grid.innerHTML = '<div class="col-span-3 text-center py-10">Gagal memuat jadwal.</div>';
-            }
+            } catch (e) { grid.innerHTML = '<div class="col-span-3 text-center py-10">Gagal memuat jadwal.</div>'; }
         }
 
         function searchByCast(castId) { 
@@ -626,7 +614,6 @@
             loading = true; abortController = new AbortController();
             const grid = document.getElementById('searchOverlay').style.display === 'block' ? document.getElementById('searchGrid') : document.getElementById('feedGrid');
             if(isNew) { page = 1; grid.innerHTML = ''; }
-            
             let url;
             if(currentCastId) { url = `https://api.themoviedb.org/3/person/${currentCastId}/combined_credits?api_key=${API_KEY}&language=id-ID`; }
             else if(searchQuery) { url = `https://api.themoviedb.org/3/search/multi?query=${encodeURIComponent(searchQuery)}&api_key=${API_KEY}&language=id-ID&page=${page}&include_adult=false`; }
@@ -650,17 +637,13 @@
                     else url += `&primary_release_year=${currentYear}`;
                 }
             }
-
             try { 
                 const res = await fetch(url, { signal: abortController.signal }); 
                 const data = await res.json(); 
                 let items = data.results || data.cast || []; 
                 if(currentCastId) items.sort((a,b) => b.popularity - a.popularity);
-                if(items.length === 0 && isNew) {
-                    grid.innerHTML = `<div class="col-span-3 text-center py-20 text-zinc-600 text-xs">Konten tidak ditemukan.</div>`;
-                } else {
-                    renderGrid(items, grid); 
-                }
+                if(items.length === 0 && isNew) { grid.innerHTML = `<div class="col-span-3 text-center py-20 text-zinc-600 text-xs">Konten tidak ditemukan.</div>`; } 
+                else { renderGrid(items, grid); }
             } catch(e) { if(e.name !== 'AbortError') console.error(e); }
             loading = false;
         }
@@ -677,7 +660,7 @@
                 const card = document.createElement('div'); 
                 card.className = 'post-card'; 
                 card.onclick = function() { openModal(m.id, mType); }; 
-                card.innerHTML = `<div class="badge-rating">★ ${(m.vote_average||0).toFixed(1)}</div><div class="badge-type">${currentType==='short'?'SHORT':(mType==='tv'?'SERIES':'FILM')}</div><img src="https://image.tmdb.org/t/p/w342${m.poster_path}" loading="lazy">`; 
+                card.innerHTML = `<div class="badge-rating">★ ${(m.vote_average||0).toFixed(1)}</div><div class="badge-type">${currentType==='short'?'SHORT':(mType==='tv'?'tv':'movie')}</div><img src="https://image.tmdb.org/t/p/w342${m.poster_path}" loading="lazy">`; 
                 grid.appendChild(card); 
             }); 
         }
@@ -685,7 +668,7 @@
         function openSearch() { 
             const titleInp = document.getElementById('searchInp');
             document.getElementById('searchOverlay').style.display = 'block'; 
-            titleInp.placeholder = "Cari film, series, atau aktor...";
+            titleInp.placeholder = "Cari movie, tv, atau aktor...";
             titleInp.value = ''; 
             document.getElementById('searchGrid').innerHTML = ''; 
             titleInp.focus(); 
@@ -693,13 +676,7 @@
         }
         function closeSearch() { document.getElementById('searchOverlay').style.display = 'none'; document.body.style.overflow='auto'; searchQuery=''; currentCastId=''; document.getElementById('smartSearchDropdown').style.display = 'none'; }
         
-        function searchAction() { 
-            currentLibMode = false; 
-            currentCastId = ''; 
-            searchQuery = document.getElementById('searchInp').value; 
-            document.getElementById('smartSearchDropdown').style.display = 'none'; 
-            loadFeed(true); 
-        }
+        function searchAction() { currentLibMode = false; currentCastId = ''; searchQuery = document.getElementById('searchInp').value; document.getElementById('smartSearchDropdown').style.display = 'none'; loadFeed(true); }
 
         function toggleFilterBar() { const b = document.getElementById('filterBar'); b.style.display = b.style.display === 'block' ? 'none' : 'block'; }
         
@@ -781,43 +758,42 @@
             }
 
             document.getElementById('castContainer').innerHTML = (dCast.cast || []).slice(0, 10).map(c => {
-                const profileImg = c.profile_path 
-                    ? `<img src="https://image.tmdb.org/t/p/w185${c.profile_path}" loading="lazy">` 
-                    : `<div style="width:100%; height:100%; background:#000;"></div>`;
-                
-                return `
-                    <div class="cast-item" onclick="searchByCast(${c.id})">
-                        <div class="cast-img-border">
-                            <div class="inner-border">
-                                ${profileImg}
-                            </div>
-                        </div>
-                        <span class="cast-name">${c.name}</span>
-                    </div>`;
+                const profileImg = c.profile_path ? `<img src="https://image.tmdb.org/t/p/w185${c.profile_path}" loading="lazy">` : `<div style="width:100%; height:100%; background:#000;"></div>`;
+                return `<div class="cast-item" onclick="searchByCast(${c.id})"><div class="cast-img-border"><div class="inner-border">${profileImg}</div></div><span class="cast-name">${c.name}</span></div>`;
             }).join('');
 
             document.getElementById('mLikeDisplay').innerText = `${Math.floor((dId.vote_average || 0) * 1234).toLocaleString('id-ID')} suka`; document.getElementById('mTitle').innerText = dId.title || dId.name || dEn.title;
-            
             originalIndoDesc = dId.overview;
             globalFullDesc = originalIndoDesc || dEn.overview || "Sinopsis belum tersedia untuk konten ini.";
             globalEnDesc = dEn.overview;
-            
-            if(globalEnDesc && globalEnDesc !== originalIndoDesc) { 
-                document.getElementById('mTranslateBtn').classList.remove('hidden'); 
-                document.getElementById('mTranslateBtn').innerText = "Lihat terjemahan"; 
-            } else { document.getElementById('mTranslateBtn').classList.add('hidden'); }
-            
-            isExpanded = false; 
-            renderSynopsis();
+            if(globalEnDesc && globalEnDesc !== originalIndoDesc) { document.getElementById('mTranslateBtn').classList.remove('hidden'); document.getElementById('mTranslateBtn').innerText = "Lihat terjemahan"; } else { document.getElementById('mTranslateBtn').classList.add('hidden'); }
+            isExpanded = false; renderSynopsis();
 
             const relYear = (dId.release_date || dId.first_air_date || "2026").split('-')[0];
-            const contentKind = (type === 'tv') ? 'Series' : 'Film';
+            const contentKind = (type === 'tv') ? 'tv' : 'movie';
             const genresArr = (dId.genres || []).map(g => `#${g.name.replace(/[^a-zA-Z0-9]/g, '')}`).slice(0, 3).join(' ');
             const studiosArr = (dId.production_companies || []).map(c => `#${c.name.replace(/[^a-zA-Z0-9]/g, '')}`).slice(0, 2).join(' ');
             document.getElementById('mHashtags').innerHTML = `#${(dId.title||dId.name||"").replace(/[^a-zA-Z0-9]/g, '')} #${relYear} #${contentKind} <br> ${genresArr} ${studiosArr}`;
             const rel = dId.release_date || dId.first_air_date || ""; 
             document.getElementById('mDateDisplay').innerText = rel ? new Date(rel).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
-            document.getElementById('serverList').innerHTML = `<button class="server-btn" onclick="playVid('https://vidsrc.me/embed/${type}?tmdb=${id}', this)">Server 1</button><button class="server-btn" onclick="playVid('https://vidrock.net/embed/${type}/${id}${type==='tv'?'/1/1':''}', this)">Server 2</button><button class="server-btn" onclick="playVid('https://embed.smashystream.com/playere.php?tmdb=${id}', this)">Server 3</button>`;
+            
+            // --- UPDATED SERVER LIST LOGIC START ---
+            document.getElementById('serverList').innerHTML = `
+                <button class="server-btn" onclick="playVid('https://vidsrc.me/embed/${type}?tmdb=${id}', this)">S1 VidSrc Me</button>
+                <button class="server-btn" onclick="playVid('https://vidrock.net/embed/${type}/${id}${type==='tv'?'/1/1':''}', this)">S2 VidRock</button>
+                <button class="server-btn" onclick="playVid('https://vidlink.pro/${type}?tmdb=${id}${type==='tv'?'&s=1&e=1':''}', this)">S3 Vidlink</button>
+                <button class="server-btn" onclick="playVid('https://vidnest.fun/${type}?tmdb=${id}${type==='tv'?'&s=1&e=1':''}', this)">S4 Vidnest</button>
+                <button class="server-btn" onclick="playVid('https://vidsrc.icu/embed/${type}?tmdb=${id}${type==='tv'?'&s=1&e=1':''}', this)">S5 vidsrc icu</button>
+                <button class="server-btn" onclick="playVid('https://vidsrc.to/embed/${type}?tmdb=${id}${type==='tv'?'/1/1':''}', this)">S6 vidsrc to</button>
+                <button class="server-btn" onclick="playVid('https://www.2embed.cc/${type}?tmdb=${id}${type==='tv'?'&s=1&e=1':''}', this)">S7 2embed</button>
+                <button class="server-btn" onclick="playVid('https://vidfast.pro/${type}?tmdb=${id}${type==='tv'?'&s=1&e=1':''}', this)">S8 vidfast</button>
+                <button class="server-btn" onclick="playVid('https://embed.smashystream.com/playere.php?tmdb=${id}', this)">S9 Smashy</button>
+                <button class="server-btn" onclick="playVid('https://vidsrc.xyz/embed/${type}/${id}${type==='tv'?'/1/1':''}', this)">S10 xyz</button>
+                <button class="server-btn" onclick="playVid('https://vidstorm.ru/${type}/${id}${type==='tv'?'/1/1':''}', this)">S11 vidstorm</button>
+                <button class="server-btn" onclick="playVid('https://multiembed.mov/directstream.php?video_id=${id}&tmdb=1', this)">S12 Multi</button>
+            `;
+            // --- UPDATED SERVER LIST LOGIC END ---
+
             if(type === 'tv') { document.getElementById('seriesControl').classList.remove('hidden'); document.getElementById('seasonSel').innerHTML = (dId.seasons||[]).filter(s=>s.season_number>0).map(s=>`<option value="${s.season_number}">Season ${s.season_number}</option>`).join(''); loadEpisodes(); } else { document.getElementById('seriesControl').classList.add('hidden'); }
             updateLibButtons(id);
         }
@@ -825,31 +801,20 @@
         async function handleTranslate() {
             const btn = document.getElementById('mTranslateBtn');
             if(!isTranslated) {
-                const oldText = btn.innerText;
-                btn.innerText = "Menerjemahkan...";
+                const oldText = btn.innerText; btn.innerText = "Menerjemahkan...";
                 try {
                     const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=id&dt=t&q=${encodeURIComponent(globalEnDesc)}`);
                     const data = await res.json();
                     globalFullDesc = data[0].map(x => x[0]).join('');
-                    isTranslated = true;
-                    btn.innerText = "Lihat versi asli";
-                    renderSynopsis();
+                    isTranslated = true; btn.innerText = "Lihat versi asli"; renderSynopsis();
                 } catch(e) { btn.innerText = "Gagal menerjemahkan"; setTimeout(()=>btn.innerText=oldText, 2000); }
             } else {
                 globalFullDesc = originalIndoDesc || globalEnDesc || "Sinopsis tidak tersedia.";
-                isTranslated = false;
-                btn.innerText = "Lihat terjemahan";
-                renderSynopsis();
+                isTranslated = false; btn.innerText = "Lihat terjemahan"; renderSynopsis();
             }
         }
         
-        function closeModal() { 
-            const track = document.getElementById('carouselTrack'); 
-            track.querySelectorAll('iframe').forEach(f => f.src = "");
-            track.innerHTML = ''; 
-            document.getElementById('movieModal').style.display = 'none'; 
-            document.body.style.overflow = 'auto';
-        }
+        function closeModal() { const track = document.getElementById('carouselTrack'); track.querySelectorAll('iframe').forEach(f => f.src = ""); track.innerHTML = ''; document.getElementById('movieModal').style.display = 'none'; document.body.style.overflow = 'auto'; }
 
         function renderSynopsis() { const descEl = document.getElementById('mDesc'), toggleBtn = document.getElementById('mToggleBtn'); if (globalFullDesc.length > 90) { toggleBtn.classList.remove('hidden'); descEl.innerText = isExpanded ? globalFullDesc : globalFullDesc.substring(0, 90) + "..."; toggleBtn.innerText = isExpanded ? "ringkas" : "selengkapnya"; } else { descEl.innerText = globalFullDesc; toggleBtn.classList.add('hidden'); } }
         function handleToggleDesc() { isExpanded = !isExpanded; renderSynopsis(); }
@@ -859,15 +824,17 @@
             const dots = document.getElementById('carouselDots'); 
             track.querySelectorAll('iframe').forEach(f => f.src = "");
             track.innerHTML = `<div class="carousel-slide"><iframe src="${url}" class="w-full h-full" allowfullscreen></iframe></div>`; 
-            track.style.transform = 'translateX(0)'; 
-            currentIdx = 0; 
-            dots.innerHTML = ''; 
-            document.getElementById('swipeOverlay').style.display = 'none'; 
-            highlightBtn(el); 
+            track.style.transform = 'translateX(0)'; currentIdx = 0; dots.innerHTML = ''; 
+            document.getElementById('swipeOverlay').style.display = 'none'; highlightBtn(el); 
         }
         
         function highlightBtn(el) { document.querySelectorAll('.server-btn').forEach(b => b.classList.remove('active-link')); el.classList.add('active-link'); }
-        async function loadEpisodes() { const s = document.getElementById('seasonSel').value; const res = await fetch(`https://api.themoviedb.org/3/tv/${window.currentMediaId}/season/${s}?api_key=${API_KEY}`); const d = await res.json(); document.getElementById('episodeGrid').innerHTML = (d.episodes||[]).map(e => `<div class="pill text-[10px]" onclick="playVid('https://vidrock.net/embed/tv/${window.currentMediaId}/${s}/${e.episode_number}', this)">${e.episode_number}</div>`).join(''); }
+        async function loadEpisodes() { 
+            const s = document.getElementById('seasonSel').value; 
+            const res = await fetch(`https://api.themoviedb.org/3/tv/${window.currentMediaId}/season/${s}?api_key=${API_KEY}`); 
+            const d = await res.json(); 
+            document.getElementById('episodeGrid').innerHTML = (d.episodes||[]).map(e => `<div class="pill text-[10px]" onclick="playVid('https://vidsrc.me/embed/tv?tmdb=${window.currentMediaId}&s=${s}&e=${e.episode_number}', this)">${e.episode_number}</div>`).join(''); 
+        }
         
         function setupSwipe() { 
             const overlay = document.getElementById('swipeOverlay'); 
