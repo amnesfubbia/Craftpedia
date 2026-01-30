@@ -110,8 +110,8 @@
         .interaction-icon { font-size: 24px; cursor: pointer; color: #fff; }
         .server-btn { width: 100%; padding: 12px 5px; border-radius: 8px; font-size: 8px; font-weight: 800; text-transform: uppercase; border: 1px solid #1c1c1c; text-align: center; cursor: pointer; background: #0a0a0a; color: #fff; }
         .server-btn.active-link { border: 2px solid #fff !important; }
-        .dl-grid { display: grid; grid-template-columns: repeat(1, 1fr); gap: 8px; margin-top: 15px; }
-        .dl-link-btn { width: 100%; padding: 14px; border-radius: 12px; background: #000; color: #fff; font-size: 10px; font-weight: 800; text-transform: uppercase; text-align: center; border: 1px solid #fff; }
+        .dl-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 15px; }
+        .dl-link-btn { width: 100%; padding: 14px; border-radius: 12px; background: #000; color: #a1a1aa; font-size: 10px; font-weight: 800; text-transform: uppercase; text-align: center; border: 1px solid #1c1c1c; }
         
         .cast-wrapper { display: flex; overflow-x: auto; gap: 15px; padding: 15px 0; scrollbar-width: none; }
         .cast-item { flex: 0 0 65px; text-align: center; cursor: pointer; }
@@ -265,7 +265,6 @@
             <div class="px-4 h-[54px] flex items-center border-b border-zinc-900 sticky top-0 bg-black z-50">
                 <i class="fa-solid fa-chevron-left text-xl cursor-pointer" onclick="closeModal()"></i>
                 <div class="flex-grow text-center text-[14px] font-bold truncate px-8" id="mTitle"></div>
-                <i class="fa-solid fa-rotate text-xl cursor-pointer" onclick="toggleRotate()"></i>
             </div>
             <div id="castContainer" class="cast-wrapper px-4 no-scrollbar"></div>
             <div class="relative overflow-hidden">
@@ -277,7 +276,7 @@
                 <div class="flex gap-4">
                     <i id="btnLikeModal" class="interaction-icon"></i>
                     <i class="fa-regular fa-comment interaction-icon"></i>
-                    <i class="fa-regular fa-paper-plane interaction-icon"></i>
+                    <i class="fa-regular fa-paper-plane interaction-icon" id="btnRotate" onclick="requestRotate()"></i>
                 </div>
                 <i id="btnBookModal" class="interaction-icon"></i>
             </div>
@@ -302,16 +301,10 @@
                     <div class="flex justify-between items-center mb-4"><h4 class="text-[9px] font-black text-zinc-400 uppercase">Episode</h4><select id="seasonSel" class="bg-zinc-900 text-white text-[10px] px-2 py-1 rounded" onchange="loadEpisodes()"></select></div>
                     <div id="episodeGrid" class="grid grid-cols-5 gap-2"></div>
                 </div>
-                
-                <div class="mt-6">
-                    <p class="text-[10px] font-bold text-zinc-500 mb-2 uppercase">Pilih Server</p>
-                    <div id="serverList" class="grid grid-cols-5 gap-2"></div>
-                </div>
-
+                <div id="serverList" class="grid grid-cols-3 gap-2 mt-6"></div>
                 <div class="dl-grid">
-                    <button id="btnDownloadMain" class="dl-link-btn" onclick="highlightBtn(this); handleDownload()">
-                        <i class="fa-solid fa-download mr-2"></i> DOWNLOAD SEKARANG
-                    </button>
+                    <button id="btnDownload1" class="dl-link-btn" onclick="highlightBtn(this); window.open(`https://dl.vidsrc.vip/${window.currentMediaType}/${window.currentMediaId}`)">Download 1</button>
+                    <button id="btnDownload2" class="dl-link-btn" onclick="highlightBtn(this); window.open(`https://multiembed.mov/directstream.php?video_id=${window.currentMediaId}&tmdb=1`)">Download 2</button>
                 </div>
             </div>
         </div>
@@ -339,8 +332,6 @@
             window.addEventListener('scroll', () => { 
                 document.getElementById('backToTop').style.display = window.scrollY > 500 ? 'flex' : 'none'; 
             }); 
-            // Otomatis deteksi rotasi layar 📱
-            window.addEventListener("orientationchange", handleAutoRotate);
         };
 
         function updateActiveNav(el) { document.querySelectorAll('.bottom-nav i').forEach(i => i.classList.remove('active-nav')); el.classList.add('active-nav'); }
@@ -478,7 +469,7 @@
                 {n: 'Anime', g: 16, img: 'Anime.png', t: 'movie', c: 'JP', s: true},
                 {n: 'Indonesia', c: 'ID', img: 'Indonesia.png', t: 'movie', s: false},
                 {n: 'Korea', c: 'KR', img: 'Korea.png', t: 'movie', s: false},
-                {n: 'India', c: 'IN', img: 'India.png', t: 'movie', s: false},
+                {n: 'India', c: 'IN', img: 'Indonesia.png', t: 'movie', s: false},
                 {n: 'Thailand', c: 'TH', img: 'Thailand.png', t: 'movie', s: false}
             ]; 
             const cont = document.getElementById('highlightList'); 
@@ -644,8 +635,43 @@
             closeD(); loadFeed(true); 
         }
 
+        // FUNGSI BARU UNTUK SERVER 4, 5, 6
+        function getEmbedUrl(provider, type, id, s=1, e=1) {
+            if(provider === 'vidlink') {
+                return type === 'movie' ? `https://vidlink.pro/movie/${id}` : `https://vidlink.pro/tv/${id}/${s}/${e}`;
+            }
+            if(provider === 'vidnest') {
+                return type === 'movie' ? `https://vidnest.fun/movie/${id}` : `https://vidnest.fun/tv/${id}/${s}/${e}`;
+            }
+            if(provider === '2embed') {
+                return type === 'movie' ? `https://www.2embed.cc/embed/${id}` : `https://www.2embed.cc/embedtv/${id}&s=${s}&e=${e}`;
+            }
+            return "";
+        }
+
+        // FUNGSI BARU UNTUK ROTASI / FULLSCREEN
+        function requestRotate() {
+            const iframe = document.querySelector('#carouselTrack iframe');
+            if(!iframe) return;
+            
+            if (iframe.requestFullscreen) {
+                iframe.requestFullscreen();
+            } else if (iframe.webkitRequestFullscreen) {
+                iframe.webkitRequestFullscreen();
+            } else if (iframe.msRequestFullscreen) {
+                iframe.msRequestFullscreen();
+            }
+
+            // Mencoba mengunci ke landscape (hanya bekerja di mode fullscreen pada browser mobile tertentu)
+            if (screen.orientation && screen.orientation.lock) {
+                screen.orientation.lock('landscape').catch(e => console.log("Auto-rotate diblokir browser"));
+            }
+        }
+
         async function openModal(id, type) {
             window.currentMediaId = id; window.currentMediaType = type;
+            window.currentS = 1; window.currentE = 1; // Default episode
+            
             document.getElementById('movieModal').style.display = 'block'; 
             document.getElementById('movieModal').scrollTop = 0;
             document.getElementById('smartSearchDropdown').style.display = 'none'; document.body.style.overflow = 'hidden'; currentIdx = 0; isTranslated = false;
@@ -714,49 +740,18 @@
             const rel = dId.release_date || dId.first_air_date || ""; 
             document.getElementById('mDateDisplay').innerText = rel ? new Date(rel).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
             
-            // Render 5 Server Streaming secara dinamis 📺
-            setupStreamingServers(id, type);
+            // UPDATE LIST SERVER (6 SERVER)
+            document.getElementById('serverList').innerHTML = `
+                <button class="server-btn" onclick="playVid('https://vidsrc.me/embed/${type}?tmdb=${id}', this)">Server 1</button>
+                <button class="server-btn" onclick="playVid('https://vidrock.net/embed/${type}/${id}${type==='tv'?'/1/1':''}', this)">Server 2</button>
+                <button class="server-btn" onclick="playVid('https://embed.smashystream.com/playere.php?tmdb=${id}', this)">Server 3</button>
+                <button class="server-btn" onclick="playVid(getEmbedUrl('vidlink', '${type}', '${id}'), this)">Server 4</button>
+                <button class="server-btn" onclick="playVid(getEmbedUrl('vidnest', '${type}', '${id}'), this)">Server 5</button>
+                <button class="server-btn" onclick="playVid(getEmbedUrl('2embed', '${type}', '${id}'), this)">Server 6</button>
+            `;
 
             if(type === 'tv') { document.getElementById('seriesControl').classList.remove('hidden'); document.getElementById('seasonSel').innerHTML = (dId.seasons||[]).filter(s=>s.season_number>0).map(s=>`<option value="${s.season_number}">Season ${s.season_number}</option>`).join(''); loadEpisodes(); } else { document.getElementById('seriesControl').classList.add('hidden'); }
             updateLibButtons(id);
-        }
-
-        // Fungsi Baru: Setup 5 Server Streaming
-        function setupStreamingServers(id, type) {
-            const servers = [
-                { name: "S1", url: `https://vidsrc.me/embed/${type}?tmdb=${id}` },
-                { name: "S2", url: `https://vidrock.net/embed/${type}/${id}${type==='tv'?'/1/1':''}` },
-                { name: "S3", url: `https://embed.smashystream.com/playere.php?tmdb=${id}` },
-                { name: "S4", url: `https://vidsrc.pro/embed/${type}/${id}` },
-                { name: "S5", url: `https://www.2embed.cc/embed/${type}/${id}` }
-            ];
-            const container = document.getElementById('serverList');
-            container.innerHTML = servers.map(s => `
-                <button class="server-btn" onclick="playVid('${s.url}', this)">${s.name}</button>
-            `).join('');
-        }
-
-        // Fungsi Baru: Download Tunggal 📥
-        function handleDownload() {
-            const type = window.currentMediaType;
-            const id = window.currentMediaId;
-            window.open(`https://dl.vidsrc.vip/${type}/${id}`, '_blank');
-        }
-
-        // Fungsi Baru: Rotasi Layar 🔄
-        function toggleRotate() {
-            const carousel = document.querySelector('.carousel-slide');
-            const isLandscape = carousel.style.aspectRatio === "21/9";
-            carousel.style.aspectRatio = isLandscape ? "16/9" : "21/9";
-        }
-
-        function handleAutoRotate() {
-            const carousel = document.querySelector('.carousel-slide');
-            if(window.innerHeight < window.innerWidth) {
-                carousel.style.aspectRatio = "21/9"; // Mode Landscape otomatis
-            } else {
-                carousel.style.aspectRatio = "16/9"; // Mode Portrait otomatis
-            }
         }
 
         async function handleTranslate() {
@@ -804,7 +799,33 @@
         }
         
         function highlightBtn(el) { document.querySelectorAll('.server-btn').forEach(b => b.classList.remove('active-link')); el.classList.add('active-link'); }
-        async function loadEpisodes() { const s = document.getElementById('seasonSel').value; const res = await fetch(`https://api.themoviedb.org/3/tv/${window.currentMediaId}/season/${s}?api_key=${API_KEY}`); const d = await res.json(); document.getElementById('episodeGrid').innerHTML = (d.episodes||[]).map(e => `<div class="pill text-[10px]" onclick="playVid('https://vidrock.net/embed/tv/${window.currentMediaId}/${s}/${e.episode_number}', this)">${e.episode_number}</div>`).join(''); }
+
+        async function loadEpisodes() { 
+            const s = document.getElementById('seasonSel').value; 
+            window.currentS = s;
+            const res = await fetch(`https://api.themoviedb.org/3/tv/${window.currentMediaId}/season/${s}?api_key=${API_KEY}`); 
+            const d = await res.json(); 
+            document.getElementById('episodeGrid').innerHTML = (d.episodes||[]).map(e => `
+                <div class="pill text-[10px]" onclick="playEpisode('${s}', '${e.episode_number}', this)">${e.episode_number}</div>
+            `).join(''); 
+        }
+
+        function playEpisode(s, e, el) {
+            window.currentE = e;
+            // Gunakan VidLink sebagai default saat pilih episode (Server 4)
+            const url = getEmbedUrl('vidlink', 'tv', window.currentMediaId, s, e);
+            playVid(url, el);
+            
+            // Update semua server agar sinkron ke episode yang dipilih
+            document.getElementById('serverList').innerHTML = `
+                <button class="server-btn" onclick="playVid('https://vidsrc.me/embed/tv?tmdb=${window.currentMediaId}&sea=${s}&epi=${e}', this)">Server 1</button>
+                <button class="server-btn" onclick="playVid('https://vidrock.net/embed/tv/${window.currentMediaId}/${s}/${e}', this)">Server 2</button>
+                <button class="server-btn" onclick="playVid('https://embed.smashystream.com/playere.php?tmdb=${window.currentMediaId}&season=${s}&episode=${e}', this)">Server 3</button>
+                <button class="server-btn" onclick="playVid(getEmbedUrl('vidlink', 'tv', '${window.currentMediaId}', ${s}, ${e}), this)">Server 4</button>
+                <button class="server-btn" onclick="playVid(getEmbedUrl('vidnest', 'tv', '${window.currentMediaId}', ${s}, ${e}), this)">Server 5</button>
+                <button class="server-btn" onclick="playVid(getEmbedUrl('2embed', 'tv', '${window.currentMediaId}', ${s}, ${e}), this)">Server 6</button>
+            `;
+        }
         
         function setupSwipe() { 
             const overlay = document.getElementById('swipeOverlay'); 
