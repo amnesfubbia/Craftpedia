@@ -110,8 +110,8 @@
         .interaction-icon { font-size: 24px; cursor: pointer; color: #fff; }
         .server-btn { width: 100%; padding: 12px 5px; border-radius: 8px; font-size: 8px; font-weight: 800; text-transform: uppercase; border: 1px solid #1c1c1c; text-align: center; cursor: pointer; background: #0a0a0a; color: #fff; }
         .server-btn.active-link { border: 2px solid #fff !important; }
-        .dl-grid { display: grid; gap: 8px; margin-top: 15px; }
-        .dl-link-btn { width: 100%; padding: 14px; border-radius: 12px; background: #000; color: #a1a1aa; font-size: 10px; font-weight: 800; text-transform: uppercase; text-align: center; border: 1px solid #1c1c1c; }
+        .dl-grid { display: grid; grid-template-columns: repeat(1, 1fr); gap: 8px; margin-top: 15px; }
+        .dl-link-btn { width: 100%; padding: 14px; border-radius: 12px; background: #000; color: #fff; font-size: 10px; font-weight: 800; text-transform: uppercase; text-align: center; border: 1px solid #fff; }
         
         .cast-wrapper { display: flex; overflow-x: auto; gap: 15px; padding: 15px 0; scrollbar-width: none; }
         .cast-item { flex: 0 0 65px; text-align: center; cursor: pointer; }
@@ -265,6 +265,7 @@
             <div class="px-4 h-[54px] flex items-center border-b border-zinc-900 sticky top-0 bg-black z-50">
                 <i class="fa-solid fa-chevron-left text-xl cursor-pointer" onclick="closeModal()"></i>
                 <div class="flex-grow text-center text-[14px] font-bold truncate px-8" id="mTitle"></div>
+                <i class="fa-solid fa-rotate text-xl cursor-pointer" onclick="toggleRotate()"></i>
             </div>
             <div id="castContainer" class="cast-wrapper px-4 no-scrollbar"></div>
             <div class="relative overflow-hidden">
@@ -301,11 +302,16 @@
                     <div class="flex justify-between items-center mb-4"><h4 class="text-[9px] font-black text-zinc-400 uppercase">Episode</h4><select id="seasonSel" class="bg-zinc-900 text-white text-[10px] px-2 py-1 rounded" onchange="loadEpisodes()"></select></div>
                     <div id="episodeGrid" class="grid grid-cols-5 gap-2"></div>
                 </div>
-                <div id="serverList" class="grid grid-cols-4 gap-2 mt-6"></div>
-                <div class="dl-grid grid-cols-3">
-                    <button id="btnDownload1" class="dl-link-btn" onclick="highlightBtn(this); window.open(`https://dl.vidsrc.vip/${window.currentMediaType}/${window.currentMediaId}`)">Download 1</button>
-                    <button id="btnDownload2" class="dl-link-btn" onclick="highlightBtn(this); window.open(`https://vidsrc.xyz/embed/${window.currentMediaType}/${window.currentMediaId}`)">Download 2</button>
-                    <button id="btnDownload3" class="dl-link-btn" onclick="highlightBtn(this); window.open(`https://vidsrc.pro/embed/${window.currentMediaType}/${window.currentMediaId}`)">Download 3</button>
+                
+                <div class="mt-6">
+                    <p class="text-[10px] font-bold text-zinc-500 mb-2 uppercase">Pilih Server</p>
+                    <div id="serverList" class="grid grid-cols-5 gap-2"></div>
+                </div>
+
+                <div class="dl-grid">
+                    <button id="btnDownloadMain" class="dl-link-btn" onclick="highlightBtn(this); handleDownload()">
+                        <i class="fa-solid fa-download mr-2"></i> DOWNLOAD SEKARANG
+                    </button>
                 </div>
             </div>
         </div>
@@ -333,6 +339,8 @@
             window.addEventListener('scroll', () => { 
                 document.getElementById('backToTop').style.display = window.scrollY > 500 ? 'flex' : 'none'; 
             }); 
+            // Otomatis deteksi rotasi layar 📱
+            window.addEventListener("orientationchange", handleAutoRotate);
         };
 
         function updateActiveNav(el) { document.querySelectorAll('.bottom-nav i').forEach(i => i.classList.remove('active-nav')); el.classList.add('active-nav'); }
@@ -706,15 +714,49 @@
             const rel = dId.release_date || dId.first_air_date || ""; 
             document.getElementById('mDateDisplay').innerText = rel ? new Date(rel).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
             
-            document.getElementById('serverList').innerHTML = `
-                <button class="server-btn" onclick="playVid('https://vidsrc.me/embed/${type}?tmdb=${id}', this)">Server 1</button>
-                <button class="server-btn" onclick="playVid('https://vidrock.net/embed/${type}/${id}${type==='tv'?'/1/1':''}', this)">Server 2</button>
-                <button class="server-btn" onclick="playVid('https://embed.smashystream.com/playere.php?tmdb=${id}', this)">Server 3</button>
-                <button class="server-btn" onclick="playVid('https://multiembed.mov/directstream.php?video_id=${id}&tmdb=1', this)">Server 4</button>
-            `;
+            // Render 5 Server Streaming secara dinamis 📺
+            setupStreamingServers(id, type);
 
             if(type === 'tv') { document.getElementById('seriesControl').classList.remove('hidden'); document.getElementById('seasonSel').innerHTML = (dId.seasons||[]).filter(s=>s.season_number>0).map(s=>`<option value="${s.season_number}">Season ${s.season_number}</option>`).join(''); loadEpisodes(); } else { document.getElementById('seriesControl').classList.add('hidden'); }
             updateLibButtons(id);
+        }
+
+        // Fungsi Baru: Setup 5 Server Streaming
+        function setupStreamingServers(id, type) {
+            const servers = [
+                { name: "S1", url: `https://vidsrc.me/embed/${type}?tmdb=${id}` },
+                { name: "S2", url: `https://vidrock.net/embed/${type}/${id}${type==='tv'?'/1/1':''}` },
+                { name: "S3", url: `https://embed.smashystream.com/playere.php?tmdb=${id}` },
+                { name: "S4", url: `https://vidsrc.pro/embed/${type}/${id}` },
+                { name: "S5", url: `https://www.2embed.cc/embed/${type}/${id}` }
+            ];
+            const container = document.getElementById('serverList');
+            container.innerHTML = servers.map(s => `
+                <button class="server-btn" onclick="playVid('${s.url}', this)">${s.name}</button>
+            `).join('');
+        }
+
+        // Fungsi Baru: Download Tunggal 📥
+        function handleDownload() {
+            const type = window.currentMediaType;
+            const id = window.currentMediaId;
+            window.open(`https://dl.vidsrc.vip/${type}/${id}`, '_blank');
+        }
+
+        // Fungsi Baru: Rotasi Layar 🔄
+        function toggleRotate() {
+            const carousel = document.querySelector('.carousel-slide');
+            const isLandscape = carousel.style.aspectRatio === "21/9";
+            carousel.style.aspectRatio = isLandscape ? "16/9" : "21/9";
+        }
+
+        function handleAutoRotate() {
+            const carousel = document.querySelector('.carousel-slide');
+            if(window.innerHeight < window.innerWidth) {
+                carousel.style.aspectRatio = "21/9"; // Mode Landscape otomatis
+            } else {
+                carousel.style.aspectRatio = "16/9"; // Mode Portrait otomatis
+            }
         }
 
         async function handleTranslate() {
