@@ -8,9 +8,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
     <style>
-        body { background-color: #000; color: #fff; font-family: 'Inter', sans-serif; margin: 0; overflow-x: hidden; width: 100vw; }
+        body { background-color: #000; color: #fff; font-family: 'Inter', sans-serif; margin: 0; overflow-x: hidden; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
         /* LOGO & SPLASH */
         #splashScreen { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
@@ -47,14 +46,14 @@
         .bio-name { font-weight: 700; font-size: 13px; display: inline-block; }
 
         .action-buttons { display: flex; gap: 6px; margin-bottom: 15px; }
-        .btn-ig { flex: 1; background: #262626; border-radius: 8px; padding: 7px; font-size: 13px; font-weight: 600; text-align: center; cursor: pointer; color: #fff; }
-        .btn-ig.active { background: #363636; }
+        .btn-ig { flex: 1; background: #262626; border-radius: 8px; padding: 7px; font-size: 13px; font-weight: 600; text-align: center; cursor: pointer; color: #fff; transition: background 0.2s; }
+        .btn-ig.active { background: #363636; border: 1px solid #555; }
         .btn-icon-sq { width: 34px; background: #262626; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
 
         #filterBar { display: none; margin-bottom: 15px; }
         .pill-grid { display: grid; gap: 6px; }
         .pill { background: transparent; border: 1px solid #1c1c1c; color: #fff; padding: 7px 0; border-radius: 8px; font-size: 10px; font-weight: 800; text-transform: uppercase; text-align: center; cursor: pointer; }
-        .pill.active-pill { border: 1px solid #fff; }
+        .pill.active-pill { border: 1px solid #fff; background: rgba(255,255,255,0.05); }
         
         .filter-dropdown { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: #121212; border-radius: 20px 20px 0 0; z-index: 9500; max-height: 60vh; overflow-y: auto; border-top: 1px solid #333; padding-bottom: 20px; animation: slideUp 0.3s ease-out; overscroll-behavior: contain; }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
@@ -65,7 +64,8 @@
         .highlights-wrapper { padding: 0 15px 15px 15px; border-bottom: 1px solid #1c1c1c; }
         .highlights-container { display: flex; gap: 18px; overflow-x: auto; }
         .highlight-item { flex: 0 0 62px; text-align: center; cursor: pointer; }
-        .highlight-circle { width: 62px; height: 62px; border-radius: 50%; border: 0.5px solid #333; margin-bottom: 5px; display: flex; align-items: center; justify-content: center; background: #000; transition: border 0.3s; overflow: hidden; }
+        .highlight-circle { width: 62px; height: 62px; border-radius: 50%; border: 0.5px solid #333; margin-bottom: 5px; display: flex; align-items: center; justify-content: center; background: #000; transition: transform 0.2s, border 0.3s; overflow: hidden; }
+        .highlight-item:active .highlight-circle { transform: scale(0.9); }
         .highlight-item.active-hl .highlight-circle { border: 2px solid #fff; }
         .highlight-circle img { width: 100%; height: 100%; object-fit: cover; }
         
@@ -79,7 +79,7 @@
 
         .movie-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; padding-bottom: 80px; }
         .post-card { position: relative; aspect-ratio: 2/3; background: #0a0a0a; overflow: hidden; cursor: pointer; }
-        .post-card img { width: 100%; height: 100%; object-fit: cover; }
+        .post-card img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.3s; }
         .badge-rating { position: absolute; top: 6px; left: 6px; padding: 2px 5px; border-radius: 2px; font-size: 7px; font-weight: 900; z-index: 5; background: rgba(255,255,255,0.9); color: #000; }
         .badge-type { position: absolute; top: 6px; right: 6px; padding: 2px 5px; border-radius: 2px; font-size: 7px; font-weight: 900; z-index: 5; background: rgba(0,0,0,0.7); color: #fff; text-transform: uppercase; border: 0.5px solid rgba(255,255,255,0.3); }
 
@@ -91,7 +91,7 @@
         #smartSearchDropdown { position: absolute; top: 100%; left: 0; right: 0; background: #1a1a1a; border-radius: 0 0 10px 10px; border: 1px solid #333; border-top: none; display: none; z-index: 500; max-height: 300px; overflow-y: auto; }
         .smart-item { display: flex; align-items: center; padding: 10px; gap: 12px; border-bottom: 1px solid #262626; cursor: pointer; }
         .smart-item img { width: 35px; height: 50px; object-fit: cover; border-radius: 4px; }
-        .smart-info { display: flex; flex-direction: column; }
+        .smart-item info { display: flex; flex-direction: column; }
         .smart-name { font-size: 13px; font-weight: 600; color: #fff; }
         .smart-meta { font-size: 11px; color: #8e8e8e; }
 
@@ -103,12 +103,14 @@
         #backToTop { position: fixed; bottom: 85px; right: 20px; background: rgba(255,255,255,0.3); width: 42px; height: 42px; border-radius: 50%; display: none; align-items: center; justify-content: center; z-index: 100; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); }
 
         .modal-player { display: none; position: fixed; inset: 0; z-index: 8000; background: #000; overflow-y: auto; }
-        .carousel-track { display: flex; transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1); width: 100%; height: 100%; }
+        .carousel-track { display: flex; transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1); width: 100%; }
         .carousel-slide { min-width: 100%; aspect-ratio: 16/9; position: relative; background: #000; }
         .swipe-overlay { position: absolute; inset: 0; z-index: 10; background: transparent; }
-        .interaction-icon { font-size: 24px; cursor: pointer; color: #fff; }
-        .server-btn { width: 100%; padding: 12px 5px; border-radius: 8px; font-size: 8px; font-weight: 800; text-transform: uppercase; border: 1px solid #1c1c1c; text-align: center; cursor: pointer; background: #0a0a0a; color: #fff; }
-        .server-btn.active-link { border: 2px solid #fff !important; }
+        .interaction-icon { font-size: 24px; cursor: pointer; color: #fff; transition: transform 0.1s; }
+        .interaction-icon:active { transform: scale(1.2); }
+        .server-btn { width: 100%; padding: 12px 5px; border-radius: 8px; font-size: 10px; font-weight: 800; text-transform: uppercase; border: 1px solid #1c1c1c; text-align: center; cursor: pointer; background: #0a0a0a; color: #fff; transition: all 0.2s; }
+        .server-btn:active { background: #1c1c1c; }
+        .server-btn.active-link { border: 2px solid #fff !important; background: rgba(255,255,255,0.1); }
         .dl-grid { display: grid; grid-template-columns: 1fr; gap: 8px; margin-top: 15px; }
         .dl-link-btn { width: 100%; padding: 14px; border-radius: 12px; background: #000; color: #fff; font-size: 12px; font-weight: 800; text-transform: uppercase; text-align: center; border: 1px solid #333; cursor: pointer; }
         
@@ -145,38 +147,36 @@
         .about-feature { margin-top: 20px; background: #111; padding: 15px; border-radius: 12px; border: 1px solid #222; }
         .about-footer { margin-top: 40px; text-align: center; border-top: 1px solid #222; padding-top: 20px; font-size: 12px; color: #666; }
 
-        /* --- LANDSCAPE CONTROLS --- */
+        /* --- NEW LANDSCAPE CONTROLS --- */
         .landscape-overlay {
             display: none; position: fixed; inset: 0; z-index: 9500; background: #000;
         }
         .landscape-video-container { width: 100%; height: 100%; position: relative; }
         
         .ls-controls {
-            position: absolute; inset: 0; background: rgba(0,0,0,0.3);
+            position: absolute; inset: 0; background: linear-gradient(0deg, rgba(0,0,0,0.7) 0%, transparent 50%, rgba(0,0,0,0.7) 100%);
             display: flex; flex-direction: column; justify-content: space-between;
-            padding: 20px; opacity: 0; transition: opacity 0.3s; z-index: 10000;
+            padding: 30px; opacity: 0; transition: opacity 0.3s; z-index: 10000; pointer-events: none;
         }
-        .ls-controls.show-ui { opacity: 1 !important; }
-        .ls-top { display: flex; justify-content: space-between; align-items: center; }
-        .ls-center { display: flex; justify-content: center; align-items: center; gap: 40px; }
-        .ls-btn { color: #fff; font-size: 28px; cursor: pointer; text-shadow: 0 0 10px rgba(0,0,0,0.8); }
-        .ls-lock-screen { position: absolute; inset: 0; z-index: 11000; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.2); backdrop-filter: blur(2px); }
-        .ls-lock-btn { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); z-index: 10001; }
+        .ls-controls.visible { opacity: 1; pointer-events: auto; }
+        .ls-top { position: relative; width: 100%; height: 50px; display: flex; justify-content: space-between; align-items: center; }
+        .ls-center { display: flex; justify-content: center; align-items: center; gap: 80px; }
+        .ls-btn { color: #fff; font-size: 28px; cursor: pointer; text-shadow: 0 0 15px rgba(0,0,0,0.9); transition: transform 0.1s; }
+        .ls-btn:active { transform: scale(1.1); }
         
-        /* Fixed Landscape Sizing */
+        /* FIX UNLOCK POSITION */
+        .ls-lock-screen { 
+            position: absolute; top: 30px; right: 30px; 
+            z-index: 11000; display: none; padding: 15px;
+            background: rgba(0,0,0,0.5); border-radius: 50%; border: 1px solid rgba(255,255,255,0.2);
+            cursor: pointer; 
+        }
+        
+        /* Landscape Mode Overrides */
         .landscape-active #movieModal { overflow: hidden !important; }
-        .landscape-active .modal-player { display: block !important; position: fixed; inset: 0; z-index: 9450; }
         .landscape-active #modalScrollTop { height: 100vh; max-width: 100%; padding: 0; }
-        .landscape-active .carousel-slide { height: 100vh; width: 100vw; }
-        .landscape-active #carouselTrack { height: 100vh; }
-        .landscape-active #mainVideoArea { height: 100vh; width: 100vw; }
-        .landscape-active .ig-post-content, 
-        .landscape-active .cast-wrapper,
-        .landscape-active #carouselDots,
-        .landscape-active .px-4,
-        .landscape-active #seriesControl,
-        .landscape-active #serverList,
-        .landscape-active .dl-grid { display: none !important; }
+        .landscape-active .carousel-slide { height: 100vh; }
+        .landscape-active #mainVideoArea { height: 100vh !important; }
     </style>
 </head>
 <body>
@@ -192,30 +192,22 @@
         </div>
     </div>
 
-    <div id="landscapeOverlay" class="landscape-overlay">
-        <div id="lsLockLayer" class="ls-lock-screen" onclick="unlockScreen()">
-            <div class="flex flex-col items-center gap-2">
-                <i class="fa-solid fa-lock text-5xl text-white opacity-40"></i>
-                <span class="text-white text-[10px] font-bold tracking-widest uppercase opacity-40">Layar Terkunci</span>
-            </div>
+    <div id="landscapeOverlay" class="landscape-overlay" onclick="toggleLsUI()">
+        <div id="lsLockLayer" class="ls-lock-screen" onclick="event.stopPropagation(); unlockScreen()">
+            <i class="fa-solid fa-lock text-3xl text-white opacity-80"></i>
         </div>
-        <div class="ls-controls" id="lsUI" onclick="handleVideoClick(event)">
+        <div class="ls-controls" id="lsUI">
             <div class="ls-top">
-                <i class="fa-solid fa-arrow-left ls-btn" onclick="exitLandscape()"></i>
+                <i class="fa-solid fa-arrow-left ls-btn" onclick="event.stopPropagation(); exitLandscape()"></i>
                 <div id="lsTitle" class="text-white font-bold truncate max-w-[60%] text-sm"></div>
-                <div class="w-10"></div> 
+                <i class="fa-solid fa-lock-open ls-btn" onclick="event.stopPropagation(); lockScreen()"></i>
             </div>
-            
-            <div class="ls-lock-btn" id="lockBtnContainer">
-                <i class="fa-solid fa-lock-open ls-btn" onclick="lockScreen()"></i>
-            </div>
-
             <div class="ls-center">
                 <i id="lsMute" class="fa-solid fa-volume-high ls-btn" onclick="event.stopPropagation(); toggleLsMute()"></i>
                 <i id="lsPlay" class="fa-solid fa-pause ls-btn text-6xl" onclick="event.stopPropagation(); toggleLsPlay()"></i>
-                <i class="fa-solid fa-compress ls-btn" onclick="event.stopPropagation(); exitLandscape()"></i>
+                <i class="fa-solid fa-expand ls-btn" onclick="event.stopPropagation(); exitLandscape()"></i>
             </div>
-            <div class="ls-bottom"></div>
+            <div class="ls-bottom text-center text-[10px] text-zinc-400">Tap untuk menyembunyikan kontrol</div>
         </div>
     </div>
 
@@ -228,14 +220,11 @@
         <div class="about-feature">
             <div class="font-bold mb-3 text-white">Fitur Utama:</div>
             <ul class="space-y-3 text-[13px]">
-                <li>🎬 <span class="font-semibold text-white">Database Luas:</span> Akses ke lebih dari 25.000+ movie dan tv global.</li>
-                <li>🔍 <span class="font-semibold text-white">Smart Search:</span> Cari berdasarkan judul, aktor, hingga studio produksi (Marvel, Disney, dll).</li>
-                <li>📥 <span class="font-semibold text-white">Personal Archive:</span> Simpan movie favoritmu ke dalam koleksi pribadi (Bookmark).</li>
-                <li>🌍 <span class="font-semibold text-white">Multi-Server:</span> Pilihan server streaming dan download yang stabil.</li>
+                <li>🎬 <span class="font-semibold text-white">Database Luas:</span> Akses ke ribuan movie dan tv global.</li>
+                <li>🔍 <span class="font-semibold text-white">Smart Search:</span> Cari judul, aktor, atau studio favoritmu.</li>
+                <li>📥 <span class="font-semibold text-white">Personal Archive:</span> Simpan koleksi ke dalam Bookmark.</li>
+                <li>🌍 <span class="font-semibold text-white">Multi-Server:</span> Streaming lancar dengan banyak opsi server.</li>
             </ul>
-        </div>
-        <div class="mt-8 text-sm text-zinc-400 italic">
-            Dikembangkan dengan dedikasi untuk para pecinta sinema di seluruh dunia.
         </div>
         <div class="about-footer">
             Created by <span class="text-white font-bold">Anasteas</span><br>
@@ -272,13 +261,13 @@
             <div class="bio">
                 <div class="bio-name-wrapper"><span class="bio-name">amnesfubbia</span><i class="fa-solid fa-circle-check text-[#0095f6] text-[13px]"></i></div>
                 <span>🎬 Discover. Watch. Archive.</span><br>
-                <span class="text-zinc-400">Cari movie, tonton trailer, simpan & Download movie favoritmu.</span>
+                <span class="text-zinc-400">Jelajahi, simpan & tonton trailer movie favoritmu.</span>
             </div>
 
             <div class="action-buttons">
                 <div class="btn-ig" id="btnNowPlaying" onclick="setSchedule('now_playing', this)">Sedang Tayang</div>
                 <div class="btn-ig" id="btnUpcoming" onclick="setSchedule('upcoming', this)">Segera Tayang</div>
-                <div class="btn-icon-sq" onclick="toggleFilterBar()"><i class="fa-solid fa-user-plus text-sm"></i></div>
+                <div class="btn-icon-sq" onclick="toggleFilterBar()"><i class="fa-solid fa-sliders text-sm"></i></div>
             </div>
 
             <div id="filterBar">
@@ -325,12 +314,15 @@
                 <i class="fa-solid fa-chevron-left text-xl cursor-pointer" onclick="closeModal()"></i>
                 <div class="flex-grow text-center text-[14px] font-bold truncate px-8" id="mTitle"></div>
             </div>
+            
             <div id="castContainer" class="cast-wrapper px-4 no-scrollbar"></div>
-            <div class="relative overflow-hidden bg-black" id="mainVideoArea">
-                <div class="swipe-overlay" id="swipeOverlay" onclick="handleVideoClick(event)"></div>
+            
+            <div class="relative overflow-hidden" id="mainVideoArea">
+                <div class="swipe-overlay" id="swipeOverlay"></div>
                 <div class="carousel-track" id="carouselTrack"></div>
                 <div id="carouselDots" class="flex justify-center gap-2 py-3"></div>
             </div>
+
             <div class="px-4 py-3 flex justify-between items-center">
                 <div class="flex gap-4">
                     <i id="btnLikeModal" class="interaction-icon"></i>
@@ -338,6 +330,7 @@
                 </div>
                 <i id="btnBookModal" class="interaction-icon"></i>
             </div>
+
             <div class="ig-post-content">
                 <span id="mLikeDisplay" class="ig-likes-count"></span>
                 <div class="mb-1">
@@ -356,10 +349,15 @@
                 </div>
                 
                 <div id="seriesControl" class="hidden mt-6 p-4 bg-zinc-950 rounded-2xl border border-zinc-900">
-                    <div class="flex justify-between items-center mb-4"><h4 class="text-[9px] font-black text-zinc-400 uppercase">Episode</h4><select id="seasonSel" class="bg-zinc-900 text-white text-[10px] px-2 py-1 rounded" onchange="loadEpisodes()"></select></div>
+                    <div class="flex justify-between items-center mb-4">
+                        <h4 class="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Episode List</h4>
+                        <select id="seasonSel" class="bg-zinc-900 text-white text-[10px] px-2 py-1 rounded border border-zinc-700 outline-none" onchange="loadEpisodes()"></select>
+                    </div>
                     <div id="episodeGrid" class="grid grid-cols-5 gap-2"></div>
                 </div>
+
                 <div id="serverList" class="grid grid-cols-4 gap-2 mt-6"></div>
+                
                 <div class="dl-grid">
                     <button id="btnDownload1" class="dl-link-btn" onclick="window.open(`https://dl.vidsrc.vip/${window.currentMediaType}/${window.currentMediaId}`)">Download</button>
                 </div>
@@ -375,10 +373,10 @@
 
     <script>
         const API_KEY = 'bfa7df5310c9974f62f26c6789a8c00d';
-        let page = 1, loading = false, currentType = 'multi', currentGenre = '', currentYear = '', currentCountry = '', currentSchedule = 'trending', searchQuery = '', currentCompany = '', currentLibMode = false, currentLibType = '', currentCastId = '';
+        let page = 1, loading = false, currentType = 'multi', currentGenre = '', currentYear = '', currentCountry = '', currentSchedule = 'trending', searchQuery = '', currentCompany = '', currentLibMode = false, currentCastId = '';
         let isExpanded = false, globalFullDesc = "", globalEnDesc = "", currentIdx = 0, startX = 0, isTranslated = false, originalIndoDesc = "";
         let abortController = null;
-        let isLsPaused = false, isLsMuted = false;
+        let isLsPaused = false, isLsMuted = false, lsControlTimer;
 
         window.onload = () => {
             setTimeout(() => {
@@ -390,17 +388,22 @@
             window.addEventListener('scroll', () => { 
                 document.getElementById('backToTop').style.display = window.scrollY > 500 ? 'flex' : 'none'; 
             }); 
-
-            // Tombol Back Handphone Handler
-            window.addEventListener('popstate', function (event) {
-                if (document.body.classList.contains('landscape-active')) {
-                    exitLandscape();
-                    history.pushState(null, null, window.location.pathname);
-                }
-            });
         };
 
-        /* --- IMPROVED LANDSCAPE FUNCTIONS --- */
+        /* --- HP BACK BUTTON SYSTEM (FIXED) --- */
+        window.addEventListener('popstate', function(event) {
+            if (document.getElementById('landscapeOverlay').style.display === 'block') {
+                exitLandscape();
+            } else if (document.getElementById('movieModal').style.display === 'block') {
+                closeModal();
+            } else if (document.getElementById('searchOverlay').style.display === 'block') {
+                closeSearch();
+            } else if (document.getElementById('sideMenu').style.display === 'block') {
+                toggleSideMenu();
+            }
+        });
+
+        /* --- LANDSCAPE CONTROLS LOGIC (FIXED) --- */
         async function enterLandscape() {
             const overlay = document.getElementById('landscapeOverlay');
             const lsTitle = document.getElementById('lsTitle');
@@ -409,58 +412,57 @@
             document.body.classList.add('landscape-active');
             overlay.style.display = 'block';
             
-            history.pushState(null, null, window.location.pathname);
+            const videoArea = document.getElementById('mainVideoArea');
+            document.getElementById('landscapeOverlay').appendChild(videoArea);
+            
+            showLsUI();
+            history.pushState({view: 'landscape'}, "");
 
             try {
                 if (document.documentElement.requestFullscreen) {
                     await document.documentElement.requestFullscreen();
-                } else if (document.documentElement.webkitRequestFullscreen) {
-                    await document.documentElement.webkitRequestFullscreen();
+                    if (screen.orientation && screen.orientation.lock) {
+                        await screen.orientation.lock('landscape').catch(() => {});
+                    }
                 }
-                
-                if (screen.orientation && screen.orientation.lock) {
-                    await screen.orientation.lock('landscape').catch(err => console.log("Orientation lock ignored"));
-                }
-            } catch (e) { console.log("Fullscreen request limited"); }
-            
-            showLSUI();
+            } catch (e) {}
         }
 
         function exitLandscape() {
             document.body.classList.remove('landscape-active');
             document.getElementById('landscapeOverlay').style.display = 'none';
-            unlockScreen(); 
             
-            if (document.fullscreenElement && document.exitFullscreen) {
+            const videoArea = document.getElementById('mainVideoArea');
+            const castContainer = document.getElementById('castContainer');
+            castContainer.after(videoArea);
+
+            if (document.exitFullscreen && document.fullscreenElement) {
                 document.exitFullscreen();
-            } else if (document.webkitExitFullscreen) {
-                document.webkitExitFullscreen();
             }
-            
             if (screen.orientation && screen.orientation.unlock) {
                 screen.orientation.unlock();
             }
-        }
-
-        function handleVideoClick(e) {
-            // Jika landscape aktif, tampilkan UI kontrol
-            if(document.body.classList.contains('landscape-active')) {
-                const ui = document.getElementById('lsUI');
-                if (ui.classList.contains('show-ui')) {
-                    ui.classList.remove('show-ui');
-                } else {
-                    showLSUI();
-                }
+            
+            if (window.history.state && window.history.state.view === 'landscape') {
+                window.history.back();
             }
         }
 
-        function showLSUI() {
+        function toggleLsUI() {
+            if(document.getElementById('lsLockLayer').style.display === 'flex') return;
             const ui = document.getElementById('lsUI');
-            ui.classList.add('show-ui');
-            clearTimeout(window.lsTimeout);
-            window.lsTimeout = setTimeout(() => {
-                ui.classList.remove('show-ui');
-            }, 4000);
+            if(ui.classList.contains('visible')) {
+                ui.classList.remove('visible');
+            } else {
+                showLsUI();
+            }
+        }
+
+        function showLsUI() {
+            const ui = document.getElementById('lsUI');
+            ui.classList.add('visible');
+            clearTimeout(lsControlTimer);
+            lsControlTimer = setTimeout(() => ui.classList.remove('visible'), 3000);
         }
 
         function toggleLsPlay() {
@@ -471,10 +473,9 @@
             isLsPaused = !isLsPaused;
             const cmd = isLsPaused ? 'pauseVideo' : 'playVideo';
             
-            // Mencoba mengirim perintah ke Youtube Player API
             currentIframe.contentWindow.postMessage(JSON.stringify({"event":"command","func":cmd,"args":""}), '*');
             btn.className = isLsPaused ? 'fa-solid fa-play ls-btn text-6xl' : 'fa-solid fa-pause ls-btn text-6xl';
-            showLSUI();
+            showLsUI();
         }
 
         function toggleLsMute() {
@@ -487,21 +488,20 @@
             
             currentIframe.contentWindow.postMessage(JSON.stringify({"event":"command","func":cmd,"args":""}), '*');
             btn.className = isLsMuted ? 'fa-solid fa-volume-xmark ls-btn' : 'fa-solid fa-volume-high ls-btn';
-            showLSUI();
+            showLsUI();
         }
 
         function lockScreen() {
-            document.getElementById('lsUI').style.display = 'none';
+            document.getElementById('lsUI').classList.remove('visible');
             document.getElementById('lsLockLayer').style.display = 'flex';
         }
 
         function unlockScreen() {
-            document.getElementById('lsUI').style.display = 'flex';
             document.getElementById('lsLockLayer').style.display = 'none';
-            showLSUI();
+            showLsUI();
         }
 
-        /* --- CORE FUNCTIONS --- */
+        /* --- CORE LOGIC --- */
         function updateActiveNav(el) { document.querySelectorAll('.bottom-nav i').forEach(i => i.classList.remove('active-nav')); el.classList.add('active-nav'); }
 
         function toggleSideMenu() {
@@ -509,6 +509,7 @@
             const isVisible = menu.style.display === 'block';
             menu.style.display = isVisible ? 'none' : 'block';
             document.body.style.overflow = isVisible ? 'auto' : 'hidden';
+            if (!isVisible) history.pushState({view: 'menu'}, "");
         }
 
         function backToHome() {
@@ -517,11 +518,7 @@
             currentType = 'multi'; searchQuery = ''; currentCastId = ''; currentCompany = '';
             
             document.querySelectorAll('.highlight-item').forEach(i => i.classList.remove('active-hl'));
-            
-            document.getElementById('btnGenre').innerText = 'Genre';
-            document.getElementById('yearBtn').innerText = 'Tahun';
-            document.getElementById('btnCountry').innerText = 'Negara';
-            document.querySelectorAll('.pill').forEach(p => p.classList.remove('active-pill'));
+            document.querySelectorAll('.pill').forEach(p => { p.classList.remove('active-pill'); p.innerHTML = p.innerText.split(' ')[0] + ' <i class="fa-solid fa-caret-down"></i>'; });
             document.querySelectorAll('.btn-ig').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.stat-item').forEach(s => s.classList.remove('active-stat'));
             document.getElementById('filterBar').style.display = 'none';
@@ -557,7 +554,7 @@
                                 const imgPath = m.poster_path || m.profile_path || '';
                                 
                                 return `<div class="smart-item" onclick="${clickAction}; document.getElementById('smartSearchDropdown').style.display='none';">
-                                    <img src="https://image.tmdb.org/t/p/w92${imgPath}">
+                                    <img src="https://image.tmdb.org/t/p/w92${imgPath}" onerror="this.src='https://via.placeholder.com/35x50?text=?'">
                                     <div class="smart-info">
                                         <span class="smart-name">${m.title || m.name}</span>
                                         <span class="smart-meta">${meta}</span>
@@ -575,12 +572,10 @@
         async function openComingSoon() {
             const grid = document.getElementById('searchGrid');
             const overlay = document.getElementById('searchOverlay');
-            const titleInp = document.getElementById('searchInp');
             overlay.style.display = 'block';
-            titleInp.value = '';
-            titleInp.placeholder = "Jadwal Rilis Mendatang...";
             grid.innerHTML = '<div class="col-span-3 text-center py-10 text-zinc-500">Memuat jadwal rilis...</div>';
             document.body.style.overflow = 'hidden';
+            history.pushState({view: 'search'}, "");
             try {
                 const today = new Date().toISOString().split('T')[0];
                 const res = await fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=id-ID&sort_by=primary_release_date.asc&primary_release_date.gte=${today}`);
@@ -592,7 +587,7 @@
                     const day = relDate.getDate();
                     const month = relDate.toLocaleDateString('id-ID', { month: 'short' });
                     const item = document.createElement('div');
-                    item.className = 'col-span-3 calendar-item cursor-pointer active:bg-zinc-900';
+                    item.className = 'col-span-3 calendar-item cursor-pointer active:bg-zinc-900 transition-colors';
                     item.onclick = () => openModal(m.id, 'movie');
                     item.innerHTML = `
                         <div class="calendar-date">
@@ -603,7 +598,7 @@
                             <div class="text-[14px] font-bold text-white truncate w-48">${m.title}</div>
                             <div class="text-[11px] text-zinc-500">Rating: ★ ${m.vote_average.toFixed(1)}</div>
                         </div>
-                        <img src="https://image.tmdb.org/t/p/w92${m.poster_path}" class="w-12 h-16 object-cover rounded">
+                        <img src="https://image.tmdb.org/t/p/w92${m.poster_path}" class="w-12 h-16 object-cover rounded shadow-lg">
                     `;
                     grid.appendChild(item);
                 });
@@ -618,6 +613,7 @@
             document.getElementById('searchOverlay').style.display = 'block'; 
             document.getElementById('smartSearchDropdown').style.display = 'none';
             document.body.style.overflow='hidden'; 
+            history.pushState({view: 'search'}, "");
             loadFeed(true); 
         }
 
@@ -651,7 +647,7 @@
         function initFilters() { 
             const yD = document.getElementById('yearDropdown'); 
             let yearHTML = '<div class="filter-item sticky-reset" onclick="setYear(\'\')">Semua Tahun</div>'; 
-            for(let y=2026; y>=1900; y--) yearHTML += `<div class="filter-item" onclick="setYear(${y})">${y}</div>`; 
+            for(let y=2026; y>=1930; y--) yearHTML += `<div class="filter-item" onclick="setYear(${y})">${y}</div>`; 
             yD.innerHTML = yearHTML; 
             const countries = [['ID','Indonesia'],['US','USA'],['KR','Korea Selatan'],['JP','Jepang'],['IN','India'],['TH','Thailand'],['CN','China'],['PH','Filipina'],['GB','Inggris'],['FR','Prancis'],['ES','Spanyol'],['IT','Italia'],['TR','Turki'],['DE','Jerman']]; 
             const cD = document.getElementById('countryDropdown'); 
@@ -720,20 +716,12 @@
                 const card = document.createElement('div'); 
                 card.className = 'post-card'; 
                 card.onclick = function() { openModal(m.id, mType); }; 
-                card.innerHTML = `<div class="badge-rating">★ ${(m.vote_average||0).toFixed(1)}</div><div class="badge-type">${currentType==='short'?'SHORT':(mType==='tv'?'tv':'movie')}</div><img src="https://image.tmdb.org/t/p/w342${m.poster_path}" loading="lazy">`; 
+                card.innerHTML = `<div class="badge-rating">★ ${(m.vote_average||0).toFixed(1)}</div><div class="badge-type">${currentType==='short'?'SHORT':(mType==='tv'?'tv':'movie')}</div><img src="https://image.tmdb.org/t/p/w342${m.poster_path}" loading="lazy" onload="this.style.opacity=1" style="opacity:0">`; 
                 grid.appendChild(card); 
             }); 
         }
 
-        function openSearch() { 
-            const titleInp = document.getElementById('searchInp');
-            document.getElementById('searchOverlay').style.display = 'block'; 
-            titleInp.placeholder = "Cari movie, tv, atau aktor...";
-            titleInp.value = ''; 
-            document.getElementById('searchGrid').innerHTML = ''; 
-            titleInp.focus(); 
-            document.body.style.overflow='hidden'; 
-        }
+        function openSearch() { document.getElementById('searchOverlay').style.display = 'block'; document.getElementById('searchInp').focus(); document.body.style.overflow='hidden'; history.pushState({view: 'search'}, ""); }
         function closeSearch() { document.getElementById('searchOverlay').style.display = 'none'; document.body.style.overflow='auto'; searchQuery=''; currentCastId=''; document.getElementById('smartSearchDropdown').style.display = 'none'; }
         
         function searchAction() { currentLibMode = false; currentCastId = ''; searchQuery = document.getElementById('searchInp').value; document.getElementById('smartSearchDropdown').style.display = 'none'; loadFeed(true); }
@@ -761,7 +749,7 @@
         function setYear(y) { 
             currentYear = y; 
             const btn = document.getElementById('yearBtn');
-            btn.innerText = y || 'Tahun'; 
+            btn.innerHTML = (y || 'Tahun') + ' <i class="fa-solid fa-caret-down"></i>'; 
             y ? btn.classList.add('active-pill') : btn.classList.remove('active-pill');
             if(currentType === 'multi') currentType = 'movie';
             closeD(); loadFeed(true); 
@@ -770,7 +758,7 @@
         function setCountry(c, n) { 
             currentCountry = c; 
             const btn = document.getElementById('btnCountry');
-            btn.innerText = n; 
+            btn.innerHTML = n + ' <i class="fa-solid fa-caret-down"></i>'; 
             c ? btn.classList.add('active-pill') : btn.classList.remove('active-pill');
             if(currentType === 'multi') currentType = 'movie';
             closeD(); loadFeed(true); 
@@ -779,7 +767,7 @@
         function setGenre(g, n) { 
             currentGenre = g; 
             const btn = document.getElementById('btnGenre');
-            btn.innerText = n; 
+            btn.innerHTML = n + ' <i class="fa-solid fa-caret-down"></i>'; 
             g ? btn.classList.add('active-pill') : btn.classList.remove('active-pill');
             if(currentType === 'multi') currentType = 'movie';
             closeD(); loadFeed(true); 
@@ -792,6 +780,8 @@
             document.getElementById('movieModal').scrollTop = 0;
             document.getElementById('smartSearchDropdown').style.display = 'none'; document.body.style.overflow = 'hidden'; currentIdx = 0; isTranslated = false;
             
+            history.pushState({view: 'modal'}, "");
+
             const [rId, rEn, rCast] = await Promise.all([
                 fetch(`https://api.themoviedb.org/3/${type}/${id}?api_key=${API_KEY}&language=id-ID&append_to_response=videos,production_companies`),
                 fetch(`https://api.themoviedb.org/3/${type}/${id}?api_key=${API_KEY}&language=en-US&append_to_response=videos`),
@@ -806,7 +796,7 @@
             
             if(vids.length > 0) { 
                 vids.forEach((v, i) => { 
-                    track.innerHTML += `<div class="carousel-slide"><iframe id="yt-${i}" src="https://www.youtube.com/embed/${v.key}?enablejsapi=1&autoplay=${i===0?1:0}&rel=0&controls=1" class="w-full h-full" allow="autoplay; fullscreen"></iframe></div>`; 
+                    track.innerHTML += `<div class="carousel-slide"><iframe id="yt-${i}" src="https://www.youtube.com/embed/${v.key}?enablejsapi=1&autoplay=${i===0?1:0}&rel=0" class="w-full h-full" allow="autoplay; fullscreen"></iframe></div>`; 
                     if(vids.length > 1) {
                         dots.innerHTML += `<div class="dot w-1.5 h-1.5 rounded-full ${i===currentIdx?'bg-blue-500':'bg-zinc-700'}"></div>`; 
                     }
@@ -818,7 +808,7 @@
             }
 
             document.getElementById('castContainer').innerHTML = (dCast.cast || []).slice(0, 10).map(c => {
-                const profileImg = c.profile_path ? `<img src="https://image.tmdb.org/t/p/w185${c.profile_path}" loading="lazy">` : `<div style="width:100%; height:100%; background:#111;"></div>`;
+                const profileImg = c.profile_path ? `<img src="https://image.tmdb.org/t/p/w185${c.profile_path}" loading="lazy" class="rounded-full">` : `<div style="width:100%; height:100%; background:#222; display:flex; align-items:center; justify-content:center; color:#555;"><i class="fa-solid fa-user"></i></div>`;
                 return `<div class="cast-item" onclick="searchByCast(${c.id})"><div class="cast-img-border"><div class="inner-border">${profileImg}</div></div><span class="cast-name">${c.name}</span></div>`;
             }).join('');
 
@@ -832,8 +822,7 @@
             const relYear = (dId.release_date || dId.first_air_date || "2026").split('-')[0];
             const contentKind = (type === 'tv') ? 'tv' : 'movie';
             const genresArr = (dId.genres || []).map(g => `#${g.name.replace(/[^a-zA-Z0-9]/g, '')}`).slice(0, 3).join(' ');
-            const studiosArr = (dId.production_companies || []).map(c => `#${c.name.replace(/[^a-zA-Z0-9]/g, '')}`).slice(0, 2).join(' ');
-            document.getElementById('mHashtags').innerHTML = `#${(dId.title||dId.name||"").replace(/[^a-zA-Z0-9]/g, '')} #${relYear} #${contentKind} <br> ${genresArr} ${studiosArr}`;
+            document.getElementById('mHashtags').innerHTML = `#${(dId.title||dId.name||"").replace(/[^a-zA-Z0-9]/g, '')} #${relYear} #${contentKind} <br> ${genresArr}`;
             const rel = dId.release_date || dId.first_air_date || ""; 
             document.getElementById('mDateDisplay').innerText = rel ? new Date(rel).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
             
@@ -841,11 +830,11 @@
                 <button class="server-btn" onclick="playVid('https://vidsrc.me/embed/${type}?tmdb=${id}', this)">Server 1</button>
                 <button class="server-btn" onclick="playVid('https://vidrock.net/embed/${type}/${id}${seriesSuffix}', this)">Server 2</button>
                 <button class="server-btn" onclick="playVid('https://vidsrc.icu/embed/${type}/${id}${seriesSuffix}', this)">Server 3</button>
-                <button class="server-btn" onclick="playVid('https://www.2embed.cc/embed/${id}', this)">Server 4</button>
-                <button class="server-btn" onclick="playVid('https://embed.smashystream.com/playere.php?tmdb=${id}', this)">Server 5</button>
-                <button class="server-btn" onclick="playVid('https://vidsrc.xyz/embed/${type}/${id}${seriesSuffix}', this)">Server 6</button>
-                <button class="server-btn" onclick="playVid('https://vidstorm.ru/${type}/${id}${seriesSuffix}', this)">Server 7</button>
-                <button class="server-btn" onclick="playVid('https://multiembed.mov/directstream.php?video_id=${id}&tmdb=1', this)">Server 8</button>
+                <button class="server-btn" onclick="playVid('https://vidsrc.to/embed/${type}/${id}${seriesSuffix}', this)">Server 4</button>
+                <button class="server-btn" onclick="playVid('https://www.2embed.cc/embed/${id}', this)">Server 5</button>
+                <button class="server-btn" onclick="playVid('https://vidfast.pro/embed/${type}/${id}${seriesSuffix}', this)">Server 6</button>
+                <button class="server-btn" onclick="playVid('https://embed.smashystream.com/playere.php?tmdb=${id}', this)">Server 7</button>
+                <button class="server-btn" onclick="playVid('https://vidsrc.xyz/embed/${type}/${id}${seriesSuffix}', this)">Server 8</button>
             `;
 
             if(type === 'tv') { document.getElementById('seriesControl').classList.remove('hidden'); document.getElementById('seasonSel').innerHTML = (dId.seasons||[]).filter(s=>s.season_number>0).map(s=>`<option value="${s.season_number}">Season ${s.season_number}</option>`).join(''); loadEpisodes(); } else { document.getElementById('seriesControl').classList.add('hidden'); }
@@ -877,17 +866,7 @@
             if(document.body.classList.contains('landscape-active')) exitLandscape();
         }
 
-        function renderSynopsis() { 
-            const descEl = document.getElementById('mDesc'), toggleBtn = document.getElementById('mToggleBtn'); 
-            if (globalFullDesc.length > 90) { 
-                toggleBtn.classList.remove('hidden'); 
-                descEl.innerText = isExpanded ? globalFullDesc : globalFullDesc.substring(0, 90) + "..."; 
-                toggleBtn.innerText = isExpanded ? "ringkas" : "selengkapnya"; 
-            } else { 
-                descEl.innerText = globalFullDesc; 
-                toggleBtn.classList.add('hidden'); 
-            } 
-        }
+        function renderSynopsis() { const descEl = document.getElementById('mDesc'), toggleBtn = document.getElementById('mToggleBtn'); if (globalFullDesc.length > 90) { toggleBtn.classList.remove('hidden'); descEl.innerText = isExpanded ? globalFullDesc : globalFullDesc.substring(0, 90) + "..."; toggleBtn.innerText = isExpanded ? "ringkas" : "selengkapnya"; } else { descEl.innerText = globalFullDesc; toggleBtn.classList.add('hidden'); } }
         function handleToggleDesc() { isExpanded = !isExpanded; renderSynopsis(); }
         
         function playVid(url, el) { 
@@ -895,16 +874,10 @@
             const dots = document.getElementById('carouselDots'); 
             const finalUrl = url.includes('?') ? `${url}&enablejsapi=1` : `${url}?enablejsapi=1`;
             
-            track.querySelectorAll('iframe').forEach(f => f.src = "");
             track.innerHTML = `<div class="carousel-slide"><iframe src="${finalUrl}" class="w-full h-full" allowfullscreen allow="autoplay"></iframe></div>`; 
             track.style.transform = 'translateX(0)'; currentIdx = 0; dots.innerHTML = ''; 
-            document.getElementById('swipeOverlay').style.display = 'none'; highlightBtn(el); 
-            
-            if(document.body.classList.contains('landscape-active')) {
-                document.getElementById('lsPlay').className = 'fa-solid fa-pause ls-btn text-6xl';
-                isLsPaused = false;
-                showLSUI();
-            }
+            document.getElementById('swipeOverlay').style.display = 'none'; 
+            if(el) highlightBtn(el); 
         }
         
         function highlightBtn(el) { document.querySelectorAll('.server-btn').forEach(b => b.classList.remove('active-link')); el.classList.add('active-link'); }
@@ -920,7 +893,7 @@
                 
                 return `
                 <div class="pill text-[10px] flex flex-col items-center justify-center gap-1 min-h-[45px]" onclick="playVid('https://vidsrc.me/embed/tv?tmdb=${window.currentMediaId}&s=${s}&e=${e.episode_number}', this)">
-                    <span>${e.episode_number}</span>
+                    <span class="font-bold">${e.episode_number}</span>
                     ${nextUrl ? `<span class="text-[7px] text-blue-400 font-black border-t border-zinc-800 w-full pt-0.5 mt-0.5" onclick="event.stopPropagation(); playVid('${nextUrl}', this.parentElement)">NEXT</span>` : ''}
                 </div>`;
             }).join(''); 
@@ -932,42 +905,24 @@
             overlay.addEventListener('touchend', e => { 
                 let diff = startX - e.changedTouches[0].clientX; 
                 const slides = document.querySelectorAll('.carousel-slide'); 
-                if(Math.abs(diff) > 60 && slides.length > 1) { 
+                if(Math.abs(diff) > 50 && slides.length > 1) { 
                     let oldIdx = currentIdx; 
                     if(diff > 0 && currentIdx < slides.length - 1) currentIdx++; 
                     else if(diff < 0 && currentIdx > 0) currentIdx--; 
-                    
-                    if (oldIdx !== currentIdx) {
-                        document.getElementById('carouselTrack').style.transform = `translateX(-${currentIdx * 100}%)`; 
-                        document.querySelectorAll('.dot').forEach((d, i) => { d.className = `dot w-1.5 h-1.5 rounded-full ${i===currentIdx?'bg-blue-500':'bg-zinc-700'}`; }); 
-                        
-                        // Stop old video, play new one
-                        const oldVid = document.getElementById(`yt-${oldIdx}`), newVid = document.getElementById(`yt-${currentIdx}`);
-                        if(oldVid) try{oldVid.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');}catch(e){}
-                        if(newVid) try{newVid.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');}catch(e){}
-                    }
+                    document.getElementById('carouselTrack').style.transform = `translateX(-${currentIdx * 100}%)`; 
+                    document.querySelectorAll('.dot').forEach((d, i) => { d.className = `dot w-1.5 h-1.5 rounded-full ${i===currentIdx?'bg-blue-500':'bg-zinc-700'}`; }); 
+                    const oldVid = document.getElementById(`yt-${oldIdx}`), newVid = document.getElementById(`yt-${currentIdx}`);
+                    if(oldVid) try{oldVid.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');}catch(e){}
+                    if(newVid) try{newVid.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');}catch(e){}
                 } 
             }); 
         }
 
-        function updateLibButtons(id) { 
-            const isL = JSON.parse(localStorage.getItem('likes') || '[]').some(x=>x.id==id); 
-            const isB = JSON.parse(localStorage.getItem('bookmarks') || '[]').some(x=>x.id==id); 
-            document.getElementById('btnLikeModal').className = isL ? 'fa-solid fa-heart text-red-500 interaction-icon' : 'fa-regular fa-heart interaction-icon'; 
-            document.getElementById('btnBookModal').className = isB ? 'fa-solid fa-bookmark text-white interaction-icon' : 'fa-regular fa-bookmark interaction-icon'; 
-            document.getElementById('btnLikeModal').onclick = () => toggleLib('likes'); 
-            document.getElementById('btnBookModal').onclick = () => toggleLib('bookmarks'); 
-        }
+        function updateLibButtons(id) { const isL = JSON.parse(localStorage.getItem('likes') || '[]').some(x=>x.id==id); const isB = JSON.parse(localStorage.getItem('bookmarks') || '[]').some(x=>x.id==id); document.getElementById('btnLikeModal').className = isL ? 'fa-solid fa-heart text-red-500 interaction-icon' : 'fa-regular fa-heart interaction-icon'; document.getElementById('btnBookModal').className = isB ? 'fa-solid fa-bookmark text-white interaction-icon' : 'fa-regular fa-bookmark interaction-icon'; document.getElementById('btnLikeModal').onclick = () => toggleLib('likes'); document.getElementById('btnBookModal').onclick = () => toggleLib('bookmarks'); }
         function toggleLib(k) { let items = JSON.parse(localStorage.getItem(k) || '[]'); const idx = items.findIndex(x => x.id == window.currentMediaId); idx > -1 ? items.splice(idx,1) : items.push({id: window.currentMediaId, type: window.currentMediaType}); localStorage.setItem(k, JSON.stringify(items)); updateLibButtons(window.currentMediaId); }
-        async function switchTab(mode, el) { document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active')); el.classList.add('active'); const grid = document.getElementById('feedGrid'); grid.innerHTML = ''; if(mode === 'likes' || mode === 'bookmarks') { currentLibMode = true; currentLibType = mode; showLibrary(mode); } else { currentLibMode = false; currentCastId = ''; searchQuery = ''; currentType='multi'; currentSchedule='trending'; currentCompany=''; loadFeed(true); } }
+        async function switchTab(mode, el) { document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active')); el.classList.add('active'); const grid = document.getElementById('feedGrid'); grid.innerHTML = ''; if(mode === 'likes' || mode === 'bookmarks') { currentLibMode = true; showLibrary(mode); } else { currentLibMode = false; currentCastId = ''; searchQuery = ''; currentType='multi'; currentSchedule='trending'; currentCompany=''; loadFeed(true); } }
         async function showLibrary(k) { const items = JSON.parse(localStorage.getItem(k) || '[]'); const grid = document.getElementById('feedGrid'); grid.innerHTML = ''; if (!items.length) { grid.innerHTML = '<div class="col-span-3 text-center py-20 text-zinc-500 text-xs">Belum ada konten disimpan</div>'; return; } const promises = items.map(i => fetch(`https://api.themoviedb.org/3/${i.type}/${i.id}?api_key=${API_KEY}&language=id-ID`).then(r => r.json())); const results = await Promise.all(promises); renderGrid(results.filter(m => m.id), grid); }
-        
-        window.onscroll = () => { 
-            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 1000 && !loading && !searchQuery && !currentLibMode) { 
-                page++; 
-                loadFeed(false); 
-            } 
-        };
+        window.onscroll = () => { if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 1000 && !loading && !searchQuery && !currentLibMode) { page++; loadFeed(false); } };
     </script>
 </body>
 </html>
