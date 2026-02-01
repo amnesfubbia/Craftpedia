@@ -91,7 +91,7 @@
         #smartSearchDropdown { position: absolute; top: 100%; left: 0; right: 0; background: #1a1a1a; border-radius: 0 0 10px 10px; border: 1px solid #333; border-top: none; display: none; z-index: 500; max-height: 300px; overflow-y: auto; }
         .smart-item { display: flex; align-items: center; padding: 10px; gap: 12px; border-bottom: 1px solid #262626; cursor: pointer; }
         .smart-item img { width: 35px; height: 50px; object-fit: cover; border-radius: 4px; }
-        .smart-item info { display: flex; flex-direction: column; }
+        .smart-info { display: flex; flex-direction: column; }
         .smart-name { font-size: 13px; font-weight: 600; color: #fff; }
         .smart-meta { font-size: 11px; color: #8e8e8e; }
 
@@ -103,8 +103,8 @@
         #backToTop { position: fixed; bottom: 85px; right: 20px; background: rgba(255,255,255,0.3); width: 42px; height: 42px; border-radius: 50%; display: none; align-items: center; justify-content: center; z-index: 100; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); }
 
         .modal-player { display: none; position: fixed; inset: 0; z-index: 8000; background: #000; overflow-y: auto; }
-        .carousel-track { display: flex; transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1); width: 100%; }
-        .carousel-slide { min-width: 100%; aspect-ratio: 16/9; position: relative; background: #000; }
+        .carousel-track { display: flex; transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1); width: 100%; height: 100%; }
+        .carousel-slide { min-width: 100%; height: 100%; position: relative; background: #000; }
         .swipe-overlay { position: absolute; inset: 0; z-index: 10; background: transparent; }
         .interaction-icon { font-size: 24px; cursor: pointer; color: #fff; transition: transform 0.1s; }
         .interaction-icon:active { transform: scale(1.2); }
@@ -163,9 +163,8 @@
         .ls-center { display: flex; justify-content: center; align-items: center; gap: 60px; }
         .ls-btn { color: #fff; font-size: 20px; cursor: pointer; text-shadow: 0 0 10px rgba(0,0,0,0.9); transition: transform 0.1s; }
         .ls-btn:active { transform: scale(1.1); }
-        .ls-btn.text-5xl { font-size: 40px; } /* Diperkecil dari 6xl */
+        .ls-btn.text-5xl { font-size: 40px; } 
         
-        /* FIX UNLOCK POSITION */
         .ls-lock-screen { 
             position: absolute; top: 20px; right: 20px; 
             z-index: 11000; display: none; padding: 12px;
@@ -173,18 +172,18 @@
             cursor: pointer; 
         }
         
-        /* Landscape Mode Overrides */
         .landscape-active #movieModal { overflow: hidden !important; }
         .landscape-active #modalScrollTop { height: 100vh; max-width: 100%; padding: 0; }
         .landscape-active .carousel-slide { height: 100vh; }
         .landscape-active #mainVideoArea { height: 100vh !important; }
+        #mainVideoArea { aspect-ratio: 16/9; width: 100%; background: #000; }
     </style>
 </head>
 <body>
 
     <div id="splashScreen">
         <div class="splash-content">
-            <img src="amnesfubbia.png" class="splash-logo" alt="Logo">
+            <img src="amnesfubbia.png" class="splash-logo" alt="Logo" onerror="this.src='https://via.placeholder.com/80?text=A'">
             <div class="splash-name">amnesfubbia</div>
         </div>
         <div class="splash-footer">
@@ -249,7 +248,7 @@
 
             <div class="profile-info">
                 <div class="profile-pic-container">
-                    <div class="profile-pic-logo"><img src="amnesfubbia.png" alt="Logo"></div>
+                    <div class="profile-pic-logo"><img src="amnesfubbia.png" alt="Logo" onerror="this.src='https://via.placeholder.com/74?text=A'"></div>
                     <div class="add-story-btn"><i class="fa-solid fa-plus"></i></div>
                 </div>
                 <div class="stats">
@@ -321,7 +320,7 @@
             <div class="relative overflow-hidden" id="mainVideoArea">
                 <div class="swipe-overlay" id="swipeOverlay"></div>
                 <div class="carousel-track" id="carouselTrack"></div>
-                <div id="carouselDots" class="flex justify-center gap-2 py-3"></div>
+                <div id="carouselDots" class="flex justify-center gap-2 py-3 absolute bottom-0 w-full z-20"></div>
             </div>
 
             <div class="px-4 py-3 flex justify-between items-center">
@@ -360,7 +359,7 @@
                 <div id="serverList" class="grid grid-cols-4 gap-2 mt-6"></div>
                 
                 <div class="dl-grid">
-                    <button id="btnDownload1" class="dl-link-btn" onclick="window.open(`https://dl.vidsrc.vip/${window.currentMediaType}/${window.currentMediaId}`)">Download</button>
+                    <button id="btnDownload1" class="dl-link-btn">Download</button>
                 </div>
             </div>
         </div>
@@ -378,9 +377,12 @@
         let isExpanded = false, globalFullDesc = "", globalEnDesc = "", currentIdx = 0, startX = 0, isTranslated = false, originalIndoDesc = "";
         let abortController = null;
         let isLsPaused = false, isLsMuted = false, lsControlTimer;
-        let isStreamingMode = false; // Flag untuk mendeteksi apakah lagi nonton trailer atau streaming
+        let isStreamingMode = false;
 
         window.onload = () => {
+            // Fix for Android back button start
+            history.replaceState({view: 'home'}, "");
+            
             setTimeout(() => {
                 document.getElementById('splashScreen').style.display = 'none';
                 document.getElementById('mainProfile').style.display = 'block';
@@ -392,10 +394,9 @@
             }); 
         };
 
-        /* --- HP BACK BUTTON SYSTEM (FIXED) --- */
         window.addEventListener('popstate', function(event) {
             if (document.getElementById('landscapeOverlay').style.display === 'block') {
-                exitLandscape(true); // Param true agar tidak double back
+                exitLandscape(true);
             } else if (document.getElementById('movieModal').style.display === 'block') {
                 closeModal(true);
             } else if (document.getElementById('searchOverlay').style.display === 'block') {
@@ -405,15 +406,12 @@
             }
         });
 
-        /* --- LANDSCAPE CONTROLS LOGIC (FIXED) --- */
         async function enterLandscape() {
             const overlay = document.getElementById('landscapeOverlay');
             const lsTitle = document.getElementById('lsTitle');
             const lsPlayBtn = document.getElementById('lsPlay');
             
             lsTitle.innerText = document.getElementById('mTitle').innerText;
-            
-            // Atur visibilitas tombol play berdasarkan mode (trailer atau streaming)
             lsPlayBtn.style.display = isStreamingMode ? 'none' : 'block';
             
             document.body.classList.add('landscape-active');
@@ -450,8 +448,7 @@
                 screen.orientation.unlock();
             }
             
-            // Jika bukan dipicu oleh tombol back HP, kita back manual history-nya
-            if (!isPopState && window.history.state && window.history.state.view === 'landscape') {
+            if (!isPopState && window.history.state?.view === 'landscape') {
                 window.history.back();
             }
         }
@@ -474,7 +471,7 @@
         }
 
         function toggleLsPlay() {
-            if(isStreamingMode) return; // Nonaktifkan di streaming
+            if(isStreamingMode) return;
             const iframes = document.querySelectorAll('#carouselTrack iframe');
             const currentIframe = iframes[currentIdx];
             const btn = document.getElementById('lsPlay');
@@ -493,15 +490,10 @@
             const btn = document.getElementById('lsMute');
             
             isLsMuted = !isLsMuted;
-            
             if(!isStreamingMode) {
-                // Perintah untuk YouTube
                 const cmd = isLsMuted ? 'mute' : 'unMute';
                 currentIframe.contentWindow.postMessage(JSON.stringify({"event":"command","func":cmd,"args":""}), '*');
             }
-            // Untuk streaming biasa (Server), mute tidak bisa dikontrol via postMessage umum, 
-            // tapi tombol tetap berubah untuk indikasi visual tap user
-            
             btn.className = isLsMuted ? 'fa-solid fa-volume-xmark ls-btn' : 'fa-solid fa-volume-high ls-btn';
             showLsUI();
         }
@@ -516,7 +508,6 @@
             showLsUI();
         }
 
-        /* --- CORE LOGIC --- */
         function updateActiveNav(el) { document.querySelectorAll('.bottom-nav i').forEach(i => i.classList.remove('active-nav')); el.classList.add('active-nav'); }
 
         function toggleSideMenu(isPopState = false) {
@@ -634,9 +625,9 @@
 
         function initHighlights() { 
             const hls = [
-                {n: 'Disney', com: '2|6125|3166|34213', img: 'Disney.png', t: 'movie', s: true},
+                {n: 'Disney', com: '2', img: 'Disney.png', t: 'movie', s: true},
                 {n: 'Pixar', com: '3', img: 'Pixar.png', t: 'movie', s: true},
-                {n: 'Dreamworks', com: '521|7|1778', img: 'Dreamwork.png', t: 'movie', s: true},
+                {n: 'Dreamworks', com: '521', img: 'Dreamwork.png', t: 'movie', s: true},
                 {n: 'Ghibli', com: '10342', img: 'Ghibli.png', t: 'movie', s: true},
                 {n: 'Anime', g: 16, img: 'Anime.png', t: 'movie', c: 'JP', s: true},
                 {n: 'Indonesia', c: 'ID', img: 'Indonesia.png', t: 'movie', s: false},
@@ -795,26 +786,29 @@
             document.getElementById('movieModal').scrollTop = 0;
             document.getElementById('smartSearchDropdown').style.display = 'none'; document.body.style.overflow = 'hidden'; currentIdx = 0; isTranslated = false;
             
-            // Saat modal dibuka, default adalah mode trailer (YouTube)
             isStreamingMode = false;
             
             history.pushState({view: 'modal'}, "");
 
+            const origin = window.location.origin;
+
             const [rId, rEn, rCast] = await Promise.all([
-                fetch(`https://api.themoviedb.org/3/${type}/${id}?api_key=${API_KEY}&language=id-ID&append_to_response=videos,production_companies`),
+                fetch(`https://api.themoviedb.org/3/${type}/${id}?api_key=${API_KEY}&language=id-ID&append_to_response=videos`),
                 fetch(`https://api.themoviedb.org/3/${type}/${id}?api_key=${API_KEY}&language=en-US&append_to_response=videos`),
                 fetch(`https://api.themoviedb.org/3/${type}/${id}/credits?api_key=${API_KEY}`)
             ]);
             
             const dId = await rId.json(), dEn = await rEn.json(), dCast = await rCast.json();
-            const vids = [...(dId.videos?.results || []), ...(dEn.videos?.results || [])].filter(v => v.site === 'YouTube' && (v.type === 'Trailer' || v.type === 'Teaser')).slice(0, 4);
-            const track = document.getElementById('carouselTrack'), dots = document.getElementById('carouselDots');
+            const vids = [...(dId.videos?.results || []), ...(dEn.videos?.results || [])]
+                .filter(v => v.site === 'YouTube' && (v.type === 'Trailer' || v.type === 'Teaser'))
+                .slice(0, 4);
             
+            const track = document.getElementById('carouselTrack'), dots = document.getElementById('carouselDots');
             track.innerHTML = ''; dots.innerHTML = ''; track.style.transform = 'translateX(0)';
             
             if(vids.length > 0) { 
                 vids.forEach((v, i) => { 
-                    track.innerHTML += `<div class="carousel-slide"><iframe id="yt-${i}" src="https://www.youtube.com/embed/${v.key}?enablejsapi=1&autoplay=${i===0?1:0}&rel=0" class="w-full h-full" allow="autoplay; fullscreen"></iframe></div>`; 
+                    track.innerHTML += `<div class="carousel-slide"><iframe id="yt-${i}" src="https://www.youtube.com/embed/${v.key}?enablejsapi=1&autoplay=${i===0?1:0}&rel=0&origin=${origin}" class="w-full h-full" allow="autoplay; fullscreen"></iframe></div>`; 
                     if(vids.length > 1) {
                         dots.innerHTML += `<div class="dot w-1.5 h-1.5 rounded-full ${i===currentIdx?'bg-blue-500':'bg-zinc-700'}"></div>`; 
                     }
@@ -830,11 +824,20 @@
                 return `<div class="cast-item" onclick="searchByCast(${c.id})"><div class="cast-img-border"><div class="inner-border">${profileImg}</div></div><span class="cast-name">${c.name}</span></div>`;
             }).join('');
 
-            document.getElementById('mLikeDisplay').innerText = `${Math.floor((dId.vote_average || 0) * 1234).toLocaleString('id-ID')} suka`; document.getElementById('mTitle').innerText = dId.title || dId.name || dEn.title;
+            document.getElementById('mLikeDisplay').innerText = `${Math.floor((dId.vote_average || 0) * 1234).toLocaleString('id-ID')} suka`; 
+            document.getElementById('mTitle').innerText = dId.title || dId.name || dEn.title;
+            
             originalIndoDesc = dId.overview;
             globalFullDesc = originalIndoDesc || dEn.overview || "Sinopsis belum tersedia untuk konten ini.";
             globalEnDesc = dEn.overview;
-            if(globalEnDesc && globalEnDesc !== originalIndoDesc) { document.getElementById('mTranslateBtn').classList.remove('hidden'); document.getElementById('mTranslateBtn').innerText = "Lihat terjemahan"; } else { document.getElementById('mTranslateBtn').classList.add('hidden'); }
+            
+            if(globalEnDesc && globalEnDesc !== originalIndoDesc && globalEnDesc.trim() !== "") { 
+                document.getElementById('mTranslateBtn').classList.remove('hidden'); 
+                document.getElementById('mTranslateBtn').innerText = "Lihat terjemahan"; 
+            } else { 
+                document.getElementById('mTranslateBtn').classList.add('hidden'); 
+            }
+            
             isExpanded = false; renderSynopsis();
 
             const relYear = (dId.release_date || dId.first_air_date || "2026").split('-')[0];
@@ -855,7 +858,15 @@
                 <button class="server-btn" onclick="playVid('https://vidsrc.xyz/embed/${type}/${id}${seriesSuffix}', this)">Server 8</button>
             `;
 
-            if(type === 'tv') { document.getElementById('seriesControl').classList.remove('hidden'); document.getElementById('seasonSel').innerHTML = (dId.seasons||[]).filter(s=>s.season_number>0).map(s=>`<option value="${s.season_number}">Season ${s.season_number}</option>`).join(''); loadEpisodes(); } else { document.getElementById('seriesControl').classList.add('hidden'); }
+            document.getElementById('btnDownload1').onclick = () => window.open(`https://dl.vidsrc.vip/${type}/${id}`);
+
+            if(type === 'tv') { 
+                document.getElementById('seriesControl').classList.remove('hidden'); 
+                document.getElementById('seasonSel').innerHTML = (dId.seasons||[]).filter(s=>s.season_number>0).map(s=>`<option value="${s.season_number}">Season ${s.season_number}</option>`).join(''); 
+                loadEpisodes(); 
+            } else { 
+                document.getElementById('seriesControl').classList.add('hidden'); 
+            }
             updateLibButtons(id);
         }
 
@@ -889,12 +900,11 @@
         function handleToggleDesc() { isExpanded = !isExpanded; renderSynopsis(); }
         
         function playVid(url, el) { 
-            // Jika memutar video dari server (Streaming), nyalakan flag streaming
             isStreamingMode = true;
-            
             const track = document.getElementById('carouselTrack'); 
             const dots = document.getElementById('carouselDots'); 
-            const finalUrl = url.includes('?') ? `${url}&enablejsapi=1` : `${url}?enablejsapi=1`;
+            const origin = window.location.origin;
+            const finalUrl = url.includes('?') ? `${url}&enablejsapi=1&origin=${origin}` : `${url}?enablejsapi=1&origin=${origin}`;
             
             track.innerHTML = `<div class="carousel-slide"><iframe src="${finalUrl}" class="w-full h-full" allowfullscreen allow="autoplay"></iframe></div>`; 
             track.style.transform = 'translateX(0)'; currentIdx = 0; dots.innerHTML = ''; 
