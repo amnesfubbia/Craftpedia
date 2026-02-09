@@ -191,14 +191,14 @@
         </div>
         <div class="ls-controls" id="lsUI">
             <div class="ls-top">
-                <i class="fa-solid fa-arrow-left ls-btn" onclick="event.stopPropagation(); exitLandscape()"></i>
+                <i class="fa-solid fa-arrow-left ls-btn" onclick="event.stopPropagation(); handleLsBack()"></i>
                 <div id="lsTitle" class="text-white font-bold truncate max-w-[60%] text-sm"></div>
                 <i class="fa-solid fa-lock-open ls-btn" onclick="event.stopPropagation(); lockScreen()"></i>
             </div>
             <div class="ls-center">
                 <i id="lsMute" class="fa-solid fa-volume-high ls-btn" onclick="event.stopPropagation(); toggleLsMute()"></i>
                 <i id="lsPlay" class="fa-solid fa-pause ls-btn text-6xl" onclick="event.stopPropagation(); toggleLsPlay()"></i>
-                <i class="fa-solid fa-expand ls-btn" onclick="event.stopPropagation(); exitLandscape()"></i>
+                <i class="fa-solid fa-expand ls-btn" onclick="event.stopPropagation(); handleLsBack()"></i>
             </div>
             <div class="ls-bottom text-center text-[10px] text-zinc-400">Tap untuk menyembunyikan kontrol</div>
         </div>
@@ -386,8 +386,8 @@
         /* --- HP BACK BUTTON SYSTEM --- */
         window.addEventListener('popstate', function(event) {
             if (document.getElementById('landscapeOverlay').style.display === 'block') {
-                // Saat mode landscape aktif dan back ditekan, jalankan exitLandscape tanpa history.back lagi
-                exitLandscape(true);
+                // Jangan panggil history.back() lagi di sini, panggil fungsi bersihnya saja
+                closeLandscapeSilently();
             } else if (document.getElementById('movieModal').style.display === 'block') {
                 closeModal();
             } else if (document.getElementById('searchOverlay').style.display === 'block') {
@@ -423,11 +423,21 @@
             } catch (e) {}
         }
 
-        function exitLandscape(fromPopState = false) {
+        // Fungsi baru untuk tombol back di layar (UI) agar sinkron dengan back fisik
+        function handleLsBack() {
+            if (window.history.state && window.history.state.view === 'landscape') {
+                window.history.back(); // Biarkan popstate yang menangani penutupan
+            } else {
+                exitLandscape(); // Fallback jika state hilang
+            }
+        }
+
+        // Fungsi khusus untuk keluar dari mode landscape tanpa mengganggu history stack
+        function closeLandscapeSilently() {
             document.body.classList.remove('landscape-active');
             document.getElementById('landscapeOverlay').style.display = 'none';
             
-            // Move video area back to modal sinopsis (sebelum server list / sesudah cast)
+            // Move video area back to modal sinopsis
             const videoArea = document.getElementById('mainVideoArea');
             const castContainer = document.getElementById('castContainer');
             castContainer.after(videoArea);
@@ -438,9 +448,12 @@
             if (screen.orientation && screen.orientation.unlock) {
                 screen.orientation.unlock();
             }
-            
-            // Jika dipanggil dari tombol di layar, kita buang history state landscape agar sinkron
-            if (!fromPopState && window.history.state && window.history.state.view === 'landscape') {
+        }
+
+        function exitLandscape() {
+            closeLandscapeSilently();
+            // Cek jika memang harus mundur history (untuk tombol UI)
+            if (window.history.state && window.history.state.view === 'landscape') {
                 window.history.back();
             }
         }
@@ -864,7 +877,7 @@
             track.innerHTML = ''; 
             document.getElementById('movieModal').style.display = 'none'; 
             document.body.style.overflow = 'auto'; 
-            if(document.body.classList.contains('landscape-active')) exitLandscape();
+            if(document.body.classList.contains('landscape-active')) closeLandscapeSilently();
         }
 
         function renderSynopsis() { const descEl = document.getElementById('mDesc'), toggleBtn = document.getElementById('mToggleBtn'); if (globalFullDesc.length > 90) { toggleBtn.classList.remove('hidden'); descEl.innerText = isExpanded ? globalFullDesc : globalFullDesc.substring(0, 90) + "..."; toggleBtn.innerText = isExpanded ? "ringkas" : "selengkapnya"; } else { descEl.innerText = globalFullDesc; toggleBtn.classList.add('hidden'); } }
