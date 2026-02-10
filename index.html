@@ -386,7 +386,6 @@
         /* --- HP BACK BUTTON SYSTEM --- */
         window.addEventListener('popstate', function(event) {
             if (document.getElementById('landscapeOverlay').style.display === 'block') {
-                // Jangan panggil history.back() lagi di sini, panggil fungsi bersihnya saja
                 closeLandscapeSilently();
             } else if (document.getElementById('movieModal').style.display === 'block') {
                 closeModal();
@@ -406,7 +405,6 @@
             document.body.classList.add('landscape-active');
             overlay.style.display = 'block';
             
-            // Move video area to landscape overlay
             const videoArea = document.getElementById('mainVideoArea');
             document.getElementById('landscapeOverlay').appendChild(videoArea);
             
@@ -423,21 +421,18 @@
             } catch (e) {}
         }
 
-        // Fungsi baru untuk tombol back di layar (UI) agar sinkron dengan back fisik
         function handleLsBack() {
             if (window.history.state && window.history.state.view === 'landscape') {
-                window.history.back(); // Biarkan popstate yang menangani penutupan
+                window.history.back();
             } else {
-                exitLandscape(); // Fallback jika state hilang
+                exitLandscape();
             }
         }
 
-        // Fungsi khusus untuk keluar dari mode landscape tanpa mengganggu history stack
         function closeLandscapeSilently() {
             document.body.classList.remove('landscape-active');
             document.getElementById('landscapeOverlay').style.display = 'none';
             
-            // Move video area back to modal sinopsis
             const videoArea = document.getElementById('mainVideoArea');
             const castContainer = document.getElementById('castContainer');
             castContainer.after(videoArea);
@@ -452,7 +447,6 @@
 
         function exitLandscape() {
             closeLandscapeSilently();
-            // Cek jika memang harus mundur history (untuk tombol UI)
             if (window.history.state && window.history.state.view === 'landscape') {
                 window.history.back();
             }
@@ -640,7 +634,7 @@
                 {n: 'Anime', g: 16, img: 'Anime.png', t: 'movie', c: 'JP', s: true},
                 {n: 'Indonesia', c: 'ID', img: 'Indonesia.png', t: 'movie', s: false},
                 {n: 'Korea', c: 'KR', img: 'Korea.png', t: 'movie', s: false},
-                {n: 'India', c: 'IN', img: 'India.png', t: 'movie', s: false},
+                {n: 'India', c: 'IN', img: 'Indonesia.png', t: 'movie', s: false},
                 {n: 'Thailand', c: 'TH', img: 'Thailand.png', t: 'movie', s: false}
             ]; 
             const cont = document.getElementById('highlightList'); 
@@ -840,15 +834,21 @@
             const rel = dId.release_date || dId.first_air_date || ""; 
             document.getElementById('mDateDisplay').innerText = rel ? new Date(rel).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
             
+            // SERVER LIST (Total 13) - Dirapikan Penomorannya
             document.getElementById('serverList').innerHTML = `
                 <button class="server-btn" onclick="playVid('https://vidsrc.me/embed/${type}?tmdb=${id}', this)">Server 1</button>
-                <button class="server-btn" onclick="playVid('https://vidrock.net/embed/${type}/${id}${seriesSuffix}', this)">Server 2</button>
+                <button class="server-btn" onclick="playVid('https://vidsrc.cc/v2/embed/${type}/${id}${type==='tv'?'?s=1&e=1':''}', this)">Server 2</button>
                 <button class="server-btn" onclick="playVid('https://vidsrc.icu/embed/${type}/${id}${seriesSuffix}', this)">Server 3</button>
-                <button class="server-btn" onclick="playVid('https://vidsrc.to/embed/${type}/${id}${seriesSuffix}', this)">Server 4</button>
-                <button class="server-btn" onclick="playVid('https://www.2embed.cc/embed/${id}', this)">Server 5</button>
-                <button class="server-btn" onclick="playVid('https://vidfast.pro/embed/${type}/${id}${seriesSuffix}', this)">Server 6</button>
-                <button class="server-btn" onclick="playVid('https://embed.smashystream.com/playere.php?tmdb=${id}', this)">Server 7</button>
-                <button class="server-btn" onclick="playVid('https://vidsrc.xyz/embed/${type}/${id}${seriesSuffix}', this)">Server 8</button>
+                <button class="server-btn" onclick="playVid('https://www.2embed.cc/embed/${id}', this)">Server 4</button>
+                <button class="server-btn" onclick="playVid('https://embed.smashystream.com/playere.php?tmdb=${id}', this)">Server 5</button>
+                <button class="server-btn" onclick="playVid('https://vidsrc.xyz/embed/${type}/${id}${seriesSuffix}', this)">Server 6</button>
+                <button class="server-btn" onclick="playVid('https://vidsrc.net/embed/${type}/${id}${seriesSuffix}', this)">Server 7</button>
+                <button class="server-btn" onclick="playVid('https://vidlink.pro/${type}/${id}${seriesSuffix}', this)">Server 8</button>
+                <button class="server-btn" onclick="playVid('https://moviesapi.club/${type}/${id}${seriesSuffix}', this)">Server 9</button>
+                <button class="server-btn" onclick="playVid('https://multiembed.mov/directstream.php?video_id=${id}&tmdb=1', this)">Server 10</button>
+                <button class="server-btn" onclick="playVid('https://vidsrc.cc/v2/embed/${type}/${id}${type==='tv'?'?s=1&e=1':''}', this)">VidCC</button>
+                <button class="server-btn" onclick="playVid('https://vidlink.pro/${type}/${id}${seriesSuffix}', this)">VidLink</button>
+                <button class="server-btn" onclick="playVid('https://www.2embed.cc/embed/${id}', this)">EmbedCC</button>
             `;
 
             if(type === 'tv') { document.getElementById('seriesControl').classList.remove('hidden'); document.getElementById('seasonSel').innerHTML = (dId.seasons||[]).filter(s=>s.season_number>0).map(s=>`<option value="${s.season_number}">Season ${s.season_number}</option>`).join(''); loadEpisodes(); } else { document.getElementById('seriesControl').classList.add('hidden'); }
@@ -903,11 +903,10 @@
             const episodes = d.episodes || [];
             
             document.getElementById('episodeGrid').innerHTML = episodes.map((e, index) => {
-                const nextUrl = episodes[index + 1] ? `https://vidsrc.me/embed/tv?tmdb=${window.currentMediaId}&s=${s}&e=${episodes[index + 1].episode_number}` : '';
-                
+                const epNum = e.episode_number;
                 return `
-                <div class="pill text-[10px] flex flex-col items-center justify-center gap-1 min-h-[45px]" onclick="playVid('https://vidsrc.me/embed/tv?tmdb=${window.currentMediaId}&s=${s}&e=${e.episode_number}', this)">
-                    <span class="font-bold">${e.episode_number}</span>
+                <div class="pill text-[10px] flex flex-col items-center justify-center gap-1 min-h-[45px]" onclick="playVid('https://vidsrc.me/embed/tv?tmdb=${window.currentMediaId}&s=${s}&e=${epNum}', this)">
+                    <span class="font-bold">${epNum}</span>
                 </div>`;
             }).join(''); 
         }
