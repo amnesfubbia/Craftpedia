@@ -908,7 +908,6 @@
                 return `
                 <div class="pill text-[10px] flex flex-col items-center justify-center gap-1 min-h-[45px]" onclick="playVid('https://vidsrc.me/embed/tv?tmdb=${window.currentMediaId}&s=${s}&e=${e.episode_number}', this)">
                     <span class="font-bold">${e.episode_number}</span>
-                    ${nextUrl ? `<span class="text-[7px] text-blue-400 font-black border-t border-zinc-800 w-full pt-0.5 mt-0.5" onclick="event.stopPropagation(); playVid('${nextUrl}', this.parentElement)">NEXT</span>` : ''}
                 </div>`;
             }).join(''); 
         }
