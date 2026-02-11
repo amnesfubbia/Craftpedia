@@ -111,7 +111,9 @@
         .server-btn { width: 100%; padding: 12px 5px; border-radius: 8px; font-size: 10px; font-weight: 800; text-transform: uppercase; border: 1px solid #1c1c1c; text-align: center; cursor: pointer; background: #0a0a0a; color: #fff; transition: all 0.2s; }
         .server-btn:active { background: #1c1c1c; }
         .server-btn.active-link { border: 2px solid #fff !important; background: rgba(255,255,255,0.1); }
-        .dl-grid { display: grid; grid-template-columns: 1fr; gap: 8px; margin-top: 15px; }
+        
+        /* ADJUSTED MARGIN DOWN FOR DOWNLOAD AREA */
+        .dl-grid { display: grid; grid-template-columns: 1fr; gap: 8px; margin-top: 15px; margin-bottom: 5px; }
         .dl-link-btn { width: 100%; padding: 14px; border-radius: 12px; background: #000; color: #fff; font-size: 12px; font-weight: 800; text-transform: uppercase; text-align: center; border: 1px solid #333; cursor: pointer; }
         
         .cast-wrapper { display: flex; overflow-x: auto; gap: 15px; padding: 15px 0; scrollbar-width: none; }
@@ -302,7 +304,7 @@
     <div id="yearDropdown" class="filter-dropdown no-scrollbar"></div>
 
     <div id="movieModal" class="modal-player">
-        <div id="modalScrollTop" class="max-w-xl mx-auto pb-40">
+        <div id="modalScrollTop" class="max-w-xl mx-auto pb-4">
             <div class="px-4 h-[54px] flex items-center border-b border-zinc-900 sticky top-0 bg-black z-50">
                 <i class="fa-solid fa-chevron-left text-xl cursor-pointer" onclick="closeModal()"></i>
                 <div class="flex-grow text-center text-[14px] font-bold truncate px-8" id="mTitle"></div>
@@ -630,7 +632,7 @@
                 {n: 'Disney', com: '2|6125|3166|34213', img: 'Disney.png', t: 'movie', s: true},
                 {n: 'Pixar', com: '3', img: 'Pixar.png', t: 'movie', s: true},
                 {n: 'Dreamworks', com: '521|778', img: 'Dreamwork.png', t: 'movie', s: true},
-                {n: 'Ghibli', com: '10342', img: 'Ghibli.png', t: 'movie', s: true},
+                {n: 'Pixar', com: '10342', img: 'Ghibli.png', t: 'movie', s: true},
                 {n: 'Anime', g: 16, img: 'Anime.png', t: 'movie', c: 'JP', s: true},
                 {n: 'Indonesia', c: 'ID', img: 'Indonesia.png', t: 'movie', s: false},
                 {n: 'Korea', c: 'KR', img: 'Korea.png', t: 'movie', s: false},
