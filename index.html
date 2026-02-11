@@ -834,7 +834,7 @@
             const rel = dId.release_date || dId.first_air_date || ""; 
             document.getElementById('mDateDisplay').innerText = rel ? new Date(rel).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
             
-            // SERVER LIST (Perbaikan Nama Server 11-15 & Link 14-15)
+            // SERVER LIST (DIPERBAIKI)
             document.getElementById('serverList').innerHTML = `
                 <button class="server-btn" onclick="playVid('https://vidsrc.me/embed/${type}?tmdb=${id}', this)">Server 1</button>
                 <button class="server-btn" onclick="playVid('https://vidsrc.cc/v2/embed/${type}/${id}${type==='tv'?'?s=1&e=1':''}', this)">Server 2</button>
@@ -846,11 +846,11 @@
                 <button class="server-btn" onclick="playVid('https://vidlink.pro/${type}/${id}${seriesSuffix}', this)">Server 8</button>
                 <button class="server-btn" onclick="playVid('https://moviesapi.club/${type}/${id}${seriesSuffix}', this)">Server 9</button>
                 <button class="server-btn" onclick="playVid('https://multiembed.mov/directstream.php?video_id=${id}&tmdb=1', this)">Server 10</button>
-                <button class="server-btn" onclick="playVid('https://vidsrc.cc/v2/embed/${type}/${id}${type==='tv'?'?s=1&e=1':''}', this)">Server 11</button>
+                <button class="server-btn" onclick="playVid('https://autoembed.to/movie/tmdb/${id}', this)">Server 11</button>
                 <button class="server-btn" onclick="playVid('https://vidlink.pro/${type}/${id}${seriesSuffix}', this)">Server 12</button>
                 <button class="server-btn" onclick="playVid('https://www.2embed.cc/embed/${id}', this)">Server 13</button>
-                <button class="server-btn" onclick="playVid('https://vidsrc.pro/embed/${type}/${id}${seriesSuffix}', this)">Server 14</button>
-                <button class="server-btn" onclick="playVid('https://vidsrc.in/embed/${type}/${id}${seriesSuffix}', this)">Server 15</button>
+                <button class="server-btn" onclick="playVid('https://vidsrc.pm/embed/${type}/${id}${seriesSuffix}', this)">Server 14</button>
+                <button class="server-btn" onclick="playVid('https://vidsrc.rip/embed/${type}/${id}${seriesSuffix}', this)">Server 15</button>
             `;
 
             if(type === 'tv') { document.getElementById('seriesControl').classList.remove('hidden'); document.getElementById('seasonSel').innerHTML = (dId.seasons||[]).filter(s=>s.season_number>0).map(s=>`<option value="${s.season_number}">Season ${s.season_number}</option>`).join(''); loadEpisodes(); } else { document.getElementById('seriesControl').classList.add('hidden'); }
