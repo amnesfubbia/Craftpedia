@@ -582,6 +582,10 @@
         async function openComingSoon() {
             const grid = document.getElementById('searchGrid');
             const overlay = document.getElementById('searchOverlay');
+            
+            // Perbaikan: Sembunyikan header input pencarian saat menampilkan jadwal rilis
+            document.querySelector('.search-header').style.display = 'none';
+            
             overlay.style.display = 'block';
             grid.innerHTML = '<div class="col-span-3 text-center py-10 text-zinc-500">Memuat jadwal rilis...</div>';
             document.body.style.overflow = 'hidden';
@@ -731,10 +735,32 @@
             }); 
         }
 
-        function openSearch() { document.getElementById('searchOverlay').style.display = 'block'; document.getElementById('searchInp').focus(); document.body.style.overflow='hidden'; history.pushState({view: 'search'}, ""); }
-        function closeSearch() { document.getElementById('searchOverlay').style.display = 'none'; document.body.style.overflow='auto'; searchQuery=''; currentCastId=''; document.getElementById('smartSearchDropdown').style.display = 'none'; }
+        function openSearch() { 
+            // Pastikan header pencarian muncul kembali jika sebelumnya disembunyikan oleh openComingSoon
+            document.querySelector('.search-header').style.display = 'flex';
+            document.getElementById('searchGrid').innerHTML = ''; // Bersihkan list jadwal jika ada
+            document.getElementById('searchOverlay').style.display = 'block'; 
+            document.getElementById('searchInp').focus(); 
+            document.body.style.overflow='hidden'; 
+            history.pushState({view: 'search'}, ""); 
+        }
+
+        function closeSearch() { 
+            document.getElementById('searchOverlay').style.display = 'none'; 
+            document.body.style.overflow='auto'; 
+            searchQuery=''; 
+            currentCastId=''; 
+            document.getElementById('searchInp').value = '';
+            document.getElementById('smartSearchDropdown').style.display = 'none'; 
+        }
         
-        function searchAction() { currentLibMode = false; currentCastId = ''; searchQuery = document.getElementById('searchInp').value; document.getElementById('smartSearchDropdown').style.display = 'none'; loadFeed(true); }
+        function searchAction() { 
+            currentLibMode = false; 
+            currentCastId = ''; 
+            searchQuery = document.getElementById('searchInp').value; 
+            document.getElementById('smartSearchDropdown').style.display = 'none'; 
+            loadFeed(true); 
+        }
 
         function toggleFilterBar() { const b = document.getElementById('filterBar'); b.style.display = b.style.display === 'block' ? 'none' : 'block'; }
         
