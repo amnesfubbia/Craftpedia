@@ -350,7 +350,7 @@
                     <div id="episodeGrid" class="grid grid-cols-5 gap-2"></div>
                 </div>
 
-                <div id="serverList" class="grid grid-cols-4 gap-2 mt-6"></div>
+                <div id="serverList" class="grid grid-cols-5 gap-2 mt-6"></div>
                 
                 <div class="dl-grid">
                     <button id="btnDownload1" class="dl-link-btn" onclick="window.open(`https://dl.vidsrc.vip/${window.currentMediaType}/${window.currentMediaId}`)">Download</button>
@@ -885,8 +885,6 @@
                 <button class="server-btn" onclick="playVid('https://vidlink.pro/${type}/${id}${seriesSuffix}', this)">Server 8</button>
                 <button class="server-btn" onclick="playVid('https://moviesapi.club/${type}/${id}${seriesSuffix}', this)">Server 9</button>
                 <button class="server-btn" onclick="playVid('https://multiembed.mov/directstream.php?video_id=${id}&tmdb=1', this)">Server 10</button>
-                <button class="server-btn" onclick="playVid('https://autoembed.to/embed/${type}/${id}${seriesSuffix}', this)">Server 11</button>
-                <button class="server-btn" onclick="playVid('https://player.vidsrc.nl/embed/${type}/${id}${seriesSuffix}', this)">Server 12</button>
             `;
 
             if(type === 'tv') { document.getElementById('seriesControl').classList.remove('hidden'); document.getElementById('seasonSel').innerHTML = (dId.seasons||[]).filter(s=>s.season_number>0).map(s=>`<option value="${s.season_number}">Season ${s.season_number}</option>`).join(''); loadEpisodes(); } else { document.getElementById('seriesControl').classList.add('hidden'); }
