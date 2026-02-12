@@ -112,7 +112,6 @@
         .server-btn:active { background: #1c1c1c; }
         .server-btn.active-link { border: 2px solid #fff !important; background: rgba(255,255,255,0.1); }
         
-        /* ADJUSTED MARGIN DOWN FOR DOWNLOAD AREA */
         .dl-grid { display: grid; grid-template-columns: 1fr; gap: 8px; margin-top: 15px; margin-bottom: 5px; }
         .dl-link-btn { width: 100%; padding: 14px; border-radius: 12px; background: #000; color: #fff; font-size: 12px; font-weight: 800; text-transform: uppercase; text-align: center; border: 1px solid #333; cursor: pointer; }
         
@@ -137,12 +136,12 @@
         .ig-hashtags { color: #e0f1ff; display: block; margin-top: 10px; font-size: 13px; line-height: 1.5; }
         .ig-date { color: #a8a8a8; font-size: 11px; text-transform: uppercase; }
         
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: #000; border-top: 1px solid #1c1c1c; display: flex; justify-content: space-around; padding: 12px 0; z-index: 300; }
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: #000; border-top: 1px solid #1c1c1c; display: flex; justify-content: space-around; padding: 12px 0; z-index: 9000; }
         .bottom-nav i { color: #a8a8a8; transition: color 0.3s; }
         .bottom-nav i.active-nav { color: #fff; }
 
         /* SIDEBAR / ABOUT MENU */
-        #sideMenu { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 9000; display: none; padding: 40px 25px; overflow-y: auto; }
+        #sideMenu { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 9500; display: none; padding: 40px 25px; overflow-y: auto; }
         .side-close { position: absolute; top: 20px; right: 20px; font-size: 24px; cursor: pointer; }
         .about-title { font-size: 22px; font-weight: 900; margin-bottom: 20px; border-left: 4px solid #fff; padding-left: 12px; }
         .about-content { font-size: 14px; line-height: 1.6; color: #ccc; }
@@ -151,7 +150,7 @@
 
         /* --- NEW LANDSCAPE CONTROLS --- */
         .landscape-overlay {
-            display: none; position: fixed; inset: 0; z-index: 9500; background: #000;
+            display: none; position: fixed; inset: 0; z-index: 9900; background: #000;
         }
         .landscape-video-container { width: 100%; height: 100%; position: relative; }
         
@@ -304,7 +303,7 @@
     <div id="yearDropdown" class="filter-dropdown no-scrollbar"></div>
 
     <div id="movieModal" class="modal-player">
-        <div id="modalScrollTop" class="max-w-xl mx-auto pb-4">
+        <div id="modalScrollTop" class="max-w-xl mx-auto pb-20">
             <div class="px-4 h-[54px] flex items-center border-b border-zinc-900 sticky top-0 bg-black z-50">
                 <i class="fa-solid fa-chevron-left text-xl cursor-pointer" onclick="closeModal()"></i>
                 <div class="flex-grow text-center text-[14px] font-bold truncate px-8" id="mTitle"></div>
@@ -363,7 +362,7 @@
     <nav class="bottom-nav">
         <i class="fa-solid fa-house cursor-pointer text-xl active-nav" id="homeBtnNav" onclick="updateActiveNav(this); backToHome()"></i>
         <i class="fa-solid fa-magnifying-glass cursor-pointer text-xl" onclick="updateActiveNav(this); openSearch()"></i>
-        <i class="fa-regular fa-bookmark cursor-pointer text-xl" onclick="updateActiveNav(this); switchTab('bookmarks', document.getElementById('tabBookmark'))"></i>
+        <i class="fa-solid fa-bookmark cursor-pointer text-xl" id="bookmarkBtnNav" onclick="updateActiveNav(this); switchTab('bookmarks', document.getElementById('tabBookmark'))"></i>
     </nav>
 
     <script>
@@ -512,7 +511,10 @@
         }
 
         /* --- CORE LOGIC --- */
-        function updateActiveNav(el) { document.querySelectorAll('.bottom-nav i').forEach(i => i.classList.remove('active-nav')); el.classList.add('active-nav'); }
+        function updateActiveNav(el) { 
+            document.querySelectorAll('.bottom-nav i').forEach(i => i.classList.remove('active-nav')); 
+            if(el) el.classList.add('active-nav'); 
+        }
 
         function toggleSideMenu() {
             const menu = document.getElementById('sideMenu');
@@ -528,9 +530,20 @@
             currentType = 'multi'; searchQuery = ''; currentCastId = ''; currentCompany = '';
             
             document.querySelectorAll('.highlight-item').forEach(i => i.classList.remove('active-hl'));
-            document.querySelectorAll('.pill').forEach(p => { p.classList.remove('active-pill'); p.innerHTML = p.innerText.split(' ')[0] + ' <i class="fa-solid fa-caret-down"></i>'; });
+            
+            // Reset visual buttons filters
+            const btnCountry = document.getElementById('btnCountry');
+            const btnGenre = document.getElementById('btnGenre');
+            const btnYear = document.getElementById('yearBtn');
+            
+            btnCountry.innerHTML = 'Negara <i class="fa-solid fa-caret-down"></i>';
+            btnGenre.innerHTML = 'Genre <i class="fa-solid fa-caret-down"></i>';
+            btnYear.innerHTML = 'Tahun <i class="fa-solid fa-caret-down"></i>';
+            
+            document.querySelectorAll('.pill').forEach(p => p.classList.remove('active-pill'));
             document.querySelectorAll('.btn-ig').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.stat-item').forEach(s => s.classList.remove('active-stat'));
+            
             document.getElementById('filterBar').style.display = 'none';
             document.getElementById('tabGrid').classList.add('active');
             document.getElementById('tabLikes').classList.remove('active');
@@ -583,7 +596,6 @@
             const grid = document.getElementById('searchGrid');
             const overlay = document.getElementById('searchOverlay');
             
-            // Perbaikan: Sembunyikan header input pencarian saat menampilkan jadwal rilis
             document.querySelector('.search-header').style.display = 'none';
             
             overlay.style.display = 'block';
@@ -636,11 +648,11 @@
                 {n: 'Disney', com: '2|6125|3166|34213', img: 'Disney.png', t: 'movie', s: true},
                 {n: 'Pixar', com: '3', img: 'Pixar.png', t: 'movie', s: true},
                 {n: 'Dreamworks', com: '521|778', img: 'Dreamwork.png', t: 'movie', s: true},
-                {n: 'Pixar', com: '10342', img: 'Ghibli.png', t: 'movie', s: true},
+                {n: 'Ghibli', com: '10342', img: 'Ghibli.png', t: 'movie', s: true},
                 {n: 'Anime', g: 16, img: 'Anime.png', t: 'movie', c: 'JP', s: true},
                 {n: 'Indonesia', c: 'ID', img: 'Indonesia.png', t: 'movie', s: false},
                 {n: 'Korea', c: 'KR', img: 'Korea.png', t: 'movie', s: false},
-                {n: 'India', c: 'IN', img: 'Indonesia.png', t: 'movie', s: false},
+                {n: 'India', c: 'IN', img: 'India.png', t: 'movie', s: false},
                 {n: 'Thailand', c: 'TH', img: 'Thailand.png', t: 'movie', s: false}
             ]; 
             const cont = document.getElementById('highlightList'); 
@@ -694,7 +706,7 @@
                 if(currentCountry) url += `&with_origin_country=${currentCountry}`;
                 if(currentGenre) url += `&with_genres=${currentGenre}`;
                 if(currentCompany) url += `&with_companies=${currentCompany}`;
-                if(currentType === 'short') url += `&with_runtime.lte=40&with_runtime.gte=1`;
+                if(currentType === 'short') url += `&with_runtime.lte=45&with_runtime.gte=1`;
                 if(currentSchedule === 'now_playing' || currentSchedule === 'upcoming') { 
                     const today = new Date().toISOString().split('T')[0]; 
                     if(currentSchedule === 'now_playing') { 
@@ -736,9 +748,8 @@
         }
 
         function openSearch() { 
-            // Pastikan header pencarian muncul kembali jika sebelumnya disembunyikan oleh openComingSoon
             document.querySelector('.search-header').style.display = 'flex';
-            document.getElementById('searchGrid').innerHTML = ''; // Bersihkan list jadwal jika ada
+            document.getElementById('searchGrid').innerHTML = ''; 
             document.getElementById('searchOverlay').style.display = 'block'; 
             document.getElementById('searchInp').focus(); 
             document.body.style.overflow='hidden'; 
@@ -839,7 +850,8 @@
                 }); 
                 document.getElementById('swipeOverlay').style.display = vids.length > 1 ? 'block' : 'none'; 
             } else { 
-                track.innerHTML = `<div class="carousel-slide"><iframe src="https://vidsrc.me/embed/${type}?tmdb=${id}" class="w-full h-full" allowfullscreen></iframe></div>`; 
+                const fallbackUrl = `https://vidsrc.me/embed/${type}?tmdb=${id}`;
+                track.innerHTML = `<div class="carousel-slide"><iframe src="${fallbackUrl}" class="w-full h-full" allowfullscreen allow="autoplay"></iframe></div>`; 
                 document.getElementById('swipeOverlay').style.display = 'none'; 
             }
 
@@ -862,7 +874,6 @@
             const rel = dId.release_date || dId.first_air_date || ""; 
             document.getElementById('mDateDisplay').innerText = rel ? new Date(rel).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
             
-            // SERVER LIST
             document.getElementById('serverList').innerHTML = `
                 <button class="server-btn" onclick="playVid('https://vidsrc.me/embed/${type}?tmdb=${id}', this)">Server 1</button>
                 <button class="server-btn" onclick="playVid('https://vidsrc.cc/v2/embed/${type}/${id}${type==='tv'?'?s=1&e=1':''}', this)">Server 2</button>
@@ -874,9 +885,8 @@
                 <button class="server-btn" onclick="playVid('https://vidlink.pro/${type}/${id}${seriesSuffix}', this)">Server 8</button>
                 <button class="server-btn" onclick="playVid('https://moviesapi.club/${type}/${id}${seriesSuffix}', this)">Server 9</button>
                 <button class="server-btn" onclick="playVid('https://multiembed.mov/directstream.php?video_id=${id}&tmdb=1', this)">Server 10</button>
-                <button class="server-btn" onclick="playVid('https://autoembed.to/movie/tmdb/${id}', this)">Server 11</button>
-                <button class="server-btn" onclick="playVid('https://vidlink.pro/${type}/${id}${seriesSuffix}', this)">Server 12</button>
-                <button class="server-btn" onclick="playVid('https://www.2embed.cc/embed/${id}', this)">Server 13</button>
+                <button class="server-btn" onclick="playVid('https://autoembed.to/embed/${type}/${id}${seriesSuffix}', this)">Server 11</button>
+                <button class="server-btn" onclick="playVid('https://player.vidsrc.nl/embed/${type}/${id}${seriesSuffix}', this)">Server 12</button>
             `;
 
             if(type === 'tv') { document.getElementById('seriesControl').classList.remove('hidden'); document.getElementById('seasonSel').innerHTML = (dId.seasons||[]).filter(s=>s.season_number>0).map(s=>`<option value="${s.season_number}">Season ${s.season_number}</option>`).join(''); loadEpisodes(); } else { document.getElementById('seriesControl').classList.add('hidden'); }
@@ -901,8 +911,10 @@
         
         function closeModal() { 
             const track = document.getElementById('carouselTrack'); 
-            track.querySelectorAll('iframe').forEach(f => f.src = ""); 
-            track.innerHTML = ''; 
+            if(track) {
+                track.querySelectorAll('iframe').forEach(f => f.src = ""); 
+                track.innerHTML = ''; 
+            }
             document.getElementById('movieModal').style.display = 'none'; 
             document.body.style.overflow = 'auto'; 
             if(document.body.classList.contains('landscape-active')) closeLandscapeSilently();
@@ -960,7 +972,29 @@
 
         function updateLibButtons(id) { const isL = JSON.parse(localStorage.getItem('likes') || '[]').some(x=>x.id==id); const isB = JSON.parse(localStorage.getItem('bookmarks') || '[]').some(x=>x.id==id); document.getElementById('btnLikeModal').className = isL ? 'fa-solid fa-heart text-red-500 interaction-icon' : 'fa-regular fa-heart interaction-icon'; document.getElementById('btnBookModal').className = isB ? 'fa-solid fa-bookmark text-white interaction-icon' : 'fa-regular fa-bookmark interaction-icon'; document.getElementById('btnLikeModal').onclick = () => toggleLib('likes'); document.getElementById('btnBookModal').onclick = () => toggleLib('bookmarks'); }
         function toggleLib(k) { let items = JSON.parse(localStorage.getItem(k) || '[]'); const idx = items.findIndex(x => x.id == window.currentMediaId); idx > -1 ? items.splice(idx,1) : items.push({id: window.currentMediaId, type: window.currentMediaType}); localStorage.setItem(k, JSON.stringify(items)); updateLibButtons(window.currentMediaId); }
-        async function switchTab(mode, el) { document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active')); el.classList.add('active'); const grid = document.getElementById('feedGrid'); grid.innerHTML = ''; if(mode === 'likes' || mode === 'bookmarks') { currentLibMode = true; showLibrary(mode); } else { currentLibMode = false; currentCastId = ''; searchQuery = ''; currentType='multi'; currentSchedule='trending'; currentCompany=''; loadFeed(true); } }
+        
+        async function switchTab(mode, el) { 
+            closeModal();
+            closeSearch();
+            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active')); 
+            if(el) el.classList.add('active'); 
+
+            if(mode === 'bookmarks') {
+                updateActiveNav(document.getElementById('bookmarkBtnNav'));
+            } else {
+                updateActiveNav(document.getElementById('homeBtnNav'));
+            }
+
+            const grid = document.getElementById('feedGrid'); 
+            grid.innerHTML = ''; 
+            if(mode === 'likes' || mode === 'bookmarks') { 
+                currentLibMode = true; 
+                showLibrary(mode); 
+            } else { 
+                currentLibMode = false; currentCastId = ''; searchQuery = ''; currentType='multi'; currentSchedule='trending'; currentCompany=''; loadFeed(true); 
+            } 
+        }
+
         async function showLibrary(k) { const items = JSON.parse(localStorage.getItem(k) || '[]'); const grid = document.getElementById('feedGrid'); grid.innerHTML = ''; if (!items.length) { grid.innerHTML = '<div class="col-span-3 text-center py-20 text-zinc-500 text-xs">Belum ada konten disimpan</div>'; return; } const promises = items.map(i => fetch(`https://api.themoviedb.org/3/${i.type}/${i.id}?api_key=${API_KEY}&language=id-ID`).then(r => r.json())); const results = await Promise.all(promises); renderGrid(results.filter(m => m.id), grid); }
         window.onscroll = () => { if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 1000 && !loading && !searchQuery && !currentLibMode) { page++; loadFeed(false); } };
     </script>
