@@ -841,15 +841,27 @@
                 fetch(`https://api.themoviedb.org/3/${type}/${id}/credits?api_key=${API_KEY}`)
             ]);
             
-            const dId = await rId.json(), dCast = await rCast.json();
+            let dId = await rId.json(), dCast = await rCast.json();
             
-            // Filter video bertipe Trailer/Teaser dari semua bahasa yang didapat
+            // Perbaikan Sinopsis: Jika Indonesia kosong, ambil dari English
+            if(!dId.overview) {
+                const rEn = await fetch(`https://api.themoviedb.org/3/${type}/${id}?api_key=${API_KEY}&language=en-US`);
+                const dEn = await rEn.json();
+                dId.overview = dEn.overview;
+                globalEnDesc = dEn.overview || "";
+                if(globalEnDesc) document.getElementById('mTranslateBtn').classList.remove('hidden');
+            } else {
+                globalEnDesc = "";
+                document.getElementById('mTranslateBtn').classList.add('hidden');
+            }
+            
+            // Perbaikan Trailer: Ambil trailer global
             const vids = (dId.videos?.results || []).filter(v => 
                 v.site === 'YouTube' && 
                 (v.type === 'Trailer' || v.type === 'Teaser') && 
                 !v.name.toLowerCase().includes('private') &&
                 !v.name.toLowerCase().includes('deleted')
-            ).slice(0, 5); // Ambil sampai 5 trailer agar lebih variatif
+            ).slice(0, 5);
 
             const track = document.getElementById('carouselTrack'), dots = document.getElementById('carouselDots');
             track.innerHTML = ''; dots.innerHTML = ''; track.style.transform = 'translateX(0)';
@@ -875,12 +887,7 @@
 
             document.getElementById('mLikeDisplay').innerText = `${Math.floor((dId.vote_average || 0) * 1234).toLocaleString('id-ID')} suka`; document.getElementById('mTitle').innerText = dId.title || dId.name;
             originalIndoDesc = dId.overview;
-            
-            // Backup deskripsi jika Indonesia kosong (mengambil dari English jika ada di data utama)
             globalFullDesc = originalIndoDesc || "Sinopsis belum tersedia untuk konten ini.";
-            
-            // Tombol terjemahan hanya muncul jika kita punya teks untuk diterjemahkan (biasanya butuh fetch EN terpisah jika ID kosong, tapi di sini kita fokus ke Global Trailer)
-            document.getElementById('mTranslateBtn').classList.add('hidden'); 
             
             isExpanded = false; renderSynopsis();
 
@@ -923,7 +930,7 @@
                     isTranslated = true; btn.innerText = "Lihat versi asli"; renderSynopsis();
                 } catch(e) { btn.innerText = "Gagal menerjemahkan"; setTimeout(()=>btn.innerText=oldText, 2000); }
             } else {
-                globalFullDesc = originalIndoDesc || "Sinopsis tidak tersedia.";
+                globalFullDesc = globalEnDesc || "Sinopsis tidak tersedia.";
                 isTranslated = false; btn.innerText = "Lihat terjemahan"; renderSynopsis();
             }
         }
