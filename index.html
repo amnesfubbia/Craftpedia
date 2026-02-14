@@ -843,21 +843,32 @@
             
             const dId = await rId.json(), dEn = await rEn.json(), dCast = await rCast.json();
             
-            // Perbaikan Logika Trailer: Menggabungkan hasil video dari ID dan EN agar lebih lengkap
-            const allVideos = [...(dId.videos?.results || []), ...(dEn.videos?.results || [])];
-            const vids = allVideos.filter(v => 
+            // Gabungkan video dari ID dan EN secara pintar
+            let allVideos = [...(dId.videos?.results || []), ...(dEn.videos?.results || [])];
+            
+            // Filter video yang unik berdasarkan KEY
+            let uniqueVideos = Array.from(new Map(allVideos.map(item => [item['key'], item])).values());
+
+            // Filter Trailer & Teaser
+            let vids = uniqueVideos.filter(v => 
                 v.site === 'YouTube' && 
                 (v.type === 'Trailer' || v.type === 'Teaser') && 
                 !v.name.toLowerCase().includes('private') &&
                 !v.name.toLowerCase().includes('deleted')
-            ).slice(0, 4);
+            ).slice(0, 5);
+
+            // Jika trailer masih kosong (khusus film luar negeri dengan ejaan asli), ambil database tanpa bahasa
+            if(vids.length === 0) {
+                const rOriginal = await fetch(`https://api.themoviedb.org/3/${type}/${id}/videos?api_key=${API_KEY}`);
+                const dOriginal = await rOriginal.json();
+                vids = (dOriginal.results || []).filter(v => v.site === 'YouTube' && (v.type === 'Trailer' || v.type === 'Teaser')).slice(0, 5);
+            }
 
             const track = document.getElementById('carouselTrack'), dots = document.getElementById('carouselDots');
             track.innerHTML = ''; dots.innerHTML = ''; track.style.transform = 'translateX(0)';
             
             if(vids.length > 0) { 
                 vids.forEach((v, i) => { 
-                    // Menambahkan mute=0 agar suara aktif secara default
                     track.innerHTML += `<div class="carousel-slide"><iframe id="yt-${i}" src="https://www.youtube.com/embed/${v.key}?enablejsapi=1&autoplay=${i===0?1:0}&rel=0&mute=0" class="w-full h-full" allow="autoplay; fullscreen"></iframe></div>`; 
                     if(vids.length > 1) {
                         dots.innerHTML += `<div class="dot w-1.5 h-1.5 rounded-full ${i===currentIdx?'bg-blue-500':'bg-zinc-700'}"></div>`; 
@@ -865,7 +876,7 @@
                 }); 
                 document.getElementById('swipeOverlay').style.display = vids.length > 1 ? 'block' : 'none'; 
             } else { 
-                // Jika tidak ada trailer di YouTube, tampilkan player server 1 sebagai fallback agar tidak kosong
+                // Jika trailer benar-benar tidak ada di YouTube TMDB, tampilkan Player Utama
                 const fallbackUrl = `https://vidlink.pro/${type}/${id}${seriesSuffix}`;
                 track.innerHTML = `<div class="carousel-slide"><iframe src="${fallbackUrl}" class="w-full h-full" allowfullscreen allow="autoplay"></iframe></div>`; 
                 document.getElementById('swipeOverlay').style.display = 'none'; 
@@ -876,7 +887,11 @@
                 return `<div class="cast-item" onclick="searchByCast(${c.id})"><div class="cast-img-border"><div class="inner-border">${profileImg}</div></div><span class="cast-name">${c.name}</span></div>`;
             }).join('');
 
-            document.getElementById('mLikeDisplay').innerText = `${Math.floor((dId.vote_average || 0) * 1234).toLocaleString('id-ID')} suka`; document.getElementById('mTitle').innerText = dId.title || dId.name || dEn.title;
+            document.getElementById('mLikeDisplay').innerText = `${Math.floor((dId.vote_average || 0) * 1234).toLocaleString('id-ID')} suka`; 
+            
+            // Prioritas Judul: ID > EN > Original Title
+            document.getElementById('mTitle').innerText = dId.title || dId.name || dEn.title || dId.original_title || dId.original_name;
+            
             originalIndoDesc = dId.overview;
             globalFullDesc = originalIndoDesc || dEn.overview || "Sinopsis belum tersedia untuk konten ini.";
             globalEnDesc = dEn.overview;
