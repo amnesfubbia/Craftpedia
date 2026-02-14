@@ -564,7 +564,7 @@
                 if(q.length < 2) { drop.style.display = 'none'; return; } 
                 timeout = setTimeout(async () => { 
                     try { 
-                        const res = await fetch(`https://api.themoviedb.org/3/search/multi?query=${encodeURIComponent(q)}&api_key=${API_KEY}&language=id-ID`); 
+                        const res = await fetch(`https://api.themoviedb.org/3/search/multi?query=${encodeURIComponent(q)}&api_key=${API_KEY}&language=id-ID&include_adult=false`); 
                         const data = await res.json(); 
                         const results = (data.results || []).slice(0, 5); 
                         if(results.length) { 
@@ -835,34 +835,33 @@
             
             history.pushState({view: 'modal'}, "");
 
-            const [rId, rEn, rCast] = await Promise.all([
-                fetch(`https://api.themoviedb.org/3/${type}/${id}?api_key=${API_KEY}&language=id-ID&append_to_response=videos,production_companies`),
+            const [rId, rEn, rCast, rAllVids] = await Promise.all([
+                fetch(`https://api.themoviedb.org/3/${type}/${id}?api_key=${API_KEY}&language=id-ID&append_to_response=videos`),
                 fetch(`https://api.themoviedb.org/3/${type}/${id}?api_key=${API_KEY}&language=en-US&append_to_response=videos`),
-                fetch(`https://api.themoviedb.org/3/${type}/${id}/credits?api_key=${API_KEY}`)
+                fetch(`https://api.themoviedb.org/3/${type}/${id}/credits?api_key=${API_KEY}`),
+                fetch(`https://api.themoviedb.org/3/${type}/${id}/videos?api_key=${API_KEY}`)
             ]);
             
-            const dId = await rId.json(), dEn = await rEn.json(), dCast = await rCast.json();
+            const dId = await rId.json(), dEn = await rEn.json(), dCast = await rCast.json(), dAllVids = await rAllVids.json();
             
-            // Gabungkan video dari ID dan EN secara pintar
-            let allVideos = [...(dId.videos?.results || []), ...(dEn.videos?.results || [])];
+            // Gabungkan video dari ID, EN, dan NO-LANGUAGE secara pintar
+            let allVideos = [...(dId.videos?.results || []), ...(dEn.videos?.results || []), ...(dAllVids.results || [])];
             
             // Filter video yang unik berdasarkan KEY
             let uniqueVideos = Array.from(new Map(allVideos.map(item => [item['key'], item])).values());
 
-            // Filter Trailer & Teaser
+            // Prioritas: Trailer > Teaser
             let vids = uniqueVideos.filter(v => 
                 v.site === 'YouTube' && 
-                (v.type === 'Trailer' || v.type === 'Teaser') && 
-                !v.name.toLowerCase().includes('private') &&
-                !v.name.toLowerCase().includes('deleted')
-            ).slice(0, 5);
-
-            // Jika trailer masih kosong (khusus film luar negeri dengan ejaan asli), ambil database tanpa bahasa
+                (v.type === 'Trailer')
+            );
+            
+            // Jika trailer tidak ada, baru ambil teaser
             if(vids.length === 0) {
-                const rOriginal = await fetch(`https://api.themoviedb.org/3/${type}/${id}/videos?api_key=${API_KEY}`);
-                const dOriginal = await rOriginal.json();
-                vids = (dOriginal.results || []).filter(v => v.site === 'YouTube' && (v.type === 'Trailer' || v.type === 'Teaser')).slice(0, 5);
+                vids = uniqueVideos.filter(v => v.site === 'YouTube' && v.type === 'Teaser');
             }
+
+            vids = vids.slice(0, 5);
 
             const track = document.getElementById('carouselTrack'), dots = document.getElementById('carouselDots');
             track.innerHTML = ''; dots.innerHTML = ''; track.style.transform = 'translateX(0)';
