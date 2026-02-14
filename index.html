@@ -564,11 +564,7 @@
                 if(q.length < 2) { drop.style.display = 'none'; return; } 
                 timeout = setTimeout(async () => { 
                     try { 
-                        // Update Smart Search URL to include Year filtering if year is selected
-                        let smartUrl = `https://api.themoviedb.org/3/search/multi?query=${encodeURIComponent(q)}&api_key=${API_KEY}&language=id-ID`;
-                        if(currentYear) smartUrl += `&year=${currentYear}&primary_release_year=${currentYear}`;
-                        
-                        const res = await fetch(smartUrl); 
+                        const res = await fetch(`https://api.themoviedb.org/3/search/multi?query=${encodeURIComponent(q)}&api_key=${API_KEY}&language=id-ID`); 
                         const data = await res.json(); 
                         const results = (data.results || []).slice(0, 5); 
                         if(results.length) { 
@@ -702,14 +698,8 @@
             if(isNew) { page = 1; grid.innerHTML = ''; }
             let url;
             if(currentCastId) { url = `https://api.themoviedb.org/3/person/${currentCastId}/combined_credits?api_key=${API_KEY}&language=id-ID`; }
-            else if(searchQuery) { 
-                // Optimization: If year filter is active, apply it to search multi as well
-                url = `https://api.themoviedb.org/3/search/multi?query=${encodeURIComponent(searchQuery)}&api_key=${API_KEY}&language=id-ID&page=${page}&include_adult=false`; 
-                if(currentYear) url += `&year=${currentYear}&primary_release_year=${currentYear}`;
-            }
-            else if(currentType === 'multi') { 
-                url = `https://api.themoviedb.org/3/trending/all/day?api_key=${API_KEY}&language=id-ID&page=${page}`; 
-            }
+            else if(searchQuery) { url = `https://api.themoviedb.org/3/search/multi?query=${encodeURIComponent(searchQuery)}&api_key=${API_KEY}&language=id-ID&page=${page}&include_adult=false`; }
+            else if(currentType === 'multi') { url = `https://api.themoviedb.org/3/trending/all/day?api_key=${API_KEY}&language=id-ID&page=${page}`; }
             else {
                 let endpoint = (currentType === 'tv') ? 'discover/tv' : 'discover/movie';
                 url = `https://api.themoviedb.org/3/${endpoint}?api_key=${API_KEY}&language=id-ID&page=${page}&include_adult=false&sort_by=popularity.desc`;
@@ -845,28 +835,27 @@
             
             history.pushState({view: 'modal'}, "");
 
-            const [rId, rEn, rCast] = await Promise.all([
-                fetch(`https://api.themoviedb.org/3/${type}/${id}?api_key=${API_KEY}&language=id-ID&append_to_response=videos,production_companies`),
-                fetch(`https://api.themoviedb.org/3/${type}/${id}?api_key=${API_KEY}&language=en-US&append_to_response=videos`),
+            // Menggunakan include_video_language untuk memanggil trailer global (Hollywood, India, Thailand, dll) dalam satu hit
+            const [rId, rCast] = await Promise.all([
+                fetch(`https://api.themoviedb.org/3/${type}/${id}?api_key=${API_KEY}&language=id-ID&append_to_response=videos,production_companies&include_video_language=en,id,hi,th,ko,ja,null`),
                 fetch(`https://api.themoviedb.org/3/${type}/${id}/credits?api_key=${API_KEY}`)
             ]);
             
-            const dId = await rId.json(), dEn = await rEn.json(), dCast = await rCast.json();
+            const dId = await rId.json(), dCast = await rCast.json();
             
-            const allVideos = [...(dId.videos?.results || []), ...(dEn.videos?.results || [])];
-            const vids = allVideos.filter(v => 
+            // Filter video bertipe Trailer/Teaser dari semua bahasa yang didapat
+            const vids = (dId.videos?.results || []).filter(v => 
                 v.site === 'YouTube' && 
                 (v.type === 'Trailer' || v.type === 'Teaser') && 
                 !v.name.toLowerCase().includes('private') &&
                 !v.name.toLowerCase().includes('deleted')
-            ).slice(0, 4);
+            ).slice(0, 5); // Ambil sampai 5 trailer agar lebih variatif
 
             const track = document.getElementById('carouselTrack'), dots = document.getElementById('carouselDots');
             track.innerHTML = ''; dots.innerHTML = ''; track.style.transform = 'translateX(0)';
             
             if(vids.length > 0) { 
                 vids.forEach((v, i) => { 
-                    // Menambahkan mute=0 agar suara aktif
                     track.innerHTML += `<div class="carousel-slide"><iframe id="yt-${i}" src="https://www.youtube.com/embed/${v.key}?enablejsapi=1&autoplay=${i===0?1:0}&rel=0&mute=0" class="w-full h-full" allow="autoplay; fullscreen"></iframe></div>`; 
                     if(vids.length > 1) {
                         dots.innerHTML += `<div class="dot w-1.5 h-1.5 rounded-full ${i===currentIdx?'bg-blue-500':'bg-zinc-700'}"></div>`; 
@@ -884,11 +873,15 @@
                 return `<div class="cast-item" onclick="searchByCast(${c.id})"><div class="cast-img-border"><div class="inner-border">${profileImg}</div></div><span class="cast-name">${c.name}</span></div>`;
             }).join('');
 
-            document.getElementById('mLikeDisplay').innerText = `${Math.floor((dId.vote_average || 0) * 1234).toLocaleString('id-ID')} suka`; document.getElementById('mTitle').innerText = dId.title || dId.name || dEn.title;
+            document.getElementById('mLikeDisplay').innerText = `${Math.floor((dId.vote_average || 0) * 1234).toLocaleString('id-ID')} suka`; document.getElementById('mTitle').innerText = dId.title || dId.name;
             originalIndoDesc = dId.overview;
-            globalFullDesc = originalIndoDesc || dEn.overview || "Sinopsis belum tersedia untuk konten ini.";
-            globalEnDesc = dEn.overview;
-            if(globalEnDesc && globalEnDesc !== originalIndoDesc) { document.getElementById('mTranslateBtn').classList.remove('hidden'); document.getElementById('mTranslateBtn').innerText = "Lihat terjemahan"; } else { document.getElementById('mTranslateBtn').classList.add('hidden'); }
+            
+            // Backup deskripsi jika Indonesia kosong (mengambil dari English jika ada di data utama)
+            globalFullDesc = originalIndoDesc || "Sinopsis belum tersedia untuk konten ini.";
+            
+            // Tombol terjemahan hanya muncul jika kita punya teks untuk diterjemahkan (biasanya butuh fetch EN terpisah jika ID kosong, tapi di sini kita fokus ke Global Trailer)
+            document.getElementById('mTranslateBtn').classList.add('hidden'); 
+            
             isExpanded = false; renderSynopsis();
 
             const relYear = (dId.release_date || dId.first_air_date || "2026").split('-')[0];
@@ -930,7 +923,7 @@
                     isTranslated = true; btn.innerText = "Lihat versi asli"; renderSynopsis();
                 } catch(e) { btn.innerText = "Gagal menerjemahkan"; setTimeout(()=>btn.innerText=oldText, 2000); }
             } else {
-                globalFullDesc = originalIndoDesc || globalEnDesc || "Sinopsis tidak tersedia.";
+                globalFullDesc = originalIndoDesc || "Sinopsis tidak tersedia.";
                 isTranslated = false; btn.innerText = "Lihat terjemahan"; renderSynopsis();
             }
         }
