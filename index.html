@@ -856,38 +856,32 @@
                 document.getElementById('mTranslateBtn').classList.add('hidden');
             }
             
-            // FILTER VIDEO: UTAMAKAN TRAILER/TEASER, HAPUS PRIVATE/ERROR
+            // --- FILTER TRAILER KETAT ---
+            // Hanya ambil video YouTube/Vimeo yang bertipe 'Trailer' atau 'Teaser'
+            // Filter video yang mengandung kata 'private', 'unlisted', 'BTS', atau 'Shorts' agar tidak merusak pengalaman
             const allVideos = (dId.videos?.results || []).filter(v => 
                 (v.type === 'Trailer' || v.type === 'Teaser') && 
+                v.official === true &&
                 !v.name.toLowerCase().includes('private') &&
-                !v.name.toLowerCase().includes('deleted') &&
-                !v.name.toLowerCase().includes('behind the scenes')
+                !v.name.toLowerCase().includes('behind the scenes') &&
+                !v.name.toLowerCase().includes('bts') &&
+                !v.name.toLowerCase().includes('shorts')
             );
 
             const track = document.getElementById('carouselTrack'), dots = document.getElementById('carouselDots');
             track.innerHTML = ''; dots.innerHTML = ''; track.style.transform = 'translateX(0)';
             
-            // LOGIKA PEMANGGILAN VIDEO
-            let vidsToDisplay = [];
-            if (currentType === 'short') {
-                // Short: Vimeo -> YouTube
-                const vimeoVids = allVideos.filter(v => v.site === 'Vimeo');
-                const youtubeVids = allVideos.filter(v => v.site === 'YouTube');
-                vidsToDisplay = [...vimeoVids, ...youtubeVids].slice(0, 5);
-            } else {
-                // Movie/TV: YouTube -> Vimeo
-                const youtubeVids = allVideos.filter(v => v.site === 'YouTube');
-                const vimeoVids = allVideos.filter(v => v.site === 'Vimeo');
-                vidsToDisplay = [...youtubeVids, ...vimeoVids].slice(0, 5);
-            }
+            // Urutan prioritas: YouTube Trailer > YouTube Teaser > Vimeo
+            let vidsToDisplay = allVideos.sort((a, b) => (a.type === 'Trailer' ? -1 : 1)).slice(0, 5);
 
             if(vidsToDisplay.length > 0) { 
                 vidsToDisplay.forEach((v, i) => { 
                     let embedUrl = "";
-                    if(v.site === 'YouTube') {
-                        embedUrl = `https://www.youtube.com/embed/${v.key}?enablejsapi=1&autoplay=${i===0?1:0}&rel=0&mute=0`;
-                    } else if(v.site === 'Vimeo') {
+                    if(v.site === 'Vimeo') {
                         embedUrl = `https://player.vimeo.com/video/${v.key}?autoplay=${i===0?1:0}&muted=0`;
+                    } else if(v.site === 'YouTube') {
+                        // Tambahkan parameter 'rel=0' untuk mencegah video rekomendasi aneh di akhir trailer
+                        embedUrl = `https://www.youtube.com/embed/${v.key}?enablejsapi=1&autoplay=${i===0?1:0}&rel=0&modestbranding=1&mute=0`;
                     }
                     track.innerHTML += `<div class="carousel-slide"><iframe id="vid-${i}" src="${embedUrl}" class="w-full h-full" allow="autoplay; fullscreen"></iframe></div>`; 
                     if(vidsToDisplay.length > 1) {
@@ -896,7 +890,7 @@
                 }); 
                 document.getElementById('swipeOverlay').style.display = vidsToDisplay.length > 1 ? 'block' : 'none'; 
             } else { 
-                // FALLBACK KE SERVER 1 JIKA TIDAK ADA YOUTUBE/VIMEO
+                // FALLBACK KE SERVER JIKA TIDAK ADA TRAILER RESMI
                 const fallbackUrl = `https://vidlink.pro/${type}/${id}${seriesSuffix}`;
                 track.innerHTML = `<div class="carousel-slide"><iframe src="${fallbackUrl}" class="w-full h-full" allowfullscreen allow="autoplay"></iframe></div>`; 
                 document.getElementById('swipeOverlay').style.display = 'none'; 
@@ -920,12 +914,13 @@
             const rel = dId.release_date || dId.first_air_date || ""; 
             document.getElementById('mDateDisplay').innerText = rel ? new Date(rel).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
             
+            // --- SERVER FILTERING (REORDERED BY STABILITY) ---
             document.getElementById('serverList').innerHTML = `
                 <button class="server-btn" onclick="playVid('https://vidlink.pro/${type}/${id}${seriesSuffix}', this)">Server 1</button>
-                <button class="server-btn" onclick="playVid('https://www.2embed.cc/embed/${id}', this)">Server 2</button>
-                <button class="server-btn" onclick="playVid('https://multiembed.mov/directstream.php?video_id=${id}&tmdb=1', this)">Server 3</button>
-                <button class="server-btn" onclick="playVid('https://vidsrc.me/embed/${type}?tmdb=${id}', this)">Server 4</button>
-                <button class="server-btn" onclick="playVid('https://vidsrc.cc/v2/embed/${type}/${id}${type==='tv'?'?s=1&e=1':''}', this)">Server 5</button>
+                <button class="server-btn" onclick="playVid('https://vidsrc.me/embed/${type}?tmdb=${id}', this)">Server 2</button>
+                <button class="server-btn" onclick="playVid('https://vidsrc.cc/v2/embed/${type}/${id}${type==='tv'?'?s=1&e=1':''}', this)">Server 3</button>
+                <button class="server-btn" onclick="playVid('https://www.2embed.cc/embed/${id}', this)">Server 4</button>
+                <button class="server-btn" onclick="playVid('https://multiembed.mov/directstream.php?video_id=${id}&tmdb=1', this)">Server 5</button>
                 <button class="server-btn" onclick="playVid('https://vidsrc.xyz/embed/${type}/${id}${seriesSuffix}', this)">Server 6</button>
                 <button class="server-btn" onclick="playVid('https://vidsrc.net/embed/${type}/${id}${seriesSuffix}', this)">Server 7</button>
                 <button class="server-btn" onclick="playVid('https://moviesapi.club/${type}/${id}${seriesSuffix}', this)">Server 8</button>
@@ -987,11 +982,9 @@
             track.style.transform = 'translateX(0)'; currentIdx = 0; dots.innerHTML = ''; 
             document.getElementById('swipeOverlay').style.display = 'none'; highlightBtn(el); 
 
-            // Fallback Logic: Jika frame gagal load dalam 5 detik, beri notifikasi atau coba server lain
+            // Fallback Logic: Jika frame gagal load dalam 5 detik, coba server alternatif otomatis
             const frame = document.getElementById('player-frame');
             frame.onerror = () => {
-                console.log("Server error, trying fallback...");
-                // Otomatis pindah ke server vidsrc jika gagal
                 frame.src = `https://vidsrc.me/embed/${window.currentMediaType}?tmdb=${window.currentMediaId}`;
             };
         }
