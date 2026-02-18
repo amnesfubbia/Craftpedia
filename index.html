@@ -189,12 +189,12 @@
 
         /* --- NEW ACTOR PROFILE MODAL STYLE --- */
         .actor-modal { display: none; position: fixed; inset: 0; z-index: 8500; background: #000; overflow-y: auto; }
-        .actor-profile-img { width: 140px; height: 140px; border-radius: 50%; object-fit: cover; border: 3px solid #fff; margin: 20px auto 15px; box-shadow: 0 0 20px rgba(255,255,255,0.2); }
+        .actor-profile-img { width: 140px; height: 140px; border-radius: 50%; object-fit: cover; border: 3px solid #fff; margin: 40px auto 15px; box-shadow: 0 0 20px rgba(255,255,255,0.2); }
         .actor-name { font-size: 22px; font-weight: 900; text-align: center; margin-bottom: 5px; }
         .actor-bio-box { text-align: center; padding: 0 25px; margin-bottom: 25px; }
         .actor-bio-text { font-size: 11px; color: #8e8e8e; line-height: 1.5; }
         .actor-film-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; padding: 10px 0 80px; }
-        .actor-section-title { padding: 15px; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; border-top: 1px solid #1c1c1c; border-bottom: 1px solid #1c1c1c; background: #050505; }
+        .actor-section-title { padding: 15px; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; border-top: 1px solid #1c1c1c; border-bottom: 1px solid #1c1c1c; background: #050505; text-align: center; }
     </style>
 </head>
 <body>
@@ -401,7 +401,7 @@
     <div id="actorModal" class="actor-modal">
         <div class="sticky top-0 bg-black z-[100] border-b border-zinc-900 px-4 h-[54px] flex items-center">
             <i class="fa-solid fa-chevron-left text-xl cursor-pointer" onclick="closeActorModal()"></i>
-            <div class="flex-grow text-center text-[14px] font-black uppercase tracking-tighter" id="actorHeaderTitle">PROFILE</div>
+            <div class="flex-grow text-center text-[14px] font-black uppercase tracking-tighter" id="actorHeaderTitle"></div>
         </div>
         <div class="flex flex-col items-center">
             <img id="actorPic" src="" class="actor-profile-img" alt="Actor">
@@ -416,7 +416,7 @@
 
     <nav class="bottom-nav">
         <i class="fa-solid fa-house cursor-pointer text-xl active-nav" id="homeBtnNav" onclick="updateActiveNav(this); backToHome()"></i>
-        <i class="fa-solid fa-magnifying-glass cursor-pointer text-xl" onclick="updateActiveNav(this); openSearch()"></i>
+        <i class="fa-solid fa-magnifying-glass cursor-pointer text-xl" id="searchBtnNav" onclick="updateActiveNav(this); openSearch()"></i>
         <i class="fa-solid fa-bookmark cursor-pointer text-xl" id="bookmarkBtnNav" onclick="updateActiveNav(this); switchTab('bookmarks', document.getElementById('tabBookmark'))"></i>
     </nav>
 
@@ -554,6 +554,12 @@
 
         /* --- FITUR: PROFIL AKTOR MENDETAIL --- */
         async function openActorProfile(actorId) {
+            // STOP TRAILER AUDIO
+            const track = document.getElementById('carouselTrack');
+            if(track) {
+                track.querySelectorAll('iframe').forEach(f => f.src = "");
+            }
+
             const actorModal = document.getElementById('actorModal');
             actorModal.style.display = 'block';
             document.body.style.overflow = 'hidden';
@@ -896,6 +902,7 @@
             document.getElementById('searchOverlay').style.display = 'block'; 
             document.getElementById('searchInp').focus(); 
             document.body.style.overflow='hidden'; 
+            updateActiveNav(document.getElementById('searchBtnNav'));
             history.pushState({view: 'search'}, ""); 
         }
 
@@ -1128,6 +1135,7 @@
         }
         
         function closeModal() { 
+            // STOP TRAILER AUDIO
             const track = document.getElementById('carouselTrack'); 
             if(track) {
                 track.querySelectorAll('iframe').forEach(f => f.src = ""); 
