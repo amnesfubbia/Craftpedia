@@ -895,6 +895,7 @@
         function openSearch() { 
             closeModal();
             closeD();
+            closeActorModal(); // Otomatis menutup modal pemeran jika terbuka
             if(document.getElementById('sideMenu').style.display === 'block') toggleSideMenu();
 
             document.querySelector('.search-header').style.display = 'flex';
@@ -1206,6 +1207,7 @@
         async function switchTab(mode, el) { 
             closeModal();
             closeSearch();
+            closeActorModal(); // Otomatis menutup modal pemeran jika terbuka
             document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active')); 
             if(el) el.classList.add('active'); 
 
