@@ -95,10 +95,23 @@
         .smart-name { font-size: 13px; font-weight: 600; color: #fff; }
         .smart-meta { font-size: 11px; color: #8e8e8e; }
 
-        .calendar-item { display: flex; align-items: center; gap: 15px; padding: 15px; border-bottom: 1px solid #1c1c1c; }
-        .calendar-date { flex: 0 0 50px; text-align: center; background: #262626; border-radius: 8px; padding: 5px; }
-        .calendar-date .day { font-size: 16px; font-weight: 700; color: #fff; }
-        .calendar-date .month { font-size: 10px; text-transform: uppercase; color: #8e8e8e; }
+        /* --- UPDATED CALENDAR STYLE --- */
+        .calendar-item { display: flex; align-items: center; gap: 15px; padding: 12px 15px; border-bottom: 1px solid #111; }
+        .calendar-poster { flex: 0 0 85px; aspect-ratio: 2/3; border-radius: 12px; overflow: hidden; background: #111; border: 1px solid #222; }
+        .calendar-info { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+        .cal-title { font-size: 15px; font-weight: 800; color: #fff; line-height: 1.2; }
+        .cal-meta { display: flex; align-items: center; gap: 8px; font-size: 11px; color: #8e8e8e; }
+        .cal-genre-pill { padding: 2px 8px; background: #1c1c1c; border-radius: 100px; color: #ccc; font-size: 9px; font-weight: 600; }
+        .cal-rating { color: #ffca28; font-weight: 700; font-size: 11px; }
+        
+        /* Sticky Date Strip Fix */
+        .sticky-wrapper { position: sticky; top: 54px; z-index: 90; background: #000; }
+        .date-strip { display: flex; overflow-x: auto; gap: 10px; padding: 15px; background: #000; border-bottom: 1px solid #111; }
+        .date-chip { flex: 0 0 55px; height: 65px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 14px; background: #111; cursor: pointer; transition: all 0.2s; border: 1px solid transparent; }
+        .date-chip.active-date { background: #fff; border-color: #fff; }
+        .date-chip.active-date span { color: #000 !important; }
+        .date-chip .d-day { font-size: 18px; font-weight: 800; color: #fff; }
+        .date-chip .d-month { font-size: 10px; font-weight: 600; color: #8e8e8e; text-transform: uppercase; }
 
         #backToTop { position: fixed; bottom: 85px; right: 20px; background: rgba(255,255,255,0.3); width: 42px; height: 42px; border-radius: 50%; display: none; align-items: center; justify-content: center; z-index: 100; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); }
 
@@ -161,7 +174,6 @@
         }
         .ls-controls.visible { opacity: 1; pointer-events: auto; }
         .ls-top { display: flex; justify-content: space-between; align-items: center; }
-        .ls-center { display: flex; justify-content: center; align-items: center; gap: 80px; }
         .ls-btn { color: #fff; font-size: 28px; cursor: pointer; text-shadow: 0 0 15px rgba(0,0,0,0.9); transition: transform 0.1s; }
         .ls-btn:active { transform: scale(1.1); }
         .ls-lock-screen { position: absolute; inset: 0; z-index: 11000; display: none; align-items: flex-start; justify-content: flex-end; padding: 30px; background: rgba(0,0,0,0.01); pointer-events: auto; }
@@ -195,11 +207,6 @@
                 <i class="fa-solid fa-arrow-left ls-btn" onclick="event.stopPropagation(); handleLsBack()"></i>
                 <div id="lsTitle" class="text-white font-bold truncate max-w-[60%] text-sm"></div>
                 <i class="fa-solid fa-lock-open ls-btn" onclick="event.stopPropagation(); lockScreen()"></i>
-            </div>
-            <div class="ls-center">
-                <i id="lsMute" class="fa-solid fa-volume-high ls-btn" onclick="event.stopPropagation(); toggleLsMute()"></i>
-                <i id="lsPlay" class="fa-solid fa-pause ls-btn text-6xl" onclick="event.stopPropagation(); toggleLsPlay()"></i>
-                <i class="fa-solid fa-expand ls-btn" onclick="event.stopPropagation(); handleLsBack()"></i>
             </div>
             <div class="ls-bottom text-center text-[10px] text-zinc-400">Tap untuk menyembunyikan kontrol</div>
         </div>
@@ -293,7 +300,10 @@
                 <div id="smartSearchDropdown" class="no-scrollbar"></div>
             </div>
         </div>
-        <div id="searchGrid" class="movie-grid"></div>
+        <div id="searchContent" class="flex flex-col">
+            <div id="calendarHeader" class="hidden sticky-wrapper"></div>
+            <div id="searchGrid" class="movie-grid"></div>
+        </div>
     </div>
 
     <div id="backToTop" onclick="window.scrollTo({top: 0, behavior: 'smooth'})"><i class="fa-solid fa-arrow-up"></i></div>
@@ -475,32 +485,6 @@
             }, 3000);
         }
 
-        function toggleLsPlay() {
-            const iframes = document.querySelectorAll('#carouselTrack iframe');
-            const currentIframe = iframes[currentIdx];
-            const btn = document.getElementById('lsPlay');
-            
-            isLsPaused = !isLsPaused;
-            const cmd = isLsPaused ? 'pauseVideo' : 'playVideo';
-            
-            currentIframe.contentWindow.postMessage(JSON.stringify({"event":"command","func":cmd,"args":""}), '*');
-            btn.className = isLsPaused ? 'fa-solid fa-play ls-btn text-6xl' : 'fa-solid fa-pause ls-btn text-6xl';
-            showLsUI();
-        }
-
-        function toggleLsMute() {
-            const iframes = document.querySelectorAll('#carouselTrack iframe');
-            const currentIframe = iframes[currentIdx];
-            const btn = document.getElementById('lsMute');
-            
-            isLsMuted = !isLsMuted;
-            const cmd = isLsMuted ? 'mute' : 'unMute';
-            
-            currentIframe.contentWindow.postMessage(JSON.stringify({"event":"command","func":cmd,"args":""}), '*');
-            btn.className = isLsMuted ? 'fa-solid fa-volume-xmark ls-btn' : 'fa-solid fa-volume-high ls-btn';
-            showLsUI();
-        }
-
         function lockScreen() {
             document.getElementById('lsUI').classList.remove('visible');
             document.getElementById('lsLockLayer').style.display = 'flex';
@@ -596,40 +580,78 @@
         async function openComingSoon() {
             const grid = document.getElementById('searchGrid');
             const overlay = document.getElementById('searchOverlay');
-            
-            document.querySelector('.search-header').style.display = 'none';
+            const calendarHeader = document.getElementById('calendarHeader');
             
             overlay.style.display = 'block';
-            grid.innerHTML = '<div class="col-span-3 text-center py-10 text-zinc-500">Memuat jadwal rilis...</div>';
+            calendarHeader.classList.remove('hidden');
             document.body.style.overflow = 'hidden';
             history.pushState({view: 'search'}, "");
+            
+            // Generate Date Strip inside the sticky wrapper
+            let dateStripHTML = '<div class="date-strip no-scrollbar">';
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+            for(let i=0; i<14; i++) {
+                let d = new Date(); d.setDate(d.getDate() + i);
+                let active = i === 0 ? 'active-date' : '';
+                dateStripHTML += `
+                    <div class="date-chip ${active}" onclick="filterByDate('${d.toISOString().split('T')[0]}', this)">
+                        <span class="d-month">${months[d.getMonth()]}</span>
+                        <span class="d-day">${d.getDate()}</span>
+                    </div>`;
+            }
+            dateStripHTML += '</div>';
+            
+            calendarHeader.innerHTML = dateStripHTML;
+            grid.innerHTML = '<div id="calendarList" class="col-span-3"></div>';
+            filterByDate(new Date().toISOString().split('T')[0]);
+        }
+
+        async function filterByDate(dateStr, el) {
+            if(el) {
+                document.querySelectorAll('.date-chip').forEach(c => c.classList.remove('active-date'));
+                el.classList.add('active-date');
+            }
+            const list = document.getElementById('calendarList');
+            list.innerHTML = '<div class="text-center py-10 text-zinc-500 text-xs">Mencari tayangan...</div>';
+
             try {
-                const today = new Date().toISOString().split('T')[0];
-                const res = await fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=id-ID&sort_by=primary_release_date.asc&primary_release_date.gte=${today}`);
+                const res = await fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=id-ID&sort_by=popularity.desc&primary_release_date.gte=${dateStr}&primary_release_date.lte=${dateStr}`);
                 const data = await res.json();
-                grid.innerHTML = ''; 
+                
+                if(data.results.length === 0) {
+                    list.innerHTML = '<div class="text-center py-20 text-zinc-600 text-xs">Tidak ada jadwal rilis hari ini.</div>';
+                    return;
+                }
+
+                list.innerHTML = '';
+                // Get Genre Names Map
+                const gRes = await fetch(`https://api.themoviedb.org/3/genre/movie/list?api_key=${API_KEY}&language=id-ID`);
+                const gData = await gRes.json();
+                const genreMap = {}; gData.genres.forEach(g => genreMap[g.id] = g.name);
+
                 data.results.forEach(m => {
-                    if(!m.release_date) return;
-                    const relDate = new Date(m.release_date);
-                    const day = relDate.getDate();
-                    const month = relDate.toLocaleDateString('id-ID', { month: 'short' });
+                    const genres = m.genre_ids.slice(0, 2).map(id => `<span class="cal-genre-pill">${genreMap[id]}</span>`).join('');
                     const item = document.createElement('div');
-                    item.className = 'col-span-3 calendar-item cursor-pointer active:bg-zinc-900 transition-colors';
+                    item.className = 'calendar-item active:bg-zinc-900';
                     item.onclick = () => openModal(m.id, 'movie');
                     item.innerHTML = `
-                        <div class="calendar-date">
-                            <div class="day">${day}</div>
-                            <div class="month">${month}</div>
+                        <div class="calendar-poster">
+                            <img src="https://image.tmdb.org/t/p/w185${m.poster_path}" onerror="this.src='https://via.placeholder.com/185x278?text=No+Poster'" class="w-full h-full object-cover">
                         </div>
-                        <div class="flex-grow">
-                            <div class="text-[14px] font-bold text-white truncate w-48">${m.title}</div>
-                            <div class="text-[11px] text-zinc-500">Rating: ★ ${m.vote_average.toFixed(1)}</div>
+                        <div class="calendar-info">
+                            <div class="cal-title">${m.title}</div>
+                            <div class="cal-meta">
+                                <span class="cal-rating">★ ${m.vote_average.toFixed(1)}</span>
+                                <span class="text-zinc-600">•</span>
+                                <span>${m.release_date.split('-')[0]}</span>
+                            </div>
+                            <div class="flex gap-1 mt-1">${genres}</div>
                         </div>
-                        <img src="https://image.tmdb.org/t/p/w92${m.poster_path}" class="w-12 h-16 object-cover rounded shadow-lg">
+                        <i class="fa-solid fa-chevron-right text-zinc-800 text-xs"></i>
                     `;
-                    grid.appendChild(item);
+                    list.appendChild(item);
                 });
-            } catch (e) { grid.innerHTML = '<div class="col-span-3 text-center py-10">Gagal memuat jadwal.</div>'; }
+            } catch (e) { list.innerHTML = '<div class="text-center py-10">Gagal memuat data.</div>'; }
         }
 
         function searchByCast(castId) { 
@@ -647,8 +669,6 @@
         function initHighlights() { 
             const hls = [
                 {n: 'Disney', com: '2|6125|3166|34213', img: 'Disney.png', t: 'movie', s: true},
-                {n: 'Pixar', com: '3', img: 'Pixar.png', t: 'movie', s: true},
-                {n: 'Dreamworks', com: '521|778', img: 'Dreamwork.png', t: 'movie', s: true},
                 {n: 'Pixar', com: '3', img: 'Pixar.png', t: 'movie', s: true},
                 {n: 'Dreamworks', com: '521|778', img: 'Dreamwork.png', t: 'movie', s: true},
                 {n: 'Ghibli', com: '10342', img: 'Ghibli.png', t: 'movie', s: true},
@@ -766,6 +786,7 @@
 
         function closeSearch() { 
             document.getElementById('searchOverlay').style.display = 'none'; 
+            document.getElementById('calendarHeader').classList.add('hidden');
             document.body.style.overflow='auto'; 
             searchQuery=''; 
             currentCastId=''; 
@@ -778,6 +799,7 @@
             currentLibMode = false; 
             currentCastId = ''; 
             searchQuery = document.getElementById('searchInp').value; 
+            document.getElementById('calendarHeader').classList.add('hidden');
             document.getElementById('smartSearchDropdown').style.display = 'none'; 
             loadFeed(true); 
         }
