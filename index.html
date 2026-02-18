@@ -101,6 +101,7 @@
         .calendar-poster { flex: 0 0 85px; aspect-ratio: 2/3; border-radius: 12px; overflow: hidden; background: #111; border: 1px solid #222; }
         .calendar-info { flex: 1; display: flex; flex-direction: column; gap: 4px; }
         .cal-title { font-size: 15px; font-weight: 800; color: #fff; line-height: 1.2; }
+        .calendar-info { flex: 1; display: flex; flex-direction: column; gap: 4px; }
         .cal-meta { display: flex; align-items: center; gap: 8px; font-size: 11px; color: #8e8e8e; }
         .cal-genre-pill { padding: 2px 8px; background: #1c1c1c; border-radius: 100px; color: #ccc; font-size: 9px; font-weight: 600; }
         .cal-rating { color: #ffca28; font-weight: 700; font-size: 11px; }
@@ -187,14 +188,39 @@
         .landscape-active .carousel-slide { height: 100vh; }
         .landscape-active #mainVideoArea { height: 100vh !important; }
 
-        /* --- NEW ACTOR PROFILE MODAL STYLE --- */
+        /* --- NEW ACTOR PROFILE MODAL STYLE (Premium Instagram Aesthetic) --- */
         .actor-modal { display: none; position: fixed; inset: 0; z-index: 8500; background: #000; overflow-y: auto; }
-        .actor-profile-img { width: 140px; height: 140px; border-radius: 50%; object-fit: cover; border: 3px solid #fff; margin: 40px auto 15px; box-shadow: 0 0 20px rgba(255,255,255,0.2); }
-        .actor-name { font-size: 22px; font-weight: 900; text-align: center; margin-bottom: 5px; }
-        .actor-bio-box { text-align: center; padding: 0 25px; margin-bottom: 25px; }
-        .actor-bio-text { font-size: 11px; color: #8e8e8e; line-height: 1.5; }
-        .actor-film-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; padding: 10px 0 80px; }
-        .actor-section-title { padding: 15px; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; border-top: 1px solid #1c1c1c; border-bottom: 1px solid #1c1c1c; background: #050505; text-align: center; }
+        
+        .actor-header-premium {
+            display: flex; align-items: center; gap: 15px; padding: 25px 15px 15px;
+        }
+        .actor-pic-wrapper {
+            position: relative; width: 80px; height: 80px;
+            background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+            border-radius: 50%; padding: 2.5px; flex-shrink: 0;
+        }
+        .actor-pic-inner {
+            width: 100%; height: 100%; border-radius: 50%; border: 3px solid #000; overflow: hidden; background: #111;
+        }
+        .actor-profile-img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .actor-stats-row {
+            flex-grow: 1; display: flex; justify-content: space-around; text-align: center; gap: 5px;
+        }
+        .actor-stat-col { display: flex; flex-direction: column; gap: 1px; }
+        .actor-stat-num { font-size: 15px; font-weight: 800; color: #fff; line-height: 1; }
+        .actor-stat-lbl { font-size: 11px; color: #8e8e8e; font-weight: 400; line-height: 1; }
+
+        .actor-bio-premium { padding: 0 20px 20px; }
+        .actor-name-premium { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 2px; }
+        .actor-origin-premium { font-size: 13px; color: #8e8e8e; margin-bottom: 4px; display: flex; align-items: center; gap: 4px; }
+        .actor-birth-premium { font-size: 13px; color: #efefef; line-height: 1.4; }
+
+        .actor-film-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; padding-bottom: 80px; }
+        .actor-section-title { 
+            padding: 12px; font-size: 13px; font-weight: 700; color: #fff; 
+            border-top: 1px solid #1c1c1c; display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
     </style>
 </head>
 <body>
@@ -285,7 +311,7 @@
 
             <div class="bio">
                 <div class="bio-name-wrapper"><span class="bio-name">amnesfubbia</span><i class="fa-solid fa-circle-check text-[#0095f6] text-[13px]"></i></div>
-                <span>🎬 Discover. Watch. Archive.</span><br>
+                <span><i class="ph ph-film-slate mr-1"></i> Discover. Watch. Archive.</span><br>
                 <span class="text-zinc-400">Jelajahi, simpan & tonton trailer movie favoritmu.</span>
             </div>
 
@@ -403,14 +429,39 @@
             <i class="fa-solid fa-chevron-left text-xl cursor-pointer" onclick="closeActorModal()"></i>
             <div class="flex-grow text-center text-[14px] font-black uppercase tracking-tighter" id="actorHeaderTitle"></div>
         </div>
-        <div class="flex flex-col items-center">
-            <img id="actorPic" src="" class="actor-profile-img" alt="Actor">
-            <h2 id="actorName" class="actor-name"></h2>
-            <div class="actor-bio-box">
-                <div id="actorDetails" class="actor-bio-text"></div>
+        
+        <div class="actor-header-premium">
+            <div class="actor-pic-wrapper">
+                <div class="actor-pic-inner">
+                    <img id="actorPic" src="" class="actor-profile-img" alt="Actor">
+                </div>
+            </div>
+            <div class="actor-stats-row">
+                <div class="actor-stat-col">
+                    <span id="statKarya" class="actor-stat-num">0</span>
+                    <span class="actor-stat-lbl">Karya</span>
+                </div>
+                <div class="actor-stat-col">
+                    <span id="statPop" class="actor-stat-num">N/A</span>
+                    <span class="actor-stat-lbl">Populer</span>
+                </div>
+                <div class="actor-stat-col">
+                    <span id="statUsia" class="actor-stat-num">0</span>
+                    <span class="actor-stat-lbl">Usia</span>
+                </div>
             </div>
         </div>
-        <div class="actor-section-title">Filmografi</div>
+
+        <div class="actor-bio-premium">
+            <h2 id="actorName" class="actor-name-premium"></h2>
+            <div id="actorOrigin" class="actor-origin-premium"></div>
+            <div id="actorBirth" class="actor-birth-premium"></div>
+        </div>
+
+        <div class="actor-section-title">
+            <i class="fa-solid fa-table-cells"></i>
+            <span>FILMOGRAFI</span>
+        </div>
         <div id="actorFilmGrid" class="actor-film-grid"></div>
     </div>
 
@@ -440,17 +491,28 @@
             }); 
         };
 
-        /* --- HP BACK BUTTON SYSTEM --- */
+        /* --- HP BACK BUTTON SYSTEM (FIXED) --- */
         window.addEventListener('popstate', function(event) {
+            const state = event.state;
+            
+            // Tutup Landscape dulu jika aktif
             if (document.getElementById('landscapeOverlay').style.display === 'block') {
                 closeLandscapeSilently();
-            } else if (document.getElementById('actorModal').style.display === 'block') {
+            } 
+            // Tutup Modal Aktor jika aktif
+            else if (document.getElementById('actorModal').style.display === 'block') {
                 closeActorModal();
-            } else if (document.getElementById('movieModal').style.display === 'block') {
+            } 
+            // Tutup Modal Film jika aktif
+            else if (document.getElementById('movieModal').style.display === 'block') {
                 closeModal();
-            } else if (document.getElementById('searchOverlay').style.display === 'block') {
+            } 
+            // Tutup Search jika aktif
+            else if (document.getElementById('searchOverlay').style.display === 'block') {
                 closeSearch();
-            } else if (document.getElementById('sideMenu').style.display === 'block') {
+            } 
+            // Tutup Side Menu jika aktif
+            else if (document.getElementById('sideMenu').style.display === 'block') {
                 toggleSideMenu();
             }
         });
@@ -481,11 +543,7 @@
         }
 
         function handleLsBack() {
-            if (window.history.state && window.history.state.view === 'landscape') {
-                window.history.back();
-            } else {
-                exitLandscape();
-            }
+            window.history.back();
         }
 
         function closeLandscapeSilently() {
@@ -494,7 +552,7 @@
             
             const videoArea = document.getElementById('mainVideoArea');
             const castContainer = document.getElementById('castContainer');
-            castContainer.after(videoArea);
+            if(castContainer) castContainer.after(videoArea);
 
             if (document.exitFullscreen && document.fullscreenElement) {
                 document.exitFullscreen();
@@ -505,10 +563,7 @@
         }
 
         function exitLandscape() {
-            closeLandscapeSilently();
-            if (window.history.state && window.history.state.view === 'landscape') {
-                window.history.back();
-            }
+            window.history.back();
         }
 
         function toggleLsUI() {
@@ -538,6 +593,7 @@
         }
 
         function unlockScreen() {
+            document.getElementById('lsUI').classList.remove('visible');
             document.getElementById('lsLockLayer').style.display = 'none';
             showLsUI();
         }
@@ -552,9 +608,9 @@
             return data;
         }
 
-        /* --- FITUR: PROFIL AKTOR MENDETAIL --- */
+        /* --- FITUR: PROFIL AKTOR MENDETAIL (Updated Instagram Style) --- */
         async function openActorProfile(actorId) {
-            // STOP TRAILER AUDIO
+            // Hentikan video yang sedang diputar di modal film
             const track = document.getElementById('carouselTrack');
             if(track) {
                 track.querySelectorAll('iframe').forEach(f => f.src = "");
@@ -563,28 +619,34 @@
             const actorModal = document.getElementById('actorModal');
             actorModal.style.display = 'block';
             document.body.style.overflow = 'hidden';
-            history.pushState({view: 'actor'}, "");
+            
+            // Push state hanya jika belum dalam state actor
+            if (!window.history.state || window.history.state.view !== 'actor') {
+                history.pushState({view: 'actor'}, "");
+            }
 
             try {
                 const details = await fetchWithCache(`https://api.themoviedb.org/3/person/${actorId}?api_key=${API_KEY}&language=id-ID`);
                 const credits = await fetchWithCache(`https://api.themoviedb.org/3/person/${actorId}/combined_credits?api_key=${API_KEY}&language=id-ID`);
 
-                // Set Foto & Nama
                 document.getElementById('actorPic').src = details.profile_path ? `https://image.tmdb.org/t/p/w500${details.profile_path}` : 'amnesfubbia.png';
                 document.getElementById('actorName').innerText = details.name;
+                document.getElementById('actorHeaderTitle').innerText = details.name;
 
-                // Set Biodata
-                const birth = details.birthday ? details.birthday : 'N/A';
-                const place = details.place_of_birth ? details.place_of_birth : 'N/A';
-                const totalFilms = (credits.cast || []).length;
-                
-                document.getElementById('actorDetails').innerHTML = `
-                    Lahir: ${birth} <br>
-                    Asal: ${place} <br>
-                    Jumlah Film: ${totalFilms} Karya
-                `;
+                let age = '0';
+                if(details.birthday) {
+                    const birthDate = new Date(details.birthday);
+                    const diff = Date.now() - birthDate.getTime();
+                    age = Math.floor(diff / (1000 * 60 * 60 * 24 * 365.25));
+                }
 
-                // Set Filmografi Grid
+                document.getElementById('statKarya').innerText = (credits.cast || []).length;
+                document.getElementById('statPop').innerText = Math.floor(details.popularity || 0);
+                document.getElementById('statUsia').innerText = age;
+
+                document.getElementById('actorOrigin').innerHTML = details.place_of_birth ? `<i class="ph ph-map-pin"></i> ${details.place_of_birth}` : '';
+                document.getElementById('actorBirth').innerText = details.birthday ? `Born: ${new Date(details.birthday).toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'})}` : '';
+
                 const filmGrid = document.getElementById('actorFilmGrid');
                 filmGrid.innerHTML = "";
                 const sortedFilms = (credits.cast || []).sort((a,b) => b.popularity - a.popularity);
@@ -593,9 +655,13 @@
                     const mType = m.media_type || 'movie';
                     const card = document.createElement('div');
                     card.className = 'post-card';
-                    card.onclick = () => { openModal(m.id, mType); };
+                    // FIX: Fungsi klik untuk membuka modal film
+                    card.onclick = () => { 
+                        openModal(m.id, mType); 
+                    };
                     card.innerHTML = `
                         <div class="badge-rating">★ ${(m.vote_average||0).toFixed(1)}</div>
+                        <div class="badge-type">${mType === 'tv' ? 'tv' : 'movie'}</div>
                         <img src="https://image.tmdb.org/t/p/w185${m.poster_path}" onerror="this.src='https://via.placeholder.com/185x278?text=No+Poster'" class="w-full h-full object-cover">
                     `;
                     filmGrid.appendChild(card);
@@ -606,6 +672,7 @@
 
         function closeActorModal() {
             document.getElementById('actorModal').style.display = 'none';
+            // Jika modal film masih terbuka di belakangnya, jangan kembalikan overflow ke auto
             if (document.getElementById('movieModal').style.display !== 'block') {
                 document.body.style.overflow = 'auto';
             }
@@ -895,7 +962,7 @@
         function openSearch() { 
             closeModal();
             closeD();
-            closeActorModal(); // Otomatis menutup modal pemeran jika terbuka
+            closeActorModal();
             if(document.getElementById('sideMenu').style.display === 'block') toggleSideMenu();
 
             document.querySelector('.search-header').style.display = 'flex';
@@ -975,17 +1042,29 @@
         }
 
         async function openModal(id, type) {
+            // FIX: Tutup modal aktor jika terbuka saat klik film baru
+            const actorModal = document.getElementById('actorModal');
+            if (actorModal.style.display === 'block') {
+                actorModal.style.display = 'none';
+            }
+
             window.currentMediaId = id; window.currentMediaType = type;
             const seriesSuffix = (type === 'tv') ? '/1/1' : ''; 
             
-            // RESET MODAL
             document.getElementById('mTitle').innerText = "Memuat...";
             document.getElementById('mDesc').innerText = "";
             document.getElementById('mLikeDisplay').innerText = "";
             document.getElementById('mDateDisplay').innerText = "";
             document.getElementById('mHashtags').innerHTML = "";
             document.getElementById('castContainer').innerHTML = "";
-            document.getElementById('carouselTrack').innerHTML = "";
+            
+            // Hentikan video lama sebelum memuat yang baru
+            const track = document.getElementById('carouselTrack');
+            if(track) {
+                track.querySelectorAll('iframe').forEach(f => f.src = "");
+                track.innerHTML = "";
+            }
+            
             document.getElementById('carouselDots').innerHTML = "";
             document.getElementById('serverList').innerHTML = "";
             document.getElementById('mToggleBtn').classList.add('hidden');
@@ -999,11 +1078,11 @@
             currentIdx = 0; 
             isTranslated = false;
             
+            // Push state baru jika belum ada state modal
             if (!window.history.state || window.history.state.view !== 'modal') {
                 history.pushState({view: 'modal'}, "");
             }
 
-            // Fetch with CACHE
             const [dId, dEn, dCast, dExt] = await Promise.all([
                 fetchWithCache(`https://api.themoviedb.org/3/${type}/${id}?api_key=${API_KEY}&language=id-ID&append_to_response=videos,production_companies&include_video_language=en,id,hi,th,ko,ja,null`),
                 fetchWithCache(`https://api.themoviedb.org/3/${type}/${id}?api_key=${API_KEY}&language=en-US`),
@@ -1034,7 +1113,7 @@
                 !v.name.toLowerCase().includes('shorts') 
             );
 
-            const track = document.getElementById('carouselTrack'), dots = document.getElementById('carouselDots');
+            const dots = document.getElementById('carouselDots');
             track.innerHTML = ''; dots.innerHTML = ''; track.style.transform = 'translateX(0)';
             
             let vidsToDisplay = allVideos.sort((a, b) => (a.type === 'Trailer' ? -1 : 1)).slice(0, 5);
@@ -1054,7 +1133,6 @@
                 document.getElementById('swipeOverlay').style.display = 'none'; 
             }
 
-            // Aktor ke profil mendetail
             document.getElementById('castContainer').innerHTML = (dCast.cast || []).slice(0, 10).map(c => {
                 const profileImg = c.profile_path ? `<img src="https://image.tmdb.org/t/p/w185${c.profile_path}" loading="lazy" class="rounded-full">` : `<div style="width:100%; height:100%; background:#222; display:flex; align-items:center; justify-content:center; color:#555;"><i class="fa-solid fa-user"></i></div>`;
                 return `<div class="cast-item" onclick="openActorProfile(${c.id})"><div class="cast-img-border"><div class="inner-border">${profileImg}</div></div><span class="cast-name">${c.name}</span></div>`;
@@ -1069,14 +1147,7 @@
             const contentKind = (type === 'tv') ? 'tv' : 'movie';
             const genresArr = (dId.genres || []).map(g => `#${g.name.replace(/[^a-zA-Z0-9]/g, '')}`).slice(0, 3).join(' ');
             
-            // Pencarian STUDIO/NETWORK
-            const companies = (dId.production_companies || []).slice(0, 2);
-            let studioHTML = "";
-            companies.forEach(com => {
-                studioHTML += `<span class="bg-zinc-800 px-2 py-1 rounded text-[10px] mr-1 cursor-pointer hover:bg-white hover:text-black transition" onclick="searchByStudio(${com.id}, '${com.name}')">${com.name}</span>`;
-            });
-
-            document.getElementById('mHashtags').innerHTML = `${studioHTML} <br><br> #${(dId.title||dId.name||"").replace(/[^a-zA-Z0-9]/g, '')} #${relYear} #${contentKind} <br> ${genresArr}`;
+            document.getElementById('mHashtags').innerHTML = `<br> #${(dId.title||dId.name||"").replace(/[^a-zA-Z0-9]/g, '')} #${relYear} #${contentKind} <br> ${genresArr}`;
             
             const rel = dId.release_date || dId.first_air_date || ""; 
             document.getElementById('mDateDisplay').innerText = rel ? new Date(rel).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
@@ -1136,7 +1207,6 @@
         }
         
         function closeModal() { 
-            // STOP TRAILER AUDIO
             const track = document.getElementById('carouselTrack'); 
             if(track) {
                 track.querySelectorAll('iframe').forEach(f => f.src = ""); 
@@ -1145,6 +1215,7 @@
             document.getElementById('movieModal').style.display = 'none'; 
             document.body.style.overflow = 'auto'; 
             if(document.body.classList.contains('landscape-active')) closeLandscapeSilently();
+            window.currentMediaId = null; 
         }
 
         function renderSynopsis() { const descEl = document.getElementById('mDesc'), toggleBtn = document.getElementById('mToggleBtn'); if (globalFullDesc.length > 90) { toggleBtn.classList.remove('hidden'); descEl.innerText = isExpanded ? globalFullDesc : globalFullDesc.substring(0, 90) + "..."; toggleBtn.innerText = isExpanded ? "ringkas" : "selengkapnya"; } else { descEl.innerText = globalFullDesc; toggleBtn.classList.add('hidden'); } }
@@ -1207,7 +1278,7 @@
         async function switchTab(mode, el) { 
             closeModal();
             closeSearch();
-            closeActorModal(); // Otomatis menutup modal pemeran jika terbuka
+            closeActorModal();
             document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active')); 
             if(el) el.classList.add('active'); 
 
