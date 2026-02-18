@@ -186,6 +186,15 @@
         .landscape-active #modalScrollTop { height: 100vh; max-width: 100%; padding: 0; }
         .landscape-active .carousel-slide { height: 100vh; }
         .landscape-active #mainVideoArea { height: 100vh !important; }
+
+        /* --- NEW ACTOR PROFILE MODAL STYLE --- */
+        .actor-modal { display: none; position: fixed; inset: 0; z-index: 8500; background: #000; overflow-y: auto; }
+        .actor-profile-img { width: 140px; height: 140px; border-radius: 50%; object-fit: cover; border: 3px solid #fff; margin: 20px auto 15px; box-shadow: 0 0 20px rgba(255,255,255,0.2); }
+        .actor-name { font-size: 22px; font-weight: 900; text-align: center; margin-bottom: 5px; }
+        .actor-bio-box { text-align: center; padding: 0 25px; margin-bottom: 25px; }
+        .actor-bio-text { font-size: 11px; color: #8e8e8e; line-height: 1.5; }
+        .actor-film-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; padding: 10px 0 80px; }
+        .actor-section-title { padding: 15px; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; border-top: 1px solid #1c1c1c; border-bottom: 1px solid #1c1c1c; background: #050505; }
     </style>
 </head>
 <body>
@@ -389,6 +398,22 @@
         </div>
     </div>
 
+    <div id="actorModal" class="actor-modal">
+        <div class="sticky top-0 bg-black z-[100] border-b border-zinc-900 px-4 h-[54px] flex items-center">
+            <i class="fa-solid fa-chevron-left text-xl cursor-pointer" onclick="closeActorModal()"></i>
+            <div class="flex-grow text-center text-[14px] font-black uppercase tracking-tighter" id="actorHeaderTitle">PROFILE</div>
+        </div>
+        <div class="flex flex-col items-center">
+            <img id="actorPic" src="" class="actor-profile-img" alt="Actor">
+            <h2 id="actorName" class="actor-name"></h2>
+            <div class="actor-bio-box">
+                <div id="actorDetails" class="actor-bio-text"></div>
+            </div>
+        </div>
+        <div class="actor-section-title">Filmografi</div>
+        <div id="actorFilmGrid" class="actor-film-grid"></div>
+    </div>
+
     <nav class="bottom-nav">
         <i class="fa-solid fa-house cursor-pointer text-xl active-nav" id="homeBtnNav" onclick="updateActiveNav(this); backToHome()"></i>
         <i class="fa-solid fa-magnifying-glass cursor-pointer text-xl" onclick="updateActiveNav(this); openSearch()"></i>
@@ -419,6 +444,8 @@
         window.addEventListener('popstate', function(event) {
             if (document.getElementById('landscapeOverlay').style.display === 'block') {
                 closeLandscapeSilently();
+            } else if (document.getElementById('actorModal').style.display === 'block') {
+                closeActorModal();
             } else if (document.getElementById('movieModal').style.display === 'block') {
                 closeModal();
             } else if (document.getElementById('searchOverlay').style.display === 'block') {
@@ -527,48 +554,55 @@
 
         /* --- FITUR: PROFIL AKTOR MENDETAIL --- */
         async function openActorProfile(actorId) {
-            document.getElementById('mTitle').innerText = "Loading Profile...";
-            document.getElementById('movieModal').scrollTop = 0;
-            
+            const actorModal = document.getElementById('actorModal');
+            actorModal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            history.pushState({view: 'actor'}, "");
+
             try {
                 const details = await fetchWithCache(`https://api.themoviedb.org/3/person/${actorId}?api_key=${API_KEY}&language=id-ID`);
                 const credits = await fetchWithCache(`https://api.themoviedb.org/3/person/${actorId}/combined_credits?api_key=${API_KEY}&language=id-ID`);
 
-                // Update UI Profile
-                const profileImg = details.profile_path ? `https://image.tmdb.org/t/p/w500${details.profile_path}` : 'amnesfubbia.png';
-                const track = document.getElementById('carouselTrack');
-                track.innerHTML = `<div class="carousel-slide"><img src="${profileImg}" class="w-full h-full object-cover"></div>`;
-                document.getElementById('carouselDots').innerHTML = '';
-                document.getElementById('swipeOverlay').style.display = 'none';
+                // Set Foto & Nama
+                document.getElementById('actorPic').src = details.profile_path ? `https://image.tmdb.org/t/p/w500${details.profile_path}` : 'amnesfubbia.png';
+                document.getElementById('actorName').innerText = details.name;
 
-                document.getElementById('mTitle').innerText = details.name;
-                globalFullDesc = details.biography || "Biografi belum tersedia.";
-                isExpanded = false;
-                renderSynopsis();
-
-                document.getElementById('mLikeDisplay').innerText = `${details.known_for_department} • Born in ${details.place_of_birth || 'N/A'}`;
-                document.getElementById('mDateDisplay').innerText = details.birthday ? `Lahir: ${details.birthday}` : '';
-                document.getElementById('mTranslateBtn').classList.add('hidden');
-                document.getElementById('mHashtags').innerHTML = "";
-
-                // Tampilkan Filmografi Terpopuler di area Server List
-                const filmGrid = document.getElementById('serverList');
-                filmGrid.innerHTML = `<div class="col-span-4 font-bold text-[11px] mb-2 uppercase text-zinc-500">Karya Terpopuler</div>`;
+                // Set Biodata
+                const birth = details.birthday ? details.birthday : 'N/A';
+                const place = details.place_of_birth ? details.place_of_birth : 'N/A';
+                const totalFilms = (credits.cast || []).length;
                 
-                const topMovies = (credits.cast || []).sort((a,b) => b.popularity - a.popularity).slice(0, 12);
-                topMovies.forEach(m => {
+                document.getElementById('actorDetails').innerHTML = `
+                    Lahir: ${birth} <br>
+                    Asal: ${place} <br>
+                    Jumlah Film: ${totalFilms} Karya
+                `;
+
+                // Set Filmografi Grid
+                const filmGrid = document.getElementById('actorFilmGrid');
+                filmGrid.innerHTML = "";
+                const sortedFilms = (credits.cast || []).sort((a,b) => b.popularity - a.popularity);
+                
+                sortedFilms.forEach(m => {
                     const mType = m.media_type || 'movie';
-                    filmGrid.innerHTML += `
-                        <div class="cursor-pointer active:scale-95 transition" onclick="openModal(${m.id}, '${mType}')">
-                            <img src="https://image.tmdb.org/t/p/w185${m.poster_path}" class="rounded-lg mb-1 border border-zinc-800 aspect-[2/3] object-cover" onerror="this.src='https://via.placeholder.com/185x278?text=No+Img'">
-                            <p class="text-[8px] truncate leading-tight">${m.title || m.name}</p>
-                        </div>
+                    const card = document.createElement('div');
+                    card.className = 'post-card';
+                    card.onclick = () => { openModal(m.id, mType); };
+                    card.innerHTML = `
+                        <div class="badge-rating">★ ${(m.vote_average||0).toFixed(1)}</div>
+                        <img src="https://image.tmdb.org/t/p/w185${m.poster_path}" onerror="this.src='https://via.placeholder.com/185x278?text=No+Poster'" class="w-full h-full object-cover">
                     `;
+                    filmGrid.appendChild(card);
                 });
 
-                document.getElementById('seriesControl').classList.add('hidden');
-                document.getElementById('castContainer').innerHTML = ""; // Bersihkan cast saat di profil aktor
             } catch (e) { console.error(e); }
+        }
+
+        function closeActorModal() {
+            document.getElementById('actorModal').style.display = 'none';
+            if (document.getElementById('movieModal').style.display !== 'block') {
+                document.body.style.overflow = 'auto';
+            }
         }
 
         /* --- FITUR: PENCARIAN STUDIO/NETWORK --- */
@@ -596,7 +630,7 @@
         }
 
         function backToHome() {
-            closeModal(); closeSearch(); closeD();
+            closeModal(); closeSearch(); closeD(); closeActorModal();
             currentGenre = ''; currentYear = ''; currentCountry = ''; currentSchedule = 'trending'; 
             currentType = 'multi'; searchQuery = ''; currentCastId = ''; currentCompany = '';
             
@@ -642,7 +676,7 @@
                                 const mType = m.media_type || 'movie';
                                 const mId = m.id;
                                 const isPerson = mType === 'person';
-                                const clickAction = isPerson ? `searchByCast(${mId})` : `openModal(${mId}, '${mType}')`;
+                                const clickAction = isPerson ? `openActorProfile(${mId})` : `openModal(${mId}, '${mType}')`;
                                 const meta = isPerson ? 'Pemeran / Aktor' : (mType === 'tv' ? 'tv' : 'movie');
                                 const imgPath = m.poster_path || m.profile_path || '';
                                 
