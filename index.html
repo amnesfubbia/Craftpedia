@@ -697,14 +697,7 @@
         function stopAllAudio() {
             const iframes = document.querySelectorAll('iframe');
             iframes.forEach(f => {
-                const src = f.src;
-                f.src = "";
-                // Jika masih dalam modal tujuannya agar bisa di-resume nanti jika perlu
-                if(f.closest('.modal-player')) {
-                    f.src = src; 
-                    // Kami memicu pause lewat postMessage untuk YT
-                    try { f.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*'); } catch(e){}
-                }
+                f.src = ""; // Stop total
             });
         }
 
@@ -735,7 +728,7 @@
             if(vidsToDisplay.length > 0) { 
                 vidsToDisplay.forEach((v, i) => { 
                     const embedUrl = `https://www.youtube.com/embed/${v.key}?enablejsapi=1&autoplay=${i===currentIdx?1:0}&rel=0&modestbranding=1&mute=0`;
-                    track.innerHTML += `<div class="carousel-slide"><iframe id="vid-${i}" src="${embedUrl}" class="w-full h-full" allow="autoplay; fullscreen"></iframe></div>`; 
+                    track.innerHTML += `<div class="carousel-slide"><iframe id="vid-${i}" src="${embedUrl}" class="w-full h-full" allow="autoplay; encrypted-media; picture-in-picture; fullscreen"></iframe></div>`; 
                     if(vidsToDisplay.length > 1) {
                         dots.innerHTML += `<div class="dot w-1.5 h-1.5 rounded-full ${i===currentIdx?'bg-blue-500':'bg-zinc-700'}"></div>`;
                     }
@@ -744,7 +737,7 @@
                 document.getElementById('carouselTrack').style.transform = `translateX(-${currentIdx * 100}%)`;
             } else {
                 const seriesSuffix = (type === 'tv') ? '/1/1' : '';
-                track.innerHTML = `<div class="carousel-slide"><iframe src="https://vidlink.pro/${type}/${id}${seriesSuffix}" class="w-full h-full" allowfullscreen allow="autoplay"></iframe></div>`; 
+                track.innerHTML = `<div class="carousel-slide"><iframe src="https://vidlink.pro/${type}/${id}${seriesSuffix}" class="w-full h-full" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture"></iframe></div>`; 
             }
         }
 
@@ -1178,15 +1171,15 @@
             if(vidsToDisplay.length > 0) { 
                 vidsToDisplay.forEach((v, i) => { 
                     const embedUrl = `https://www.youtube.com/embed/${v.key}?enablejsapi=1&autoplay=${i===0?1:0}&rel=0&modestbranding=1&mute=0`;
-                    track.innerHTML += `<div class="carousel-slide"><iframe id="vid-${i}" src="${embedUrl}" class="w-full h-full" allow="autoplay; fullscreen"></iframe></div>`; 
+                    track.innerHTML += `<div class="carousel-slide"><iframe id="vid-${i}" src="${embedUrl}" class="w-full h-full" allow="autoplay; encrypted-media; picture-in-picture; fullscreen"></iframe></div>`; 
                     if(vidsToDisplay.length > 1) {
-                        dots.innerHTML += `<div class="dot w-1.5 h-1.5 rounded-full ${i===currentIdx?'bg-blue-500':'bg-zinc-700'}"></div>`; 
+                        dots.innerHTML += `<div class="dot w-1.5 h-1.5 rounded-full ${i===currentIdx?'bg-blue-500':'bg-zinc-700' accessories}"></div>`; 
                     }
                 }); 
                 document.getElementById('swipeOverlay').style.display = vidsToDisplay.length > 1 ? 'block' : 'none'; 
             } else { 
                 const fallbackUrl = `https://vidlink.pro/${type}/${id}${seriesSuffix}`;
-                track.innerHTML = `<div class="carousel-slide"><iframe src="${fallbackUrl}" class="w-full h-full" allowfullscreen allow="autoplay"></iframe></div>`; 
+                track.innerHTML = `<div class="carousel-slide"><iframe src="${fallbackUrl}" class="w-full h-full" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture"></iframe></div>`; 
                 document.getElementById('swipeOverlay').style.display = 'none'; 
             }
 
@@ -1267,7 +1260,6 @@
             stopAllAudio(); // Stop audio saat modal ditutup
             const track = document.getElementById('carouselTrack'); 
             if(track) {
-                track.querySelectorAll('iframe').forEach(f => f.src = ""); 
                 track.innerHTML = ''; 
             }
             document.getElementById('movieModal').style.display = 'none'; 
@@ -1284,10 +1276,10 @@
             const dots = document.getElementById('carouselDots'); 
             const finalUrl = url.includes('?') ? `${url}&enablejsapi=1&mute=0` : `${url}?enablejsapi=1&mute=0`;
             
-            // Hentikan video lama secara total sebelum ganti server
+            // FIX: Hentikan video lama secara total sebelum ganti server agar suara mati
             track.querySelectorAll('iframe').forEach(f => f.src = "");
             
-            track.innerHTML = `<div class="carousel-slide"><iframe id="player-frame" src="${finalUrl}" class="w-full h-full" allowfullscreen allow="autoplay"></iframe></div>`; 
+            track.innerHTML = `<div class="carousel-slide"><iframe id="player-frame" src="${finalUrl}" class="w-full h-full" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture"></iframe></div>`; 
             track.style.transform = 'translateX(0)'; currentIdx = 0; dots.innerHTML = ''; 
             document.getElementById('swipeOverlay').style.display = 'none'; highlightBtn(el); 
 
@@ -1325,14 +1317,14 @@
                 let diff = startX - e.changedTouches[0].clientX; 
                 const slides = document.querySelectorAll('.carousel-slide'); 
                 
+                // Pointer Events Fix: Jika hanya ketukan ringan (bukan swipe), sembunyikan overlay sejenak
                 if (Math.abs(diff) < 10) {
                     overlay.style.pointerEvents = 'none'; 
-                    setTimeout(() => { overlay.style.pointerEvents = 'auto'; }, 100); 
+                    setTimeout(() => { overlay.style.pointerEvents = 'auto'; }, 150); 
                     return;
                 }
 
                 if(Math.abs(diff) > 70 && slides.length > 1) { 
-                    let oldIdx = currentIdx; 
                     if(diff > 0 && currentIdx < slides.length - 1) currentIdx++; 
                     else if(diff < 0 && currentIdx > 0) currentIdx--; 
                     
@@ -1346,11 +1338,10 @@
                     iframes.forEach((f, idx) => {
                         if(idx !== currentIdx) {
                             const tempSrc = f.src;
-                            f.src = ""; // Reset src agar suara mati total
-                            f.src = tempSrc;
+                            f.src = ""; // Matikan total
+                            f.src = tempSrc; // Re-load (tapi pause via postMessage jika didukung)
                             try { f.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*'); } catch(e){}
                         } else {
-                            // Play video di slide yang baru aktif (khusus YouTube)
                             try { f.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*'); } catch(e){}
                         }
                     });
