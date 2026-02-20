@@ -493,17 +493,29 @@
             // State awal Home
             history.replaceState({view: 'home'}, "");
 
+            // Pastikan inisialisasi berjalan dengan try-catch agar tidak memblock splash timer
+            try {
+                initFilters(); 
+                initHighlights(); 
+                loadFeed(); 
+                setupSwipe(); 
+                initSmartSearch(); 
+            } catch (err) {
+                console.error("Initialization Error: ", err);
+            }
+
             setTimeout(() => {
-                document.getElementById('splashScreen').style.display = 'none';
-                document.getElementById('mainProfile').style.display = 'block';
+                const splash = document.getElementById('splashScreen');
+                const main = document.getElementById('mainProfile');
+                if(splash) splash.style.display = 'none';
+                if(main) main.style.display = 'block';
             }, 2500);
 
-            initFilters(); initHighlights(); loadFeed(); setupSwipe(); initSmartSearch(); 
             window.addEventListener('scroll', () => { 
-                document.getElementById('backToTop').style.display = window.scrollY > 500 ? 'flex' : 'none'; 
+                const btt = document.getElementById('backToTop');
+                if(btt) btt.style.display = window.scrollY > 500 ? 'flex' : 'none'; 
             }); 
             
-            // FIX: Otomatis Pause saat aplikasi diminimize / keluar
             document.addEventListener('visibilitychange', () => {
                 if (document.visibilityState === 'hidden') {
                     stopAllAudio();
@@ -766,9 +778,9 @@
             const btnGenre = document.getElementById('btnGenre');
             const btnYear = document.getElementById('yearBtn');
             
-            btnCountry.innerHTML = 'Negara <i class="fa-solid fa-caret-down"></i>';
-            btnGenre.innerHTML = 'Genre <i class="fa-solid fa-caret-down"></i>';
-            btnYear.innerHTML = 'Tahun <i class="fa-solid fa-caret-down"></i>';
+            if(btnCountry) btnCountry.innerHTML = 'Negara <i class="fa-solid fa-caret-down"></i>';
+            if(btnGenre) btnGenre.innerHTML = 'Genre <i class="fa-solid fa-caret-down"></i>';
+            if(btnYear) btnYear.innerHTML = 'Tahun <i class="fa-solid fa-caret-down"></i>';
             
             document.querySelectorAll('.pill').forEach(p => p.classList.remove('active-pill'));
             document.querySelectorAll('.btn-ig').forEach(b => b.classList.remove('active'));
@@ -788,6 +800,7 @@
             const inp = document.getElementById('searchInp'); 
             const drop = document.getElementById('smartSearchDropdown'); 
             let timeout = null; 
+            if(!inp) return;
             inp.addEventListener('input', () => { 
                 clearTimeout(timeout); 
                 const q = inp.value.trim(); 
@@ -819,7 +832,7 @@
                     } catch(e){} 
                 }, 300); 
             }); 
-            document.addEventListener('click', (e) => { if(!e.target.closest('.search-input-box')) drop.style.display = 'none'; }); 
+            document.addEventListener('click', (e) => { if(drop && !e.target.closest('.search-input-box')) drop.style.display = 'none'; }); 
         }
 
         async function openComingSoon() {
@@ -856,6 +869,7 @@
                 el.classList.add('active-date');
             }
             const list = document.getElementById('calendarList');
+            if(!list) return;
             list.innerHTML = '<div class="text-center py-10 text-zinc-500 text-xs">Mencari tayangan...</div>';
 
             try {
@@ -922,6 +936,7 @@
                 {n: 'Thailand', c: 'TH', img: 'Thailand.png', t: 'movie', s: false}
             ]; 
             const cont = document.getElementById('highlightList'); 
+            if(!cont) return;
             hls.forEach(h => { 
                 const div = document.createElement('div'); 
                 div.className = 'highlight-item'; 
@@ -938,19 +953,25 @@
 
         function initFilters() { 
             const yD = document.getElementById('yearDropdown'); 
-            let yearHTML = '<div class="filter-item sticky-reset" onclick="setYear(\'\')">Semua Tahun</div>'; 
-            for(let y=2026; y>=1930; y--) yearHTML += `<div class="filter-item" onclick="setYear(${y})">${y}</div>`; 
-            yD.innerHTML = yearHTML; 
+            if(yD) {
+                let yearHTML = '<div class="filter-item sticky-reset" onclick="setYear(\'\')">Semua Tahun</div>'; 
+                for(let y=2026; y>=1930; y--) yearHTML += `<div class="filter-item" onclick="setYear(${y})">${y}</div>`; 
+                yD.innerHTML = yearHTML; 
+            }
             const countries = [['ID','Indonesia'],['US','USA'],['KR','Korea Selatan'],['JP','Jepang'],['IN','India'],['TH','Thailand'],['CN','China'],['PH','Filipina'],['GB','Inggris'],['FR','Prancis'],['ES','Spanyol'],['IT','Italia'],['TR','Turki'],['DE','Jerman']]; 
             const cD = document.getElementById('countryDropdown'); 
-            let countryHTML = '<div class="filter-item sticky-reset" onclick="setCountry(\'\',\'Negara\')">Semua Negara</div>'; 
-            countries.forEach(c => countryHTML += `<div class="filter-item" onclick="setCountry('${c[0]}','${c[1]}')">${c[1]}</div>`); 
-            cD.innerHTML = countryHTML; 
+            if(cD) {
+                let countryHTML = '<div class="filter-item sticky-reset" onclick="setCountry(\'\',\'Negara\')">Semua Negara</div>'; 
+                countries.forEach(c => countryHTML += `<div class="filter-item" onclick="setCountry('${c[0]}','${c[1]}')">${c[1]}</div>`); 
+                cD.innerHTML = countryHTML; 
+            }
             const genres = [[28,'Action'],[12,'Adventure'],[16,'Animasi'],[35,'Komedi'],[80,'Crime'],[99,'Dokumenter'],[18,'Drama'],[10751,'Family'],[14,'Fantasy'],[36,'History'],[27,'Horror'],[10402,'Music'],[9648,'Misteri'],[10749,'Romance'],[878,'Sci-Fi'],[53,'Thriller']]; 
             const gD = document.getElementById('genreDropdown'); 
-            let genreHTML = '<div class="filter-item sticky-reset" onclick="setGenre(\'\',\'Genre\')">Semua Genre</div>'; 
-            genres.forEach(g => genreHTML += `<div class="filter-item" onclick="setGenre('${g[0]}','${g[1]}')">${g[1]}</div>`); 
-            gD.innerHTML = genreHTML; 
+            if(gD) {
+                let genreHTML = '<div class="filter-item sticky-reset" onclick="setGenre(\'\',\'Genre\')">Semua Genre</div>'; 
+                genres.forEach(g => genreHTML += `<div class="filter-item" onclick="setGenre('${g[0]}','${g[1]}')">${g[1]}</div>`); 
+                gD.innerHTML = genreHTML; 
+            }
         }
 
         function toggleFilter(e, id) { e.stopPropagation(); const d = document.getElementById(id); const overlay = document.getElementById('filterOverlay'); document.querySelectorAll('.filter-dropdown').forEach(el => el.style.display = 'none'); d.style.display = 'block'; d.scrollTop = 0; overlay.style.display = 'block'; document.body.style.overflow = 'hidden'; }
@@ -1021,7 +1042,8 @@
             document.querySelector('.search-header').style.display = 'flex';
             document.getElementById('searchGrid').innerHTML = ''; 
             document.getElementById('searchOverlay').style.display = 'block'; 
-            document.getElementById('searchInp').focus(); 
+            const inp = document.getElementById('searchInp');
+            if(inp) inp.focus(); 
             document.body.style.overflow='hidden'; 
             updateActiveNav(document.getElementById('searchBtnNav'));
             history.pushState({view: 'search'}, ""); 
@@ -1033,7 +1055,8 @@
             document.body.style.overflow='auto'; 
             searchQuery=''; 
             currentCastId=''; 
-            document.getElementById('searchInp').value = '';
+            const inp = document.getElementById('searchInp');
+            if(inp) inp.value = '';
             document.getElementById('smartSearchDropdown').style.display = 'none'; 
             updateActiveNav(document.getElementById('homeBtnNav'));
         }
@@ -1041,7 +1064,8 @@
         function searchAction() { 
             currentLibMode = false; 
             currentCastId = ''; 
-            searchQuery = document.getElementById('searchInp').value; 
+            const inp = document.getElementById('searchInp');
+            searchQuery = inp ? inp.value : ''; 
             document.getElementById('calendarHeader').classList.add('hidden');
             document.getElementById('smartSearchDropdown').style.display = 'none'; 
             loadFeed(true); 
@@ -1070,8 +1094,10 @@
         function setYear(y) { 
             currentYear = y; 
             const btn = document.getElementById('yearBtn');
-            btn.innerHTML = (y || 'Tahun') + ' <i class="fa-solid fa-caret-down"></i>'; 
-            y ? btn.classList.add('active-pill') : btn.classList.remove('active-pill');
+            if(btn) {
+                btn.innerHTML = (y || 'Tahun') + ' <i class="fa-solid fa-caret-down"></i>'; 
+                y ? btn.classList.add('active-pill') : btn.classList.remove('active-pill');
+            }
             if(currentType === 'multi') currentType = 'movie';
             closeD(); loadFeed(true); 
         }
@@ -1079,8 +1105,10 @@
         function setCountry(c, n) { 
             currentCountry = c; 
             const btn = document.getElementById('btnCountry');
-            btn.innerHTML = n + ' <i class="fa-solid fa-caret-down"></i>'; 
-            c ? btn.classList.add('active-pill') : btn.classList.remove('active-pill');
+            if(btn) {
+                btn.innerHTML = n + ' <i class="fa-solid fa-caret-down"></i>'; 
+                c ? btn.classList.add('active-pill') : btn.classList.remove('active-pill');
+            }
             if(currentType === 'multi') currentType = 'movie';
             closeD(); loadFeed(true); 
         }
@@ -1088,15 +1116,17 @@
         function setGenre(g, n) { 
             currentGenre = g; 
             const btn = document.getElementById('btnGenre');
-            btn.innerHTML = n + ' <i class="fa-solid fa-caret-down"></i>'; 
-            g ? btn.classList.add('active-pill') : btn.classList.remove('active-pill');
+            if(btn) {
+                btn.innerHTML = n + ' <i class="fa-solid fa-caret-down"></i>'; 
+                g ? btn.classList.add('active-pill') : btn.classList.remove('active-pill');
+            }
             if(currentType === 'multi') currentType = 'movie';
             closeD(); loadFeed(true); 
         }
 
         async function openModal(id, type) {
             const actorModal = document.getElementById('actorModal');
-            if (actorModal.style.display === 'block') {
+            if (actorModal && actorModal.style.display === 'block') {
                 actorModal.style.display = 'none';
             }
 
@@ -1148,12 +1178,12 @@
             const translateBtn = document.getElementById('mTranslateBtn');
             if (originalIndoDesc.trim() !== "") {
                 globalFullDesc = originalIndoDesc;
-                translateBtn.innerText = "Lihat versi asli";
-                translateBtn.classList.remove('hidden');
+                if(translateBtn) translateBtn.innerText = "Lihat versi asli";
+                if(translateBtn) translateBtn.classList.remove('hidden');
             } else {
                 globalFullDesc = globalEnDesc || "Sinopsis belum tersedia.";
-                translateBtn.innerText = "Lihat terjemahan";
-                if(globalEnDesc) translateBtn.classList.remove('hidden');
+                if(translateBtn) translateBtn.innerText = "Lihat terjemahan";
+                if(globalEnDesc && translateBtn) translateBtn.classList.remove('hidden');
             }
             
             const allVideos = (dId.videos?.results || []).filter(v => 
@@ -1164,23 +1194,25 @@
             );
 
             const dots = document.getElementById('carouselDots');
-            track.innerHTML = ''; dots.innerHTML = ''; track.style.transform = 'translateX(0)';
-            
-            let vidsToDisplay = allVideos.sort((a, b) => (a.type === 'Trailer' ? -1 : 1)).slice(0, 5);
+            if(track) {
+                track.innerHTML = ''; dots.innerHTML = ''; track.style.transform = 'translateX(0)';
+                
+                let vidsToDisplay = allVideos.sort((a, b) => (a.type === 'Trailer' ? -1 : 1)).slice(0, 5);
 
-            if(vidsToDisplay.length > 0) { 
-                vidsToDisplay.forEach((v, i) => { 
-                    const embedUrl = `https://www.youtube.com/embed/${v.key}?enablejsapi=1&autoplay=${i===0?1:0}&rel=0&modestbranding=1&mute=0`;
-                    track.innerHTML += `<div class="carousel-slide"><iframe id="vid-${i}" src="${embedUrl}" class="w-full h-full" allow="autoplay; encrypted-media; picture-in-picture; fullscreen"></iframe></div>`; 
-                    if(vidsToDisplay.length > 1) {
-                        dots.innerHTML += `<div class="dot w-1.5 h-1.5 rounded-full ${i===currentIdx?'bg-blue-500':'bg-zinc-700' accessories}"></div>`; 
-                    }
-                }); 
-                document.getElementById('swipeOverlay').style.display = vidsToDisplay.length > 1 ? 'block' : 'none'; 
-            } else { 
-                const fallbackUrl = `https://vidlink.pro/${type}/${id}${seriesSuffix}`;
-                track.innerHTML = `<div class="carousel-slide"><iframe src="${fallbackUrl}" class="w-full h-full" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture"></iframe></div>`; 
-                document.getElementById('swipeOverlay').style.display = 'none'; 
+                if(vidsToDisplay.length > 0) { 
+                    vidsToDisplay.forEach((v, i) => { 
+                        const embedUrl = `https://www.youtube.com/embed/${v.key}?enablejsapi=1&autoplay=${i===0?1:0}&rel=0&modestbranding=1&mute=0`;
+                        track.innerHTML += `<div class="carousel-slide"><iframe id="vid-${i}" src="${embedUrl}" class="w-full h-full" allow="autoplay; encrypted-media; picture-in-picture; fullscreen"></iframe></div>`; 
+                        if(vidsToDisplay.length > 1) {
+                            dots.innerHTML += `<div class="dot w-1.5 h-1.5 rounded-full ${i===currentIdx?'bg-blue-500':'bg-zinc-700'}"></div>`; 
+                        }
+                    }); 
+                    document.getElementById('swipeOverlay').style.display = vidsToDisplay.length > 1 ? 'block' : 'none'; 
+                } else { 
+                    const fallbackUrl = `https://vidlink.pro/${type}/${id}${seriesSuffix}`;
+                    track.innerHTML = `<div class="carousel-slide"><iframe src="${fallbackUrl}" class="w-full h-full" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture"></iframe></div>`; 
+                    document.getElementById('swipeOverlay').style.display = 'none'; 
+                }
             }
 
             document.getElementById('castContainer').innerHTML = (dCast.cast || []).slice(0, 10).map(c => {
@@ -1225,7 +1257,14 @@
                 <button class="server-btn" style="background:#1a1a1a; border-color:#333;" onclick="playVid('https://embed.smashystream.com/playere.php?tmdb=${id}', this)">Server 20</button>
             `;
 
-            if(type === 'tv') { document.getElementById('seriesControl').classList.remove('hidden'); document.getElementById('seasonSel').innerHTML = (dId.seasons||[]).filter(s=>s.season_number>0).map(s=>`<option value="${s.season_number}">Season ${s.season_number}</option>`).join(''); loadEpisodes(); } else { document.getElementById('seriesControl').classList.add('hidden'); }
+            if(type === 'tv') { 
+                document.getElementById('seriesControl').classList.remove('hidden'); 
+                const sSel = document.getElementById('seasonSel');
+                if(sSel) sSel.innerHTML = (dId.seasons||[]).filter(s=>s.season_number>0).map(s=>`<option value="${s.season_number}">Season ${s.season_number}</option>`).join(''); 
+                loadEpisodes(); 
+            } else { 
+                document.getElementById('seriesControl').classList.add('hidden'); 
+            }
             updateLibButtons(id);
         }
 
@@ -1234,23 +1273,29 @@
             if (originalIndoDesc && globalEnDesc) {
                 if (globalFullDesc === originalIndoDesc) {
                     globalFullDesc = globalEnDesc;
-                    btn.innerText = "Lihat versi asli";
+                    if(btn) btn.innerText = "Lihat versi asli";
                 } else {
                     globalFullDesc = originalIndoDesc;
-                    btn.innerText = "Lihat versi asli";
+                    if(btn) btn.innerText = "Lihat versi asli";
                 }
             } else if (!originalIndoDesc && globalEnDesc) {
                 if(!isTranslated) {
-                    const oldText = btn.innerText; btn.innerText = "Menerjemahkan...";
+                    const oldText = btn ? btn.innerText : ""; 
+                    if(btn) btn.innerText = "Menerjemahkan...";
                     try {
                         const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=id&dt=t&q=${encodeURIComponent(globalEnDesc)}`);
                         const data = await res.json();
                         globalFullDesc = data[0].map(x => x[0]).join('');
-                        isTranslated = true; btn.innerText = "Lihat versi asli";
-                    } catch(e) { btn.innerText = "Gagal menerjemahkan"; setTimeout(()=>btn.innerText=oldText, 2000); }
+                        isTranslated = true; 
+                        if(btn) btn.innerText = "Lihat versi asli";
+                    } catch(e) { 
+                        if(btn) btn.innerText = "Gagal menerjemahkan"; 
+                        setTimeout(()=> { if(btn) btn.innerText=oldText; }, 2000); 
+                    }
                 } else {
                     globalFullDesc = globalEnDesc;
-                    isTranslated = false; btn.innerText = "Lihat terjemahan";
+                    isTranslated = false; 
+                    if(btn) btn.innerText = "Lihat terjemahan";
                 }
             }
             renderSynopsis();
@@ -1268,19 +1313,20 @@
             window.currentMediaId = null; 
         }
 
-        function renderSynopsis() { const descEl = document.getElementById('mDesc'), toggleBtn = document.getElementById('mToggleBtn'); if (globalFullDesc.length > 90) { toggleBtn.classList.remove('hidden'); descEl.innerText = isExpanded ? globalFullDesc : globalFullDesc.substring(0, 90) + "..."; toggleBtn.innerText = isExpanded ? "ringkas" : "selengkapnya"; } else { descEl.innerText = globalFullDesc; toggleBtn.classList.add('hidden'); } }
+        function renderSynopsis() { const descEl = document.getElementById('mDesc'), toggleBtn = document.getElementById('mToggleBtn'); if (globalFullDesc.length > 90) { if(toggleBtn) toggleBtn.classList.remove('hidden'); if(descEl) descEl.innerText = isExpanded ? globalFullDesc : globalFullDesc.substring(0, 90) + "..."; if(toggleBtn) toggleBtn.innerText = isExpanded ? "ringkas" : "selengkapnya"; } else { if(descEl) descEl.innerText = globalFullDesc; if(toggleBtn) toggleBtn.classList.add('hidden'); } }
         function handleToggleDesc() { isExpanded = !isExpanded; renderSynopsis(); }
         
         function playVid(url, el) { 
             const track = document.getElementById('carouselTrack'); 
             const dots = document.getElementById('carouselDots'); 
+            if(!track) return;
             const finalUrl = url.includes('?') ? `${url}&enablejsapi=1&mute=0` : `${url}?enablejsapi=1&mute=0`;
             
             // FIX: Hentikan video lama secara total sebelum ganti server agar suara mati
             track.querySelectorAll('iframe').forEach(f => f.src = "");
             
             track.innerHTML = `<div class="carousel-slide"><iframe id="player-frame" src="${finalUrl}" class="w-full h-full" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture"></iframe></div>`; 
-            track.style.transform = 'translateX(0)'; currentIdx = 0; dots.innerHTML = ''; 
+            track.style.transform = 'translateX(0)'; currentIdx = 0; if(dots) dots.innerHTML = ''; 
             document.getElementById('swipeOverlay').style.display = 'none'; highlightBtn(el); 
 
             const frame = document.getElementById('player-frame');
@@ -1289,25 +1335,29 @@
             };
         }
         
-        function highlightBtn(el) { document.querySelectorAll('.server-btn').forEach(b => b.classList.remove('active-link')); el.classList.add('active-link'); }
+        function highlightBtn(el) { document.querySelectorAll('.server-btn').forEach(b => b.classList.remove('active-link')); if(el) el.classList.add('active-link'); }
         
         async function loadEpisodes() { 
             const s = document.getElementById('seasonSel').value; 
             const data = await fetchWithCache(`https://api.themoviedb.org/3/tv/${window.currentMediaId}/season/${s}?api_key=${API_KEY}`); 
             const episodes = data.episodes || [];
             
-            document.getElementById('episodeGrid').innerHTML = episodes.map((e, index) => {
-                const epNum = e.episode_number;
-                return `
-                <div class="pill text-[10px] flex flex-col items-center justify-center gap-1 min-h-[45px]" onclick="playVid('https://vidsrc.me/embed/tv?tmdb=${window.currentMediaId}&s=${s}&e=${epNum}', this)">
-                    <span class="font-bold">${epNum}</span>
-                </div>`;
-            }).join(''); 
+            const grid = document.getElementById('episodeGrid');
+            if(grid) {
+                grid.innerHTML = episodes.map((e, index) => {
+                    const epNum = e.episode_number;
+                    return `
+                    <div class="pill text-[10px] flex flex-col items-center justify-center gap-1 min-h-[45px]" onclick="playVid('https://vidsrc.me/embed/tv?tmdb=${window.currentMediaId}&s=${s}&e=${epNum}', this)">
+                        <span class="font-bold">${epNum}</span>
+                    </div>`;
+                }).join(''); 
+            }
         }
         
         function setupSwipe() { 
             const trackCont = document.getElementById('mainVideoArea'); 
             const overlay = document.getElementById('swipeOverlay');
+            if(!overlay) return;
 
             overlay.addEventListener('touchstart', e => { 
                 startX = e.touches[0].clientX; 
@@ -1328,7 +1378,8 @@
                     if(diff > 0 && currentIdx < slides.length - 1) currentIdx++; 
                     else if(diff < 0 && currentIdx > 0) currentIdx--; 
                     
-                    document.getElementById('carouselTrack').style.transform = `translateX(-${currentIdx * 100}%)`; 
+                    const track = document.getElementById('carouselTrack');
+                    if(track) track.style.transform = `translateX(-${currentIdx * 100}%)`; 
                     document.querySelectorAll('.dot').forEach((d, i) => { 
                         d.className = `dot w-1.5 h-1.5 rounded-full ${i===currentIdx?'bg-blue-500':'bg-zinc-700'}`; 
                     }); 
@@ -1349,7 +1400,7 @@
             }); 
         }
 
-        function updateLibButtons(id) { const isL = JSON.parse(localStorage.getItem('likes') || '[]').some(x=>x.id==id); const isB = JSON.parse(localStorage.getItem('bookmarks') || '[]').some(x=>x.id==id); document.getElementById('btnLikeModal').className = isL ? 'fa-solid fa-heart text-red-500 interaction-icon' : 'fa-regular fa-heart interaction-icon'; document.getElementById('btnBookModal').className = isB ? 'fa-solid fa-bookmark text-white interaction-icon' : 'fa-regular fa-bookmark interaction-icon'; document.getElementById('btnLikeModal').onclick = () => toggleLib('likes'); document.getElementById('btnBookModal').onclick = () => toggleLib('bookmarks'); }
+        function updateLibButtons(id) { const isL = JSON.parse(localStorage.getItem('likes') || '[]').some(x=>x.id==id); const isB = JSON.parse(localStorage.getItem('bookmarks') || '[]').some(x=>x.id==id); const btnL = document.getElementById('btnLikeModal'); const btnB = document.getElementById('btnBookModal'); if(btnL) btnL.className = isL ? 'fa-solid fa-heart text-red-500 interaction-icon' : 'fa-regular fa-heart interaction-icon'; if(btnB) btnB.className = isB ? 'fa-solid fa-bookmark text-white interaction-icon' : 'fa-regular fa-bookmark interaction-icon'; if(btnL) btnL.onclick = () => toggleLib('likes'); if(btnB) btnB.onclick = () => toggleLib('bookmarks'); }
         function toggleLib(k) { let items = JSON.parse(localStorage.getItem(k) || '[]'); const idx = items.findIndex(x => x.id == window.currentMediaId); idx > -1 ? items.splice(idx,1) : items.push({id: window.currentMediaId, type: window.currentMediaType}); localStorage.setItem(k, JSON.stringify(items)); updateLibButtons(window.currentMediaId); }
         
         async function switchTab(mode, el) { 
@@ -1366,6 +1417,7 @@
             }
 
             const grid = document.getElementById('feedGrid'); 
+            if(!grid) return;
             grid.innerHTML = ''; 
             if(mode === 'likes' || mode === 'bookmarks') { 
                 currentLibMode = true; 
@@ -1375,7 +1427,7 @@
             } 
         }
 
-        async function showLibrary(k) { const items = JSON.parse(localStorage.getItem(k) || '[]'); const grid = document.getElementById('feedGrid'); grid.innerHTML = ''; if (!items.length) { grid.innerHTML = '<div class="col-span-3 text-center py-20 text-zinc-500 text-xs">Belum ada konten disimpan</div>'; return; } const promises = items.map(i => fetchWithCache(`https://api.themoviedb.org/3/${i.type}/${i.id}?api_key=${API_KEY}&language=id-ID`).then(r => r)); const results = await Promise.all(promises); renderGrid(results.filter(m => m.id), grid); }
+        async function showLibrary(k) { const items = JSON.parse(localStorage.getItem(k) || '[]'); const grid = document.getElementById('feedGrid'); if(!grid) return; grid.innerHTML = ''; if (!items.length) { grid.innerHTML = '<div class="col-span-3 text-center py-20 text-zinc-500 text-xs">Belum ada konten disimpan</div>'; return; } const promises = items.map(i => fetchWithCache(`https://api.themoviedb.org/3/${i.type}/${i.id}?api_key=${API_KEY}&language=id-ID`).then(r => r)); const results = await Promise.all(promises); renderGrid(results.filter(m => m.id), grid); }
         window.onscroll = () => { if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 1000 && !loading && !searchQuery && !currentLibMode) { page++; loadFeed(false); } };
     </script>
 </body>
