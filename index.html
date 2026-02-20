@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>amnesfubbia</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -101,7 +101,6 @@
         .calendar-poster { flex: 0 0 85px; aspect-ratio: 2/3; border-radius: 12px; overflow: hidden; background: #111; border: 1px solid #222; }
         .calendar-info { flex: 1; display: flex; flex-direction: column; gap: 4px; }
         .cal-title { font-size: 15px; font-weight: 800; color: #fff; line-height: 1.2; }
-        .calendar-info { flex: 1; display: flex; flex-direction: column; gap: 4px; }
         .cal-meta { display: flex; align-items: center; gap: 8px; font-size: 11px; color: #8e8e8e; }
         .cal-genre-pill { padding: 2px 8px; background: #1c1c1c; border-radius: 100px; color: #ccc; font-size: 9px; font-weight: 600; }
         .cal-rating { color: #ffca28; font-weight: 700; font-size: 11px; }
@@ -123,7 +122,11 @@
         .modal-player { display: none; position: fixed; inset: 0; z-index: 8000; background: #000; overflow-y: auto; }
         .carousel-track { display: flex; transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1); width: 100%; }
         .carousel-slide { min-width: 100%; aspect-ratio: 16/9; position: relative; background: #000; }
-        .swipe-overlay { position: absolute; inset: 0; z-index: 10; background: transparent; }
+        
+        /* FIX: Agar Iframe bisa di klik DAN swipe tetap jalan */
+        .swipe-overlay { position: absolute; inset: 0; z-index: 10; background: transparent; pointer-events: auto; }
+        .carousel-track iframe { position: relative; z-index: 5; }
+
         .interaction-icon { font-size: 24px; cursor: pointer; color: #fff; transition: transform 0.1s; }
         .interaction-icon:active { transform: scale(1.2); }
         .server-btn { width: 100%; padding: 12px 5px; border-radius: 8px; font-size: 10px; font-weight: 800; text-transform: uppercase; border: 1px solid #1c1c1c; text-align: center; cursor: pointer; background: #0a0a0a; color: #fff; transition: all 0.2s; }
@@ -192,9 +195,8 @@
         /* Landscape Mode Overrides */
         .landscape-active #movieModal { overflow: hidden !important; }
         .landscape-active #modalScrollTop { height: 100vh; max-width: 100%; padding: 0; }
-        .landscape-active .carousel-slide { height: 100vh; width: 100vw; }
-        .landscape-active #mainVideoArea { height: 100vh !important; width: 100vw !important; aspect-ratio: auto !important; }
-        .landscape-active #mainVideoArea iframe { height: 100vh !important; width: 100vw !important; }
+        .landscape-active .carousel-slide { height: 100vh; }
+        .landscape-active #mainVideoArea { height: 100vh !important; }
 
         /* --- NEW ACTOR PROFILE MODAL STYLE (Premium Instagram Aesthetic) --- */
         .actor-modal { display: none; position: fixed; inset: 0; z-index: 8500; background: #000; overflow-y: auto; }
@@ -260,7 +262,7 @@
 
     <div id="sideMenu">
         <i class="ph ph-x side-close" onclick="toggleSideMenu()"></i>
-        <div class="about-title">About Amnesfubbia</div>
+        <div class="about-title">Amnesfubbia</div>
         <div class="about-content px-1">
             amnesfubbia adalah platform katalog sinema digital yang dirancang untuk memberikan pengalaman eksplorasi movie dan tv tanpa batas.
         </div>
@@ -488,6 +490,9 @@
         let currentImdbId = ""; 
 
         window.onload = () => {
+            // State awal Home
+            history.replaceState({view: 'home'}, "");
+
             setTimeout(() => {
                 document.getElementById('splashScreen').style.display = 'none';
                 document.getElementById('mainProfile').style.display = 'block';
@@ -499,29 +504,28 @@
             }); 
         };
 
-        /* --- HP BACK BUTTON SYSTEM (FIXED) --- */
+        /* --- HP BACK BUTTON SYSTEM (FIXED & STEP BY STEP) --- */
         window.addEventListener('popstate', function(event) {
             const state = event.state;
             
-            // Tutup Landscape dulu jika aktif
-            if (document.getElementById('landscapeOverlay').style.display === 'block') {
+            const isLandscapeOpen = document.getElementById('landscapeOverlay').style.display === 'block';
+            const isActorOpen = document.getElementById('actorModal').style.display === 'block';
+            const isMovieOpen = document.getElementById('movieModal').style.display === 'block';
+            const isSearchOpen = document.getElementById('searchOverlay').style.display === 'block';
+            const isMenuOpen = document.getElementById('sideMenu').style.display === 'block';
+
+            if (isLandscapeOpen) {
                 closeLandscapeSilently();
-            } 
-            // Tutup Modal Aktor jika aktif
-            else if (document.getElementById('actorModal').style.display === 'block') {
+            } else if (isActorOpen) {
                 closeActorModal();
-            } 
-            // Tutup Modal Film jika aktif
-            else if (document.getElementById('movieModal').style.display === 'block') {
+            } else if (isMovieOpen) {
                 closeModal();
-            } 
-            // Tutup Search jika aktif
-            else if (document.getElementById('searchOverlay').style.display === 'block') {
+            } else if (isSearchOpen) {
                 closeSearch();
-            } 
-            // Tutup Side Menu jika aktif
-            else if (document.getElementById('sideMenu').style.display === 'block') {
+            } else if (isMenuOpen) {
                 toggleSideMenu();
+            } else {
+                // Jika sudah di home dan tidak ada modal, browser akan menangani back (keluar aplikasi)
             }
         });
 
@@ -535,28 +539,25 @@
             overlay.style.display = 'block';
             
             const videoArea = document.getElementById('mainVideoArea');
-            overlay.appendChild(videoArea);
+            document.getElementById('landscapeOverlay').appendChild(videoArea);
             
             showLsUI();
-            history.pushState({view: 'landscape'}, "");
+            
+            if (!window.history.state || window.history.state.view !== 'landscape') {
+                history.pushState({view: 'landscape'}, "");
+            }
 
             try {
                 if (document.documentElement.requestFullscreen) {
                     await document.documentElement.requestFullscreen();
-                } else if (document.documentElement.webkitRequestFullscreen) {
-                    await document.documentElement.webkitRequestFullscreen();
                 }
-                
                 if (screen.orientation && screen.orientation.lock) {
                     await screen.orientation.lock('landscape').catch(() => {});
                 }
-            } catch (e) {
-                console.log("Orientation lock failed, basic landscape used.");
-            }
+            } catch (e) {}
         }
 
         function handleLsBack() {
-            // Kita panggil history.back() agar popstate terpanggil dan menjalankan closeLandscapeSilently()
             window.history.back();
         }
 
@@ -564,29 +565,16 @@
             document.body.classList.remove('landscape-active');
             document.getElementById('landscapeOverlay').style.display = 'none';
             
-            // KEMBALIKAN VIDEO AREA KE MODAL PORTRAIT SECARA PAKSA
             const videoArea = document.getElementById('mainVideoArea');
-            const modalHeader = document.querySelector('#movieModal .sticky');
             const castContainer = document.getElementById('castContainer');
-            
-            if (modalHeader && videoArea && castContainer) {
-                // Video area harus diletakkan setelah castContainer
-                castContainer.after(videoArea);
-            }
+            if(castContainer) castContainer.after(videoArea);
 
             if (document.exitFullscreen && document.fullscreenElement) {
                 document.exitFullscreen();
-            } else if (document.webkitExitFullscreen && document.webkitFullscreenElement) {
-                document.webkitExitFullscreen();
             }
-
             if (screen.orientation && screen.orientation.unlock) {
                 screen.orientation.unlock();
             }
-        }
-
-        function exitLandscape() {
-            window.history.back();
         }
 
         function toggleLsUI() {
@@ -631,30 +619,15 @@
             return data;
         }
 
-        /* --- FITUR: PROFIL AKTOR MENDETAIL (Updated Instagram Style) --- */
+        /* --- FITUR: PROFIL AKTOR MENDETAIL --- */
         async function openActorProfile(actorId) {
-            // Hentikan video yang sedang diputar di modal film
-            const track = document.getElementById('carouselTrack');
-            if(track) {
-                track.querySelectorAll('iframe').forEach(f => f.src = "");
-            }
-
-            // RISET KONTEN MODAL SEBELUM DITAMPILKAN (MENCEGAH DELAY GAMBAR LAMA)
-            document.getElementById('actorPic').src = "";
-            document.getElementById('actorName').innerText = "Memuat...";
-            document.getElementById('actorHeaderTitle').innerText = "";
-            document.getElementById('actorFilmGrid').innerHTML = "";
-            document.getElementById('statKarya').innerText = "0";
-            document.getElementById('statPop').innerText = "0";
-            document.getElementById('statUsia').innerText = "0";
-            document.getElementById('actorOrigin').innerHTML = "";
-            document.getElementById('actorBirth').innerText = "";
-
+            // STOP TRAILER AUDIO agar tidak bocor
+            stopTrailerAudio();
+            
             const actorModal = document.getElementById('actorModal');
             actorModal.style.display = 'block';
             document.body.style.overflow = 'hidden';
             
-            // Push state hanya jika belum dalam state actor
             if (!window.history.state || window.history.state.view !== 'actor') {
                 history.pushState({view: 'actor'}, "");
             }
@@ -689,7 +662,6 @@
                     const mType = m.media_type || 'movie';
                     const card = document.createElement('div');
                     card.className = 'post-card';
-                    // FIX: Fungsi klik untuk membuka modal film
                     card.onclick = () => { 
                         openModal(m.id, mType); 
                     };
@@ -706,22 +678,52 @@
 
         function closeActorModal() {
             document.getElementById('actorModal').style.display = 'none';
-            // Jika modal film masih terbuka di belakangnya, jangan kembalikan overflow ke auto
-            if (document.getElementById('movieModal').style.display !== 'block') {
-                document.body.style.overflow = 'hidden';
+            // Jika modal trailer masih ada di belakangnya, refresh videonya saja
+            if (document.getElementById('movieModal').style.display === 'block') {
+                refreshVideoOnly();
             } else {
                 document.body.style.overflow = 'auto';
             }
         }
 
-        /* --- FITUR: PENCARIAN STUDIO/NETWORK --- */
-        function searchByStudio(studioId, studioName) {
-            closeModal();
-            currentCompany = studioId;
-            currentType = 'movie'; 
-            document.getElementById('btnGenre').innerHTML = studioName + ' <i class="fa-solid fa-caret-down"></i>';
-            document.getElementById('btnGenre').classList.add('active-pill');
-            loadFeed(true);
+        function stopTrailerAudio() {
+            const track = document.getElementById('carouselTrack');
+            if (track) {
+                track.querySelectorAll('iframe').forEach(f => {
+                    // Kosongkan src agar audio berhenti total
+                    const currentSrc = f.src;
+                    f.src = ""; 
+                    f.dataset.oldSrc = currentSrc; // Simpan untuk reload nanti
+                });
+            }
+        }
+
+        async function refreshVideoOnly() {
+            const id = window.currentMediaId;
+            const type = window.currentMediaType;
+            if(!id) return;
+
+            const dId = await fetchWithCache(`https://api.themoviedb.org/3/${type}/${id}?api_key=${API_KEY}&language=id-ID&append_to_response=videos&include_video_language=en,id,hi,th,ko,ja,null`);
+            const allVideos = (dId.videos?.results || []).filter(v => (v.type === 'Trailer' || v.type === 'Teaser') && v.official === true && v.site === 'YouTube');
+            const track = document.getElementById('carouselTrack');
+            const dots = document.getElementById('carouselDots');
+            track.innerHTML = ''; dots.innerHTML = '';
+            
+            let vidsToDisplay = allVideos.sort((a, b) => (a.type === 'Trailer' ? -1 : 1)).slice(0, 5);
+            if(vidsToDisplay.length > 0) { 
+                vidsToDisplay.forEach((v, i) => { 
+                    const embedUrl = `https://www.youtube.com/embed/${v.key}?enablejsapi=1&autoplay=${i===currentIdx?1:0}&rel=0&modestbranding=1&mute=0`;
+                    track.innerHTML += `<div class="carousel-slide"><iframe id="vid-${i}" src="${embedUrl}" class="w-full h-full" allow="autoplay; fullscreen"></iframe></div>`; 
+                    if(vidsToDisplay.length > 1) {
+                        dots.innerHTML += `<div class="dot w-1.5 h-1.5 rounded-full ${i===currentIdx?'bg-blue-500':'bg-zinc-700'}"></div>`;
+                    }
+                }); 
+                document.getElementById('swipeOverlay').style.display = vidsToDisplay.length > 1 ? 'block' : 'none'; 
+                document.getElementById('carouselTrack').style.transform = `translateX(-${currentIdx * 100}%)`;
+            } else {
+                const seriesSuffix = (type === 'tv') ? '/1/1' : '';
+                track.innerHTML = `<div class="carousel-slide"><iframe src="https://vidlink.pro/${type}/${id}${seriesSuffix}" class="w-full h-full" allowfullscreen allow="autoplay"></iframe></div>`; 
+            }
         }
 
         /* --- CORE LOGIC --- */
@@ -901,7 +903,7 @@
                 {n: 'Anime', g: 16, img: 'Anime.png', t: 'movie', c: 'JP', s: true},
                 {n: 'Indonesia', c: 'ID', img: 'Indonesia.png', t: 'movie', s: false},
                 {n: 'Korea', c: 'KR', img: 'Korea.png', t: 'movie', s: false},
-                {n: 'India', c: 'IN', img: 'India.png', t: 'movie', s: false},
+                {n: 'India', c: 'IN', img: 'Indonesia.png', t: 'movie', s: false},
                 {n: 'Thailand', c: 'TH', img: 'Thailand.png', t: 'movie', s: false}
             ]; 
             const cont = document.getElementById('highlightList'); 
@@ -1006,7 +1008,7 @@
             document.getElementById('searchOverlay').style.display = 'block'; 
             document.getElementById('searchInp').focus(); 
             document.body.style.overflow='hidden'; 
-            updateActiveNav(document.getElementById('homeBtnNav'));
+            updateActiveNav(document.getElementById('searchBtnNav'));
             history.pushState({view: 'search'}, ""); 
         }
 
@@ -1078,7 +1080,6 @@
         }
 
         async function openModal(id, type) {
-            // FIX: Tutup modal aktor jika terbuka saat klik film baru
             const actorModal = document.getElementById('actorModal');
             if (actorModal.style.display === 'block') {
                 actorModal.style.display = 'none';
@@ -1094,7 +1095,6 @@
             document.getElementById('mHashtags').innerHTML = "";
             document.getElementById('castContainer').innerHTML = "";
             
-            // Hentikan video lama sebelum memuat yang baru
             const track = document.getElementById('carouselTrack');
             if(track) {
                 track.querySelectorAll('iframe').forEach(f => f.src = "");
@@ -1114,7 +1114,6 @@
             currentIdx = 0; 
             isTranslated = false;
             
-            // Push state baru jika belum ada state modal
             if (!window.history.state || window.history.state.view !== 'modal') {
                 history.pushState({view: 'modal'}, "");
             }
@@ -1164,9 +1163,8 @@
                 }); 
                 document.getElementById('swipeOverlay').style.display = vidsToDisplay.length > 1 ? 'block' : 'none'; 
             } else { 
-                // FALLBACK: JIKA TIDAK ADA TRAILER, LANGSUNG MUAT VIDSRC.CC SEBAGAI PLAYER UTAMA
-                const fallbackUrl = `https://vidsrc.cc/v2/embed/${type}/${currentImdbId || id}${type==='tv'?'?s=1&e=1':''}`;
-                track.innerHTML = `<div class="carousel-slide"><iframe id="player-frame" src="${fallbackUrl}" class="w-full h-full" allowfullscreen allow="autoplay"></iframe></div>`; 
+                const fallbackUrl = `https://vidlink.pro/${type}/${id}${seriesSuffix}`;
+                track.innerHTML = `<div class="carousel-slide"><iframe src="${fallbackUrl}" class="w-full h-full" allowfullscreen allow="autoplay"></iframe></div>`; 
                 document.getElementById('swipeOverlay').style.display = 'none'; 
             }
 
@@ -1268,7 +1266,10 @@
             track.style.transform = 'translateX(0)'; currentIdx = 0; dots.innerHTML = ''; 
             document.getElementById('swipeOverlay').style.display = 'none'; highlightBtn(el); 
 
-            // ERROR HANDLING UNTUK PLAYER FRAME SUDAH DIHAPUS FALLBACK-NYA AGAR TETAP ERROR JIKA SERVER BERMASALAH
+            const frame = document.getElementById('player-frame');
+            frame.onerror = () => {
+                frame.src = `https://vidsrc.me/embed/${window.currentMediaType}?tmdb=${window.currentMediaId}`;
+            };
         }
         
         function highlightBtn(el) { document.querySelectorAll('.server-btn').forEach(b => b.classList.remove('active-link')); el.classList.add('active-link'); }
@@ -1288,17 +1289,36 @@
         }
         
         function setupSwipe() { 
-            const overlay = document.getElementById('swipeOverlay'); 
-            overlay.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, {passive:true}); 
+            const trackCont = document.getElementById('mainVideoArea'); 
+            const overlay = document.getElementById('swipeOverlay');
+
+            // Tangkap event touch di overlay
+            overlay.addEventListener('touchstart', e => { 
+                startX = e.touches[0].clientX; 
+            }, {passive:true}); 
+
             overlay.addEventListener('touchend', e => { 
                 let diff = startX - e.changedTouches[0].clientX; 
                 const slides = document.querySelectorAll('.carousel-slide'); 
-                if(Math.abs(diff) > 50 && slides.length > 1) { 
+                
+                // Jika gerakan geser sangat kecil, anggap sebagai KLIK
+                if (Math.abs(diff) < 10) {
+                    overlay.style.pointerEvents = 'none'; // Matikan overlay sebentar
+                    setTimeout(() => { overlay.style.pointerEvents = 'auto'; }, 100); // Hidupkan lagi
+                    return;
+                }
+
+                // Logika geser (Swipe)
+                if(Math.abs(diff) > 70 && slides.length > 1) { 
                     let oldIdx = currentIdx; 
                     if(diff > 0 && currentIdx < slides.length - 1) currentIdx++; 
                     else if(diff < 0 && currentIdx > 0) currentIdx--; 
+                    
                     document.getElementById('carouselTrack').style.transform = `translateX(-${currentIdx * 100}%)`; 
-                    document.querySelectorAll('.dot').forEach((d, i) => { d.className = `dot w-1.5 h-1.5 rounded-full ${i===currentIdx?'bg-blue-500':'bg-zinc-700'}`; }); 
+                    document.querySelectorAll('.dot').forEach((d, i) => { 
+                        d.className = `dot w-1.5 h-1.5 rounded-full ${i===currentIdx?'bg-blue-500':'bg-zinc-700'}`; 
+                    }); 
+                    
                     const oldVid = document.getElementById(`vid-${oldIdx}`), newVid = document.getElementById(`vid-${currentIdx}`);
                     if(oldVid) try{oldVid.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');}catch(e){}
                     if(newVid) try{newVid.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');}catch(e){}
