@@ -490,10 +490,8 @@
         let currentImdbId = ""; 
 
         window.onload = () => {
-            // State awal Home
             history.replaceState({view: 'home'}, "");
 
-            // Pastikan inisialisasi berjalan dengan try-catch agar tidak memblock splash timer
             try {
                 initFilters(); 
                 initHighlights(); 
@@ -536,21 +534,18 @@
             if (isLandscapeOpen) {
                 closeLandscapeSilently();
             } else if (isActorOpen) {
-                closeActorModal();
+                closeActorModal(false); // false agar tidak pushState lagi
             } else if (isMovieOpen) {
-                closeModal();
+                closeModal(false); // false agar tidak panggil history.back lagi
             } else if (isSearchOpen) {
                 closeSearch();
             } else if (isMenuOpen) {
                 toggleSideMenu();
-            } else {
-                // Jika sudah di home dan tidak ada modal, browser akan menangani back (keluar aplikasi)
             }
         });
 
         /* --- LANDSCAPE CONTROLS LOGIC --- */
         async function enterLandscape() {
-            // Hentikan audio yang mungkin sedang berjalan di latar (jika ada slide lain)
             stopAllAudioExceptCurrent();
             
             const overlay = document.getElementById('landscapeOverlay');
@@ -643,7 +638,7 @@
 
         /* --- FITUR: PROFIL AKTOR MENDETAIL --- */
         async function openActorProfile(actorId) {
-            stopAllAudio(); // Stop audio saat buka profil aktor
+            stopAllAudio();
             
             const actorModal = document.getElementById('actorModal');
             actorModal.style.display = 'block';
@@ -697,19 +692,20 @@
             } catch (e) { console.error(e); }
         }
 
-        function closeActorModal() {
+        function closeActorModal(doBack = true) {
             document.getElementById('actorModal').style.display = 'none';
             if (document.getElementById('movieModal').style.display === 'block') {
                 refreshVideoOnly();
             } else {
                 document.body.style.overflow = 'auto';
             }
+            if(doBack && window.history.state?.view === 'actor') window.history.back();
         }
 
         function stopAllAudio() {
             const iframes = document.querySelectorAll('iframe');
             iframes.forEach(f => {
-                f.src = ""; // Stop total
+                f.src = ""; 
             });
         }
 
@@ -1159,6 +1155,7 @@
             currentIdx = 0; 
             isTranslated = false;
             
+            // HP BACK BUTTON FIX: Pastikan history state di push saat modal terbuka
             if (!window.history.state || window.history.state.view !== 'modal') {
                 history.pushState({view: 'modal'}, "");
             }
@@ -1301,8 +1298,8 @@
             renderSynopsis();
         }
         
-        function closeModal() { 
-            stopAllAudio(); // Stop audio saat modal ditutup
+        function closeModal(doBack = true) { 
+            stopAllAudio();
             const track = document.getElementById('carouselTrack'); 
             if(track) {
                 track.innerHTML = ''; 
@@ -1311,6 +1308,11 @@
             document.body.style.overflow = 'auto'; 
             if(document.body.classList.contains('landscape-active')) closeLandscapeSilently();
             window.currentMediaId = null; 
+            
+            // HP BACK BUTTON FIX: Trigger history back agar state sinkron
+            if(doBack && window.history.state?.view === 'modal') {
+                window.history.back();
+            }
         }
 
         function renderSynopsis() { const descEl = document.getElementById('mDesc'), toggleBtn = document.getElementById('mToggleBtn'); if (globalFullDesc.length > 90) { if(toggleBtn) toggleBtn.classList.remove('hidden'); if(descEl) descEl.innerText = isExpanded ? globalFullDesc : globalFullDesc.substring(0, 90) + "..."; if(toggleBtn) toggleBtn.innerText = isExpanded ? "ringkas" : "selengkapnya"; } else { if(descEl) descEl.innerText = globalFullDesc; if(toggleBtn) toggleBtn.classList.add('hidden'); } }
@@ -1322,7 +1324,6 @@
             if(!track) return;
             const finalUrl = url.includes('?') ? `${url}&enablejsapi=1&mute=0` : `${url}?enablejsapi=1&mute=0`;
             
-            // FIX: Hentikan video lama secara total sebelum ganti server agar suara mati
             track.querySelectorAll('iframe').forEach(f => f.src = "");
             
             track.innerHTML = `<div class="carousel-slide"><iframe id="player-frame" src="${finalUrl}" class="w-full h-full" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture"></iframe></div>`; 
@@ -1367,7 +1368,6 @@
                 let diff = startX - e.changedTouches[0].clientX; 
                 const slides = document.querySelectorAll('.carousel-slide'); 
                 
-                // Pointer Events Fix: Jika hanya ketukan ringan (bukan swipe), sembunyikan overlay sejenak
                 if (Math.abs(diff) < 10) {
                     overlay.style.pointerEvents = 'none'; 
                     setTimeout(() => { overlay.style.pointerEvents = 'auto'; }, 150); 
@@ -1384,13 +1384,12 @@
                         d.className = `dot w-1.5 h-1.5 rounded-full ${i===currentIdx?'bg-blue-500':'bg-zinc-700'}`; 
                     }); 
                     
-                    // --- FIX: MATIKAN AUDIO SLIDE LAMA SAAT SWIPE ---
                     const iframes = document.querySelectorAll('.carousel-track iframe');
                     iframes.forEach((f, idx) => {
                         if(idx !== currentIdx) {
                             const tempSrc = f.src;
-                            f.src = ""; // Matikan total
-                            f.src = tempSrc; // Re-load (tapi pause via postMessage jika didukung)
+                            f.src = ""; 
+                            f.src = tempSrc; 
                             try { f.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*'); } catch(e){}
                         } else {
                             try { f.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*'); } catch(e){}
