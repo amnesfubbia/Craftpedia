@@ -502,6 +502,13 @@
             window.addEventListener('scroll', () => { 
                 document.getElementById('backToTop').style.display = window.scrollY > 500 ? 'flex' : 'none'; 
             }); 
+            
+            // FIX: Otomatis Pause saat aplikasi diminimize / keluar
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'hidden') {
+                    stopAllAudio();
+                }
+            });
         };
 
         /* --- HP BACK BUTTON SYSTEM (FIXED & STEP BY STEP) --- */
@@ -531,6 +538,9 @@
 
         /* --- LANDSCAPE CONTROLS LOGIC --- */
         async function enterLandscape() {
+            // Hentikan audio yang mungkin sedang berjalan di latar (jika ada slide lain)
+            stopAllAudioExceptCurrent();
+            
             const overlay = document.getElementById('landscapeOverlay');
             const lsTitle = document.getElementById('lsTitle');
             
@@ -539,7 +549,7 @@
             overlay.style.display = 'block';
             
             const videoArea = document.getElementById('mainVideoArea');
-            document.getElementById('landscapeOverlay').appendChild(videoArea);
+            overlay.appendChild(videoArea);
             
             showLsUI();
             
@@ -621,8 +631,7 @@
 
         /* --- FITUR: PROFIL AKTOR MENDETAIL --- */
         async function openActorProfile(actorId) {
-            // STOP TRAILER AUDIO agar tidak bocor
-            stopTrailerAudio();
+            stopAllAudio(); // Stop audio saat buka profil aktor
             
             const actorModal = document.getElementById('actorModal');
             actorModal.style.display = 'block';
@@ -678,7 +687,6 @@
 
         function closeActorModal() {
             document.getElementById('actorModal').style.display = 'none';
-            // Jika modal trailer masih ada di belakangnya, refresh videonya saja
             if (document.getElementById('movieModal').style.display === 'block') {
                 refreshVideoOnly();
             } else {
@@ -686,16 +694,30 @@
             }
         }
 
-        function stopTrailerAudio() {
-            const track = document.getElementById('carouselTrack');
-            if (track) {
-                track.querySelectorAll('iframe').forEach(f => {
-                    // Kosongkan src agar audio berhenti total
-                    const currentSrc = f.src;
-                    f.src = ""; 
-                    f.dataset.oldSrc = currentSrc; // Simpan untuk reload nanti
-                });
-            }
+        function stopAllAudio() {
+            const iframes = document.querySelectorAll('iframe');
+            iframes.forEach(f => {
+                const src = f.src;
+                f.src = "";
+                // Jika masih dalam modal tujuannya agar bisa di-resume nanti jika perlu
+                if(f.closest('.modal-player')) {
+                    f.src = src; 
+                    // Kami memicu pause lewat postMessage untuk YT
+                    try { f.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*'); } catch(e){}
+                }
+            });
+        }
+
+        function stopAllAudioExceptCurrent() {
+            const iframes = document.querySelectorAll('.carousel-track iframe');
+            iframes.forEach((f, idx) => {
+                if(idx !== currentIdx) {
+                    const src = f.src;
+                    f.src = "";
+                    f.src = src;
+                    try { f.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*'); } catch(e){}
+                }
+            });
         }
 
         async function refreshVideoOnly() {
@@ -1242,6 +1264,7 @@
         }
         
         function closeModal() { 
+            stopAllAudio(); // Stop audio saat modal ditutup
             const track = document.getElementById('carouselTrack'); 
             if(track) {
                 track.querySelectorAll('iframe').forEach(f => f.src = ""); 
@@ -1261,7 +1284,9 @@
             const dots = document.getElementById('carouselDots'); 
             const finalUrl = url.includes('?') ? `${url}&enablejsapi=1&mute=0` : `${url}?enablejsapi=1&mute=0`;
             
+            // Hentikan video lama secara total sebelum ganti server
             track.querySelectorAll('iframe').forEach(f => f.src = "");
+            
             track.innerHTML = `<div class="carousel-slide"><iframe id="player-frame" src="${finalUrl}" class="w-full h-full" allowfullscreen allow="autoplay"></iframe></div>`; 
             track.style.transform = 'translateX(0)'; currentIdx = 0; dots.innerHTML = ''; 
             document.getElementById('swipeOverlay').style.display = 'none'; highlightBtn(el); 
@@ -1292,7 +1317,6 @@
             const trackCont = document.getElementById('mainVideoArea'); 
             const overlay = document.getElementById('swipeOverlay');
 
-            // Tangkap event touch di overlay
             overlay.addEventListener('touchstart', e => { 
                 startX = e.touches[0].clientX; 
             }, {passive:true}); 
@@ -1301,14 +1325,12 @@
                 let diff = startX - e.changedTouches[0].clientX; 
                 const slides = document.querySelectorAll('.carousel-slide'); 
                 
-                // Jika gerakan geser sangat kecil, anggap sebagai KLIK
                 if (Math.abs(diff) < 10) {
-                    overlay.style.pointerEvents = 'none'; // Matikan overlay sebentar
-                    setTimeout(() => { overlay.style.pointerEvents = 'auto'; }, 100); // Hidupkan lagi
+                    overlay.style.pointerEvents = 'none'; 
+                    setTimeout(() => { overlay.style.pointerEvents = 'auto'; }, 100); 
                     return;
                 }
 
-                // Logika geser (Swipe)
                 if(Math.abs(diff) > 70 && slides.length > 1) { 
                     let oldIdx = currentIdx; 
                     if(diff > 0 && currentIdx < slides.length - 1) currentIdx++; 
@@ -1319,9 +1341,19 @@
                         d.className = `dot w-1.5 h-1.5 rounded-full ${i===currentIdx?'bg-blue-500':'bg-zinc-700'}`; 
                     }); 
                     
-                    const oldVid = document.getElementById(`vid-${oldIdx}`), newVid = document.getElementById(`vid-${currentIdx}`);
-                    if(oldVid) try{oldVid.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');}catch(e){}
-                    if(newVid) try{newVid.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');}catch(e){}
+                    // --- FIX: MATIKAN AUDIO SLIDE LAMA SAAT SWIPE ---
+                    const iframes = document.querySelectorAll('.carousel-track iframe');
+                    iframes.forEach((f, idx) => {
+                        if(idx !== currentIdx) {
+                            const tempSrc = f.src;
+                            f.src = ""; // Reset src agar suara mati total
+                            f.src = tempSrc;
+                            try { f.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*'); } catch(e){}
+                        } else {
+                            // Play video di slide yang baru aktif (khusus YouTube)
+                            try { f.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*'); } catch(e){}
+                        }
+                    });
                 } 
             }); 
         }
