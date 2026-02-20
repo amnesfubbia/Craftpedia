@@ -92,7 +92,7 @@
         #smartSearchDropdown { position: absolute; top: 100%; left: 0; right: 0; background: #1a1a1a; border-radius: 0 0 10px 10px; border: 1px solid #333; border-top: none; display: none; z-index: 500; max-height: 300px; overflow-y: auto; }
         .smart-item { display: flex; align-items: center; padding: 10px; gap: 12px; border-bottom: 1px solid #262626; cursor: pointer; }
         .smart-item img { width: 35px; height: 50px; object-fit: cover; border-radius: 4px; }
-        .smart-info { display: flex; flex-direction: column; }
+        .smart-item info { display: flex; flex-direction: column; }
         .smart-name { font-size: 13px; font-weight: 600; color: #fff; }
         .smart-meta { font-size: 11px; color: #8e8e8e; }
 
@@ -1070,7 +1070,6 @@
             document.getElementById('mHashtags').innerHTML = "";
             document.getElementById('castContainer').innerHTML = "";
             
-            // Hentikan video lama sebelum memuat yang baru
             const track = document.getElementById('carouselTrack');
             if(track) {
                 track.querySelectorAll('iframe').forEach(f => f.src = "");
@@ -1102,7 +1101,6 @@
             ]);
             
             currentImdbId = dExt.imdb_id || ""; 
-
             originalIndoDesc = dId.overview || "";
             globalEnDesc = dEn.overview || "";
 
@@ -1117,32 +1115,21 @@
                 if(globalEnDesc) translateBtn.classList.remove('hidden');
             }
             
-            // AMBIL TRAILER YOUTUBE
-            let allVideos = (dId.videos?.results || []).filter(v => 
+            // FILTER YOUTUBE TRAILER
+            const allVideos = (dId.videos?.results || []).filter(v => 
                 (v.type === 'Trailer' || v.type === 'Teaser') && 
                 v.official === true &&
                 v.site === 'YouTube' && 
                 !v.name.toLowerCase().includes('shorts') 
             );
 
-            // FALLBACK KE VIMEO JIKA YOUTUBE TIDAK ADA
-            if(allVideos.length === 0) {
-                allVideos = (dId.videos?.results || []).filter(v => v.site === 'Vimeo');
-            }
-
             const dots = document.getElementById('carouselDots');
             track.innerHTML = ''; dots.innerHTML = ''; track.style.transform = 'translateX(0)';
             
-            let vidsToDisplay = allVideos.sort((a, b) => (a.type === 'Trailer' ? -1 : 1)).slice(0, 5);
-
-            if(vidsToDisplay.length > 0) { 
+            if(allVideos.length > 0) { 
+                let vidsToDisplay = allVideos.sort((a, b) => (a.type === 'Trailer' ? -1 : 1)).slice(0, 5);
                 vidsToDisplay.forEach((v, i) => { 
-                    let embedUrl = "";
-                    if(v.site === 'YouTube') {
-                        embedUrl = `https://www.youtube.com/embed/${v.key}?enablejsapi=1&autoplay=${i===0?1:0}&rel=0&modestbranding=1&mute=0`;
-                    } else if(v.site === 'Vimeo') {
-                        embedUrl = `https://player.vimeo.com/video/${v.key}?autoplay=${i===0?1:0}`;
-                    }
+                    const embedUrl = `https://www.youtube.com/embed/${v.key}?enablejsapi=1&autoplay=${i===0?1:0}&rel=0&modestbranding=1&mute=0`;
                     track.innerHTML += `<div class="carousel-slide"><iframe id="vid-${i}" src="${embedUrl}" class="w-full h-full" allow="autoplay; fullscreen"></iframe></div>`; 
                     if(vidsToDisplay.length > 1) {
                         dots.innerHTML += `<div class="dot w-1.5 h-1.5 rounded-full ${i===currentIdx?'bg-blue-500':'bg-zinc-700'}"></div>`; 
@@ -1150,10 +1137,32 @@
                 }); 
                 document.getElementById('swipeOverlay').style.display = vidsToDisplay.length > 1 ? 'block' : 'none'; 
             } else { 
-                // JIKA YOUTUBE & VIMEO TIDAK ADA, LANGSUNG KE PEMUTAR (SERVER 1)
-                const fallbackUrl = `https://player.videasy.net/movie/${id}`;
-                track.innerHTML = `<div class="carousel-slide"><iframe src="${fallbackUrl}" class="w-full h-full" allowfullscreen allow="autoplay"></iframe></div>`; 
-                document.getElementById('swipeOverlay').style.display = 'none'; 
+                // JIKA YOUTUBE TIDAK ADA, CARI DAILYMOTION
+                const titleQuery = dId.title || dId.name;
+                const releaseYear = (dId.release_date || dId.first_air_date || "").split('-')[0];
+                const dmSearchUrl = `https://api.dailymotion.com/videos?fields=id&search=${encodeURIComponent(titleQuery + ' ' + releaseYear + ' trailer')}&limit=1`;
+                
+                try {
+                    const dmRes = await fetch(dmSearchUrl);
+                    const dmData = await dmRes.json();
+                    
+                    if(dmData.list && dmData.list.length > 0) {
+                        // JIKA DAILYMOTION ADA
+                        const dmId = dmData.list[0].id;
+                        track.innerHTML = `<div class="carousel-slide"><iframe src="https://www.dailymotion.com/embed/video/${dmId}?autoplay=1&mute=0" class="w-full h-full" allowfullscreen allow="autoplay"></iframe></div>`;
+                        document.getElementById('swipeOverlay').style.display = 'none';
+                    } else {
+                        // JIKA DAILYMOTION JUGA TIDAK ADA, LANGSUNG PEMUTAR FILM (Server 2)
+                        const fallbackUrl = `https://vidlink.pro/${type}/${id}${seriesSuffix}`;
+                        track.innerHTML = `<div class="carousel-slide"><iframe id="player-frame" src="${fallbackUrl}" class="w-full h-full" allowfullscreen allow="autoplay"></iframe></div>`; 
+                        document.getElementById('swipeOverlay').style.display = 'none';
+                    }
+                } catch(e) {
+                    // FALLBACK JIKA FETCH DAILYMOTION ERROR
+                    const fallbackUrl = `https://vidlink.pro/${type}/${id}${seriesSuffix}`;
+                    track.innerHTML = `<div class="carousel-slide"><iframe id="player-frame" src="${fallbackUrl}" class="w-full h-full" allowfullscreen allow="autoplay"></iframe></div>`; 
+                    document.getElementById('swipeOverlay').style.display = 'none';
+                }
             }
 
             document.getElementById('castContainer').innerHTML = (dCast.cast || []).slice(0, 10).map(c => {
