@@ -498,7 +498,7 @@
             }); 
         };
 
-        /* --- HP BACK BUTTON SYSTEM (FIXED) --- */
+        /* --- HP BACK BUTTON SYSTEM --- */
         window.addEventListener('popstate', function(event) {
             // Tutup Landscape dulu jika aktif
             if (document.getElementById('landscapeOverlay').style.display === 'block') {
@@ -532,10 +532,13 @@
             overlay.style.display = 'block';
             
             const videoArea = document.getElementById('mainVideoArea');
-            document.getElementById('landscapeOverlay').appendChild(videoArea);
+            overlay.appendChild(videoArea); // Pindahkan ke overlay landscape
             
             showLsUI();
-            history.pushState({view: 'landscape'}, "");
+            
+            if (!window.history.state || window.history.state.view !== 'landscape') {
+                history.pushState({view: 'landscape'}, "");
+            }
 
             try {
                 if (document.documentElement.requestFullscreen) {
@@ -557,7 +560,10 @@
             
             const videoArea = document.getElementById('mainVideoArea');
             const castContainer = document.getElementById('castContainer');
-            if(castContainer) castContainer.after(videoArea);
+            if(castContainer && videoArea) {
+                // Kembalikan ke posisi semula di modal film
+                castContainer.after(videoArea);
+            }
 
             if (document.exitFullscreen && document.fullscreenElement) {
                 document.exitFullscreen();
@@ -565,10 +571,6 @@
             if (screen.orientation && screen.orientation.unlock) {
                 screen.orientation.unlock();
             }
-        }
-
-        function exitLandscape() {
-            window.history.back();
         }
 
         function toggleLsUI() {
@@ -603,7 +605,6 @@
             showLsUI();
         }
 
-        /* --- FITUR: CACHE API --- */
         async function fetchWithCache(url) {
             const cached = sessionStorage.getItem(url);
             if (cached) return JSON.parse(cached);
@@ -613,14 +614,12 @@
             return data;
         }
 
-        /* --- FITUR: PROFIL AKTOR MENDETAIL --- */
+        /* --- PROFIL AKTOR MENDETAIL --- */
         async function openActorProfile(actorId) {
-            // Simpan trailer yang ada sebelum dikosongkan agar bisa dikembalikan nanti
             lastTrailerSources = [];
             const frames = document.querySelectorAll('#carouselTrack iframe');
             frames.forEach(f => {
                 lastTrailerSources.push(f.src);
-                // Matikan video agar suara tidak bentrok
                 f.src = "";
             });
 
@@ -676,21 +675,16 @@
 
         function closeActorModal() {
             document.getElementById('actorModal').style.display = 'none';
-            
-            // Kembalikan trailer ke modal film jika modal film sedang terbuka
             if (document.getElementById('movieModal').style.display === 'block') {
                 const frames = document.querySelectorAll('#carouselTrack iframe');
                 frames.forEach((f, i) => {
-                    if (lastTrailerSources[i]) {
-                        f.src = lastTrailerSources[i];
-                    }
+                    if (lastTrailerSources[i]) f.src = lastTrailerSources[i];
                 });
             } else {
                 document.body.style.overflow = 'auto';
             }
         }
 
-        /* --- FITUR: PENCARIAN STUDIO/NETWORK --- */
         function searchByStudio(studioId, studioName) {
             closeModal();
             currentCompany = studioId;
@@ -700,7 +694,6 @@
             loadFeed(true);
         }
 
-        /* --- CORE LOGIC --- */
         function updateActiveNav(el) { 
             document.querySelectorAll('.bottom-nav i').forEach(i => i.classList.remove('active-nav')); 
             if(el) el.classList.add('active-nav'); 
@@ -711,7 +704,9 @@
             const isVisible = menu.style.display === 'block';
             menu.style.display = isVisible ? 'none' : 'block';
             document.body.style.overflow = isVisible ? 'auto' : 'hidden';
-            if (!isVisible) history.pushState({view: 'menu'}, "");
+            if (!isVisible && (!window.history.state || window.history.state.view !== 'menu')) {
+                history.pushState({view: 'menu'}, "");
+            }
         }
 
         function backToHome() {
@@ -789,7 +784,9 @@
             overlay.style.display = 'block';
             calendarHeader.classList.remove('hidden');
             document.body.style.overflow = 'hidden';
-            history.pushState({view: 'search'}, "");
+            if (!window.history.state || window.history.state.view !== 'search') {
+                history.pushState({view: 'search'}, "");
+            }
             
             let dateStripHTML = '<div class="date-strip no-scrollbar">';
             const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
@@ -864,7 +861,9 @@
             document.getElementById('searchOverlay').style.display = 'block'; 
             document.getElementById('smartSearchDropdown').style.display = 'none';
             document.body.style.overflow='hidden'; 
-            history.pushState({view: 'search'}, "");
+            if (!window.history.state || window.history.state.view !== 'search') {
+                history.pushState({view: 'search'}, "");
+            }
             loadFeed(true); 
         }
 
@@ -931,7 +930,13 @@
                 if(currentCountry) url += `&with_origin_country=${currentCountry}`;
                 if(currentGenre) url += `&with_genres=${currentGenre}`;
                 if(currentCompany) url += `&with_companies=${currentCompany}`;
-                if(currentType === 'short') url += `&with_runtime.lte=45&with_runtime.gte=1`;
+                
+                // LOGIKA SHORT DIPERKETAT (Integrasi Indie/Short Film)
+                if(currentType === 'short') {
+                    url += `&with_runtime.lte=20&with_runtime.gte=1`;
+                    url += `&vote_count.lte=5000`; 
+                }
+
                 if(currentSchedule === 'now_playing' || currentSchedule === 'upcoming') { 
                     const today = new Date().toISOString().split('T')[0]; 
                     if(currentSchedule === 'now_playing') { 
@@ -983,7 +988,9 @@
             document.getElementById('searchInp').focus(); 
             document.body.style.overflow='hidden'; 
             updateActiveNav(document.getElementById('searchBtnNav'));
-            history.pushState({view: 'search'}, ""); 
+            if (!window.history.state || window.history.state.view !== 'search') {
+                history.pushState({view: 'search'}, "");
+            }
         }
 
         function closeSearch() { 
@@ -1054,11 +1061,8 @@
         }
 
         async function openModal(id, type) {
-            // Tutup modal aktor jika terbuka saat klik film baru
             const actorModal = document.getElementById('actorModal');
-            if (actorModal.style.display === 'block') {
-                actorModal.style.display = 'none';
-            }
+            if (actorModal.style.display === 'block') actorModal.style.display = 'none';
 
             window.currentMediaId = id; window.currentMediaType = type;
             const seriesSuffix = (type === 'tv') ? '/1/1' : ''; 
@@ -1115,7 +1119,6 @@
                 if(globalEnDesc) translateBtn.classList.remove('hidden');
             }
             
-            // FILTER YOUTUBE TRAILER
             const allVideos = (dId.videos?.results || []).filter(v => 
                 (v.type === 'Trailer' || v.type === 'Teaser') && 
                 v.official === true &&
@@ -1137,28 +1140,24 @@
                 }); 
                 document.getElementById('swipeOverlay').style.display = vidsToDisplay.length > 1 ? 'block' : 'none'; 
             } else { 
-                // JIKA YOUTUBE TIDAK ADA, CARI DAILYMOTION
                 const titleQuery = dId.title || dId.name;
                 const releaseYear = (dId.release_date || dId.first_air_date || "").split('-')[0];
-                const dmSearchUrl = `https://api.dailymotion.com/videos?fields=id&search=${encodeURIComponent(titleQuery + ' ' + releaseYear + ' trailer')}&limit=1`;
+                const dmSearchUrl = `https://api.dailymotion.com/videos?fields=id&search=${encodeURIComponent(titleQuery + ' ' + releaseYear + ' Official Trailer')}&limit=1`;
                 
                 try {
                     const dmRes = await fetch(dmSearchUrl);
                     const dmData = await dmRes.json();
                     
                     if(dmData.list && dmData.list.length > 0) {
-                        // JIKA DAILYMOTION ADA
                         const dmId = dmData.list[0].id;
                         track.innerHTML = `<div class="carousel-slide"><iframe src="https://www.dailymotion.com/embed/video/${dmId}?autoplay=1&mute=0" class="w-full h-full" allowfullscreen allow="autoplay"></iframe></div>`;
                         document.getElementById('swipeOverlay').style.display = 'none';
                     } else {
-                        // JIKA DAILYMOTION JUGA TIDAK ADA, LANGSUNG PEMUTAR FILM (Server 2)
                         const fallbackUrl = `https://vidlink.pro/${type}/${id}${seriesSuffix}`;
                         track.innerHTML = `<div class="carousel-slide"><iframe id="player-frame" src="${fallbackUrl}" class="w-full h-full" allowfullscreen allow="autoplay"></iframe></div>`; 
                         document.getElementById('swipeOverlay').style.display = 'none';
                     }
                 } catch(e) {
-                    // FALLBACK JIKA FETCH DAILYMOTION ERROR
                     const fallbackUrl = `https://vidlink.pro/${type}/${id}${seriesSuffix}`;
                     track.innerHTML = `<div class="carousel-slide"><iframe id="player-frame" src="${fallbackUrl}" class="w-full h-full" allowfullscreen allow="autoplay"></iframe></div>`; 
                     document.getElementById('swipeOverlay').style.display = 'none';
@@ -1184,11 +1183,15 @@
             const rel = dId.release_date || dId.first_air_date || ""; 
             document.getElementById('mDateDisplay').innerText = rel ? new Date(rel).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
             
+            // INTEGRASI SERVER KHUSUS INDIE/SHORT (Viddsee & Filmzie)
+            const movieTitleClean = (dId.title || dId.name).replace(/\s+/g, '-').toLowerCase();
             document.getElementById('serverList').innerHTML = `
                 <button class="server-btn" onclick="playVid('https://player.videasy.net/movie/${id}', this)">Server 1</button>
                 <button class="server-btn" onclick="playVid('https://vidlink.pro/${type}/${id}${seriesSuffix}', this)">Server 2</button>
                 <button class="server-btn" onclick="playVid('https://vidrock.net/embed/${type}/${id}${seriesSuffix}', this)">Server 3</button>
                 <button class="server-btn" onclick="playVid('https://vidstorm.ru/embed/${type}/${id}${seriesSuffix}', this)">Server 4</button>
+                <button class="server-btn" style="border-color:#ffca28; color:#ffca28;" onclick="window.open('https://www.viddsee.com/search?q=${encodeURIComponent(dId.title || dId.name)}')">Viddsee (Indie)</button>
+                <button class="server-btn" style="border-color:#00ff95; color:#00ff95;" onclick="window.open('https://filmzie.com/search/${encodeURIComponent(dId.title || dId.name)}')">Filmzie (Indie)</button>
                 <button class="server-btn" onclick="playVid('https://vidfast.pro/movie/${id}', this)">Server 5</button>
                 <button class="server-btn" onclick="playVid('https://111movies.com/movie/${id}', this)">Server 6</button>
                 <button class="server-btn" onclick="playVid('https://www.nontongo.win/embed/${type}/${id}${seriesSuffix}', this)">Server 7</button>
@@ -1308,17 +1311,12 @@
         function toggleLib(k) { let items = JSON.parse(localStorage.getItem(k) || '[]'); const idx = items.findIndex(x => x.id == window.currentMediaId); idx > -1 ? items.splice(idx,1) : items.push({id: window.currentMediaId, type: window.currentMediaType}); localStorage.setItem(k, JSON.stringify(items)); updateLibButtons(window.currentMediaId); }
         
         async function switchTab(mode, el) { 
-            closeModal();
-            closeSearch();
-            closeActorModal();
+            closeModal(); closeSearch(); closeActorModal();
             document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active')); 
             if(el) el.classList.add('active'); 
 
-            if(mode === 'bookmarks') {
-                updateActiveNav(document.getElementById('bookmarkBtnNav'));
-            } else {
-                updateActiveNav(document.getElementById('homeBtnNav'));
-            }
+            if(mode === 'bookmarks') updateActiveNav(document.getElementById('bookmarkBtnNav'));
+            else updateActiveNav(document.getElementById('homeBtnNav'));
 
             const grid = document.getElementById('feedGrid'); 
             grid.innerHTML = ''; 
