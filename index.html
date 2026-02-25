@@ -485,6 +485,7 @@
         let isLsPaused = false, isLsMuted = false, lsControlTimer;
         let currentImdbId = ""; 
         let lastTrailerSources = []; // Variable untuk menyimpan trailer sementara
+        const renderedIds = new Set(); // Mencegah duplikasi data
 
         window.onload = () => {
             setTimeout(() => {
@@ -536,9 +537,8 @@
             
             showLsUI();
             
-            if (!window.history.state || window.history.state.view !== 'landscape') {
-                history.pushState({view: 'landscape'}, "");
-            }
+            // PushState saat masuk landscape
+            history.pushState({view: 'landscape'}, "");
 
             try {
                 if (document.documentElement.requestFullscreen) {
@@ -627,9 +627,8 @@
             actorModal.style.display = 'block';
             document.body.style.overflow = 'hidden';
             
-            if (!window.history.state || window.history.state.view !== 'actor') {
-                history.pushState({view: 'actor'}, "");
-            }
+            // PushState saat buka modal aktor
+            history.pushState({view: 'actor'}, "");
 
             try {
                 const details = await fetchWithCache(`https://api.themoviedb.org/3/person/${actorId}?api_key=${API_KEY}&language=id-ID`);
@@ -704,7 +703,7 @@
             const isVisible = menu.style.display === 'block';
             menu.style.display = isVisible ? 'none' : 'block';
             document.body.style.overflow = isVisible ? 'auto' : 'hidden';
-            if (!isVisible && (!window.history.state || window.history.state.view !== 'menu')) {
+            if (!isVisible) {
                 history.pushState({view: 'menu'}, "");
             }
         }
@@ -784,9 +783,8 @@
             overlay.style.display = 'block';
             calendarHeader.classList.remove('hidden');
             document.body.style.overflow = 'hidden';
-            if (!window.history.state || window.history.state.view !== 'search') {
-                history.pushState({view: 'search'}, "");
-            }
+            
+            history.pushState({view: 'search'}, "");
             
             let dateStripHTML = '<div class="date-strip no-scrollbar">';
             const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
@@ -861,9 +859,7 @@
             document.getElementById('searchOverlay').style.display = 'block'; 
             document.getElementById('smartSearchDropdown').style.display = 'none';
             document.body.style.overflow='hidden'; 
-            if (!window.history.state || window.history.state.view !== 'search') {
-                history.pushState({view: 'search'}, "");
-            }
+            history.pushState({view: 'search'}, "");
             loadFeed(true); 
         }
 
@@ -919,7 +915,7 @@
             if(loading && !isNew) return;
             loading = true; abortController = new AbortController();
             const grid = document.getElementById('searchOverlay').style.display === 'block' ? document.getElementById('searchGrid') : document.getElementById('feedGrid');
-            if(isNew) { page = 1; grid.innerHTML = ''; }
+            if(isNew) { page = 1; grid.innerHTML = ''; renderedIds.clear(); }
             let url;
             if(currentCastId) { url = `https://api.themoviedb.org/3/person/${currentCastId}/combined_credits?api_key=${API_KEY}&language=id-ID`; }
             else if(searchQuery) { url = `https://api.themoviedb.org/3/search/multi?query=${encodeURIComponent(searchQuery)}&api_key=${API_KEY}&language=id-ID&page=${page}&include_adult=false`; }
@@ -931,10 +927,10 @@
                 if(currentGenre) url += `&with_genres=${currentGenre}`;
                 if(currentCompany) url += `&with_companies=${currentCompany}`;
                 
-                // LOGIKA SHORT DIPERKETAT (Integrasi Indie/Short Film)
+                // LOGIKA SHORT DIPERKETAT
                 if(currentType === 'short') {
-                    url += `&with_runtime.lte=20&with_runtime.gte=1`;
-                    url += `&vote_count.lte=5000`; 
+                    // Hanya izinkan durasi 1 - 20 menit + Genre Animasi agar akurat
+                    url += `&with_runtime.lte=20&with_runtime.gte=1&with_genres=16`;
                 }
 
                 if(currentSchedule === 'now_playing' || currentSchedule === 'upcoming') { 
@@ -961,17 +957,18 @@
 
         function renderGrid(items, grid) { 
             items.forEach(m => { 
-                if(!m.poster_path || m.media_type === 'person') return; 
+                if(!m.poster_path || m.media_type === 'person' || renderedIds.has(m.id)) return; 
+                renderedIds.add(m.id);
                 let mType = m.media_type;
                 if(!mType) {
                     if(currentType === 'tv') mType = 'tv';
-                    else if(currentType === 'movie' || currentType === 'short') mType = 'movie';
                     else mType = 'movie'; 
                 }
                 const card = document.createElement('div'); 
                 card.className = 'post-card'; 
                 card.onclick = function() { openModal(m.id, mType); }; 
-                card.innerHTML = `<div class="badge-rating">★ ${(m.vote_average||0).toFixed(1)}</div><div class="badge-type">${currentType==='short'?'SHORT':(mType==='tv'?'tv':'movie')}</div><img src="https://image.tmdb.org/t/p/w342${m.poster_path}" loading="lazy" onload="this.style.opacity=1" style="opacity:0">`; 
+                // Optimasi LCP: Menggunakan w185 untuk grid mobile
+                card.innerHTML = `<div class="badge-rating">★ ${(m.vote_average||0).toFixed(1)}</div><div class="badge-type">${currentType==='short'?'SHORT':(mType==='tv'?'tv':'movie')}</div><img src="https://image.tmdb.org/t/p/w185${m.poster_path}" loading="lazy" onload="this.style.opacity=1" style="opacity:0">`; 
                 grid.appendChild(card); 
             }); 
         }
@@ -988,9 +985,7 @@
             document.getElementById('searchInp').focus(); 
             document.body.style.overflow='hidden'; 
             updateActiveNav(document.getElementById('searchBtnNav'));
-            if (!window.history.state || window.history.state.view !== 'search') {
-                history.pushState({view: 'search'}, "");
-            }
+            history.pushState({view: 'search'}, "");
         }
 
         function closeSearch() { 
@@ -1093,9 +1088,8 @@
             currentIdx = 0; 
             isTranslated = false;
             
-            if (!window.history.state || window.history.state.view !== 'modal') {
-                history.pushState({view: 'modal'}, "");
-            }
+            // PushState saat buka modal utama
+            history.pushState({view: 'modal'}, "");
 
             const [dId, dEn, dCast, dExt] = await Promise.all([
                 fetchWithCache(`https://api.themoviedb.org/3/${type}/${id}?api_key=${API_KEY}&language=id-ID&append_to_response=videos,production_companies&include_video_language=en,id,hi,th,ko,ja,null`),
@@ -1133,7 +1127,8 @@
                 let vidsToDisplay = allVideos.sort((a, b) => (a.type === 'Trailer' ? -1 : 1)).slice(0, 5);
                 vidsToDisplay.forEach((v, i) => { 
                     const embedUrl = `https://www.youtube.com/embed/${v.key}?enablejsapi=1&autoplay=${i===0?1:0}&rel=0&modestbranding=1&mute=0`;
-                    track.innerHTML += `<div class="carousel-slide"><iframe id="vid-${i}" src="${embedUrl}" class="w-full h-full" allow="autoplay; fullscreen"></iframe></div>`; 
+                    // Menambahkan SANDBOX untuk membatasi pop-up dari YouTube
+                    track.innerHTML += `<div class="carousel-slide"><iframe id="vid-${i}" src="${embedUrl}" class="w-full h-full" allow="autoplay; fullscreen" sandbox="allow-forms allow-pointer-lock allow-same-origin allow-scripts allow-top-navigation"></iframe></div>`; 
                     if(vidsToDisplay.length > 1) {
                         dots.innerHTML += `<div class="dot w-1.5 h-1.5 rounded-full ${i===currentIdx?'bg-blue-500':'bg-zinc-700'}"></div>`; 
                     }
@@ -1150,16 +1145,16 @@
                     
                     if(dmData.list && dmData.list.length > 0) {
                         const dmId = dmData.list[0].id;
-                        track.innerHTML = `<div class="carousel-slide"><iframe src="https://www.dailymotion.com/embed/video/${dmId}?autoplay=1&mute=0" class="w-full h-full" allowfullscreen allow="autoplay"></iframe></div>`;
+                        track.innerHTML = `<div class="carousel-slide"><iframe src="https://www.dailymotion.com/embed/video/${dmId}?autoplay=1&mute=0" class="w-full h-full" allowfullscreen allow="autoplay" sandbox="allow-forms allow-pointer-lock allow-same-origin allow-scripts allow-top-navigation"></iframe></div>`;
                         document.getElementById('swipeOverlay').style.display = 'none';
                     } else {
                         const fallbackUrl = `https://vidlink.pro/${type}/${id}${seriesSuffix}`;
-                        track.innerHTML = `<div class="carousel-slide"><iframe id="player-frame" src="${fallbackUrl}" class="w-full h-full" allowfullscreen allow="autoplay"></iframe></div>`; 
+                        track.innerHTML = `<div class="carousel-slide"><iframe id="player-frame" src="${fallbackUrl}" class="w-full h-full" allowfullscreen allow="autoplay" sandbox="allow-forms allow-pointer-lock allow-same-origin allow-scripts allow-top-navigation"></iframe></div>`; 
                         document.getElementById('swipeOverlay').style.display = 'none';
                     }
                 } catch(e) {
                     const fallbackUrl = `https://vidlink.pro/${type}/${id}${seriesSuffix}`;
-                    track.innerHTML = `<div class="carousel-slide"><iframe id="player-frame" src="${fallbackUrl}" class="w-full h-full" allowfullscreen allow="autoplay"></iframe></div>`; 
+                    track.innerHTML = `<div class="carousel-slide"><iframe id="player-frame" src="${fallbackUrl}" class="w-full h-full" allowfullscreen allow="autoplay" sandbox="allow-forms allow-pointer-lock allow-same-origin allow-scripts allow-top-navigation"></iframe></div>`; 
                     document.getElementById('swipeOverlay').style.display = 'none';
                 }
             }
@@ -1183,15 +1178,11 @@
             const rel = dId.release_date || dId.first_air_date || ""; 
             document.getElementById('mDateDisplay').innerText = rel ? new Date(rel).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
             
-            // INTEGRASI SERVER KHUSUS INDIE/SHORT (Viddsee & Filmzie)
-            const movieTitleClean = (dId.title || dId.name).replace(/\s+/g, '-').toLowerCase();
             document.getElementById('serverList').innerHTML = `
                 <button class="server-btn" onclick="playVid('https://player.videasy.net/movie/${id}', this)">Server 1</button>
                 <button class="server-btn" onclick="playVid('https://vidlink.pro/${type}/${id}${seriesSuffix}', this)">Server 2</button>
                 <button class="server-btn" onclick="playVid('https://vidrock.net/embed/${type}/${id}${seriesSuffix}', this)">Server 3</button>
                 <button class="server-btn" onclick="playVid('https://vidstorm.ru/embed/${type}/${id}${seriesSuffix}', this)">Server 4</button>
-                <button class="server-btn" style="border-color:#ffca28; color:#ffca28;" onclick="window.open('https://www.viddsee.com/search?q=${encodeURIComponent(dId.title || dId.name)}')">Viddsee (Indie)</button>
-                <button class="server-btn" style="border-color:#00ff95; color:#00ff95;" onclick="window.open('https://filmzie.com/search/${encodeURIComponent(dId.title || dId.name)}')">Filmzie (Indie)</button>
                 <button class="server-btn" onclick="playVid('https://vidfast.pro/movie/${id}', this)">Server 5</button>
                 <button class="server-btn" onclick="playVid('https://111movies.com/movie/${id}', this)">Server 6</button>
                 <button class="server-btn" onclick="playVid('https://www.nontongo.win/embed/${type}/${id}${seriesSuffix}', this)">Server 7</button>
@@ -1262,7 +1253,8 @@
             const finalUrl = url.includes('?') ? `${url}&enablejsapi=1&mute=0` : `${url}?enablejsapi=1&mute=0`;
             
             track.querySelectorAll('iframe').forEach(f => f.src = "");
-            track.innerHTML = `<div class="carousel-slide"><iframe id="player-frame" src="${finalUrl}" class="w-full h-full" allowfullscreen allow="autoplay"></iframe></div>`; 
+            // Menambahkan SANDBOX pada server streaming juga
+            track.innerHTML = `<div class="carousel-slide"><iframe id="player-frame" src="${finalUrl}" class="w-full h-full" allowfullscreen allow="autoplay" sandbox="allow-forms allow-pointer-lock allow-same-origin allow-scripts allow-top-navigation"></iframe></div>`; 
             track.style.transform = 'translateX(0)'; currentIdx = 0; dots.innerHTML = ''; 
             document.getElementById('swipeOverlay').style.display = 'none'; highlightBtn(el); 
 
