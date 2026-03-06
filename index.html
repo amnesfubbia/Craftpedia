@@ -811,7 +811,7 @@
             yD.innerHTML = yearHTML; 
             const countries = [['ID','Indonesia'],['US','USA'],['KR','Korea Selatan'],['JP','Jepang'],['IN','India'],['TH','Thailand'],['CN','China'],['PH','Filipina'],['GB','Inggris'],['FR','Prancis'],['ES','Spanyol'],['IT','Italia'],['TR','Turki'],['DE','Jerman']]; 
             const cD = document.getElementById('countryDropdown'); 
-            let countryHTML = '<div class="filter-item sticky-reset" onclick="setCountry(\'\',\'Negara\')">Semua Negara</div>'; 
+            let countryHTML = '<div class="filter-item sticky-reset" onclick="setYear(\'\')">Semua Negara</div>'; 
             countries.forEach(c => countryHTML += `<div class="filter-item" onclick="setCountry('${c[0]}','${c[1]}')">${c[1]}</div>`); 
             cD.innerHTML = countryHTML; 
             const genres = [[28,'Action'],[12,'Adventure'],[16,'Animasi'],[35,'Komedi'],[80,'Crime'],[99,'Dokumenter'],[18,'Drama'],[10751,'Family'],[14,'Fantasy'],[36,'History'],[27,'Horror'],[10402,'Music'],[9648,'Misteri'],[10749,'Romance'],[878,'Sci-Fi'],[53,'Thriller']]; 
@@ -986,59 +986,56 @@
             const translateBtn = document.getElementById('mTranslateBtn');
             if (originalIndoDesc.trim() !== "") { globalFullDesc = originalIndoDesc; translateBtn.innerText = "Lihat versi asli"; translateBtn.classList.remove('hidden'); } else { globalFullDesc = globalEnDesc || "Sinopsis belum tersedia."; translateBtn.innerText = "Lihat terjemahan"; if(globalEnDesc) translateBtn.classList.remove('hidden'); }
             
-            // LOGIKA HIERARCHY OF TRUTH (TRAILER ACCURACY)
-            const trackArea = document.getElementById('carouselTrack');
-            const dotsArea = document.getElementById('carouselDots');
-            trackArea.innerHTML = ''; dotsArea.innerHTML = ''; trackArea.style.transform = 'translateX(0)';
+            // PRIORITAS 1: YOUTUBE OFFICIAL (Hierarchy of Truth)
+            const allVideos = (dId.videos?.results || [])
+                .filter(v => v.site === 'YouTube' && v.official === true && (v.type === 'Trailer' || v.type === 'Teaser'))
+                .sort((a, b) => (a.type === 'Trailer' ? -1 : 1));
 
-            const loadTrailerSequentially = async () => {
-                // TINGKAT 1: YouTube Official dari TMDB
-                const tmdbTrailers = (dId.videos?.results || []).filter(v => 
-                    v.site === 'YouTube' && 
-                    (v.type === 'Trailer' || v.type === 'Teaser') && 
-                    v.official === true
-                );
-
-                if (tmdbTrailers.length > 0) {
-                    let vidsToDisplay = tmdbTrailers.sort((a, b) => (a.type === 'Trailer' ? -1 : 1)).slice(0, 5);
-                    vidsToDisplay.forEach((v, i) => { 
-                        const embedUrl = `https://www.youtube.com/embed/${v.key}?enablejsapi=1&autoplay=${i===0?1:0}&rel=0&modestbranding=1&mute=0`;
-                        trackArea.innerHTML += `<div class="carousel-slide"><iframe id="vid-${i}" src="${embedUrl}" class="w-full h-full" allow="autoplay; fullscreen" onerror="handleTrailerError()"></iframe></div>`; 
-                        if(vidsToDisplay.length > 1) { dotsArea.innerHTML += `<div class="dot w-1.5 h-1.5 rounded-full ${i===currentIdx?'bg-blue-500':'bg-zinc-700'}"></div>`; }
-                    }); 
-                    document.getElementById('swipeOverlay').style.display = vidsToDisplay.length > 1 ? 'block' : 'none'; 
-                } else {
-                    // TINGKAT 2: Pencarian Dailymotion dengan Validasi Ketat
-                    const titleStr = dId.title || dId.name;
-                    const yearStr = (dId.release_date || dId.first_air_date || "2026").split('-')[0];
-                    const dmSearchUrl = `https://api.dailymotion.com/videos?fields=id,title,duration&search=${encodeURIComponent(titleStr + ' ' + yearStr + ' official trailer')}&sort=relevance&limit=10`;
-                    
-                    try {
-                        const dmRes = await fetch(dmSearchUrl);
-                        const dmData = await dmRes.json();
-                        // Filter manual hasil Dailymotion: harus mengandung judul asli & durasi < 5 menit (mencegah spam full movie palsu)
-                        const validatedDm = (dmData.list || []).find(v => {
-                            const lowTitle = v.title.toLowerCase();
-                            return lowTitle.includes(titleStr.toLowerCase()) && v.duration < 300 && v.duration > 30;
-                        });
-
-                        if (validatedDm) {
-                            trackArea.innerHTML = `<div class="carousel-slide"><iframe src="https://www.dailymotion.com/embed/video/${validatedDm.id}?autoplay=1&mute=0" class="w-full h-full" allowfullscreen allow="autoplay"></iframe></div>`;
-                            document.getElementById('swipeOverlay').style.display = 'none';
-                        } else {
-                            // TINGKAT 3: Fallback ke Player Utama jika tidak ada trailer akurat
-                            const fallbackUrl = `https://vidlink.pro/${type}/${id}${seriesSuffix}`; 
-                            trackArea.innerHTML = `<div class="carousel-slide"><iframe id="player-frame" src="${fallbackUrl}" class="w-full h-full" allowfullscreen allow="autoplay"></iframe></div>`;
-                            document.getElementById('swipeOverlay').style.display = 'none';
-                        }
-                    } catch(e) {
-                        const fallbackUrl = `https://vidlink.pro/${type}/${id}${seriesSuffix}`; 
-                        trackArea.innerHTML = `<div class="carousel-slide"><iframe id="player-frame" src="${fallbackUrl}" class="w-full h-full" allowfullscreen allow="autoplay"></iframe></div>`;
+            const dots = document.getElementById('carouselDots');
+            track.innerHTML = ''; dots.innerHTML = ''; track.style.transform = 'translateX(0)';
+            
+            const handleTrailerError = async () => {
+                const titleQuery = dId.title || dId.name;
+                const releaseYear = (dId.release_date || dId.first_air_date || "2026").split('-')[0];
+                
+                // PRIORITAS 2 & 3: Dailymotion dengan Validasi Judul
+                const dmSearchUrl = `https://api.dailymotion.com/videos?fields=id,title&search=${encodeURIComponent(titleQuery + ' ' + releaseYear + ' official trailer')}&sort=relevance&limit=5`;
+                try {
+                    const dmRes = await fetch(dmSearchUrl);
+                    const dmData = await dmRes.json();
+                    let foundVideoId = null;
+                    if(dmData.list && dmData.list.length > 0) {
+                        // Similarity Check sederhana: Minimal mengandung judul utama
+                        const mainTitle = titleQuery.toLowerCase();
+                        const matchedVideo = dmData.list.find(v => v.title.toLowerCase().includes(mainTitle));
+                        if(matchedVideo) foundVideoId = matchedVideo.id;
                     }
+                    
+                    if(foundVideoId) { 
+                        track.innerHTML = `<div class="carousel-slide"><iframe src="https://www.dailymotion.com/embed/video/${foundVideoId}?autoplay=1&mute=0" class="w-full h-full" allowfullscreen allow="autoplay"></iframe></div>`; 
+                    } else { 
+                        // PRIORITAS 4: Fallback Langsung ke Player
+                        const fallbackUrl = `https://vidlink.pro/${type}/${id}${seriesSuffix}`; 
+                        track.innerHTML = `<div class="carousel-slide"><iframe id="player-frame" src="${fallbackUrl}" class="w-full h-full" allowfullscreen allow="autoplay"></iframe></div>`; 
+                    }
+                } catch(e) {
+                    const fallbackUrl = `https://vidlink.pro/${type}/${id}${seriesSuffix}`; 
+                    track.innerHTML = `<div class="carousel-slide"><iframe id="player-frame" src="${fallbackUrl}" class="w-full h-full" allowfullscreen allow="autoplay"></iframe></div>`; 
                 }
+                document.getElementById('swipeOverlay').style.display = 'none';
             };
 
-            await loadTrailerSequentially();
+            if(allVideos.length > 0) { 
+                let vidsToDisplay = allVideos.slice(0, 5);
+                vidsToDisplay.forEach((v, i) => { 
+                    const embedUrl = `https://www.youtube.com/embed/${v.key}?enablejsapi=1&autoplay=${i===0?1:0}&rel=0&modestbranding=1&mute=0`;
+                    track.innerHTML += `<div class="carousel-slide"><iframe id="vid-${i}" src="${embedUrl}" class="w-full h-full" allow="autoplay; fullscreen" onerror="this.src=''; handleTrailerError()"></iframe></div>`; 
+                    if(vidsToDisplay.length > 1) { dots.innerHTML += `<div class="dot w-1.5 h-1.5 rounded-full ${i===currentIdx?'bg-blue-500':'bg-zinc-700'}"></div>`; }
+                }); 
+                document.getElementById('swipeOverlay').style.display = vidsToDisplay.length > 1 ? 'block' : 'none'; 
+            } else { 
+                await handleTrailerError();
+            }
 
             document.getElementById('castContainer').innerHTML = (dCast.cast || []).slice(0, 10).map(c => {
                 const profileImg = c.profile_path ? `<img src="https://image.tmdb.org/t/p/w185${c.profile_path}" loading="lazy" class="rounded-full">` : `<div style="width:100%; height:100%; background:#222; display:flex; align-items:center; justify-content:center; color:#555;"><i class="fa-solid fa-user"></i></div>`;
