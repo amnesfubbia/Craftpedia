@@ -998,23 +998,30 @@
                 const titleQuery = dId.title || dId.name;
                 const releaseYear = (dId.release_date || dId.first_air_date || "2026").split('-')[0];
                 
-                // PRIORITAS 2 & 3: Dailymotion dengan Validasi Judul
-                const dmSearchUrl = `https://api.dailymotion.com/videos?fields=id,title&search=${encodeURIComponent(titleQuery + ' ' + releaseYear + ' official trailer')}&sort=relevance&limit=5`;
+                // PRIORITAS 2 & 3: Dailymotion dengan Validasi Judul & Verified Akun
+                // Menambahkan verified=1 untuk mengambil video dari channel resmi/terpercaya saja
+                const dmSearchUrl = `https://api.dailymotion.com/videos?fields=id,title&search=${encodeURIComponent(titleQuery + ' ' + releaseYear + ' official trailer')}&sort=relevance&limit=10&verified=1`;
                 try {
                     const dmRes = await fetch(dmSearchUrl);
                     const dmData = await dmRes.json();
                     let foundVideoId = null;
+                    
                     if(dmData.list && dmData.list.length > 0) {
-                        // Similarity Check sederhana: Minimal mengandung judul utama
                         const mainTitle = titleQuery.toLowerCase();
-                        const matchedVideo = dmData.list.find(v => v.title.toLowerCase().includes(mainTitle));
+                        // Mencari video yang judulnya benar-benar mengandung judul film kita (Similarity Check)
+                        const matchedVideo = dmData.list.find(v => {
+                            const dmTitle = v.title.toLowerCase();
+                            // Pastikan judul video mengandung judul utama film agar tidak nyasar ke berita/video pribadi
+                            return dmTitle.includes(mainTitle);
+                        });
+                        
                         if(matchedVideo) foundVideoId = matchedVideo.id;
                     }
                     
                     if(foundVideoId) { 
                         track.innerHTML = `<div class="carousel-slide"><iframe src="https://www.dailymotion.com/embed/video/${foundVideoId}?autoplay=1&mute=0" class="w-full h-full" allowfullscreen allow="autoplay"></iframe></div>`; 
                     } else { 
-                        // PRIORITAS 4: Fallback Langsung ke Player
+                        // Jika di Dailymotion pun tidak ada yang cocok, langsung tampilkan player filmnya saja
                         const fallbackUrl = `https://vidlink.pro/${type}/${id}${seriesSuffix}`; 
                         track.innerHTML = `<div class="carousel-slide"><iframe id="player-frame" src="${fallbackUrl}" class="w-full h-full" allowfullscreen allow="autoplay"></iframe></div>`; 
                     }
