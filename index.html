@@ -986,19 +986,12 @@
             const translateBtn = document.getElementById('mTranslateBtn');
             if (originalIndoDesc.trim() !== "") { globalFullDesc = originalIndoDesc; translateBtn.innerText = "Lihat versi asli"; translateBtn.classList.remove('hidden'); } else { globalFullDesc = globalEnDesc || "Sinopsis belum tersedia."; translateBtn.innerText = "Lihat terjemahan"; if(globalEnDesc) translateBtn.classList.remove('hidden'); }
             
-            // PRIORITAS 1: YOUTUBE OFFICIAL (Hierarchy of Truth)
-            const allVideos = (dId.videos?.results || [])
-                .filter(v => v.site === 'YouTube' && v.official === true && (v.type === 'Trailer' || v.type === 'Teaser'))
-                .sort((a, b) => (a.type === 'Trailer' ? -1 : 1));
-
             const dots = document.getElementById('carouselDots');
             track.innerHTML = ''; dots.innerHTML = ''; track.style.transform = 'translateX(0)';
-            
+
             const handleTrailerError = async () => {
                 const titleQuery = dId.title || dId.name;
                 const releaseYear = (dId.release_date || dId.first_air_date || "2026").split('-')[0];
-                
-                // PRIORITAS 2 & 3: Dailymotion dengan Validasi Judul & SDK Mobile Friendly
                 const origin = window.location.origin;
                 const dmSearchUrl = `https://api.dailymotion.com/videos?fields=id,title&search=${encodeURIComponent(titleQuery + ' ' + releaseYear + ' official trailer')}&sort=relevance&limit=10`;
                 try {
@@ -1010,12 +1003,9 @@
                         const matchedVideo = dmData.list.find(v => v.title.toLowerCase().includes(mainTitle));
                         if(matchedVideo) foundVideoId = matchedVideo.id;
                     }
-                    
                     if(foundVideoId) { 
-                        // Tambahkan origin agar IFrame load sempurna di mobile
                         track.innerHTML = `<div class="carousel-slide"><iframe src="https://www.dailymotion.com/embed/video/${foundVideoId}?autoplay=1&mute=0&origin=${encodeURIComponent(origin)}&syndication=1" class="w-full h-full" allowfullscreen allow="autoplay"></iframe></div>`; 
                     } else { 
-                        // PRIORITAS 4: Fallback Langsung ke Player Utama
                         const fallbackUrl = `https://vidlink.pro/${type}/${id}${seriesSuffix}`; 
                         track.innerHTML = `<div class="carousel-slide"><iframe id="player-frame" src="${fallbackUrl}" class="w-full h-full" allowfullscreen allow="autoplay"></iframe></div>`; 
                     }
@@ -1025,6 +1015,10 @@
                 }
                 document.getElementById('swipeOverlay').style.display = 'none';
             };
+
+            const allVideos = (dId.videos?.results || [])
+                .filter(v => v.site === 'YouTube' && v.official === true && (v.type === 'Trailer' || v.type === 'Teaser'))
+                .sort((a, b) => (a.type === 'Trailer' ? -1 : 1));
 
             if(allVideos.length > 0) { 
                 let vidsToDisplay = allVideos.slice(0, 5);
