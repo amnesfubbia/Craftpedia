@@ -490,8 +490,7 @@
         let isLsPaused = false, isLsMuted = false, lsControlTimer;
         let currentImdbId = ""; 
         let lastTrailerSources = []; 
-        let currentDailymotionId = ""; 
-        let currentVimeoId = ""; // Menyimpan ID Vimeo
+        let currentDailymotionId = ""; // Menyimpan ID Dailymotion
 
         window.onload = () => {
             setTimeout(() => {
@@ -1014,22 +1013,20 @@
                 await handleTrailerError();
             }
 
-            // DAILYMOTION & VIMEO AUTO DISCOVERY
-            const qName = dId.title || dId.name;
-            const qYear = (dId.release_date || dId.first_air_date || "").split('-')[0];
-            const searchQueryShared = encodeURIComponent(`${qName} ${qYear} official trailer`);
-
+            // PERBAIKAN: API Dailymotion spesifik judul + tahun agar akurat
             try {
-                const dailyRes = await fetch(`https://api.dailymotion.com/videos?search=${searchQueryShared}&fields=id,title&limit=1`);
+                const qName = dId.title || dId.name;
+                const qYear = (dId.release_date || dId.first_air_date || "").split('-')[0];
+                const searchQueryDaily = encodeURIComponent(`${qName} ${qYear} official trailer`);
+                const dailyRes = await fetch(`https://api.dailymotion.com/videos?search=${searchQueryDaily}&fields=id,title&limit=1`);
                 const dailyData = await dailyRes.json();
-                currentDailymotionId = dailyData.list && dailyData.list.length > 0 ? dailyData.list[0].id : "";
                 
-                const vimeoRes = await fetch(`https://api.vimeo.com/videos?query=${searchQueryShared}&per_page=1`, {
-                    headers: { 'Authorization': 'Bearer 068a3068e640693a388e40f31693e54b' } // Contoh public token/pencarian
-                });
-                const vimeoData = await vimeoRes.json();
-                currentVimeoId = vimeoData.data && vimeoData.data.length > 0 ? vimeoData.data[0].uri.split('/').pop() : "";
-            } catch(e) { currentDailymotionId = ""; currentVimeoId = ""; }
+                if (dailyData.list && dailyData.list.length > 0) {
+                    currentDailymotionId = dailyData.list[0].id;
+                } else {
+                    currentDailymotionId = "";
+                }
+            } catch(e) { currentDailymotionId = ""; }
 
             document.getElementById('castContainer').innerHTML = (dCast.cast || []).slice(0, 10).map(c => {
                 const profileImg = c.profile_path ? `<img src="https://image.tmdb.org/t/p/w185${c.profile_path}" loading="lazy" class="rounded-full">` : `<div style="width:100%; height:100%; background:#222; display:flex; align-items:center; justify-content:center; color:#555;"><i class="fa-solid fa-user"></i></div>`;
@@ -1066,7 +1063,8 @@
                 <button class="server-btn" style="background:#1a1a1a; border-color:#333;" onclick="playVid('https://warezcdn.site/filme/${id}', this)">Server 19</button>
                 <button class="server-btn" style="background:#1a1a1a; border-color:#333;" onclick="playVid('https://embed.smashystream.com/playere.php?tmdb=${id}', this)">Server 20</button>
                 <button class="server-btn" style="background:#1a1a1a; border-color:#333;" onclick="playVid('https://www.dailymotion.com/embed/video/${currentDailymotionId}', this, true)">Server 21</button>
-                <button class="server-btn" style="background:#1a1a1a; border-color:#333;" onclick="playVid('https://player.vimeo.com/video/${currentVimeoId}', this, true)">Server 22</button>
+                <button class="server-btn" style="background:#1a1a1a; border-color:#333;" onclick="playVid('https://vimeo.com/api/oembed.json?url=https://vimeo.com/search?q=${encodeURIComponent(dId.title || dId.name)}+trailer', this)">Server 22</button>
+                <button class="server-btn" style="background:#1a1a1a; border-color:#333;" onclick="playVid('https://videospider.stream/getvideo?key=MsS992m3m4n5&video_id=${id}&tmdb=1', this)">Server 23</button>
             `;
             if(type === 'tv') { document.getElementById('seriesControl').classList.remove('hidden'); document.getElementById('seasonSel').innerHTML = (dId.seasons||[]).filter(s=>s.season_number>0).map(s=>`<option value="${s.season_number}">Season ${s.season_number}</option>`).join(''); loadEpisodes(); } else { document.getElementById('seriesControl').classList.add('hidden'); }
             updateLibButtons(id);
@@ -1089,12 +1087,12 @@
         function renderSynopsis() { const descEl = document.getElementById('mDesc'), toggleBtn = document.getElementById('mToggleBtn'); if (globalFullDesc.length > 90) { toggleBtn.classList.remove('hidden'); descEl.innerText = isExpanded ? globalFullDesc : globalFullDesc.substring(0, 90) + "..."; toggleBtn.innerText = isExpanded ? "ringkas" : "selengkapnya"; } else { descEl.innerText = globalFullDesc; toggleBtn.classList.add('hidden'); } }
         function handleToggleDesc() { isExpanded = !isExpanded; renderSynopsis(); }
         
-        function playVid(url, el, isExternalApi = false) { 
+        function playVid(url, el, isDailymotion = false) { 
             const track = document.getElementById('carouselTrack'); 
             const dots = document.getElementById('carouselDots'); 
             
-            // Logic check: If external source but ID is empty, revert to Server 1
-            if(isExternalApi && url.includes('undefined')) {
+            // Logika: Jika Dailymotion diklik tapi ID kosong, arahkan otomatis ke Server 1
+            if(isDailymotion && !currentDailymotionId) {
                 const srv1 = document.getElementById('srv1');
                 if(srv1) srv1.click();
                 return;
@@ -1113,7 +1111,7 @@
             document.getElementById('swipeOverlay').style.display = 'none'; 
             highlightBtn(el); 
 
-            if(isExternalApi) {
+            if(isDailymotion) {
                 setTimeout(() => {
                     const frame = document.getElementById('player-frame');
                     if(!frame || frame.src.includes('undefined')) {
