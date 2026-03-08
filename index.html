@@ -101,6 +101,7 @@
         .calendar-poster { flex: 0 0 85px; aspect-ratio: 2/3; border-radius: 12px; overflow: hidden; background: #111; border: 1px solid #222; }
         .calendar-info { flex: 1; display: flex; flex-direction: column; gap: 4px; }
         .cal-title { font-size: 15px; font-weight: 800; color: #fff; line-height: 1.2; }
+        .calendar-info { flex: 1; display: flex; flex-direction: column; gap: 4px; }
         .cal-meta { display: flex; align-items: center; gap: 8px; font-size: 11px; color: #8e8e8e; }
         .cal-genre-pill { padding: 2px 8px; background: #1c1c1c; border-radius: 100px; color: #ccc; font-size: 9px; font-weight: 600; }
         .cal-rating { color: #ffca28; font-weight: 700; font-size: 11px; }
@@ -489,7 +490,8 @@
         let isLsPaused = false, isLsMuted = false, lsControlTimer;
         let currentImdbId = ""; 
         let lastTrailerSources = []; 
-        let currentDailymotionId = ""; // Menyimpan ID Dailymotion
+        let currentDailymotionId = ""; 
+        let currentVimeoId = ""; // Menyimpan ID Vimeo
 
         window.onload = () => {
             setTimeout(() => {
@@ -1012,13 +1014,22 @@
                 await handleTrailerError();
             }
 
-            // Mencari Trailer Dailymotion berdasarkan judul
+            // DAILYMOTION & VIMEO AUTO DISCOVERY
+            const qName = dId.title || dId.name;
+            const qYear = (dId.release_date || dId.first_air_date || "").split('-')[0];
+            const searchQueryShared = encodeURIComponent(`${qName} ${qYear} official trailer`);
+
             try {
-                const qName = dId.title || dId.name;
-                const dailyRes = await fetch(`https://api.dailymotion.com/videos?search=${encodeURIComponent(qName + ' trailer')}&fields=id&limit=1`);
+                const dailyRes = await fetch(`https://api.dailymotion.com/videos?search=${searchQueryShared}&fields=id,title&limit=1`);
                 const dailyData = await dailyRes.json();
-                currentDailymotionId = (dailyData.list && dailyData.list.length > 0) ? dailyData.list[0].id : "";
-            } catch(e) { currentDailymotionId = ""; }
+                currentDailymotionId = dailyData.list && dailyData.list.length > 0 ? dailyData.list[0].id : "";
+                
+                const vimeoRes = await fetch(`https://api.vimeo.com/videos?query=${searchQueryShared}&per_page=1`, {
+                    headers: { 'Authorization': 'Bearer 068a3068e640693a388e40f31693e54b' } // Contoh public token/pencarian
+                });
+                const vimeoData = await vimeoRes.json();
+                currentVimeoId = vimeoData.data && vimeoData.data.length > 0 ? vimeoData.data[0].uri.split('/').pop() : "";
+            } catch(e) { currentDailymotionId = ""; currentVimeoId = ""; }
 
             document.getElementById('castContainer').innerHTML = (dCast.cast || []).slice(0, 10).map(c => {
                 const profileImg = c.profile_path ? `<img src="https://image.tmdb.org/t/p/w185${c.profile_path}" loading="lazy" class="rounded-full">` : `<div style="width:100%; height:100%; background:#222; display:flex; align-items:center; justify-content:center; color:#555;"><i class="fa-solid fa-user"></i></div>`;
@@ -1038,7 +1049,7 @@
                 <button class="server-btn" onclick="playVid('https://player.videasy.net/movie/${id}', this)">Server 2</button>
                 <button class="server-btn" onclick="playVid('https://vidlink.pro/${type}/${id}${seriesSuffix}', this)">Server 3</button>
                 <button class="server-btn" onclick="playVid('https://vidrock.net/embed/${type}/${id}${seriesSuffix}', this)">Server 4</button>
-                <button class="server-btn" onclick="playVid('https://vidstorm.ru/embed/${type}/${id}${seriesSuffix}', this)">Server 5</button>
+                <button class="server-btn" onclick="playVid('https://vidrock.net/embed/${type}/${id}${seriesSuffix}', this)">Server 5</button>
                 <button class="server-btn" onclick="playVid('https://vidfast.pro/movie/${id}', this)">Server 6</button>
                 <button class="server-btn" onclick="playVid('https://www.nontongo.win/embed/${type}/${id}${seriesSuffix}', this)">Server 7</button>
                 <button class="server-btn" onclick="playVid('https://vidsrc.cc/v2/embed/${type}/${currentImdbId || id}', this)">Server 8</button>
@@ -1055,6 +1066,7 @@
                 <button class="server-btn" style="background:#1a1a1a; border-color:#333;" onclick="playVid('https://warezcdn.site/filme/${id}', this)">Server 19</button>
                 <button class="server-btn" style="background:#1a1a1a; border-color:#333;" onclick="playVid('https://embed.smashystream.com/playere.php?tmdb=${id}', this)">Server 20</button>
                 <button class="server-btn" style="background:#1a1a1a; border-color:#333;" onclick="playVid('https://www.dailymotion.com/embed/video/${currentDailymotionId}', this, true)">Server 21</button>
+                <button class="server-btn" style="background:#1a1a1a; border-color:#333;" onclick="playVid('https://player.vimeo.com/video/${currentVimeoId}', this, true)">Server 22</button>
             `;
             if(type === 'tv') { document.getElementById('seriesControl').classList.remove('hidden'); document.getElementById('seasonSel').innerHTML = (dId.seasons||[]).filter(s=>s.season_number>0).map(s=>`<option value="${s.season_number}">Season ${s.season_number}</option>`).join(''); loadEpisodes(); } else { document.getElementById('seriesControl').classList.add('hidden'); }
             updateLibButtons(id);
@@ -1077,9 +1089,17 @@
         function renderSynopsis() { const descEl = document.getElementById('mDesc'), toggleBtn = document.getElementById('mToggleBtn'); if (globalFullDesc.length > 90) { toggleBtn.classList.remove('hidden'); descEl.innerText = isExpanded ? globalFullDesc : globalFullDesc.substring(0, 90) + "..."; toggleBtn.innerText = isExpanded ? "ringkas" : "selengkapnya"; } else { descEl.innerText = globalFullDesc; toggleBtn.classList.add('hidden'); } }
         function handleToggleDesc() { isExpanded = !isExpanded; renderSynopsis(); }
         
-        function playVid(url, el, isDailymotion = false) { 
+        function playVid(url, el, isExternalApi = false) { 
             const track = document.getElementById('carouselTrack'); 
             const dots = document.getElementById('carouselDots'); 
+            
+            // Logic check: If external source but ID is empty, revert to Server 1
+            if(isExternalApi && url.includes('undefined')) {
+                const srv1 = document.getElementById('srv1');
+                if(srv1) srv1.click();
+                return;
+            }
+
             const finalUrl = url.includes('?') ? `${url}&enablejsapi=1&autoplay=1&mute=0` : `${url}?enablejsapi=1&autoplay=1&mute=0`;
             
             track.querySelectorAll('iframe').forEach(f => f.src = "");
@@ -1093,20 +1113,14 @@
             document.getElementById('swipeOverlay').style.display = 'none'; 
             highlightBtn(el); 
 
-            const frame = document.getElementById('player-frame');
-            
-            // Fallback System: Jika server 21 (Dailymotion) ID-nya kosong atau gagal muat, balik ke Server 1
-            if(isDailymotion) {
-                if(!currentDailymotionId) {
-                   console.log("No Dailymotion Trailer found, switching to Server 1...");
-                   document.getElementById('srv1').click();
-                   return;
-                }
-                const checkLoad = setTimeout(() => {
-                    console.log("Server 21 timeout/error, switching to Server 1...");
-                    document.getElementById('srv1').click();
-                }, 5000);
-                frame.onload = () => clearTimeout(checkLoad);
+            if(isExternalApi) {
+                setTimeout(() => {
+                    const frame = document.getElementById('player-frame');
+                    if(!frame || frame.src.includes('undefined')) {
+                        const srv1 = document.getElementById('srv1');
+                        if(srv1) srv1.click();
+                    }
+                }, 3000);
             }
         }
         
