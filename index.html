@@ -390,12 +390,10 @@
                 </div>
 
                 <div class="px-4 py-3 flex justify-between items-center bg-black">
-                    <div class="flex gap-4">
+                    <div class="flex gap-4 items-center">
                         <i id="btnLikeModal" class="interaction-icon"></i>
-                        <div class="flex gap-4 items-center">
-                            <i class="fa-solid fa-expand interaction-icon" onclick="enterLandscape()"></i>
-                            <i class="fa-regular fa-paper-plane interaction-icon -rotate-[20deg] mt-[-3px] text-[20px]" onclick="replayTrailer()"></i>
-                        </div>
+                        <i class="fa-regular fa-comment interaction-icon" onclick="enterLandscape()"></i>
+                        <i class="fa-regular fa-paper-plane interaction-icon -rotate-[20deg] text-[20px]" onclick="replayTrailer()"></i>
                     </div>
                     <i id="btnBookModal" class="interaction-icon"></i>
                 </div>
@@ -507,6 +505,7 @@
             }); 
         };
 
+        // --- PENANGANAN BACK BERTAHAP (POPSTATE) ---
         window.addEventListener('popstate', function(event) {
             if (document.getElementById('landscapeOverlay').style.display === 'block') {
                 closeLandscapeSilently();
@@ -597,7 +596,14 @@
         async function openActorProfile(actorId) {
             lastTrailerSources = [];
             const frames = document.querySelectorAll('#carouselTrack iframe');
-            frames.forEach(f => { lastTrailerSources.push(f.src); f.src = ""; });
+            
+            // --- OPTIMASI MEMORY: Remove iframe sepenuhnya ---
+            frames.forEach(f => { 
+                lastTrailerSources.push(f.src); 
+                f.src = ""; 
+                f.remove(); 
+            });
+
             const actorModal = document.getElementById('actorModal');
             actorModal.style.display = 'block';
             document.body.style.overflow = 'hidden';
@@ -638,8 +644,16 @@
         function closeActorModal() {
             document.getElementById('actorModal').style.display = 'none';
             if (document.getElementById('movieModal').style.display === 'block') {
-                const frames = document.querySelectorAll('#carouselTrack iframe');
-                frames.forEach((f, i) => { if (lastTrailerSources[i]) f.src = lastTrailerSources[i]; });
+                const track = document.getElementById('carouselTrack');
+                track.innerHTML = ""; // Bersihkan kontainer
+                lastTrailerSources.forEach((src, i) => { 
+                    if (src) {
+                        const slide = document.createElement('div');
+                        slide.className = 'carousel-slide';
+                        slide.innerHTML = `<iframe id="vid-${i}" src="${src}" class="w-full h-full" allow="autoplay; fullscreen"></iframe>`;
+                        track.appendChild(slide);
+                    }
+                });
             } else { document.body.style.overflow = 'auto'; }
         }
 
@@ -667,6 +681,7 @@
             }
         }
 
+        // --- BACK TO HOME: Langsung Lompat Kembali ---
         function backToHome() {
             closeModal(); closeSearch(); closeD(); closeActorModal();
             currentGenre = ''; currentYear = ''; currentCountry = ''; currentSchedule = 'trending'; 
@@ -689,6 +704,8 @@
             currentLibMode = false;
             loadFeed(true);
             window.scrollTo({top: 0, behavior: 'smooth'});
+            // Reset History agar tidak menumpuk saat menekan Home/Tab
+            history.pushState(null, "", window.location.pathname);
         }
 
         function initSmartSearch() { 
@@ -962,6 +979,9 @@
             const seriesSuffix = (type === 'tv') ? '/1/1' : ''; 
             const track = document.getElementById('carouselTrack');
             const dots = document.getElementById('carouselDots');
+            
+            // --- OPTIMASI MEMORY: Hapus iframe lama ---
+            track.querySelectorAll('iframe').forEach(f => { f.src = ""; f.remove(); });
             track.innerHTML = ''; dots.innerHTML = ''; track.style.transform = 'translateX(0)';
             currentIdx = 0;
             document.querySelectorAll('.server-btn').forEach(b => b.classList.remove('active-link'));
@@ -995,8 +1015,14 @@
             document.getElementById('mDateDisplay').innerText = "";
             document.getElementById('mHashtags').innerHTML = "";
             document.getElementById('castContainer').innerHTML = "";
+            
+            // --- OPTIMASI MEMORY: Remove iframe sepenuhnya ---
             const track = document.getElementById('carouselTrack');
-            if(track) { track.querySelectorAll('iframe').forEach(f => f.src = ""); track.innerHTML = ""; }
+            if(track) { 
+                track.querySelectorAll('iframe').forEach(f => { f.src = ""; f.remove(); }); 
+                track.innerHTML = ""; 
+            }
+            
             document.getElementById('carouselDots').innerHTML = "";
             document.getElementById('serverList').innerHTML = "";
             document.getElementById('mToggleBtn').classList.add('hidden');
@@ -1112,7 +1138,19 @@
             renderSynopsis();
         }
         
-        function closeModal() { const track = document.getElementById('carouselTrack'); if(track) { track.querySelectorAll('iframe').forEach(f => f.src = ""); track.innerHTML = ''; } document.getElementById('movieModal').style.display = 'none'; document.body.style.overflow = 'auto'; if(document.body.classList.contains('landscape-active')) closeLandscapeSilently(); window.currentMediaId = null; }
+        function closeModal() { 
+            // --- OPTIMASI MEMORY: Remove iframe sepenuhnya ---
+            const track = document.getElementById('carouselTrack'); 
+            if(track) { 
+                track.querySelectorAll('iframe').forEach(f => { f.src = ""; f.remove(); }); 
+                track.innerHTML = ''; 
+            } 
+            document.getElementById('movieModal').style.display = 'none'; 
+            document.body.style.overflow = 'auto'; 
+            if(document.body.classList.contains('landscape-active')) closeLandscapeSilently(); 
+            window.currentMediaId = null; 
+        }
+
         function renderSynopsis() { const descEl = document.getElementById('mDesc'), toggleBtn = document.getElementById('mToggleBtn'); if (globalFullDesc.length > 90) { toggleBtn.classList.remove('hidden'); descEl.innerText = isExpanded ? globalFullDesc : globalFullDesc.substring(0, 90) + "..."; toggleBtn.innerText = isExpanded ? "ringkas" : "selengkapnya"; } else { descEl.innerText = globalFullDesc; toggleBtn.classList.add('hidden'); } }
         function handleToggleDesc() { isExpanded = !isExpanded; renderSynopsis(); }
         
@@ -1128,7 +1166,8 @@
 
             const finalUrl = url.includes('?') ? `${url}&enablejsapi=1&autoplay=1&mute=0` : `${url}?enablejsapi=1&autoplay=1&mute=0`;
             
-            track.querySelectorAll('iframe').forEach(f => f.src = "");
+            // --- OPTIMASI MEMORY: Remove iframe lama sebelum ganti baru ---
+            track.querySelectorAll('iframe').forEach(f => { f.src = ""; f.remove(); });
             track.innerHTML = `<div class="carousel-slide">
                 <iframe id="player-frame" src="${finalUrl}" class="w-full h-full" allowfullscreen allow="autoplay"></iframe>
             </div>`; 
