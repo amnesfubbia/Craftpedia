@@ -492,6 +492,11 @@
         let currentImdbId = ""; 
         let lastTrailerSources = []; 
         let currentDailymotionId = ""; // Menyimpan ID Dailymotion
+        
+        // GLOBAL STATE UNTUK TV SERIES
+        let activeServerIdx = 1; // Default server 1
+        let activeEpisode = 1;
+        let activeSeason = 1;
 
         window.onload = () => {
             setTimeout(() => {
@@ -1018,6 +1023,12 @@
             const actorModal = document.getElementById('actorModal');
             if (actorModal.style.display === 'block') actorModal.style.display = 'none';
             window.currentMediaId = id; window.currentMediaType = type;
+            
+            // Reset Global State for TV
+            activeServerIdx = 1;
+            activeEpisode = 1;
+            activeSeason = 1;
+            
             const seriesSuffix = (type === 'tv') ? '/1/1' : ''; 
             document.getElementById('mTitle').innerText = "Memuat...";
             document.getElementById('mDesc').innerText = "";
@@ -1108,28 +1119,29 @@
             const rel = dId.release_date || dId.first_air_date || ""; 
             document.getElementById('mDateDisplay').innerText = rel ? new Date(rel).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
             
+            // SETUP SERVER LIST BUTTONS
             document.getElementById('serverList').innerHTML = `
-                <button class="server-btn" id="srv1" onclick="playVid('https://vidrock.net/embed/${type}/${id}${seriesSuffix}', this)">Server 1</button>
-                <button class="server-btn" onclick="playVid('https://vidsrc.cc/v2/embed/${type}/${currentImdbId || id}', this)">Server 2</button>
-                <button class="server-btn" onclick="playVid('https://vidlink.pro/${type}/${id}${seriesSuffix}', this)">Server 3</button>
-                <button class="server-btn" onclick="playVid('https://vidstorm.ru/embed/${type}/${id}${seriesSuffix}', this)">Server 4</button>
-                <button class="server-btn" onclick="playVid('https://111movies.com/movie/${id}', this)">Server 5</button>
-                <button class="server-btn" onclick="playVid('https://www.nontongo.win/embed/${type}/${id}${seriesSuffix}', this)">Server 6</button>
-                <button class="server-btn" onclick="playVid('https://player.videasy.net/movie/${id}', this)">Server 7</button>
-                <button class="server-btn" onclick="playVid('https://vidfast.pro/movie/${id}', this)">Server 8</button>
-                <button class="server-btn" onclick="playVid('https://moviesapi.club/${type}/${id}${seriesSuffix}', this)">Server 9</button>
-                <button class="server-btn" onclick="playVid('https://vidsrc.cc/v2/embed/${type}/${id}${type==='tv'?'?s=1&e=1':''}', this)">Server 10</button>
-                <button class="server-btn" onclick="playVid('https://multiembed.mov/directstream.php?video_id=${id}&tmdb=1', this)">Server 11</button>
-                <button class="server-btn" onclick="playVid('https://www.2embed.cc/embed/${id}', this)">Server 12</button>
-                <button class="server-btn" onclick="playVid('https://vidsrc.xyz/embed/${type}/${id}${seriesSuffix}', this)">Server 13</button>
-                <button class="server-btn" onclick="playVid('https://vidsrc.me/embed/${type}?tmdb=${id}${seriesSuffix}', this)">Server 14</button>
-                <button class="server-btn" onclick="playVid('https://vidsrc.net/embed/${type}/${id}${seriesSuffix}', this)">Server 15</button>
-                <button class="server-btn" onclick="playVid('https://vidsrc.icu/embed/${type}/${id}${seriesSuffix}', this)">Server 16</button>
-                <button class="server-btn" onclick="playVid('https://vidnest.fun/movie/${id}', this)">Server 17</button>
-                <button class="server-btn" onclick="playVid('https://player.autoembed.cc/embed/${type}/${id}', this)">Server 18</button>
-                <button class="server-btn" onclick="playVid('https://warezcdn.site/filme/${id}', this)">Server 19</button>
-                <button class="server-btn" onclick="playVid('https://embed.smashystream.com/playere.php?tmdb=${id}', this)">Server 20</button>
-                <button class="server-btn" onclick="playVid('https://www.dailymotion.com/embed/video/${currentDailymotionId}', this, true)">Server 21</button>
+                <button class="server-btn active-link" onclick="changeServer(1, this)">Server 1</button>
+                <button class="server-btn" onclick="changeServer(2, this)">Server 2</button>
+                <button class="server-btn" onclick="changeServer(3, this)">Server 3</button>
+                <button class="server-btn" onclick="changeServer(4, this)">Server 4</button>
+                <button class="server-btn" onclick="changeServer(5, this)">Server 5</button>
+                <button class="server-btn" onclick="changeServer(6, this)">Server 6</button>
+                <button class="server-btn" onclick="changeServer(7, this)">Server 7</button>
+                <button class="server-btn" onclick="changeServer(8, this)">Server 8</button>
+                <button class="server-btn" onclick="changeServer(9, this)">Server 9</button>
+                <button class="server-btn" onclick="changeServer(10, this)">Server 10</button>
+                <button class="server-btn" onclick="changeServer(11, this)">Server 11</button>
+                <button class="server-btn" onclick="changeServer(12, this)">Server 12</button>
+                <button class="server-btn" onclick="changeServer(13, this)">Server 13</button>
+                <button class="server-btn" onclick="changeServer(14, this)">Server 14</button>
+                <button class="server-btn" onclick="changeServer(15, this)">Server 15</button>
+                <button class="server-btn" onclick="changeServer(16, this)">Server 16</button>
+                <button class="server-btn" onclick="changeServer(17, this)">Server 17</button>
+                <button class="server-btn" onclick="changeServer(18, this)">Server 18</button>
+                <button class="server-btn" onclick="changeServer(19, this)">Server 19</button>
+                <button class="server-btn" onclick="changeServer(20, this)">Server 20</button>
+                <button class="server-btn" onclick="changeServer(21, this)">Server 21</button>
             `;
             if(type === 'tv') { document.getElementById('seriesControl').classList.remove('hidden'); document.getElementById('seasonSel').innerHTML = (dId.seasons||[]).filter(s=>s.season_number>0).map(s=>`<option value="${s.season_number}">Season ${s.season_number}</option>`).join(''); loadEpisodes(); } else { document.getElementById('seriesControl').classList.add('hidden'); }
             updateLibButtons(id);
@@ -1164,19 +1176,13 @@
         function renderSynopsis() { const descEl = document.getElementById('mDesc'), toggleBtn = document.getElementById('mToggleBtn'); if (globalFullDesc.length > 90) { toggleBtn.classList.remove('hidden'); descEl.innerText = isExpanded ? globalFullDesc : globalFullDesc.substring(0, 90) + "..."; toggleBtn.innerText = isExpanded ? "ringkas" : "selengkapnya"; } else { descEl.innerText = globalFullDesc; toggleBtn.classList.add('hidden'); } }
         function handleToggleDesc() { isExpanded = !isExpanded; renderSynopsis(); }
         
-        function playVid(url, el, isDailymotion = false) { 
+        // --- PERBAIKAN: Fungsi PlayVid yang lebih dinamis ---
+        function playVid(url, el) { 
             const track = document.getElementById('carouselTrack'); 
             const dots = document.getElementById('carouselDots'); 
             
-            if(isDailymotion && !currentDailymotionId) {
-                const srv1 = document.getElementById('srv1');
-                if(srv1) srv1.click();
-                return;
-            }
-
             const finalUrl = url.includes('?') ? `${url}&enablejsapi=1&autoplay=1&mute=0` : `${url}?enablejsapi=1&autoplay=1&mute=0`;
             
-            // --- OPTIMASI MEMORY: Remove iframe lama sebelum ganti baru ---
             track.querySelectorAll('iframe').forEach(f => { f.src = ""; f.remove(); });
             track.innerHTML = `<div class="carousel-slide">
                 <iframe id="player-frame" src="${finalUrl}" class="w-full h-full" allowfullscreen allow="autoplay"></iframe>
@@ -1186,32 +1192,70 @@
             currentIdx = 0; 
             dots.innerHTML = ''; 
             document.getElementById('swipeOverlay').style.display = 'none'; 
-            highlightBtn(el); 
-
-            if(isDailymotion) {
-                setTimeout(() => {
-                    const frame = document.getElementById('player-frame');
-                    if(!frame || frame.src.includes('undefined')) {
-                        const srv1 = document.getElementById('srv1');
-                        if(srv1) srv1.click();
-                    }
-                }, 3000);
-            }
         }
         
-        function highlightBtn(el) { document.querySelectorAll('.server-btn').forEach(b => b.classList.remove('active-link')); el.classList.add('active-link'); }
-        
-        // --- UPDATED loadEpisodes: Ditambahkan indikator border putih pada tombol yang dipilih ---
+        // --- PERBAIKAN: Fungsi ganti server tanpa reset episode ---
+        function changeServer(srvIdx, el) {
+            activeServerIdx = srvIdx;
+            document.querySelectorAll('.server-btn').forEach(b => b.classList.remove('active-link'));
+            el.classList.add('active-link');
+            
+            // Build URL berdasarkan server dan episode aktif
+            const url = buildEmbedUrl(window.currentMediaType, window.currentMediaId, activeSeason, activeEpisode, activeServerIdx);
+            playVid(url);
+        }
+
+        // --- PERBAIKAN: Fungsi ganti episode tanpa reset server ---
+        function changeEpisode(epNum, el) {
+            activeEpisode = epNum;
+            document.querySelectorAll('.ep-btn').forEach(b => b.classList.remove('active-pill'));
+            el.classList.add('active-pill');
+            
+            const url = buildEmbedUrl(window.currentMediaType, window.currentMediaId, activeSeason, activeEpisode, activeServerIdx);
+            playVid(url);
+        }
+
+        // --- FUNGSI HELPER: Membangun URL Embed berdasarkan Server ---
+        function buildEmbedUrl(type, id, s, e, srv) {
+            const seriesSuffix = (type === 'tv') ? `/${s}/${e}` : '';
+            const tvParam = (type === 'tv') ? `?s=${s}&e=${e}` : '';
+            
+            switch(srv) {
+                case 1: return `https://vidrock.net/embed/${type}/${id}${seriesSuffix}`;
+                case 2: return `https://vidsrc.cc/v2/embed/${type}/${currentImdbId || id}${type==='tv'?`?s=${s}&e=${e}`:''}`;
+                case 3: return `https://vidlink.pro/${type}/${id}${seriesSuffix}`;
+                case 4: return `https://vidstorm.ru/embed/${type}/${id}${seriesSuffix}`;
+                case 5: return `https://111movies.com/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`;
+                case 6: return `https://www.nontongo.win/embed/${type}/${id}${seriesSuffix}`;
+                case 7: return `https://player.videasy.net/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`;
+                case 8: return `https://vidfast.pro/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`;
+                case 9: return `https://moviesapi.club/${type}/${id}${seriesSuffix}`;
+                case 10: return `https://vidsrc.cc/v2/embed/${type}/${id}${type==='tv'?`?s=${s}&e=${e}`:''}`;
+                case 11: return `https://multiembed.mov/directstream.php?video_id=${id}&tmdb=1${type==='tv'?`&s=${s}&e=${e}`:''}`;
+                case 12: return `https://www.2embed.cc/embed${type==='tv'?'tv':''}/${id}${type==='tv'?`&s=${s}&e=${e}`:''}`;
+                case 13: return `https://vidsrc.xyz/embed/${type}/${id}${seriesSuffix}`;
+                case 14: return `https://vidsrc.me/embed/${type}?tmdb=${id}${seriesSuffix}`;
+                case 15: return `https://vidsrc.net/embed/${type}/${id}${seriesSuffix}`;
+                case 16: return `https://vidsrc.icu/embed/${type}/${id}${seriesSuffix}`;
+                case 17: return `https://vidnest.fun/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`;
+                case 18: return `https://player.autoembed.cc/embed/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`;
+                case 19: return `https://warezcdn.site/${type==='tv'?'serie':'filme'}/${id}${type==='tv'?`/${s}/${e}`:''}`;
+                case 20: return `https://embed.smashystream.com/playere.php?tmdb=${id}${type==='tv'?`&season=${s}&episode=${e}`:''}`;
+                case 21: return `https://www.dailymotion.com/embed/video/${currentDailymotionId}`;
+                default: return `https://vidrock.net/embed/${type}/${id}${seriesSuffix}`;
+            }
+        }
+
         async function loadEpisodes() { 
-            const s = document.getElementById('seasonSel').value; 
-            const data = await fetchWithCache(`https://api.themoviedb.org/3/tv/${window.currentMediaId}/season/${s}?api_key=${API_KEY}`); 
+            activeSeason = document.getElementById('seasonSel').value; 
+            const data = await fetchWithCache(`https://api.themoviedb.org/3/tv/${window.currentMediaId}/season/${activeSeason}?api_key=${API_KEY}`); 
             const episodes = data.episodes || [];
             document.getElementById('episodeGrid').innerHTML = episodes.map((e) => { 
                 const epNum = e.episode_number; 
-                const targetUrl = `https://vidrock.net/embed/tv/${window.currentMediaId}/${s}/${epNum}`;
+                const isActive = (epNum == activeEpisode) ? 'active-pill' : '';
                 return `
-                    <div class="pill text-[10px] flex flex-col items-center justify-center gap-1 min-h-[45px] ep-btn" 
-                         onclick="playVid('${targetUrl}', this); document.querySelectorAll('.ep-btn').forEach(b=>b.classList.remove('active-pill')); this.classList.add('active-pill');">
+                    <div class="pill text-[10px] flex flex-col items-center justify-center gap-1 min-h-[45px] ep-btn ${isActive}" 
+                         onclick="changeEpisode(${epNum}, this)">
                         <span class="font-bold">${epNum}</span>
                     </div>`; 
             }).join(''); 
@@ -1244,3 +1288,4 @@
     </script>
 </body>
 </html>
+ 
