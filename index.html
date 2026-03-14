@@ -233,10 +233,27 @@
             border-top: 1px solid #1c1c1c; display: flex; align-items: center; justify-content: center; gap: 8px;
         }
 
-        /* --- SOUNDTRACK STYLE --- */
+        /* --- SOUNDTRACK STYLE (UPDATED TO BLACK DOMINANT) --- */
         @keyframes spin-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         .animate-spin-slow { animation: spin-slow 3s linear infinite; }
-        #soundtrackModal { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10,10,10,0.98); backdrop-filter: blur(30px); border-radius: 24px 24px 0 0; z-index: 9600; max-height: 70vh; overflow-y: auto; border-top: 1px solid #222; animation: slideUp 0.4s cubic-bezier(0.25, 1, 0.5, 1); }
+        #soundtrackModal { 
+            display: none; position: fixed; bottom: 0; left: 0; right: 0; 
+            background: #000; border-radius: 28px 28px 0 0; z-index: 9600; 
+            max-height: 75vh; overflow-y: auto; border-top: 1px solid #1c1c1c; 
+            animation: slideUp 0.4s cubic-bezier(0.25, 1, 0.5, 1); 
+            padding-bottom: 40px;
+        }
+        
+        /* Audio Preview Styles (More Black) */
+        .audio-player-mini { 
+            width: 100%; height: 32px; margin-top: 10px; outline: none; 
+            filter: invert(100%) hue-rotate(180deg) brightness(1.2); /* Membuat player bawaan browser menjadi hitam */
+        }
+        .music-card {
+            background: #000; padding: 14px; border-radius: 20px; 
+            border: 1px solid #1a1a1a; transition: all 0.2s;
+        }
+        .music-card:active { background: #0a0a0a; transform: scale(0.98); }
     </style>
 </head>
 <body>
@@ -379,12 +396,12 @@
     <div id="yearDropdown" class="filter-dropdown no-scrollbar"></div>
 
     <div id="soundtrackModal" class="no-scrollbar">
-        <div class="w-12 h-1 bg-zinc-800 rounded-full mx-auto mt-3 mb-5"></div>
+        <div class="w-12 h-1 bg-zinc-800 rounded-full mx-auto mt-3 mb-6"></div>
         <div class="px-5">
-            <h3 class="text-[11px] font-black uppercase tracking-[3px] mb-6 flex items-center gap-2 text-zinc-400">
-                <i class="fa-solid fa-compact-disc animate-spin-slow text-white"></i> Soundtrack List
+            <h3 class="text-[10px] font-black uppercase tracking-[4px] mb-8 text-center text-zinc-500">
+                Official Soundtrack
             </h3>
-            <div id="musicList" class="space-y-4 pb-12">
+            <div id="musicList" class="space-y-3 pb-12">
                 </div>
         </div>
     </div>
@@ -409,14 +426,14 @@
                     <div class="flex gap-4 items-center">
                         <i id="btnLikeModal" class="interaction-icon"></i>
                         <i class="fa-regular fa-comment interaction-icon" onclick="enterLandscape()"></i>
-                        <i class="fa-regular fa-paper-plane interaction-icon -rotate-[20deg] text-[20px]" onclick="replayTrailer()"></i>
+                        <i class="fa-solid fa-rotate-right interaction-icon text-[20px]" onclick="replayTrailer()"></i>
                     </div>
                     <i id="btnBookModal" class="interaction-icon"></i>
                 </div>
                 
-                <div class="px-4 bg-black pb-1 flex justify-between items-start">
+                <div class="px-4 bg-black pb-1 flex justify-between items-end">
                     <span id="mLikeDisplay" class="ig-likes-count"></span>
-                    <span class="text-white text-[11px] font-bold cursor-pointer uppercase tracking-tighter mt-0.5" onclick="openSoundtrack()">Soundtrack</span>
+                    <span class="text-[11px] font-bold text-white cursor-pointer mb-[5px] uppercase tracking-tighter" onclick="openSoundtrack()">Soundtrack</span>
                 </div>
             </div>
             
@@ -509,12 +526,12 @@
         let currentImdbId = ""; 
         let lastTrailerSources = []; 
         let currentDailymotionId = ""; // Menyimpan ID Dailymotion
+        let currentReleaseYear = ""; // Menyimpan tahun rilis film untuk akurasi soundtrack
         
         // GLOBAL STATE UNTUK TV SERIES
         let activeServerIdx = 1; // Default server 1
         let activeEpisode = 1;
         let activeSeason = 1;
-        let activeAudio = null; // Audio player global
 
         window.onload = () => {
             setTimeout(() => {
@@ -528,79 +545,87 @@
             }); 
         };
 
-        // --- SOUNDTRACK LOGIC ---
+        // --- SOUNDTRACK LOGIC (MODIFIED FOR ACCURACY & BACK BUTTON) ---
         async function openSoundtrack() {
+            // BERHENTIKAN TRAILER DENGAN BENAR
+            document.querySelectorAll('#carouselTrack iframe').forEach(iframe => {
+                try {
+                    iframe.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+                    if (iframe.src.includes("autoplay=1")) {
+                        iframe.src = iframe.src.replace("autoplay=1", "autoplay=0");
+                    }
+                } catch(e) {}
+            });
+
             const title = document.getElementById('mTitle').innerText;
             const listCont = document.getElementById('musicList');
             const overlay = document.getElementById('filterOverlay');
             const sheet = document.getElementById('soundtrackModal');
 
-            listCont.innerHTML = '<div class="text-center py-10 text-zinc-500 text-[10px] tracking-widest uppercase">Mencari playlist...</div>';
+            listCont.innerHTML = '<div class="text-center py-10 text-zinc-600 text-[10px] tracking-widest uppercase animate-pulse">Scanning tracklist...</div>';
             sheet.style.display = 'block';
             overlay.style.display = 'block';
             document.body.style.overflow = 'hidden';
 
+            // Push state agar tombol back menutup modal soundtrack
+            if (!window.history.state || window.history.state.view !== 'soundtrack') {
+                history.pushState({view: 'soundtrack'}, "");
+            }
+
             try {
-                const response = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(title + " Soundtrack")}&entity=song&limit=12`);
-                const data = await response.json();
+                // Menambahkan tahun rilis ke pencarian agar lebih akurat (mencegah film Disney keluar di film Indo)
+                const searchTerm = `${title} ${currentReleaseYear} soundtrack`;
+                const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(searchTerm)}&entity=song&limit=15`);
+                const data = await res.json();
 
                 if (data.results.length === 0) {
-                    listCont.innerHTML = '<div class="text-center py-10 text-zinc-600 text-[10px] uppercase">Soundtrack tidak ditemukan.</div>';
+                    listCont.innerHTML = '<div class="text-center py-20 text-zinc-700 text-[10px] uppercase tracking-widest">No soundtrack tracks found.</div>';
                     return;
                 }
 
-                listCont.innerHTML = data.results.map((song, index) => `
-                    <div class="flex items-center gap-4 bg-zinc-900/40 p-3 rounded-2xl border border-zinc-800/50">
-                        <img src="${song.artworkUrl100}" class="w-12 h-12 rounded-lg shadow-2xl">
-                        <div class="flex-grow overflow-hidden">
-                            <div class="text-[13px] font-bold text-white truncate">${song.trackName}</div>
-                            <div class="text-[10px] text-zinc-500 font-medium truncate uppercase tracking-wider">${song.artistName}</div>
+                listCont.innerHTML = data.results.map(song => `
+                    <div class="music-card">
+                        <div class="flex items-center gap-4">
+                            <div class="relative flex-shrink-0 group">
+                                <img src="${song.artworkUrl100}" class="w-14 h-14 rounded-xl shadow-lg brightness-75">
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <i class="fa-solid fa-music text-[10px] text-white/20"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow overflow-hidden">
+                                <div class="text-[14px] font-bold text-white truncate mb-0.5">${song.trackName}</div>
+                                <div class="text-[11px] text-zinc-500 font-bold truncate uppercase tracking-tighter">${song.artistName}</div>
+                            </div>
                         </div>
-                        <button onclick="playPreview('${song.previewUrl}', this)" class="play-audio-btn w-9 h-9 flex items-center justify-center bg-white text-black rounded-full shadow-lg active:scale-90 transition-transform">
-                            <i class="fa-solid fa-play text-[10px] ml-0.5"></i>
-                        </button>
+                        <audio controls class="audio-player-mini" onplay="stopOtherAudios(this)" src="${song.previewUrl}"></audio>
                     </div>
                 `).join('');
 
             } catch (error) {
-                listCont.innerHTML = '<div class="text-center py-10 text-red-500 text-[10px] uppercase">Gagal memuat musik.</div>';
+                listCont.innerHTML = '<div class="text-center py-10 text-red-900 text-[10px] uppercase">Failed to retrieve audio.</div>';
             }
         }
 
-        // FUNGSI BARU: Play Preview Audio (Bukan YouTube/Dailymotion/Apple Music Web)
-        function playPreview(url, btn) {
-            const allBtns = document.querySelectorAll('.play-audio-btn');
-            
-            if (activeAudio && activeAudio.src === url) {
-                if (activeAudio.paused) {
-                    activeAudio.play();
-                    btn.innerHTML = '<i class="fa-solid fa-pause text-[10px]"></i>';
-                } else {
-                    activeAudio.pause();
-                    btn.innerHTML = '<i class="fa-solid fa-play text-[10px] ml-0.5"></i>';
+        function stopOtherAudios(currentAudio) {
+            const allAudios = document.querySelectorAll('.audio-player-mini');
+            allAudios.forEach(audio => {
+                if (audio !== currentAudio) {
+                    audio.pause();
+                    audio.currentTime = 0;
                 }
-            } else {
-                if (activeAudio) {
-                    activeAudio.pause();
-                    allBtns.forEach(b => b.innerHTML = '<i class="fa-solid fa-play text-[10px] ml-0.5"></i>');
-                }
-                activeAudio = new Audio(url);
-                activeAudio.play();
-                btn.innerHTML = '<i class="fa-solid fa-pause text-[10px]"></i>';
-                
-                activeAudio.onended = () => {
-                    btn.innerHTML = '<i class="fa-solid fa-play text-[10px] ml-0.5"></i>';
-                };
-            }
+            });
         }
 
         function closeSoundtrack() {
-            if (activeAudio) {
-                activeAudio.pause();
-                activeAudio = null;
-            }
             document.getElementById('soundtrackModal').style.display = 'none';
-            if (document.getElementById('movieModal').style.display !== 'block') {
+            document.querySelectorAll('.audio-player-mini').forEach(a => a.pause());
+            
+            // Perbaikan Back: Jika modal film masih terbuka, hanya hilangkan overlay filter
+            if (document.getElementById('movieModal').style.display === 'block') {
+                document.getElementById('filterOverlay').style.display = 'none';
+                replayTrailer();
+            } else {
+                document.getElementById('filterOverlay').style.display = 'none';
                 document.body.style.overflow = 'auto';
             }
         }
@@ -709,8 +734,6 @@
         async function openActorProfile(actorId) {
             lastTrailerSources = [];
             const frames = document.querySelectorAll('#carouselTrack iframe');
-            
-            // --- OPTIMASI MEMORY: Remove iframe sepenuhnya ---
             frames.forEach(f => { 
                 lastTrailerSources.push(f.src); 
                 f.src = ""; 
@@ -758,7 +781,7 @@
             document.getElementById('actorModal').style.display = 'none';
             if (document.getElementById('movieModal').style.display === 'block') {
                 const track = document.getElementById('carouselTrack');
-                track.innerHTML = ""; // Bersihkan kontainer
+                track.innerHTML = "";
                 lastTrailerSources.forEach((src, i) => { 
                     if (src) {
                         const slide = document.createElement('div');
@@ -794,7 +817,6 @@
             }
         }
 
-        // --- BACK TO HOME: Langsung Lompat Kembali ---
         function backToHome() {
             closeModal(); closeSearch(); closeD(); closeActorModal();
             currentGenre = ''; currentYear = ''; currentCountry = ''; currentSchedule = 'trending'; 
@@ -817,7 +839,6 @@
             currentLibMode = false;
             loadFeed(true);
             window.scrollTo({top: 0, behavior: 'smooth'});
-            // Reset History agar tidak menumpuk saat menekan Home/Tab
             history.pushState(null, "", window.location.pathname);
         }
 
@@ -1093,7 +1114,6 @@
             const track = document.getElementById('carouselTrack');
             const dots = document.getElementById('carouselDots');
             
-            // --- OPTIMASI MEMORY: Hapus iframe lama ---
             track.querySelectorAll('iframe').forEach(f => { f.src = ""; f.remove(); });
             track.innerHTML = ''; dots.innerHTML = ''; track.style.transform = 'translateX(0)';
             currentIdx = 0;
@@ -1122,7 +1142,6 @@
             if (actorModal.style.display === 'block') actorModal.style.display = 'none';
             window.currentMediaId = id; window.currentMediaType = type;
             
-            // Reset Global State for TV
             activeServerIdx = 1;
             activeEpisode = 1;
             activeSeason = 1;
@@ -1135,7 +1154,6 @@
             document.getElementById('mHashtags').innerHTML = "";
             document.getElementById('castContainer').innerHTML = "";
             
-            // --- OPTIMASI MEMORY: Remove iframe sepenuhnya ---
             const track = document.getElementById('carouselTrack');
             if(track) { 
                 track.querySelectorAll('iframe').forEach(f => { f.src = ""; f.remove(); }); 
@@ -1159,6 +1177,10 @@
                 fetchWithCache(`https://api.themoviedb.org/3/${type}/${id}/credits?api_key=${API_KEY}`),
                 fetchWithCache(`https://api.themoviedb.org/3/${type}/${id}/external_ids?api_key=${API_KEY}`)
             ]);
+            
+            // Simpan tahun rilis untuk pencarian soundtrack yang akurat
+            currentReleaseYear = (dId.release_date || dId.first_air_date || "").split('-')[0];
+            
             currentImdbId = dExt.imdb_id || ""; 
             originalIndoDesc = dId.overview || "";
             globalEnDesc = dEn.overview || "";
@@ -1217,7 +1239,6 @@
             const rel = dId.release_date || dId.first_air_date || ""; 
             document.getElementById('mDateDisplay').innerText = rel ? new Date(rel).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
             
-            // SETUP SERVER LIST BUTTONS
             document.getElementById('serverList').innerHTML = `
                 <button class="server-btn active-link" onclick="changeServer(1, this)">Server 1</button>
                 <button class="server-btn" onclick="changeServer(2, this)">Server 2</button>
@@ -1259,7 +1280,6 @@
         }
         
         function closeModal() { 
-            // --- OPTIMASI MEMORY: Remove iframe sepenuhnya ---
             const track = document.getElementById('carouselTrack'); 
             if(track) { 
                 track.querySelectorAll('iframe').forEach(f => { f.src = ""; f.remove(); }); 
@@ -1274,50 +1294,37 @@
         function renderSynopsis() { const descEl = document.getElementById('mDesc'), toggleBtn = document.getElementById('mToggleBtn'); if (globalFullDesc.length > 90) { toggleBtn.classList.remove('hidden'); descEl.innerText = isExpanded ? globalFullDesc : globalFullDesc.substring(0, 90) + "..."; toggleBtn.innerText = isExpanded ? "ringkas" : "selengkapnya"; } else { descEl.innerText = globalFullDesc; toggleBtn.classList.add('hidden'); } }
         function handleToggleDesc() { isExpanded = !isExpanded; renderSynopsis(); }
         
-        // --- PERBAIKAN: Fungsi PlayVid yang lebih dinamis ---
         function playVid(url, el) { 
             const track = document.getElementById('carouselTrack'); 
             const dots = document.getElementById('carouselDots'); 
-            
             const finalUrl = url.includes('?') ? `${url}&enablejsapi=1&autoplay=1&mute=0` : `${url}?enablejsapi=1&autoplay=1&mute=0`;
-            
             track.querySelectorAll('iframe').forEach(f => { f.src = ""; f.remove(); });
-            track.innerHTML = `<div class="carousel-slide">
-                <iframe id="player-frame" src="${finalUrl}" class="w-full h-full" allowfullscreen allow="autoplay"></iframe>
-            </div>`; 
-            
+            track.innerHTML = `<div class="carousel-slide"><iframe id="player-frame" src="${finalUrl}" class="w-full h-full" allowfullscreen allow="autoplay"></iframe></div>`; 
             track.style.transform = 'translateX(0)'; 
             currentIdx = 0; 
             dots.innerHTML = ''; 
             document.getElementById('swipeOverlay').style.display = 'none'; 
         }
         
-        // --- PERBAIKAN: Fungsi ganti server tanpa reset episode ---
         function changeServer(srvIdx, el) {
             activeServerIdx = srvIdx;
             document.querySelectorAll('.server-btn').forEach(b => b.classList.remove('active-link'));
             el.classList.add('active-link');
-            
-            // Build URL berdasarkan server dan episode aktif
             const url = buildEmbedUrl(window.currentMediaType, window.currentMediaId, activeSeason, activeEpisode, activeServerIdx);
             playVid(url);
         }
 
-        // --- PERBAIKAN: Fungsi ganti episode tanpa reset server ---
         function changeEpisode(epNum, el) {
             activeEpisode = epNum;
             document.querySelectorAll('.ep-btn').forEach(b => b.classList.remove('active-pill'));
             el.classList.add('active-pill');
-            
             const url = buildEmbedUrl(window.currentMediaType, window.currentMediaId, activeSeason, activeEpisode, activeServerIdx);
             playVid(url);
         }
 
-        // --- FUNGSI HELPER: Membangun URL Embed berdasarkan Server ---
         function buildEmbedUrl(type, id, s, e, srv) {
             const seriesSuffix = (type === 'tv') ? `/${s}/${e}` : '';
             const tvParam = (type === 'tv') ? `?s=${s}&e=${e}` : '';
-            
             switch(srv) {
                 case 1: return `https://vidrock.net/embed/${type}/${id}${seriesSuffix}`;
                 case 2: return `https://vidstorm.ru/embed/${type}/${id}${seriesSuffix}`;
@@ -1351,11 +1358,7 @@
             document.getElementById('episodeGrid').innerHTML = episodes.map((e) => { 
                 const epNum = e.episode_number; 
                 const isActive = (epNum == activeEpisode) ? 'active-pill' : '';
-                return `
-                    <div class="pill text-[10px] flex flex-col items-center justify-center gap-1 min-h-[45px] ep-btn ${isActive}" 
-                         onclick="changeEpisode(${epNum}, this)">
-                        <span class="font-bold">${epNum}</span>
-                    </div>`; 
+                return `<div class="pill text-[10px] flex flex-col items-center justify-center gap-1 min-h-[45px] ep-btn ${isActive}" onclick="changeEpisode(${epNum}, this)"><span class="font-bold">${epNum}</span></div>`; 
             }).join(''); 
         }
         
