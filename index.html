@@ -526,7 +526,7 @@
         let currentImdbId = ""; 
         let lastTrailerSources = []; 
         let currentDailymotionId = ""; // Menyimpan ID Dailymotion
-        let currentReleaseYear = ""; // Menyimpan tahun rilis film untuk akurasi soundtrack
+        let globalReleaseYear = ""; // Menyimpan tahun rilis untuk akurasi soundtrack
         
         // GLOBAL STATE UNTUK TV SERIES
         let activeServerIdx = 1; // Default server 1
@@ -545,7 +545,7 @@
             }); 
         };
 
-        // --- SOUNDTRACK LOGIC (MODIFIED FOR ACCURACY & BACK BUTTON) ---
+        // --- SOUNDTRACK LOGIC (MODIFIED FOR BLACK AESTHETIC) ---
         async function openSoundtrack() {
             // BERHENTIKAN TRAILER DENGAN BENAR
             document.querySelectorAll('#carouselTrack iframe').forEach(iframe => {
@@ -567,15 +567,15 @@
             overlay.style.display = 'block';
             document.body.style.overflow = 'hidden';
 
-            // Push state agar tombol back menutup modal soundtrack
+            // Masukkan state ke history agar tombol back handphone bisa menutup modal soundtrack
             if (!window.history.state || window.history.state.view !== 'soundtrack') {
                 history.pushState({view: 'soundtrack'}, "");
             }
 
             try {
-                // Menambahkan tahun rilis ke pencarian agar lebih akurat (mencegah film Disney keluar di film Indo)
-                const searchTerm = `${title} ${currentReleaseYear} soundtrack`;
-                const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(searchTerm)}&entity=song&limit=15`);
+                // Gunakan globalReleaseYear untuk akurasi agar tidak tertukar (contoh: Jumbo Indonesia vs Jumbo Disney)
+                const searchYear = globalReleaseYear ? " " + globalReleaseYear : "";
+                const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(title + searchYear + " soundtrack")}&entity=song&limit=15`);
                 const data = await res.json();
 
                 if (data.results.length === 0) {
@@ -619,14 +619,13 @@
         function closeSoundtrack() {
             document.getElementById('soundtrackModal').style.display = 'none';
             document.querySelectorAll('.audio-player-mini').forEach(a => a.pause());
-            
-            // Perbaikan Back: Jika modal film masih terbuka, hanya hilangkan overlay filter
             if (document.getElementById('movieModal').style.display === 'block') {
-                document.getElementById('filterOverlay').style.display = 'none';
                 replayTrailer();
+            }
+            if (document.getElementById('movieModal').style.display !== 'block') {
+                document.body.style.overflow = 'auto';
             } else {
                 document.getElementById('filterOverlay').style.display = 'none';
-                document.body.style.overflow = 'auto';
             }
         }
 
@@ -1177,13 +1176,13 @@
                 fetchWithCache(`https://api.themoviedb.org/3/${type}/${id}/credits?api_key=${API_KEY}`),
                 fetchWithCache(`https://api.themoviedb.org/3/${type}/${id}/external_ids?api_key=${API_KEY}`)
             ]);
-            
-            // Simpan tahun rilis untuk pencarian soundtrack yang akurat
-            currentReleaseYear = (dId.release_date || dId.first_air_date || "").split('-')[0];
-            
             currentImdbId = dExt.imdb_id || ""; 
             originalIndoDesc = dId.overview || "";
             globalEnDesc = dEn.overview || "";
+
+            // Simpan tahun rilis untuk pencarian soundtrack yang lebih akurat
+            globalReleaseYear = (dId.release_date || dId.first_air_date || "").split('-')[0];
+
             const translateBtn = document.getElementById('mTranslateBtn');
             if (originalIndoDesc.trim() !== "") { globalFullDesc = originalIndoDesc; translateBtn.innerText = "Lihat versi asli"; translateBtn.classList.remove('hidden'); } else { globalFullDesc = globalEnDesc || "Sinopsis belum tersedia."; translateBtn.innerText = "Lihat terjemahan"; if(globalEnDesc) translateBtn.classList.remove('hidden'); }
             
@@ -1214,7 +1213,7 @@
 
             try {
                 const qName = dId.title || dId.name;
-                const qYear = (dId.release_date || dId.first_air_date || "").split('-')[0];
+                const qYear = globalReleaseYear;
                 const searchQueryDaily = encodeURIComponent(`${qName} ${qYear} official trailer`);
                 const dailyRes = await fetch(`https://api.dailymotion.com/videos?search=${searchQueryDaily}&fields=id,title&limit=1`);
                 const dailyData = await dailyRes.json();
@@ -1232,7 +1231,7 @@
             }).join('');
             document.getElementById('mLikeDisplay').innerText = `${Math.floor((dId.vote_average || 0) * 1234).toLocaleString('id-ID')} suka`; document.getElementById('mTitle').innerText = dId.title || dId.name;
             isExpanded = false; renderSynopsis();
-            const relYear = (dId.release_date || dId.first_air_date || "2026").split('-')[0];
+            const relYear = globalReleaseYear || "2026";
             const contentKind = (type === 'tv') ? 'tv' : 'movie';
             const genresArr = (dId.genres || []).map(g => `#${g.name.replace(/[^a-zA-Z0-9]/g, '')}`).slice(0, 3).join(' ');
             document.getElementById('mHashtags').innerHTML = `<br> #${(dId.title||dId.name||"").replace(/[^a-zA-Z0-9]/g, '')} #${relYear} #${contentKind} <br> ${genresArr}`;
