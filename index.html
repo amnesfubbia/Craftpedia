@@ -1205,18 +1205,14 @@
             const rel = dId.release_date || dId.first_air_date || ""; 
             document.getElementById('mDateDisplay').innerText = rel ? new Date(rel).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
             
-            // Server List 1 - 20 & New Servers
+            // Server List (1 - 25)
             let serverButtonsHTML = '';
-            for(let i=1; i<=20; i++) {
-                serverButtonsHTML += `<button class="server-btn ${i===1?'active-link':''}" onclick="changeServer(${i}, this)">Server ${i}</button>`;
+            const totalServers = 25;
+            const names = {21: 'vidUp', 22: 'streamx', 23: 'cinemaos', 24: 'vidking', 25: 'zxcstream'};
+            for(let i=1; i<=totalServers; i++) {
+                let sName = names[i] || `Server ${i}`;
+                serverButtonsHTML += `<button class="server-btn ${i===1?'active-link':''}" onclick="changeServer(${i}, this)">${sName}</button>`;
             }
-            // Menambahkan Server Baru
-            serverButtonsHTML += `<button class="server-btn" onclick="changeServer(22, this)">vidUp</button>`;
-            serverButtonsHTML += `<button class="server-btn" onclick="changeServer(23, this)">streamx</button>`;
-            serverButtonsHTML += `<button class="server-btn" onclick="changeServer(24, this)">cinemaos</button>`;
-            serverButtonsHTML += `<button class="server-btn" onclick="changeServer(25, this)">vidking</button>`;
-            serverButtonsHTML += `<button class="server-btn" onclick="changeServer(26, this)">zxcstream</button>`;
-
             document.getElementById('serverList').innerHTML = serverButtonsHTML;
 
             if(type === 'tv') { document.getElementById('seriesControl').classList.remove('hidden'); document.getElementById('seasonSel').innerHTML = (dId.seasons||[]).filter(s=>s.season_number>0).map(s=>`<option value="${s.season_number}">Season ${s.season_number}</option>`).join(''); loadEpisodes(); } else { document.getElementById('seriesControl').classList.add('hidden'); }
@@ -1291,7 +1287,7 @@
         function changeServer(srvIdx, el) {
             activeServerIdx = srvIdx;
             document.querySelectorAll('.server-btn').forEach(b => b.classList.remove('active-link'));
-            if(srvIdx !== 21) el.classList.add('active-link');
+            el.classList.add('active-link');
             const url = buildEmbedUrl(window.currentMediaType, window.currentMediaId, activeSeason, activeEpisode, activeServerIdx);
             playVid(url);
         }
@@ -1331,12 +1327,12 @@
                 case 18: url = `https://player.autoembed.cc/embed/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`; break;
                 case 19: url = `https://warezcdn.site/${type==='tv'?'serie':'filme'}/${id}${type==='tv'?`/${s}/${e}`:''}`; break;
                 case 20: url = `https://embed.smashystream.com/playere.php?tmdb=${id}${type==='tv'?`&season=${s}&episode=${e}`:''}`; break;
-                case 21: url = `https://www.dailymotion.com/embed/video/${currentDailymotionId}`; break;
-                case 22: url = `https://vidup.me/embed/${type}/${id}${seriesSuffix}`; break;
-                case 23: url = `https://streamx.to/embed/${type}/${id}${seriesSuffix}`; break;
-                case 24: url = `https://cinemaos.com/embed/${type}/${id}${seriesSuffix}`; break;
-                case 25: url = `https://vidking.com/embed/${type}/${id}${seriesSuffix}`; break;
-                case 26: url = `https://zxcstream.com/embed/${type}/${id}${seriesSuffix}`; break;
+                case 21: url = `https://vidup.me/embed/${type}/${id}${seriesSuffix}`; break;
+                case 22: url = `https://streamx.pro/embed/${type}/${id}${seriesSuffix}`; break;
+                case 23: url = `https://cinemaos.net/embed/${type}/${id}${seriesSuffix}`; break;
+                case 24: url = `https://vidking.net/embed/${type}/${id}${seriesSuffix}`; break;
+                case 25: url = `https://zxcstream.com/embed/${type}/${id}${seriesSuffix}`; break;
+                case 99: url = `https://www.dailymotion.com/embed/video/${currentDailymotionId}`; break;
                 default: url = `https://vidrock.net/embed/${type}/${id}${seriesSuffix}`;
             }
             return url.replace("http://", "https://");
