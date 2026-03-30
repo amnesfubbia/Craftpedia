@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
         body { background-color: #000; color: #fff; font-family: 'Inter', sans-serif; margin: 0; overflow-x: hidden; }
         /* Fix Horizontal Scroll & Safari Smoothness */
@@ -235,8 +236,7 @@
         .tv-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 20px; padding-bottom: 100px; }
         .tv-item { background: #111; border: 1px solid #222; border-radius: 16px; padding: 15px; text-align: center; cursor: pointer; transition: all 0.2s; }
         .tv-item:active { transform: scale(0.95); background: #222; }
-        .tv-logo-placeholder { width: 60px; height: 60px; background: #222; border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #fff; overflow: hidden; }
-        .tv-logo-placeholder img { width: 100%; height: 100%; object-fit: cover; }
+        .tv-logo-placeholder { width: 60px; height: 60px; background: #222; border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #fff; }
         .tv-name { font-size: 13px; font-weight: 700; color: #fff; }
     </style>
 </head>
@@ -537,45 +537,29 @@
             }); 
         };
 
-        // --- TV MODAL LOGIC (UPDATED WITH IPTV-ORG) ---
-        async function initTvChannels() {
+        // --- TV MODAL LOGIC (SUPPORT M3U8) ---
+        function initTvChannels() {
+            const channels = [
+                { name: 'RCTI', id: 'https://cdn.jio.tv/live/RCTI/RCTI.m3u8', logo: 'R' },
+                { name: 'SCTV', id: 'https://cdn.jio.tv/live/SCTV/SCTV.m3u8', logo: 'S' },
+                { name: 'TRANS TV', id: 'https://cdn.jio.tv/live/Trans_TV/Trans_TV.m3u8', logo: 'T' },
+                { name: 'TRANS 7', id: 'https://cdn.jio.tv/live/Trans_7/Trans_7.m3u8', logo: 'T7' },
+                { name: 'INDOSIAR', id: 'https://cdn.jio.tv/live/Indosiar/Indosiar.m3u8', logo: 'I' },
+                { name: 'MNCTV', id: 'https://cdn.jio.tv/live/MNCTV/MNCTV.m3u8', logo: 'M' },
+                { name: 'GTV', id: 'https://cdn.jio.tv/live/GTV/GTV.m3u8', logo: 'G' },
+                { name: 'ANTV', id: 'https://cdn.jio.tv/live/ANTV/ANTV.m3u8', logo: 'A' },
+                { name: 'METRO TV', id: 'https://cdn.jio.tv/live/Metro_TV/Metro_TV.m3u8', logo: 'M' },
+                { name: 'TV ONE', id: 'https://cdn.jio.tv/live/tv_One/tv_One.m3u8', logo: 'T1' },
+                { name: 'KOMPAS TV', id: 'https://cdn.jio.tv/live/Kompas_TV/Kompas_TV.m3u8', logo: 'K' },
+                { name: 'NET TV', id: 'https://cdn.jio.tv/live/Net_TV/Net_TV.m3u8', logo: 'N' }
+            ];
             const cont = document.getElementById('tvChannelList');
-            cont.innerHTML = '<div class="col-span-2 text-center py-10 text-zinc-500 text-xs animate-pulse">Memuat Saluran TV...</div>';
-            
-            try {
-                // Fetching Indonesian channels from iptv-org API
-                const res = await fetch('https://iptv-org.github.io/api/channels.json');
-                const allChannels = await res.json();
-                
-                // Filter specifically for Indonesian channels
-                const idChannels = allChannels.filter(ch => ch.country === 'ID' && !ch.is_nsfw);
-                
-                // Fetch streams to match URLs
-                const streamRes = await fetch('https://iptv-org.github.io/api/streams.json');
-                const allStreams = await streamRes.json();
-
-                const finalData = idChannels.map(ch => {
-                    const stream = allStreams.find(s => s.channel === ch.id);
-                    return { ...ch, url: stream ? stream.url : null };
-                }).filter(ch => ch.url);
-
-                if(finalData.length === 0) {
-                    cont.innerHTML = '<div class="col-span-2 text-center py-10 text-zinc-500 text-xs">Saluran tidak tersedia.</div>';
-                    return;
-                }
-
-                cont.innerHTML = finalData.map(ch => `
-                    <div class="tv-item" onclick="playTvChannel('${ch.name.replace(/'/g, "\\'")}', '${ch.url}')">
-                        <div class="tv-logo-placeholder">
-                            ${ch.logo ? `<img src="${ch.logo}" onerror="this.parentElement.innerHTML='${ch.name[0]}'">` : ch.name[0]}
-                        </div>
-                        <div class="tv-name">${ch.name}</div>
-                    </div>
-                `).join('');
-
-            } catch (e) {
-                cont.innerHTML = '<div class="col-span-2 text-center py-10 text-red-500 text-xs">Gagal memuat daftar IPTV.</div>';
-            }
+            cont.innerHTML = channels.map(ch => `
+                <div class="tv-item" onclick="playTvChannel('${ch.name}', '${ch.id}')">
+                    <div class="tv-logo-placeholder">${ch.logo}</div>
+                    <div class="tv-name">${ch.name}</div>
+                </div>
+            `).join('');
         }
 
         function openTvModal() {
@@ -591,20 +575,18 @@
             updateActiveNav(document.getElementById('homeBtnNav'));
         }
 
-        function playTvChannel(name, streamUrl) {
+        function playTvChannel(name, id) {
             closeTvModal();
             document.getElementById('movieModal').style.display = 'block';
             document.getElementById('mTitle').innerText = "LIVE: " + name;
-            document.getElementById('mDesc').innerText = "Menyiarkan langsung saluran " + name + " via IPTV-Org. Pastikan koneksi internet stabil untuk pemutaran M3U8.";
-            document.getElementById('mLikeDisplay').innerText = "IPTV Stream";
-            document.getElementById('mDateDisplay').innerText = "LIVE NOW";
+            document.getElementById('mDesc').innerText = "Sedang memutar siaran langsung " + name + " via M3U8 Stream.";
+            document.getElementById('mLikeDisplay').innerText = "Live Streaming";
+            document.getElementById('mDateDisplay').innerText = "Online";
             document.getElementById('castContainer').innerHTML = "";
             document.getElementById('serverList').innerHTML = "";
             document.getElementById('seriesControl').classList.add('hidden');
             
-            // Menggunakan HLS Player atau MultiEmbed Proxy untuk memutar M3U8
-            const playerUrl = `https://multiembed.mov/directstream.php?video_id=${encodeURIComponent(streamUrl)}`;
-            playVid(playerUrl);
+            playVid(id);
         }
 
         // --- SOUNDTRACK LOGIC ---
@@ -1169,7 +1151,7 @@
             const track = document.getElementById('carouselTrack');
             const dots = document.getElementById('carouselDots');
             
-            track.querySelectorAll('iframe').forEach(f => { f.src = ""; f.remove(); });
+            track.querySelectorAll('iframe, video').forEach(f => { f.src = ""; f.remove(); });
             track.innerHTML = ''; dots.innerHTML = ''; track.style.transform = 'translateX(0)';
             currentIdx = 0;
             document.querySelectorAll('.server-btn').forEach(b => b.classList.remove('active-link'));
@@ -1186,8 +1168,7 @@
                     document.getElementById('swipeOverlay').style.display = vidsToDisplay.length > 1 ? 'block' : 'none';
                 } else {
                     const fallbackUrl = buildEmbedUrl(type, id, 1, 1, 1);
-                    track.innerHTML = `<div class="carousel-slide"><iframe id="player-frame" src="${fallbackUrl}" class="w-full h-full" allowfullscreen allow="autoplay"></iframe></div>`;
-                    document.getElementById('swipeOverlay').style.display = 'none';
+                    playVid(fallbackUrl);
                 }
             } catch(e) { console.error(e); }
         }
@@ -1210,7 +1191,7 @@
             
             const track = document.getElementById('carouselTrack');
             if(track) { 
-                track.querySelectorAll('iframe').forEach(f => { f.src = ""; f.remove(); }); 
+                track.querySelectorAll('iframe, video').forEach(f => { f.src = ""; f.remove(); }); 
                 track.innerHTML = ""; 
             }
             
@@ -1244,8 +1225,7 @@
 
             const handleTrailerError = async () => {
                 const fallbackUrl = buildEmbedUrl(type, id, 1, 1, 1); 
-                track.innerHTML = `<div class="carousel-slide"><iframe id="player-frame" src="${fallbackUrl}" class="w-full h-full" allowfullscreen allow="autoplay"></iframe></div>`; 
-                document.getElementById('swipeOverlay').style.display = 'none';
+                playVid(fallbackUrl);
             };
 
             const allVideos = (dId.videos?.results || [])
@@ -1317,7 +1297,7 @@
         function closeModal() { 
             const track = document.getElementById('carouselTrack'); 
             if(track) { 
-                track.querySelectorAll('iframe').forEach(f => { f.src = ""; f.remove(); }); 
+                track.querySelectorAll('iframe, video').forEach(f => { f.src = ""; f.remove(); }); 
                 track.innerHTML = ''; 
             } 
             document.getElementById('movieModal').style.display = 'none'; 
@@ -1329,34 +1309,51 @@
         function renderSynopsis() { const descEl = document.getElementById('mDesc'), toggleBtn = document.getElementById('mToggleBtn'); if (globalFullDesc.length > 90) { toggleBtn.classList.remove('hidden'); descEl.innerText = isExpanded ? globalFullDesc : globalFullDesc.substring(0, 90) + "..."; toggleBtn.innerText = isExpanded ? "ringkas" : "selengkapnya"; } else { descEl.innerText = globalFullDesc; toggleBtn.classList.add('hidden'); } }
         function handleToggleDesc() { isExpanded = !isExpanded; renderSynopsis(); }
         
-        function playVid(url, el) { 
+        // --- UPDATED PLAYVID TO SUPPORT M3U8 (HLS) ---
+        function playVid(url) { 
             const track = document.getElementById('carouselTrack'); 
             const dots = document.getElementById('carouselDots'); 
             const loader = document.getElementById('videoLoader');
             
             loader.classList.remove('hidden');
-            
-            const finalUrl = url.includes('?') ? `${url}&enablejsapi=1&autoplay=1&mute=0` : `${url}?enablejsapi=1&autoplay=1&mute=0`;
-            
-            track.querySelectorAll('iframe').forEach(f => { f.src = ""; f.remove(); });
-            
-            const newIframe = document.createElement('iframe');
-            newIframe.id = "player-frame";
-            newIframe.src = finalUrl;
-            newIframe.className = "w-full h-full";
-            newIframe.allowFullscreen = true;
-            newIframe.allow = "autoplay";
-            
-            newIframe.onload = () => {
-                loader.classList.add('hidden');
-            };
-            
+            track.querySelectorAll('iframe, video').forEach(f => { f.src = ""; f.remove(); });
             track.innerHTML = '';
+            
             const slide = document.createElement('div');
             slide.className = 'carousel-slide';
-            slide.appendChild(newIframe);
-            track.appendChild(slide);
 
+            if (url.includes('.m3u8') || url.includes('.m3u')) {
+                // RENDER AS VIDEO PLAYER FOR M3U8
+                const video = document.createElement('video');
+                video.className = "w-full h-full bg-black";
+                video.controls = true;
+                video.autoplay = true;
+                video.id = "player-frame";
+                
+                if (Hls.isSupported()) {
+                    const hls = new Hls();
+                    hls.loadSource(url);
+                    hls.attachMedia(video);
+                } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                    video.src = url;
+                }
+                
+                video.onloadedmetadata = () => loader.classList.add('hidden');
+                slide.appendChild(video);
+            } else {
+                // RENDER AS IFRAME FOR WEB LINKS
+                const finalUrl = url.includes('?') ? `${url}&enablejsapi=1&autoplay=1&mute=0` : `${url}?enablejsapi=1&autoplay=1&mute=0`;
+                const newIframe = document.createElement('iframe');
+                newIframe.id = "player-frame";
+                newIframe.src = finalUrl;
+                newIframe.className = "w-full h-full";
+                newIframe.allowFullscreen = true;
+                newIframe.allow = "autoplay";
+                newIframe.onload = () => loader.classList.add('hidden');
+                slide.appendChild(newIframe);
+            }
+
+            track.appendChild(slide);
             track.style.transform = 'translateX(0)'; 
             currentIdx = 0; 
             dots.innerHTML = ''; 
