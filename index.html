@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
         body { background-color: #000; color: #fff; font-family: 'Inter', sans-serif; margin: 0; overflow-x: hidden; }
         /* Fix Horizontal Scroll & Safari Smoothness */
@@ -537,21 +536,21 @@
             }); 
         };
 
-        // --- TV MODAL LOGIC (SUPPORT M3U8) ---
+        // --- TV MODAL LOGIC (FIXED) ---
         function initTvChannels() {
             const channels = [
-                { name: 'RCTI', id: 'https://cdn.jio.tv/live/RCTI/RCTI.m3u8', logo: 'R' },
-                { name: 'SCTV', id: 'https://cdn.jio.tv/live/SCTV/SCTV.m3u8', logo: 'S' },
-                { name: 'TRANS TV', id: 'https://cdn.jio.tv/live/Trans_TV/Trans_TV.m3u8', logo: 'T' },
-                { name: 'TRANS 7', id: 'https://cdn.jio.tv/live/Trans_7/Trans_7.m3u8', logo: 'T7' },
-                { name: 'INDOSIAR', id: 'https://cdn.jio.tv/live/Indosiar/Indosiar.m3u8', logo: 'I' },
-                { name: 'MNCTV', id: 'https://cdn.jio.tv/live/MNCTV/MNCTV.m3u8', logo: 'M' },
-                { name: 'GTV', id: 'https://cdn.jio.tv/live/GTV/GTV.m3u8', logo: 'G' },
-                { name: 'ANTV', id: 'https://cdn.jio.tv/live/ANTV/ANTV.m3u8', logo: 'A' },
-                { name: 'METRO TV', id: 'https://cdn.jio.tv/live/Metro_TV/Metro_TV.m3u8', logo: 'M' },
-                { name: 'TV ONE', id: 'https://cdn.jio.tv/live/tv_One/tv_One.m3u8', logo: 'T1' },
-                { name: 'KOMPAS TV', id: 'https://cdn.jio.tv/live/Kompas_TV/Kompas_TV.m3u8', logo: 'K' },
-                { name: 'NET TV', id: 'https://cdn.jio.tv/live/Net_TV/Net_TV.m3u8', logo: 'N' }
+                { name: 'RCTI', id: 'rcti', logo: 'R' },
+                { name: 'SCTV', id: 'sctv', logo: 'S' },
+                { name: 'TRANS TV', id: 'transtv', logo: 'T' },
+                { name: 'TRANS 7', id: 'trans7', logo: 'T7' },
+                { name: 'INDOSIAR', id: 'indosiar', logo: 'I' },
+                { name: 'MNCTV', id: 'mnctv', logo: 'M' },
+                { name: 'GTV', id: 'gtv', logo: 'G' },
+                { name: 'ANTV', id: 'antv', logo: 'A' },
+                { name: 'METRO TV', id: 'metrotv', logo: 'M' },
+                { name: 'TV ONE', id: 'tvone', logo: 'T1' },
+                { name: 'KOMPAS TV', id: 'kompastv', logo: 'K' },
+                { name: 'NET TV', id: 'nettv', logo: 'N' }
             ];
             const cont = document.getElementById('tvChannelList');
             cont.innerHTML = channels.map(ch => `
@@ -579,14 +578,16 @@
             closeTvModal();
             document.getElementById('movieModal').style.display = 'block';
             document.getElementById('mTitle').innerText = "LIVE: " + name;
-            document.getElementById('mDesc').innerText = "Sedang memutar siaran langsung " + name + " via M3U8 Stream.";
-            document.getElementById('mLikeDisplay').innerText = "Live Streaming";
+            document.getElementById('mDesc').innerText = "Sedang memutar siaran langsung " + name + ". Pastikan koneksi internet stabil.";
+            document.getElementById('mLikeDisplay').innerText = "LIVE STREAMING";
             document.getElementById('mDateDisplay').innerText = "Online";
             document.getElementById('castContainer').innerHTML = "";
             document.getElementById('serverList').innerHTML = "";
             document.getElementById('seriesControl').classList.add('hidden');
             
-            playVid(id);
+            // Perbaikan URL Direct Stream untuk Channel Lokal via multiembed
+            const tvUrl = `https://multiembed.mov/directstream.php?video_id=${id}&tmdb=1`;
+            playVid(tvUrl);
         }
 
         // --- SOUNDTRACK LOGIC ---
@@ -1151,7 +1152,7 @@
             const track = document.getElementById('carouselTrack');
             const dots = document.getElementById('carouselDots');
             
-            track.querySelectorAll('iframe, video').forEach(f => { f.src = ""; f.remove(); });
+            track.querySelectorAll('iframe').forEach(f => { f.src = ""; f.remove(); });
             track.innerHTML = ''; dots.innerHTML = ''; track.style.transform = 'translateX(0)';
             currentIdx = 0;
             document.querySelectorAll('.server-btn').forEach(b => b.classList.remove('active-link'));
@@ -1168,7 +1169,8 @@
                     document.getElementById('swipeOverlay').style.display = vidsToDisplay.length > 1 ? 'block' : 'none';
                 } else {
                     const fallbackUrl = buildEmbedUrl(type, id, 1, 1, 1);
-                    playVid(fallbackUrl);
+                    track.innerHTML = `<div class="carousel-slide"><iframe id="player-frame" src="${fallbackUrl}" class="w-full h-full" allowfullscreen allow="autoplay"></iframe></div>`;
+                    document.getElementById('swipeOverlay').style.display = 'none';
                 }
             } catch(e) { console.error(e); }
         }
@@ -1191,7 +1193,7 @@
             
             const track = document.getElementById('carouselTrack');
             if(track) { 
-                track.querySelectorAll('iframe, video').forEach(f => { f.src = ""; f.remove(); }); 
+                track.querySelectorAll('iframe').forEach(f => { f.src = ""; f.remove(); }); 
                 track.innerHTML = ""; 
             }
             
@@ -1225,7 +1227,8 @@
 
             const handleTrailerError = async () => {
                 const fallbackUrl = buildEmbedUrl(type, id, 1, 1, 1); 
-                playVid(fallbackUrl);
+                track.innerHTML = `<div class="carousel-slide"><iframe id="player-frame" src="${fallbackUrl}" class="w-full h-full" allowfullscreen allow="autoplay"></iframe></div>`; 
+                document.getElementById('swipeOverlay').style.display = 'none';
             };
 
             const allVideos = (dId.videos?.results || [])
@@ -1297,7 +1300,7 @@
         function closeModal() { 
             const track = document.getElementById('carouselTrack'); 
             if(track) { 
-                track.querySelectorAll('iframe, video').forEach(f => { f.src = ""; f.remove(); }); 
+                track.querySelectorAll('iframe').forEach(f => { f.src = ""; f.remove(); }); 
                 track.innerHTML = ''; 
             } 
             document.getElementById('movieModal').style.display = 'none'; 
@@ -1309,51 +1312,34 @@
         function renderSynopsis() { const descEl = document.getElementById('mDesc'), toggleBtn = document.getElementById('mToggleBtn'); if (globalFullDesc.length > 90) { toggleBtn.classList.remove('hidden'); descEl.innerText = isExpanded ? globalFullDesc : globalFullDesc.substring(0, 90) + "..."; toggleBtn.innerText = isExpanded ? "ringkas" : "selengkapnya"; } else { descEl.innerText = globalFullDesc; toggleBtn.classList.add('hidden'); } }
         function handleToggleDesc() { isExpanded = !isExpanded; renderSynopsis(); }
         
-        // --- UPDATED PLAYVID TO SUPPORT M3U8 (HLS) ---
-        function playVid(url) { 
+        function playVid(url, el) { 
             const track = document.getElementById('carouselTrack'); 
             const dots = document.getElementById('carouselDots'); 
             const loader = document.getElementById('videoLoader');
             
             loader.classList.remove('hidden');
-            track.querySelectorAll('iframe, video').forEach(f => { f.src = ""; f.remove(); });
-            track.innerHTML = '';
             
+            const finalUrl = url.includes('?') ? `${url}&enablejsapi=1&autoplay=1&mute=0` : `${url}?enablejsapi=1&autoplay=1&mute=0`;
+            
+            track.querySelectorAll('iframe').forEach(f => { f.src = ""; f.remove(); });
+            
+            const newIframe = document.createElement('iframe');
+            newIframe.id = "player-frame";
+            newIframe.src = finalUrl;
+            newIframe.className = "w-full h-full";
+            newIframe.allowFullscreen = true;
+            newIframe.allow = "autoplay";
+            
+            newIframe.onload = () => {
+                loader.classList.add('hidden');
+            };
+            
+            track.innerHTML = '';
             const slide = document.createElement('div');
             slide.className = 'carousel-slide';
-
-            if (url.includes('.m3u8') || url.includes('.m3u')) {
-                // RENDER AS VIDEO PLAYER FOR M3U8
-                const video = document.createElement('video');
-                video.className = "w-full h-full bg-black";
-                video.controls = true;
-                video.autoplay = true;
-                video.id = "player-frame";
-                
-                if (Hls.isSupported()) {
-                    const hls = new Hls();
-                    hls.loadSource(url);
-                    hls.attachMedia(video);
-                } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                    video.src = url;
-                }
-                
-                video.onloadedmetadata = () => loader.classList.add('hidden');
-                slide.appendChild(video);
-            } else {
-                // RENDER AS IFRAME FOR WEB LINKS
-                const finalUrl = url.includes('?') ? `${url}&enablejsapi=1&autoplay=1&mute=0` : `${url}?enablejsapi=1&autoplay=1&mute=0`;
-                const newIframe = document.createElement('iframe');
-                newIframe.id = "player-frame";
-                newIframe.src = finalUrl;
-                newIframe.className = "w-full h-full";
-                newIframe.allowFullscreen = true;
-                newIframe.allow = "autoplay";
-                newIframe.onload = () => loader.classList.add('hidden');
-                slide.appendChild(newIframe);
-            }
-
+            slide.appendChild(newIframe);
             track.appendChild(slide);
+
             track.style.transform = 'translateX(0)'; 
             currentIdx = 0; 
             dots.innerHTML = ''; 
@@ -1391,7 +1377,7 @@
                 case 8: url = `https://vidfast.pro/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`; break;
                 case 9: url = `https://moviesapi.club/${type}/${id}${seriesSuffix}`; break;
                 case 10: url = `https://vidsrc.cc/v2/embed/${type}/${id}${type==='tv'?`?s=${s}&e=${e}`:''}`; break;
-                case 11: url = `https://multiembed.mov/directstream.php?video_id=${id}${type==='tv'?`&s=${s}&e=${e}`:''}`; break;
+                case 11: url = `https://multiembed.mov/directstream.php?video_id=${id}${type==='tv'?`&s=${s}&e=${e}`:''}&tmdb=1`; break;
                 case 12: url = `https://www.2embed.cc/embed${type==='tv'?'tv':''}/${id}${type==='tv'?`&s=${s}&e=${e}`:''}`; break;
                 case 13: url = `https://vidsrc.xyz/embed/${type}/${id}${seriesSuffix}`; break;
                 case 14: url = `https://vidsrc.me/embed/${type}?tmdb=${id}${seriesSuffix}`; break;
