@@ -536,23 +536,22 @@
             }); 
         };
 
-        // --- TV MODAL LOGIC (UPDATED API SOURCE) ---
+        // --- TV MODAL LOGIC (DIPERBAIKI UNTUK INDONESIA TV) ---
         function initTvChannels() {
+            // Pemetaan ID saluran yang didukung oleh multiembed.mov/directstream.php
             const channels = [
-                { name: 'RCTI', id: 'rcti', logo: 'R' },
-                { name: 'SCTV', id: 'sctv', logo: 'S' },
-                { name: 'TRANS TV', id: 'transtv', logo: 'T' },
+                { name: 'RCTI', id: 'rcti', logo: 'RCTI' },
+                { name: 'SCTV', id: 'sctv', logo: 'SCTV' },
+                { name: 'TRANS TV', id: 'transtv', logo: 'TTV' },
                 { name: 'TRANS 7', id: 'trans7', logo: 'T7' },
-                { name: 'INDOSIAR', id: 'indosiar', logo: 'I' },
-                { name: 'MNCTV', id: 'mnctv', logo: 'M' },
-                { name: 'GTV', id: 'gtv', logo: 'G' },
-                { name: 'ANTV', id: 'antv', logo: 'A' },
-                { name: 'METRO TV', id: 'metrotv', logo: 'M' },
-                { name: 'TV ONE', id: 'tvone', logo: 'T1' },
-                { name: 'KOMPAS TV', id: 'kompastv', logo: 'K' },
-                { name: 'NET TV', id: 'nettv', logo: 'N' },
-                { name: 'INEWS', id: 'inews', logo: 'I' },
-                { name: 'TVRI', id: 'tvri', logo: 'T' }
+                { name: 'INDOSIAR', id: 'indosiar', logo: 'IDS' },
+                { name: 'MNCTV', id: 'mnctv', logo: 'MNC' },
+                { name: 'GTV', id: 'gtv', logo: 'GTV' },
+                { name: 'ANTV', id: 'antv', logo: 'ANTV' },
+                { name: 'METRO TV', id: 'metrotv', logo: 'MET' },
+                { name: 'TV ONE', id: 'tvone', logo: 'TV1' },
+                { name: 'KOMPAS TV', id: 'kompastv', logo: 'KMP' },
+                { name: 'NET TV', id: 'nettv', logo: 'NET' }
             ];
             const cont = document.getElementById('tvChannelList');
             cont.innerHTML = channels.map(ch => `
@@ -578,18 +577,19 @@
 
         function playTvChannel(name, id) {
             closeTvModal();
+            // Tampilkan Modal Player Utama
             document.getElementById('movieModal').style.display = 'block';
             document.getElementById('mTitle').innerText = "LIVE: " + name;
-            document.getElementById('mDesc').innerText = "Sedang memutar siaran langsung " + name + ". Gunakan koneksi stabil untuk menghindari buffering.";
+            document.getElementById('mDesc').innerText = "Menghubungkan ke siaran langsung " + name + "... Jika gagal, coba tekan tombol Replay.";
             document.getElementById('mLikeDisplay').innerText = "Live Streaming";
-            document.getElementById('mDateDisplay').innerText = "Real-time";
+            document.getElementById('mDateDisplay').innerText = "Live";
             document.getElementById('castContainer').innerHTML = "";
             document.getElementById('serverList').innerHTML = "";
             document.getElementById('seriesControl').classList.add('hidden');
-            document.getElementById('mHashtags').innerHTML = "#LiveTV #Indonesia #Streaming";
+            document.getElementById('mHashtags').innerHTML = "#LiveTV #Indonesia #" + name;
             
-            // Menggunakan provider m3u8 proxy yang lebih stabil
-            const tvUrl = `https://www.nontongo.win/tv/${id}`;
+            // Gunakan multiembed directstream untuk channel lokal
+            const tvUrl = `https://multiembed.mov/directstream.php?video_id=${id}`;
             playVid(tvUrl);
         }
 
@@ -1322,6 +1322,7 @@
             
             loader.classList.remove('hidden');
             
+            // Tambahkan parameter enablejsapi=1 dan autoplay=1 agar video langsung jalan
             const finalUrl = url.includes('?') ? `${url}&enablejsapi=1&autoplay=1&mute=0` : `${url}?enablejsapi=1&autoplay=1&mute=0`;
             
             track.querySelectorAll('iframe').forEach(f => { f.src = ""; f.remove(); });
