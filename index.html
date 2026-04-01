@@ -536,7 +536,7 @@
             }); 
         };
 
-        // --- TV MODAL LOGIC (UPDATED WITH BETTER API SOURCE) ---
+        // --- TV MODAL LOGIC (UPDATED API SOURCE) ---
         function initTvChannels() {
             const channels = [
                 { name: 'RCTI', id: 'rcti', logo: 'R' },
@@ -550,7 +550,9 @@
                 { name: 'METRO TV', id: 'metrotv', logo: 'M' },
                 { name: 'TV ONE', id: 'tvone', logo: 'T1' },
                 { name: 'KOMPAS TV', id: 'kompastv', logo: 'K' },
-                { name: 'NET TV', id: 'nettv', logo: 'N' }
+                { name: 'NET TV', id: 'nettv', logo: 'N' },
+                { name: 'INEWS', id: 'inews', logo: 'I' },
+                { name: 'TVRI', id: 'tvri', logo: 'T' }
             ];
             const cont = document.getElementById('tvChannelList');
             cont.innerHTML = channels.map(ch => `
@@ -578,27 +580,17 @@
             closeTvModal();
             document.getElementById('movieModal').style.display = 'block';
             document.getElementById('mTitle').innerText = "LIVE: " + name;
-            document.getElementById('mDesc').innerText = "Sedang memutar siaran langsung " + name + ". Gunakan jaringan internet yang stabil.";
+            document.getElementById('mDesc').innerText = "Sedang memutar siaran langsung " + name + ". Gunakan koneksi stabil untuk menghindari buffering.";
             document.getElementById('mLikeDisplay').innerText = "Live Streaming";
-            document.getElementById('mDateDisplay').innerText = "Online";
+            document.getElementById('mDateDisplay').innerText = "Real-time";
             document.getElementById('castContainer').innerHTML = "";
+            document.getElementById('serverList').innerHTML = "";
             document.getElementById('seriesControl').classList.add('hidden');
+            document.getElementById('mHashtags').innerHTML = "#LiveTV #Indonesia #Streaming";
             
-            // Menggunakan provider alternatif yang mendukung banyak channel lokal
-            // Server List untuk TV
-            let tvServers = '';
-            const providers = [
-                {n: 'Server 1', url: `https://www.nontongo.win/tv/${id}`},
-                {n: 'Server 2', url: `https://tv.okestream.xyz/${id}`},
-                {n: 'Server 3', url: `https://www.tvonlineindonesia.net/live/${id}`}
-            ];
-            
-            tvServers = providers.map((p, i) => 
-                `<button class="server-btn ${i===0?'active-link':''}" onclick="playVid('${p.url}', this)">${p.n}</button>`
-            ).join('');
-            
-            document.getElementById('serverList').innerHTML = tvServers;
-            playVid(providers[0].url);
+            // Menggunakan provider m3u8 proxy yang lebih stabil
+            const tvUrl = `https://www.nontongo.win/tv/${id}`;
+            playVid(tvUrl);
         }
 
         // --- SOUNDTRACK LOGIC ---
@@ -1328,13 +1320,10 @@
             const dots = document.getElementById('carouselDots'); 
             const loader = document.getElementById('videoLoader');
             
-            if(el && el.classList.contains('server-btn')) {
-                document.querySelectorAll('.server-btn').forEach(b => b.classList.remove('active-link'));
-                el.classList.add('active-link');
-            }
-
             loader.classList.remove('hidden');
+            
             const finalUrl = url.includes('?') ? `${url}&enablejsapi=1&autoplay=1&mute=0` : `${url}?enablejsapi=1&autoplay=1&mute=0`;
+            
             track.querySelectorAll('iframe').forEach(f => { f.src = ""; f.remove(); });
             
             const newIframe = document.createElement('iframe');
@@ -1343,7 +1332,10 @@
             newIframe.className = "w-full h-full";
             newIframe.allowFullscreen = true;
             newIframe.allow = "autoplay";
-            newIframe.onload = () => { loader.classList.add('hidden'); };
+            
+            newIframe.onload = () => {
+                loader.classList.add('hidden');
+            };
             
             track.innerHTML = '';
             const slide = document.createElement('div');
@@ -1375,6 +1367,7 @@
 
         function buildEmbedUrl(type, id, s, e, srv) {
             const seriesSuffix = (type === 'tv') ? `/${s}/${e}` : '';
+            
             let url = "";
             switch(srv) {
                 case 1: url = `https://vidrock.net/embed/${type}/${id}${seriesSuffix}`; break;
@@ -1400,7 +1393,7 @@
                 case 21: url = `https://www.dailymotion.com/embed/video/${currentDailymotionId}`; break;
                 default: url = `https://vidrock.net/embed/${type}/${id}${seriesSuffix}`;
             }
-            return url;
+            return url.replace("http://", "https://");
         }
 
         async function loadEpisodes() { 
