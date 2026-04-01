@@ -536,8 +536,9 @@
             }); 
         };
 
-        // --- TV MODAL LOGIC (FIXED) ---
+        // --- TV MODAL LOGIC (DIPERBAIKI) ---
         function initTvChannels() {
+            // Daftar channel lokal yang umum didukung
             const channels = [
                 { name: 'RCTI', id: 'rcti', logo: 'R' },
                 { name: 'SCTV', id: 'sctv', logo: 'S' },
@@ -576,17 +577,18 @@
 
         function playTvChannel(name, id) {
             closeTvModal();
+            // Buka Modal Player Utama untuk memutar TV
             document.getElementById('movieModal').style.display = 'block';
             document.getElementById('mTitle').innerText = "LIVE: " + name;
-            document.getElementById('mDesc').innerText = "Sedang memutar siaran langsung " + name + ". Pastikan koneksi internet stabil.";
-            document.getElementById('mLikeDisplay').innerText = "LIVE STREAMING";
+            document.getElementById('mDesc').innerText = "Sedang memutar siaran langsung " + name + ". Gunakan jaringan internet yang stabil.";
+            document.getElementById('mLikeDisplay').innerText = "Live Streaming";
             document.getElementById('mDateDisplay').innerText = "Online";
             document.getElementById('castContainer').innerHTML = "";
             document.getElementById('serverList').innerHTML = "";
             document.getElementById('seriesControl').classList.add('hidden');
             
-            // Perbaikan URL Direct Stream untuk Channel Lokal via multiembed
-            const tvUrl = `https://multiembed.mov/directstream.php?video_id=${id}&tmdb=1`;
+            // Menggunakan provider stream pihak ketiga yang stabil untuk TV lokal
+            const tvUrl = `https://www.nontongo.win/tv/${id}`;
             playVid(tvUrl);
         }
 
@@ -1377,7 +1379,7 @@
                 case 8: url = `https://vidfast.pro/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`; break;
                 case 9: url = `https://moviesapi.club/${type}/${id}${seriesSuffix}`; break;
                 case 10: url = `https://vidsrc.cc/v2/embed/${type}/${id}${type==='tv'?`?s=${s}&e=${e}`:''}`; break;
-                case 11: url = `https://multiembed.mov/directstream.php?video_id=${id}${type==='tv'?`&s=${s}&e=${e}`:''}&tmdb=1`; break;
+                case 11: url = `https://multiembed.mov/directstream.php?video_id=${id}${type==='tv'?`&s=${s}&e=${e}`:''}`; break;
                 case 12: url = `https://www.2embed.cc/embed${type==='tv'?'tv':''}/${id}${type==='tv'?`&s=${s}&e=${e}`:''}`; break;
                 case 13: url = `https://vidsrc.xyz/embed/${type}/${id}${seriesSuffix}`; break;
                 case 14: url = `https://vidsrc.me/embed/${type}?tmdb=${id}${seriesSuffix}`; break;
