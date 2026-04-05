@@ -248,7 +248,19 @@
         .tv-mini-btn.active-tv { border-color: #fff; background: #222; }
 
         /* Tombol Soundtrack (DIUBAH: Hapus Bingkai) */
-        .btn-soundtrack { font-size: 13px; font-weight: 700; color: #fff; cursor: pointer; border: none; padding: 2px 0; background: transparent; outline: none; }
+        .btn-soundtrack { font-size: 13px; font-weight: 700; color: #fff; cursor: pointer; border: none; padding: 2px 0; background: transparent; }
+
+        /* --- SOUNDTRACK LIST STYLE --- */
+        #soundtrackContainer { 
+            display: none; margin-top: 10px; padding: 0 15px; 
+            max-height: 250px; overflow-y: auto; border-top: 1px solid #1c1c1c;
+        }
+        .st-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #111; }
+        .st-info { display: flex; flex-direction: column; gap: 2px; max-width: 70%; }
+        .st-track-name { font-size: 13px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .st-artist-name { font-size: 11px; color: #8e8e8e; }
+        .st-play-btn { width: 32px; height: 32px; border-radius: 50%; background: #262626; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #fff; cursor: pointer; }
+        .st-play-btn.playing { background: #fff; color: #000; }
     </style>
 </head>
 <body>
@@ -436,9 +448,11 @@
                 
                 <div class="px-4 bg-black pb-1 flex justify-between items-center">
                     <span id="mLikeDisplay" class="ig-likes-count"></span>
-                    <button class="btn-soundtrack" onclick="openSoundtrack()">Soundtrack</button>
+                    <button class="btn-soundtrack" onclick="toggleSoundtrackList()">Soundtrack</button>
                 </div>
             </div>
+
+            <div id="soundtrackContainer" class="no-scrollbar"></div>
             
             <div class="ig-post-content">
                 <div class="mb-1">
@@ -531,6 +545,10 @@
         let lastTrailerSources = []; 
         let currentDailymotionId = ""; // Menyimpan ID Dailymotion
         
+        // Audio Player Global
+        let currentAudio = null;
+        let currentAudioBtn = null;
+
         // GLOBAL STATE UNTUK TV SERIES
         let activeServerIdx = 1; // Default server 1
         let activeEpisode = 1;
@@ -614,12 +632,81 @@
             document.getElementById('tvPlayerModal').style.display = 'none';
         }
 
-        function openSoundtrack() {
-            const title = document.getElementById('mTitle').innerText;
-            if(title && title !== "Memuat...") {
-                const query = encodeURIComponent(title + " soundtrack");
-                // Membuka tab baru yang langsung mengarah ke hasil pencarian iTunes Store untuk memudahkan user melihat judul, penyanyi & review
-                window.open(`https://itunes.apple.com/search?term=${query}&entity=song&limit=25`, '_blank');
+        // --- SOUNDTRACK FUNCTIONS (MENGGUNAKAN ITUNES API) ---
+        async function toggleSoundtrackList() {
+            const cont = document.getElementById('soundtrackContainer');
+            if (cont.style.display === 'block') {
+                cont.style.display = 'none';
+                stopCurrentAudio();
+                return;
+            }
+            
+            cont.innerHTML = '<div class="text-center py-4 text-xs text-zinc-500">Mencari soundtrack...</div>';
+            cont.style.display = 'block';
+            
+            const movieTitle = document.getElementById('mTitle').innerText;
+            try {
+                // Search iTunes API
+                const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(movieTitle)}&entity=song&limit=15`);
+                const data = await res.json();
+                
+                if (!data.results || data.results.length === 0) {
+                    cont.innerHTML = '<div class="text-center py-4 text-xs text-zinc-600">Soundtrack tidak ditemukan.</div>';
+                    return;
+                }
+                
+                cont.innerHTML = data.results.map(track => `
+                    <div class="st-item">
+                        <div class="st-info">
+                            <span class="st-track-name">${track.trackName}</span>
+                            <span class="st-artist-name">${track.artistName}</span>
+                        </div>
+                        <div class="st-play-btn" onclick="handleTrackPlay('${track.previewUrl}', this)">
+                            <i class="fa-solid fa-play"></i>
+                        </div>
+                    </div>
+                `).join('');
+                
+            } catch (e) {
+                cont.innerHTML = '<div class="text-center py-4 text-xs text-red-800 text-opacity-50">Gagal memuat musik.</div>';
+            }
+        }
+
+        function handleTrackPlay(url, btn) {
+            if (currentAudio && currentAudio.src === url) {
+                if (currentAudio.paused) {
+                    currentAudio.play();
+                    btn.innerHTML = '<i class="fa-solid fa-pause"></i>';
+                    btn.classList.add('playing');
+                } else {
+                    currentAudio.pause();
+                    btn.innerHTML = '<i class="fa-solid fa-play"></i>';
+                    btn.classList.remove('playing');
+                }
+            } else {
+                stopCurrentAudio();
+                currentAudio = new Audio(url);
+                currentAudioBtn = btn;
+                currentAudio.play();
+                btn.innerHTML = '<i class="fa-solid fa-pause"></i>';
+                btn.classList.add('playing');
+                
+                currentAudio.onended = () => {
+                    btn.innerHTML = '<i class="fa-solid fa-play"></i>';
+                    btn.classList.remove('playing');
+                    currentAudio = null;
+                };
+            }
+        }
+
+        function stopCurrentAudio() {
+            if (currentAudio) {
+                currentAudio.pause();
+                if (currentAudioBtn) {
+                    currentAudioBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
+                    currentAudioBtn.classList.remove('playing');
+                }
+                currentAudio = null;
             }
         }
 
@@ -1040,7 +1127,7 @@
             document.getElementById('searchInp').focus(); 
             document.body.style.overflow='hidden'; 
             updateActiveNav(document.getElementById('searchBtnNav'));
-            if (!window.history.state || window.history.state.view !== 'modal') { history.pushState({view: 'search'}, ""); }
+            if (!window.history.state || window.history.state.view !== 'search') { history.pushState({view: 'search'}, ""); }
         }
 
         function closeSearch() { 
@@ -1148,6 +1235,10 @@
             activeEpisode = 1;
             activeSeason = 1;
             
+            // Reset Soundtrack
+            document.getElementById('soundtrackContainer').style.display = 'none';
+            stopCurrentAudio();
+
             const seriesSuffix = (type === 'tv') ? '/1/1' : ''; 
             document.getElementById('mTitle').innerText = "Memuat...";
             document.getElementById('mDesc').innerText = "";
@@ -1290,6 +1381,7 @@
             document.body.style.overflow = 'auto'; 
             if(document.body.classList.contains('landscape-active')) closeLandscapeSilently(); 
             window.currentMediaId = null; 
+            stopCurrentAudio();
         }
 
         function renderSynopsis() { const descEl = document.getElementById('mDesc'), toggleBtn = document.getElementById('mToggleBtn'); if (globalFullDesc.length > 90) { toggleBtn.classList.remove('hidden'); descEl.innerText = isExpanded ? globalFullDesc : globalFullDesc.substring(0, 90) + "..."; toggleBtn.innerText = isExpanded ? "ringkas" : "selengkapnya"; } else { descEl.innerText = globalFullDesc; toggleBtn.classList.add('hidden'); } }
