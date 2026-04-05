@@ -247,8 +247,8 @@
         .tv-mini-btn { background: #111; border: 1px solid #333; padding: 8px 2px; border-radius: 8px; text-align: center; font-size: 9px; font-weight: 800; color: #fff; cursor: pointer; }
         .tv-mini-btn.active-tv { border-color: #fff; background: #222; }
 
-        /* Tombol Soundtrack */
-        .btn-soundtrack { font-size: 13px; font-weight: 700; color: #fff; cursor: pointer; border: 1px solid #333; padding: 2px 10px; border-radius: 6px; background: #111; }
+        /* Tombol Soundtrack (DIUBAH: Hapus Bingkai) */
+        .btn-soundtrack { font-size: 13px; font-weight: 700; color: #fff; cursor: pointer; border: none; padding: 2px 0; background: transparent; outline: none; }
     </style>
 </head>
 <body>
@@ -516,8 +516,8 @@
 
     <nav class="bottom-nav">
         <i class="fa-solid fa-house cursor-pointer text-xl active-nav" id="homeBtnNav" onclick="updateActiveNav(this); backToHome()"></i>
-        <i class="fa-solid fa-clapperboard cursor-pointer text-xl" id="tvBtnNav" onclick="updateActiveNav(this); openTvList()"></i>
         <i class="fa-solid fa-magnifying-glass cursor-pointer text-xl" id="searchBtnNav" onclick="updateActiveNav(this); openSearch()"></i>
+        <i class="fa-solid fa-clapperboard cursor-pointer text-xl" id="tvBtnNav" onclick="updateActiveNav(this); openTvList()"></i>
         <i class="fa-solid fa-bookmark cursor-pointer text-xl" id="bookmarkBtnNav" onclick="updateActiveNav(this); switchTab('bookmarks', document.getElementById('tabBookmark'))"></i>
     </nav>
 
@@ -615,9 +615,11 @@
         }
 
         function openSoundtrack() {
-            if(window.currentMediaId) {
-                const query = encodeURIComponent(document.getElementById('mTitle').innerText + " original soundtrack");
-                window.open(`https://www.youtube.com/results?search_query=${query}`, '_blank');
+            const title = document.getElementById('mTitle').innerText;
+            if(title && title !== "Memuat...") {
+                const query = encodeURIComponent(title + " soundtrack");
+                // Membuka tab baru yang langsung mengarah ke hasil pencarian iTunes Store untuk memudahkan user melihat judul, penyanyi & review
+                window.open(`https://itunes.apple.com/search?term=${query}&entity=song&limit=25`, '_blank');
             }
         }
 
@@ -1038,7 +1040,7 @@
             document.getElementById('searchInp').focus(); 
             document.body.style.overflow='hidden'; 
             updateActiveNav(document.getElementById('searchBtnNav'));
-            if (!window.history.state || window.history.state.view !== 'search') { history.pushState({view: 'search'}, ""); }
+            if (!window.history.state || window.history.state.view !== 'modal') { history.pushState({view: 'search'}, ""); }
         }
 
         function closeSearch() { 
