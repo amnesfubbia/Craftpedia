@@ -232,11 +232,38 @@
 
         /* --- TV MODAL --- */
         #tvModal { display: none; position: fixed; inset: 0; background: #000; z-index: 9600; overflow-y: auto; }
-        .tv-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; padding-bottom: 100px; }
-        .tv-item { background: #111; border: 1px solid #222; border-radius: 12px; padding: 10px 6px; text-align: center; cursor: pointer; transition: all 0.2s; }
+        .tv-search-box { margin: 12px 15px; background: #1a1a1a; border-radius: 10px; padding: 8px 12px; display: flex; align-items: center; gap: 8px; border: 1px solid #2a2a2a; }
+        .tv-search-box input { background: transparent; border: none; outline: none; color: #fff; font-size: 13px; width: 100%; }
+        .tv-category-title { font-size: 10px; font-weight: 800; color: #666; text-transform: uppercase; letter-spacing: 2px; padding: 10px 15px 6px; }
+        .tv-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 0 15px 8px; }
+        .tv-item { background: #111; border: 1px solid #222; border-radius: 10px; padding: 8px 4px; text-align: center; cursor: pointer; transition: all 0.2s; }
         .tv-item:active { transform: scale(0.95); background: #222; }
-        .tv-logo-placeholder { width: 46px; height: 46px; background: #222; border-radius: 50%; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; color: #fff; }
-        .tv-name { font-size: 11px; font-weight: 700; color: #fff; }
+        .tv-item.tv-active { border-color: #fff; background: #1a1a1a; }
+        .tv-logo-placeholder { width: 38px; height: 38px; background: #222; border-radius: 50%; margin: 0 auto 6px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; color: #fff; }
+        .tv-name { font-size: 9px; font-weight: 700; color: #fff; }
+        /* TV Player mode - sembunyikan elemen film */
+        .tv-mode #castContainer,
+        .tv-mode #btnLikeModal,
+        .tv-mode #btnBookModal,
+        .tv-mode #mLikeDisplay,
+        .tv-mode .fa-rotate-right,
+        .tv-mode [onclick="openSoundtrack()"],
+        .tv-mode #mHashtags,
+        .tv-mode #mDateDisplay,
+        .tv-mode #mTranslateBtn,
+        .tv-mode #mToggleBtn,
+        .tv-mode .fa-comment,
+        .tv-mode #serverList,
+        .tv-mode .dl-grid { display: none !important; }
+        /* Channel switcher di bawah player */
+        #tvChannelSwitcher { padding: 0 15px 100px; }
+        .tv-switcher-category { font-size: 10px; font-weight: 800; color: #555; text-transform: uppercase; letter-spacing: 2px; padding: 14px 0 6px; }
+        .tv-switcher-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+        .tv-switcher-btn { background: #111; border: 1px solid #222; border-radius: 8px; padding: 6px 4px; text-align: center; cursor: pointer; transition: all 0.2s; }
+        .tv-switcher-btn:active { transform: scale(0.95); }
+        .tv-switcher-btn.active-ch { border-color: #fff; background: #1c1c1c; }
+        .tv-switcher-logo { width: 30px; height: 30px; border-radius: 50%; margin: 0 auto 4px; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 800; color: #fff; }
+        .tv-switcher-name { font-size: 8px; font-weight: 700; color: #ccc; }
     </style>
 </head>
 <body>
@@ -500,7 +527,11 @@
             <i class="fa-solid fa-chevron-left text-xl cursor-pointer" onclick="closeTvModal()"></i>
             <div class="flex-grow text-center text-[14px] font-black uppercase tracking-widest">INDONESIA TV</div>
         </div>
-        <div class="tv-grid" id="tvChannelList"></div>
+        <div class="tv-search-box">
+            <i class="fa-solid fa-magnifying-glass text-zinc-500 text-xs"></i>
+            <input type="text" id="tvSearchInp" placeholder="Cari channel..." autocomplete="off" oninput="filterTvChannels(this.value)">
+        </div>
+        <div id="tvChannelList"></div>
     </div>
 
     <nav class="bottom-nav">
@@ -538,61 +569,93 @@
             }); 
         };
 
-        // --- TV MODAL LOGIC (DIPERBAIKI DENGAN LINK BARU) ---
-        function initTvChannels() {
-            const channels = [
-                { name: 'RCTI', url: 'https://sindikasi.inews.id/embed/video/YWdlbnQ9ZGVza3RvcCZ1cmw9aHR0cHMlM0ElMkYlMkZlbWJlZC5yY3RpcGx1cy5jb20lMkZsaXZlJTJGcmN0aSUyRmluZXdzaWQmaGVpZ2h0PTEwMCUyNSZ3aWR0aD0xMDAlMjU=', logo: 'RCTI', color: '#e00' },
-                { name: 'GTV', url: 'https://sindikasi.inews.id/embed/video/YWdlbnQ9ZGVza3RvcCZ1cmw9aHR0cHMlM0ElMkYlMkZlbWJlZC5yY3RpcGx1cy5jb20lMkZsaXZlJTJGZ3R2JTJGaW5ld3NpZCZoZWlnaHQ9MTAwJTI1JndpZHRoPTEwMCUyNQ==', logo: 'GTV', color: '#0a0' },
-                { name: 'I-News', url: 'https://sindikasi.inews.id/embed/video/YWdlbnQ9ZGVza3RvcCZ1cmw9aHR0cHMlM0ElMkYlMkZlbWJlZC5yY3RpcGx1cy5jb20lMkZsaXZlJTJGaW5ld3MlMkZpbmV3c2lkJmhlaWdodD0xMDAlMjUmd2lkdGg9MTAwJTI1', logo: 'iNEWS', color: '#00c' },
-                { name: 'MNCTV', url: 'https://sindikasi.inews.id/embed/video/YWdlbnQ9ZGVza3RvcCZ1cmw9aHR0cHMlM0ElMkYlMkZlbWJlZC5yY3RpcGx1cy5jb20lMkZsaXZlJTJGbW5jdHYlMkZpbmV3c2lkJmhlaWdodD0xMDAlMjUmd2lkdGg9MTAwJTI1', logo: 'MNC', color: '#c60' },
-                { name: 'Trans 7', url: 'https://20.detik.com/watch/livestreaming-trans7', logo: 'T7', color: '#f60' },
-                { name: 'Trans TV', url: 'https://20.detik.com/watch/livestreaming-transtv', logo: 'TTV', color: '#c00' },
-                { name: 'SCTV', url: 'https://m.vidio.com/live/204-sctv', logo: 'SCTV', color: '#06c' },
-                { name: 'INDOSIAR', url: 'https://m.vidio.com/live/205-indosiar', logo: 'IND', color: '#009' },
-                { name: 'ANTV', url: 'https://m.vidio.com/live/782-antv', logo: 'ANTV', color: '#c00' },
-                { name: 'METRO TV', url: 'https://m.vidio.com/live/777-metro-tv', logo: 'MTv', color: '#039' },
-                { name: 'TV ONE', url: 'https://m.vidio.com/live/783-tvone', logo: 'tvO', color: '#c30' },
-                { name: 'KOMPAS TV', url: 'https://m.vidio.com/live/874-kompas-tv', logo: 'KTV', color: '#c00' },
-                { name: 'NET TV', url: 'https://multiembed.mov/directstream.php?video_id=nettv', logo: 'NET', color: '#333' },
-                { name: 'RTV', url: 'https://m.vidio.com/live/1561-rtv', logo: 'RTV', color: '#060' },
-                { name: 'MENTARI TV', url: 'https://m.vidio.com/live/8237-mentari-tv', logo: 'MEN', color: '#f90' },
-                { name: 'MOJI', url: 'https://m.vidio.com/live/206-moji', logo: 'MOJI', color: '#f06' },
-                { name: 'MDTV', url: 'https://m.vidio.com/live/875-mdtv', logo: 'MD', color: '#639' },
-                { name: 'TVRI', url: 'https://m.vidio.com/live/6441-tvri', logo: 'TVRI', color: '#060' },
-                { name: 'BTV', url: 'https://m.vidio.com/live/6165-btv', logo: 'BTV', color: '#00c' },
-                { name: 'GARUDA TV', url: 'https://m.vidio.com/live/18162-garuda-tv', logo: 'GRD', color: '#c60' },
-                { name: 'JTV', url: 'https://m.vidio.com/live/9713-jtv', logo: 'JTV', color: '#06c' },
-                { name: 'JAK TV', url: 'https://m.vidio.com/live/5415-jaktv', logo: 'JAK', color: '#c00' },
-                { name: 'MAGNA TV', url: 'https://m.vidio.com/live/7230-magna-tv', logo: 'MGN', color: '#609' },
-                { name: 'NUSANTARA', url: 'https://m.vidio.com/live/7432-nusantara-tv', logo: 'NUS', color: '#090' },
-                { name: 'DMI TV', url: 'https://m.vidio.com/live/12607-dmi-tv', logo: 'DMI', color: '#036' },
-                { name: 'DAAI TV', url: 'https://m.vidio.com/live/6482-daai-tv', logo: 'DAAI', color: '#369' },
-                { name: 'CAHAYA TV', url: 'https://m.vidio.com/live/10027-cahaya-tv', logo: 'CHY', color: '#f90' },
-                { name: 'ELSHINTA TV', url: 'https://m.vidio.com/live/5731-elshinta-tv', logo: 'ELS', color: '#c30' },
-                { name: 'BERITA SATU', url: 'https://m.vidio.com/live/5765-beritasatu', logo: 'B1', color: '#03c' },
-                { name: 'CNN INDO', url: 'https://m.vidio.com/live/1148-cnn-indonesia', logo: 'CNN', color: '#c00' },
-                { name: 'CNBC INDO', url: 'https://m.vidio.com/live/1254-cnbc-indonesia', logo: 'CNBC', color: '#06c' },
-                { name: 'TVRI JABAR', url: 'https://m.vidio.com/live/6450-tvri-jawa-barat', logo: 'JBR', color: '#060' },
-                { name: 'TVRI JATENG', url: 'https://m.vidio.com/live/6444-tvri-jawa-tengah', logo: 'JTG', color: '#060' },
-                { name: 'TVRI JATIM', url: 'https://m.vidio.com/live/6445-tvri-jawa-timur', logo: 'JTM', color: '#060' },
-                { name: 'TVRI BALI', url: 'https://m.vidio.com/live/6452-tvri-bali', logo: 'BALI', color: '#c60' },
-                { name: 'TVRI SULSEL', url: 'https://m.vidio.com/live/6459-tvri-sulawesi-selatan', logo: 'SLS', color: '#060' },
-                { name: 'TVRI SUMUT', url: 'https://m.vidio.com/live/6447-tvri-sumatera-utara', logo: 'SMU', color: '#060' },
-                { name: 'TVRI KALTIM', url: 'https://m.vidio.com/live/6457-tvri-kalimantan-timur', logo: 'KLT', color: '#060' },
-                { name: 'PAL TV', url: 'https://m.vidio.com/live/9098-pal-tv', logo: 'PAL', color: '#c06' },
-                { name: 'KOMPAS TV JTM', url: 'https://m.vidio.com/live/7088-kompas-tv-jawa-timur', logo: 'KJT', color: '#c00' },
-            ];
+        // --- TV MODAL LOGIC ---
+        const tvCategories = [
+            {
+                label: 'Nasional',
+                channels: [
+                    { name: 'RCTI', url: 'https://sindikasi.inews.id/embed/video/YWdlbnQ9ZGVza3RvcCZ1cmw9aHR0cHMlM0ElMkYlMkZlbWJlZC5yY3RpcGx1cy5jb20lMkZsaXZlJTJGcmN0aSUyRmluZXdzaWQmaGVpZ2h0PTEwMCUyNSZ3aWR0aD0xMDAlMjU=', logo: 'RCTI' },
+                    { name: 'GTV', url: 'https://sindikasi.inews.id/embed/video/YWdlbnQ9ZGVza3RvcCZ1cmw9aHR0cHMlM0ElMkYlMkZlbWJlZC5yY3RpcGx1cy5jb20lMkZsaXZlJTJGZ3R2JTJGaW5ld3NpZCZoZWlnaHQ9MTAwJTI1JndpZHRoPTEwMCUyNQ==', logo: 'GTV' },
+                    { name: 'MNCTV', url: 'https://sindikasi.inews.id/embed/video/YWdlbnQ9ZGVza3RvcCZ1cmw9aHR0cHMlM0ElMkYlMkZlbWJlZC5yY3RpcGx1cy5jb20lMkZsaXZlJTJGbW5jdHYlMkZpbmV3c2lkJmhlaWdodD0xMDAlMjUmd2lkdGg9MTAwJTI1', logo: 'MNC' },
+                    { name: 'SCTV', url: 'https://m.vidio.com/live/204-sctv', logo: 'SCTV' },
+                    { name: 'INDOSIAR', url: 'https://m.vidio.com/live/205-indosiar', logo: 'IND' },
+                    { name: 'ANTV', url: 'https://m.vidio.com/live/782-antv', logo: 'ANTV' },
+                    { name: 'Trans 7', url: 'https://20.detik.com/watch/livestreaming-trans7', logo: 'T7' },
+                    { name: 'Trans TV', url: 'https://20.detik.com/watch/livestreaming-transtv', logo: 'TTV' },
+                    { name: 'NET TV', url: 'https://multiembed.mov/directstream.php?video_id=nettv', logo: 'NET' },
+                    { name: 'RTV', url: 'https://m.vidio.com/live/1561-rtv', logo: 'RTV' },
+                    { name: 'TVRI', url: 'https://m.vidio.com/live/6441-tvri', logo: 'TVRI' },
+                    { name: 'MOJI', url: 'https://m.vidio.com/live/206-moji', logo: 'MOJI' },
+                    { name: 'MENTARI TV', url: 'https://m.vidio.com/live/8237-mentari-tv', logo: 'MEN' },
+                    { name: 'MDTV', url: 'https://m.vidio.com/live/875-mdtv', logo: 'MD' },
+                    { name: 'BTV', url: 'https://m.vidio.com/live/6165-btv', logo: 'BTV' },
+                    { name: 'GARUDA TV', url: 'https://m.vidio.com/live/18162-garuda-tv', logo: 'GRD' },
+                    { name: 'MAGNA TV', url: 'https://m.vidio.com/live/7230-magna-tv', logo: 'MGN' },
+                    { name: 'DAAI TV', url: 'https://m.vidio.com/live/6482-daai-tv', logo: 'DAAI' },
+                    { name: 'CAHAYA TV', url: 'https://m.vidio.com/live/10027-cahaya-tv', logo: 'CHY' },
+                    { name: 'DMI TV', url: 'https://m.vidio.com/live/12607-dmi-tv', logo: 'DMI' },
+                ]
+            },
+            {
+                label: 'Berita',
+                channels: [
+                    { name: 'METRO TV', url: 'https://m.vidio.com/live/777-metro-tv', logo: 'MTv' },
+                    { name: 'TV ONE', url: 'https://m.vidio.com/live/783-tvone', logo: 'tvO' },
+                    { name: 'KOMPAS TV', url: 'https://m.vidio.com/live/874-kompas-tv', logo: 'KTV' },
+                    { name: 'I-News', url: 'https://sindikasi.inews.id/embed/video/YWdlbnQ9ZGVza3RvcCZ1cmw9aHR0cHMlM0ElMkYlMkZlbWJlZC5yY3RpcGx1cy5jb20lMkZsaXZlJTJGaW5ld3MlMkZpbmV3c2lkJmhlaWdodD0xMDAlMjUmd2lkdGg9MTAwJTI1', logo: 'iNEWS' },
+                    { name: 'CNN INDO', url: 'https://m.vidio.com/live/1148-cnn-indonesia', logo: 'CNN' },
+                    { name: 'CNBC INDO', url: 'https://m.vidio.com/live/1254-cnbc-indonesia', logo: 'CNBC' },
+                    { name: 'BERITA SATU', url: 'https://m.vidio.com/live/5765-beritasatu', logo: 'B1' },
+                    { name: 'ELSHINTA TV', url: 'https://m.vidio.com/live/5731-elshinta-tv', logo: 'ELS' },
+                ]
+            },
+            {
+                label: 'Lokal & Regional',
+                channels: [
+                    { name: 'JTV', url: 'https://m.vidio.com/live/9713-jtv', logo: 'JTV' },
+                    { name: 'JAK TV', url: 'https://m.vidio.com/live/5415-jaktv', logo: 'JAK' },
+                    { name: 'NUSANTARA', url: 'https://m.vidio.com/live/7432-nusantara-tv', logo: 'NUS' },
+                    { name: 'PAL TV', url: 'https://m.vidio.com/live/9098-pal-tv', logo: 'PAL' },
+                    { name: 'KOMPAS JTM', url: 'https://m.vidio.com/live/7088-kompas-tv-jawa-timur', logo: 'KJT' },
+                    { name: 'TVRI JABAR', url: 'https://m.vidio.com/live/6450-tvri-jawa-barat', logo: 'JBR' },
+                    { name: 'TVRI JATENG', url: 'https://m.vidio.com/live/6444-tvri-jawa-tengah', logo: 'JTG' },
+                    { name: 'TVRI JATIM', url: 'https://m.vidio.com/live/6445-tvri-jawa-timur', logo: 'JTM' },
+                    { name: 'TVRI BALI', url: 'https://m.vidio.com/live/6452-tvri-bali', logo: 'BALI' },
+                    { name: 'TVRI SULSEL', url: 'https://m.vidio.com/live/6459-tvri-sulawesi-selatan', logo: 'SLS' },
+                    { name: 'TVRI SUMUT', url: 'https://m.vidio.com/live/6447-tvri-sumatera-utara', logo: 'SMU' },
+                    { name: 'TVRI KALTIM', url: 'https://m.vidio.com/live/6457-tvri-kalimantan-timur', logo: 'KLT' },
+                ]
+            }
+        ];
+
+        function renderTvList(filter) {
             const cont = document.getElementById('tvChannelList');
-            cont.innerHTML = channels.map(ch => `
-                <div class="tv-item" onclick="playTvChannel('${ch.name}', '${ch.url}')">
-                    <div class="tv-logo-placeholder" style="background:${ch.color};">${ch.logo}</div>
-                    <div class="tv-name">${ch.name}</div>
-                </div>
-            `).join('');
+            const q = (filter || '').toLowerCase();
+            let html = '';
+            tvCategories.forEach(cat => {
+                const filtered = cat.channels.filter(ch => ch.name.toLowerCase().includes(q));
+                if (filtered.length === 0) return;
+                html += `<div class="tv-category-title">${cat.label}</div><div class="tv-grid">`;
+                filtered.forEach(ch => {
+                    html += `<div class="tv-item" onclick="playTvChannel('${ch.name}', '${ch.url}')">
+                        <div class="tv-logo-placeholder">${ch.logo}</div>
+                        <div class="tv-name">${ch.name}</div>
+                    </div>`;
+                });
+                html += `</div>`;
+            });
+            if (!html) html = '<div class="text-center py-10 text-zinc-600 text-xs">Channel tidak ditemukan.</div>';
+            cont.innerHTML = html;
         }
+
+        function initTvChannels() { renderTvList(''); }
+
+        function filterTvChannels(q) { renderTvList(q); }
 
         function openTvModal() {
             closeModal(); closeSearch();
+            document.getElementById('tvSearchInp').value = '';
+            renderTvList('');
             document.getElementById('tvModal').style.display = 'block';
             document.body.style.overflow = 'hidden';
             history.pushState({view: 'tv'}, "");
@@ -606,20 +669,50 @@
 
         function playTvChannel(name, url) {
             closeTvModal();
-            document.getElementById('movieModal').style.display = 'block';
-            document.getElementById('mTitle').innerText = "LIVE: " + name;
-            document.getElementById('mDesc').innerText = "Sedang memutar siaran langsung " + name + ". Pastikan koneksi internet stabil.";
-            document.getElementById('mLikeDisplay').innerText = "Live Streaming";
-            document.getElementById('mDateDisplay').innerText = "Online";
-            document.getElementById('castContainer').innerHTML = "";
-            document.getElementById('serverList').innerHTML = "";
+            const modal = document.getElementById('movieModal');
+            modal.classList.add('tv-mode');
+            modal.style.display = 'block';
+            document.getElementById('mTitle').innerText = '● LIVE: ' + name;
+            document.getElementById('mDesc').innerText = '';
+            document.getElementById('mLikeDisplay').innerText = '';
+            document.getElementById('mDateDisplay').innerText = '';
+            document.getElementById('castContainer').innerHTML = '';
+            document.getElementById('serverList').innerHTML = '';
             document.getElementById('seriesControl').classList.add('hidden');
-            document.getElementById('mHashtags').innerHTML = "#LiveTV #Indonesia #Amnesfubbia";
-            
+            document.getElementById('mHashtags').innerHTML = '';
+            document.getElementById('mToggleBtn').classList.add('hidden');
+            document.getElementById('mTranslateBtn').classList.add('hidden');
+            document.body.style.overflow = 'hidden';
+            history.pushState({view: 'modal'}, '');
+
+            // Render channel switcher di bawah player
+            const postContent = document.querySelector('#movieModal .ig-post-content');
+            let switcherHTML = '<div id="tvChannelSwitcher">';
+            tvCategories.forEach(cat => {
+                switcherHTML += `<div class="tv-switcher-category">${cat.label}</div><div class="tv-switcher-grid">`;
+                cat.channels.forEach(ch => {
+                    const isActive = ch.name === name ? 'active-ch' : '';
+                    switcherHTML += `<div class="tv-switcher-btn ${isActive}" onclick="switchTvChannel('${ch.name}','${ch.url}',this)">
+                        <div class="tv-switcher-logo">${ch.logo}</div>
+                        <div class="tv-switcher-name">${ch.name}</div>
+                    </div>`;
+                });
+                switcherHTML += `</div>`;
+            });
+            switcherHTML += '</div>';
+            postContent.innerHTML = switcherHTML;
+
             playVid(url);
         }
 
-        // --- SOUNDTRACK LOGIC ---
+        function switchTvChannel(name, url, el) {
+            document.querySelectorAll('.tv-switcher-btn').forEach(b => b.classList.remove('active-ch'));
+            el.classList.add('active-ch');
+            document.getElementById('mTitle').innerText = '● LIVE: ' + name;
+            playVid(url);
+        }
+
+
         async function openSoundtrack() {
             document.querySelectorAll('#carouselTrack iframe').forEach(iframe => {
                 try {
@@ -1332,7 +1425,36 @@
                 track.querySelectorAll('iframe').forEach(f => { f.src = ""; f.remove(); }); 
                 track.innerHTML = ''; 
             } 
-            document.getElementById('movieModal').style.display = 'none'; 
+            const modal = document.getElementById('movieModal');
+            modal.classList.remove('tv-mode');
+            modal.style.display = 'none'; 
+            // Restore ig-post-content ke struktur asli jika sebelumnya TV mode
+            const postContent = document.querySelector('#movieModal .ig-post-content');
+            if (postContent && document.getElementById('tvChannelSwitcher')) {
+                postContent.innerHTML = `
+                <div class="mb-1">
+                    <span class="ig-username">amnesfubbia</span>
+                    <span id="mDesc" class="ig-caption"></span>
+                    <div class="mt-1"><span id="mToggleBtn" class="toggle-btn hidden" onclick="handleToggleDesc()">selengkapnya</span></div>
+                </div>
+                <div id="mHashtags" class="ig-hashtags"></div>
+                <div class="flex items-center gap-2 mt-1.5">
+                    <div id="mDateDisplay" class="ig-date"></div>
+                    <p id="mTranslateBtn" class="hidden" onclick="handleTranslate()">Lihat terjemahan</p>
+                </div>
+                <div id="seriesControl" class="hidden mt-4 p-4 bg-zinc-950 rounded-2xl border border-zinc-900">
+                    <div class="flex justify-between items-center mb-4">
+                        <h4 class="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Episode List</h4>
+                        <select id="seasonSel" class="bg-zinc-900 text-white text-[10px] px-2 py-1 rounded border border-zinc-700 appearance-none" onchange="loadEpisodes()"></select>
+                    </div>
+                    <div id="episodeGrid" class="grid grid-cols-5 gap-2"></div>
+                </div>
+                <div id="serverList" class="server-scroll-wrapper mt-4 px-4"></div>
+                <div class="dl-grid">
+                    <button id="btnDownload1" class="dl-link-btn" onclick="handleDownload()">Download</button>
+                    <button id="btnTrailerDailymotion" class="dl-link-btn btn-trailer-special" onclick="changeServer(21, this)">Trailer</button>
+                </div>`;
+            }
             document.body.style.overflow = 'auto'; 
             if(document.body.classList.contains('landscape-active')) closeLandscapeSilently(); 
             window.currentMediaId = null; 
