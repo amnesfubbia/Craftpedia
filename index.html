@@ -1157,7 +1157,7 @@
                 if(currentCountry) url += `&with_origin_country=${currentCountry}`;
                 if(currentGenre) url += `&with_genres=${currentGenre}`;
                 if(currentCompany) url += `&with_companies=${currentCompany}`;
-                if(currentType === 'short') { url += `&with_runtime.lte=20&with_runtime.gte=1&vote_count.lte=5000`; }
+                if(currentType === 'short') { url += `&with_genres=10755&with_runtime.lte=40&without_genres=18,28,35,27,878,53,12`; }
                 if(currentSchedule === 'now_playing' || currentSchedule === 'upcoming') { 
                     const today = new Date().toISOString().split('T')[0]; 
                     if(currentSchedule === 'now_playing') { 
