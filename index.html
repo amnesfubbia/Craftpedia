@@ -180,6 +180,29 @@
         .about-footer { margin-top: 40px; text-align: center; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 20px; font-size: 12px; color: #666; }
         .feature-icon { font-size: 18px; color: #fff; width: 24px; text-align: center; }
 
+        /* --- MENU SECTION --- */
+        .menu-section { margin-bottom: 24px; }
+        .menu-section-title { font-size: 11px; font-weight: 700; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; padding-left: 4px; }
+        .menu-item { display: flex; align-items: center; gap: 14px; padding: 14px 16px; background: rgba(255, 255, 255, 0.05); border-radius: 12px; margin-bottom: 8px; cursor: pointer; transition: all 0.2s ease; border: 1px solid transparent; }
+        .menu-item:hover { background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.1); }
+        .menu-item:active { transform: scale(0.98); }
+        .menu-item i { font-size: 20px; width: 24px; text-align: center; color: #fff; }
+        .menu-item span { font-size: 14px; color: #eee; flex: 1; }
+        .menu-item .menu-badge { font-size: 11px; background: #0095f6; color: #fff; padding: 2px 8px; border-radius: 10px; }
+        .menu-item .menu-arrow { font-size: 14px; color: #666; }
+        .menu-item.danger { background: rgba(255, 59, 48, 0.1); }
+        .menu-item.danger i, .menu-item.danger span { color: #ff3b30; }
+        .menu-toggle { position: relative; width: 44px; height: 24px; background: #333; border-radius: 12px; cursor: pointer; transition: background 0.3s; }
+        .menu-toggle.active { background: #0095f6; }
+        .menu-toggle::after { content: ''; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; background: #fff; border-radius: 50%; transition: transform 0.3s; }
+        .menu-toggle.active::after { transform: translateX(20px); }
+        .menu-divider { height: 1px; background: rgba(255, 255, 255, 0.1); margin: 20px 0; }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 12px; }
+        .stats-card { background: rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 16px 12px; text-align: center; border: 1px solid rgba(255, 255, 255, 0.08); }
+        .stats-card .stats-number { font-size: 20px; font-weight: 800; color: #fff; }
+        .stats-card .stats-label { font-size: 10px; color: #888; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .version-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(0, 149, 246, 0.15); color: #0095f6; padding: 4px 10px; border-radius: 8px; font-size: 12px; font-weight: 600; }
+
         /* --- LANDSCAPE --- */
         .landscape-overlay { display: none; position: fixed; inset: 0; z-index: 9900; background: #000; }
         .landscape-video-container { width: 100%; height: 100%; position: relative; }
@@ -295,34 +318,135 @@
 
     <div id="sideMenu">
         <i class="ph ph-x side-close" onclick="toggleSideMenu()"></i>
-        <div class="about-title">About Amnesfubbia</div>
-        <div class="about-content px-1">
-            amnesfubbia adalah platform katalog sinema digital yang dirancang untuk memberikan pengalaman eksplorasi movie dan tv tanpa batas.
+        
+        <!-- ACCOUNT SECTION -->
+        <div class="menu-section">
+            <div class="menu-section-title">Account</div>
+            <div class="menu-item" onclick="showWatchHistory()">
+                <i class="ph ph-clock-counter-clockwise"></i>
+                <span>Watch History</span>
+                <span class="menu-badge" id="historyCount">0</span>
+                <i class="ph ph-caret-right menu-arrow"></i>
+            </div>
+            <div class="menu-item" onclick="showMyCollections()">
+                <i class="ph ph-folder-simple"></i>
+                <span>My Collections</span>
+                <i class="ph ph-caret-right menu-arrow"></i>
+            </div>
+            <div class="menu-item" onclick="showStatistics()">
+                <i class="ph ph-chart-bar"></i>
+                <span>Statistics</span>
+                <i class="ph ph-caret-right menu-arrow"></i>
+            </div>
+            <!-- Stats Preview -->
+            <div class="stats-grid" id="statsPreview">
+                <div class="stats-card">
+                    <div class="stats-number" id="totalWatched">0</div>
+                    <div class="stats-label">Watched</div>
+                </div>
+                <div class="stats-card">
+                    <div class="stats-number" id="totalBookmarks">0</div>
+                    <div class="stats-label">Bookmarks</div>
+                </div>
+                <div class="stats-card">
+                    <div class="stats-number" id="totalLikes">0</div>
+                    <div class="stats-label">Likes</div>
+                </div>
+            </div>
         </div>
-        <div class="about-feature">
-            <div class="font-bold mb-4 text-white text-sm">Fitur Utama:</div>
-            <ul class="space-y-4 text-[13px]">
-                <li class="flex items-center gap-3">
-                    <i class="ph ph-film-slate feature-icon"></i>
-                    <span><span class="font-semibold text-white">Database Luas:</span> Akses ke ribuan movie dan tv global.</span>
-                </li>
-                <li class="flex items-center gap-3">
-                    <i class="ph ph-magnifying-glass feature-icon"></i>
-                    <span><span class="font-semibold text-white">Smart Search:</span> Cari judul, aktor, atau studio favoritmu.</span>
-                </li>
-                <li class="flex items-center gap-3">
-                    <i class="ph ph-archive-box feature-icon"></i>
-                    <span><span class="font-semibold text-white">Personal Archive:</span> Simpan koleksi ke dalam Bookmark.</span>
-                </li>
-                <li class="flex items-center gap-3">
-                    <i class="ph ph-globe-hemisphere-west feature-icon"></i>
-                    <span><span class="font-semibold text-white">Multi-Server:</span> Streaming lancar dengan banyak opsi server.</span>
-                </li>
-            </ul>
+
+        <div class="menu-divider"></div>
+
+        <!-- SETTINGS SECTION -->
+        <div class="menu-section">
+            <div class="menu-section-title">Settings</div>
+            <div class="menu-item" onclick="toggleDarkMode()">
+                <i class="ph ph-moon"></i>
+                <span>Dark Mode</span>
+                <div class="menu-toggle active" id="darkModeToggle"></div>
+            </div>
+            <div class="menu-item" onclick="showQualitySettings()">
+                <i class="ph ph-gear-six"></i>
+                <span>Streaming Quality</span>
+                <span class="text-xs text-zinc-500">Auto</span>
+                <i class="ph ph-caret-right menu-arrow"></i>
+            </div>
+            <div class="menu-item" onclick="showLanguageSettings()">
+                <i class="ph ph-translate"></i>
+                <span>Language</span>
+                <span class="text-xs text-zinc-500">Indonesia</span>
+                <i class="ph ph-caret-right menu-arrow"></i>
+            </div>
+            <div class="menu-item" onclick="toggleAutoplay()">
+                <i class="ph ph-play-circle"></i>
+                <span>Autoplay Trailers</span>
+                <div class="menu-toggle" id="autoplayToggle"></div>
+            </div>
+            <div class="menu-item danger" onclick="clearAllData()">
+                <i class="ph ph-trash"></i>
+                <span>Clear All Data</span>
+            </div>
         </div>
+
+        <div class="menu-divider"></div>
+
+        <!-- ABOUT SECTION -->
+        <div class="menu-section">
+            <div class="menu-section-title">About</div>
+            <div class="about-title" style="margin-top: 0;">Amnesfubbia <span class="version-badge"><i class="ph ph-code"></i> v1.0.0</span></div>
+            <div class="about-content px-1">
+                Platform katalog sinema digital yang dirancang untuk memberikan pengalaman eksplorasi movie dan tv tanpa batas.
+            </div>
+            <div class="about-feature">
+                <div class="font-bold mb-4 text-white text-sm">Fitur Utama:</div>
+                <ul class="space-y-4 text-[13px]">
+                    <li class="flex items-center gap-3">
+                        <i class="ph ph-film-slate feature-icon"></i>
+                        <span><span class="font-semibold text-white">Database Luas:</span> Akses ke ribuan movie dan tv global.</span>
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <i class="ph ph-magnifying-glass feature-icon"></i>
+                        <span><span class="font-semibold text-white">Smart Search:</span> Cari judul, aktor, atau studio favoritmu.</span>
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <i class="ph ph-archive-box feature-icon"></i>
+                        <span><span class="font-semibold text-white">Personal Archive:</span> Simpan koleksi ke dalam Bookmark.</span>
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <i class="ph ph-globe-hemisphere-west feature-icon"></i>
+                        <span><span class="font-semibold text-white">Multi-Server:</span> Streaming lancar dengan banyak opsi server.</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Additional About Info -->
+            <div class="menu-item mt-4" onclick="showChangelog()">
+                <i class="ph ph-note"></i>
+                <span>Changelog</span>
+                <span class="menu-badge">New</span>
+                <i class="ph ph-caret-right menu-arrow"></i>
+            </div>
+            <div class="menu-item" onclick="showPrivacyPolicy()">
+                <i class="ph ph-shield-check"></i>
+                <span>Privacy Policy</span>
+                <i class="ph ph-caret-right menu-arrow"></i>
+            </div>
+            <div class="menu-item" onclick="showTermsOfService()">
+                <i class="ph ph-file-text"></i>
+                <span>Terms of Service</span>
+                <i class="ph ph-caret-right menu-arrow"></i>
+            </div>
+            <div class="menu-item" onclick="reportBug()">
+                <i class="ph ph-bug"></i>
+                <span>Report Bug</span>
+                <i class="ph ph-caret-right menu-arrow"></i>
+            </div>
+        </div>
+
         <div class="about-footer">
-            Created by <span class="text-white font-bold">Anasteas</span><br>
-            © 2026 Amnesfubbia Network
+            Created with <i class="ph ph-heart-fill text-red-500"></i> by <span class="text-white font-bold">Anasteas</span><br>
+            © 2026 Amnesfubbia Network<br>
+            <span class="text-zinc-600 text-[10px]">Powered by TMDB API</span>
         </div>
     </div>
 
@@ -1157,7 +1281,7 @@
                 if(currentCountry) url += `&with_origin_country=${currentCountry}`;
                 if(currentGenre) url += `&with_genres=${currentGenre}`;
                 if(currentCompany) url += `&with_companies=${currentCompany}`;
-                if(currentType === 'short') { url += `&with_genres=10755&with_runtime.lte=40&without_genres=18,28,35,27,878,53,12`; }
+                if(currentType === 'short') { url += `&with_runtime.lte=20&with_runtime.gte=1&vote_count.lte=5000`; }
                 if(currentSchedule === 'now_playing' || currentSchedule === 'upcoming') { 
                     const today = new Date().toISOString().split('T')[0]; 
                     if(currentSchedule === 'now_playing') { 
@@ -1297,12 +1421,15 @@
             } catch(e) { console.error(e); }
         }
 
-        async function openModal(id, type) {
-            const actorModal = document.getElementById('actorModal');
-            if (actorModal.style.display === 'block') actorModal.style.display = 'none';
-            window.currentMediaId = id; window.currentMediaType = type;
-            
-            activeServerIdx = 1;
+async function openModal(id, type) {
+  const actorModal = document.getElementById('actorModal');
+  if (actorModal.style.display === 'block') actorModal.style.display = 'none';
+  window.currentMediaId = id; window.currentMediaType = type;
+  
+  // Add to watch history
+  addToWatchHistory(id, type);
+  
+  activeServerIdx = 1;
             activeEpisode = 1;
             activeSeason = 1;
             
@@ -1579,6 +1706,160 @@
         }
         async function showLibrary(k) { const items = JSON.parse(localStorage.getItem(k) || '[]'); const grid = document.getElementById('feedGrid'); grid.innerHTML = ''; if (!items.length) { grid.innerHTML = '<div class="col-span-3 text-center py-20 text-zinc-500 text-xs">Belum ada konten disimpan</div>'; return; } const promises = items.map(i => fetchWithCache(`https://api.themoviedb.org/3/${i.type}/${i.id}?api_key=${API_KEY}&language=id-ID`).then(r => r)); const results = await Promise.all(promises); renderGrid(results.filter(m => m.id), grid); }
         window.onscroll = () => { if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 1000 && !loading && !searchQuery && !currentLibMode) { page++; loadFeed(false); } };
+        
+        // ==================== MENU FUNCTIONS ====================
+        
+        // Initialize menu stats on page load
+        function initMenuStats() {
+            const likes = JSON.parse(localStorage.getItem('likes') || '[]');
+            const bookmarks = JSON.parse(localStorage.getItem('bookmarks') || '[]');
+            const watchHistory = JSON.parse(localStorage.getItem('watchHistory') || '[]');
+            
+            document.getElementById('totalLikes').textContent = likes.length;
+            document.getElementById('totalBookmarks').textContent = bookmarks.length;
+            document.getElementById('totalWatched').textContent = watchHistory.length;
+            document.getElementById('historyCount').textContent = watchHistory.length;
+        }
+        
+        // Call on page load
+        document.addEventListener('DOMContentLoaded', initMenuStats);
+        
+        // ACCOUNT FUNCTIONS
+        function showWatchHistory() {
+            const history = JSON.parse(localStorage.getItem('watchHistory') || '[]');
+            if (history.length === 0) {
+                alert('Belum ada riwayat tontonan.');
+                return;
+            }
+            toggleSideMenu();
+            switchTab('history', null);
+            showLibraryCustom('watchHistory');
+        }
+        
+        function showMyCollections() {
+            alert('Fitur Collections akan segera hadir!');
+        }
+        
+        function showStatistics() {
+            const likes = JSON.parse(localStorage.getItem('likes') || '[]');
+            const bookmarks = JSON.parse(localStorage.getItem('bookmarks') || '[]');
+            const watchHistory = JSON.parse(localStorage.getItem('watchHistory') || '[]');
+            
+            alert(`Statistik Kamu:\n\nTotal Ditonton: ${watchHistory.length} film\nTotal Likes: ${likes.length}\nTotal Bookmarks: ${bookmarks.length}`);
+        }
+        
+        async function showLibraryCustom(k) {
+            const items = JSON.parse(localStorage.getItem(k) || '[]');
+            const grid = document.getElementById('feedGrid');
+            grid.innerHTML = '';
+            currentLibMode = true;
+            
+            if (!items.length) {
+                grid.innerHTML = '<div class="col-span-3 text-center py-20 text-zinc-500 text-xs">Belum ada konten</div>';
+                return;
+            }
+            
+            const promises = items.map(i => fetchWithCache(`https://api.themoviedb.org/3/${i.type}/${i.id}?api_key=${API_KEY}&language=id-ID`).then(r => r));
+            const results = await Promise.all(promises);
+            renderGrid(results.filter(m => m.id), grid);
+        }
+        
+        // Add to watch history when opening modal
+        function addToWatchHistory(id, type) {
+            let history = JSON.parse(localStorage.getItem('watchHistory') || '[]');
+            const exists = history.findIndex(x => x.id == id);
+            if (exists > -1) {
+                history.splice(exists, 1);
+            }
+            history.unshift({ id: id, type: type, timestamp: Date.now() });
+            if (history.length > 100) history = history.slice(0, 100);
+            localStorage.setItem('watchHistory', JSON.stringify(history));
+            initMenuStats();
+        }
+        
+        // SETTINGS FUNCTIONS
+        function toggleDarkMode() {
+            const toggle = document.getElementById('darkModeToggle');
+            toggle.classList.toggle('active');
+            // Dark mode is default, so this is just visual toggle
+            const isDark = toggle.classList.contains('active');
+            localStorage.setItem('darkMode', isDark ? 'true' : 'false');
+        }
+        
+        function showQualitySettings() {
+            const quality = prompt('Pilih kualitas streaming:\n1. Auto (Recommended)\n2. 1080p\n3. 720p\n4. 480p\n\nMasukkan nomor:', '1');
+            const qualities = ['Auto', '1080p', '720p', '480p'];
+            if (quality && quality >= 1 && quality <= 4) {
+                localStorage.setItem('streamQuality', qualities[quality - 1]);
+                alert('Kualitas streaming diubah ke: ' + qualities[quality - 1]);
+            }
+        }
+        
+        function showLanguageSettings() {
+            const lang = prompt('Pilih bahasa:\n1. Indonesia\n2. English\n\nMasukkan nomor:', '1');
+            const languages = ['Indonesia', 'English'];
+            if (lang && lang >= 1 && lang <= 2) {
+                localStorage.setItem('language', languages[lang - 1]);
+                alert('Bahasa diubah ke: ' + languages[lang - 1]);
+            }
+        }
+        
+        function toggleAutoplay() {
+            const toggle = document.getElementById('autoplayToggle');
+            toggle.classList.toggle('active');
+            const isAutoplay = toggle.classList.contains('active');
+            localStorage.setItem('autoplayTrailers', isAutoplay ? 'true' : 'false');
+        }
+        
+        function clearAllData() {
+            if (confirm('Apakah kamu yakin ingin menghapus semua data?\n\nIni akan menghapus:\n- Likes\n- Bookmarks\n- Watch History\n- Settings\n\nTindakan ini tidak dapat dibatalkan.')) {
+                localStorage.removeItem('likes');
+                localStorage.removeItem('bookmarks');
+                localStorage.removeItem('watchHistory');
+                localStorage.removeItem('darkMode');
+                localStorage.removeItem('streamQuality');
+                localStorage.removeItem('language');
+                localStorage.removeItem('autoplayTrailers');
+                initMenuStats();
+                alert('Semua data berhasil dihapus!');
+                location.reload();
+            }
+        }
+        
+        // ABOUT FUNCTIONS
+        function showChangelog() {
+            alert('Changelog v1.0.0 (April 2026)\n\n- Initial Release\n- Movie & TV catalog\n- Smart search with autocomplete\n- Multi-server streaming\n- Bookmarks & Likes\n- Watch History\n- Actor profiles\n- Soundtrack preview\n- TV Indonesia channels');
+        }
+        
+        function showPrivacyPolicy() {
+            alert('Privacy Policy\n\nAmnesfubbia tidak mengumpulkan data pribadi pengguna. Semua data (likes, bookmarks, history) disimpan secara lokal di perangkat Anda menggunakan localStorage.\n\nKami menggunakan TMDB API untuk data film dan tidak menyimpan data streaming.');
+        }
+        
+        function showTermsOfService() {
+            alert('Terms of Service\n\n1. Layanan ini disediakan "sebagaimana adanya"\n2. Konten streaming berasal dari pihak ketiga\n3. Pengguna bertanggung jawab atas penggunaan layanan\n4. Kami tidak menjamin ketersediaan server streaming\n5. Dilarang menggunakan layanan untuk tujuan ilegal');
+        }
+        
+        function reportBug() {
+            const bug = prompt('Deskripsikan bug yang kamu temukan:');
+            if (bug && bug.trim()) {
+                alert('Terima kasih atas laporanmu!\n\nBug report:\n"' + bug + '"\n\nKami akan segera memperbaikinya.');
+            }
+        }
+        
+        // Load saved settings on init
+        function loadSettings() {
+            const darkMode = localStorage.getItem('darkMode');
+            const autoplay = localStorage.getItem('autoplayTrailers');
+            
+            if (darkMode === 'false') {
+                document.getElementById('darkModeToggle').classList.remove('active');
+            }
+            if (autoplay === 'true') {
+                document.getElementById('autoplayToggle').classList.add('active');
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', loadSettings);
     </script>
 </body>
 </html>
