@@ -151,13 +151,9 @@
         .server-btn:active { background: #1c1c1c; }
         .server-btn.active-link { border: 1.5px solid #fff !important; background: rgba(255,255,255,0.1); }
         
-        /* DOWNLOAD & TRAILER GRID */
-        .dl-grid { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; margin-bottom: 2px; }
-        .dl-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-        .dl-link-btn { width: 100%; padding: 10px; border-radius: 12px; background: #000; color: #fff; font-size: 11px; font-weight: 800; text-transform: uppercase; text-align: center; border: 1px solid #333; cursor: pointer; transition: background 0.2s; }
-        .dl-link-btn:active { background: #111; }
-        .dl-link-btn.dl-primary { border-color: #555; }
-        .dl-link-btn.dl-full { grid-column: span 2; }
+        /* DOWNLOAD & TRAILER GRID - DIPERKECIL */
+        .dl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; margin-bottom: 2px; }
+        .dl-link-btn { width: 100%; padding: 10px; border-radius: 12px; background: #000; color: #fff; font-size: 11px; font-weight: 800; text-transform: uppercase; text-align: center; border: 1px solid #333; cursor: pointer; }
         
         /* PENYELARASAN WARNA TOMBOL TRAILER */
         .btn-trailer-special { background: #000; color: #fff; border: 1px solid #333; }
@@ -932,7 +928,7 @@
         .tv-bottom-item i { font-size: 22px; transition: color 0.2s; }
         .tv-bottom-item:active i { opacity: 0.6; }
         .tv-bottom-active i { color: #fff !important; }
-</style>
+    </style>
 </head>
 <body>
 
@@ -1090,7 +1086,7 @@
             </div>
             <div class="about-info-row">
                 <span class="about-info-label">Trailer & Teaser</span>
-                <span class="about-info-value">YouTube</span>
+                <span class="about-info-value">YouTube / Dailymotion</span>
             </div>
             <div class="about-info-row">
                 <span class="about-info-label">Streaming Server</span>
@@ -1312,17 +1308,8 @@
                 <div id="serverList" class="server-scroll-wrapper mt-4 px-4"></div>
                 
                 <div class="dl-grid">
-                    <div class="dl-row">
-                        <button class="dl-link-btn dl-primary" onclick="handleDownload(1)">⬇ vidsrc</button>
-                        <button class="dl-link-btn" onclick="handleDownload(2)">⬇ 0123movie</button>
-                    </div>
-                    <div class="dl-row">
-                        <button class="dl-link-btn" onclick="handleDownload(3)">⬇ soap2day</button>
-                        <button class="dl-link-btn" onclick="handleDownload(4)">⬇ gomoviestv</button>
-                    </div>
-                    <div class="dl-row">
-                        <button class="dl-link-btn btn-trailer-special dl-full" onclick="replayTrailer()">▶ Trailer</button>
-                    </div>
+                    <button id="btnDownload1" class="dl-link-btn" onclick="handleDownload()">Download</button>
+                    <button id="btnTrailerDailymotion" class="dl-link-btn btn-trailer-special" onclick="changeServer(21, this)">Trailer</button>
                 </div>
             </div>
         </div>
@@ -1424,7 +1411,7 @@
         </div>
         <div id="tvChannelList" style="padding-bottom:70px"></div>
 
-        <!-- Bottom nav khusus TV - ikon saja, 5 tombol -->
+        <!-- Bottom nav khusus TV - ikon saja -->
         <nav class="tv-bottom-nav">
             <div class="tv-bottom-item" onclick="closeTvModal(); updateActiveNav(document.getElementById('homeBtnNav'))">
                 <i class="fa-solid fa-house"></i>
@@ -1456,6 +1443,7 @@
         let isLsPaused = false, isLsMuted = false, lsControlTimer;
         let currentImdbId = ""; 
         let lastTrailerSources = []; 
+        let currentDailymotionId = ""; 
         
         let activeServerIdx = 1;
         let activeEpisode = 1;
@@ -2022,20 +2010,13 @@
             }
         }
 
-        function handleDownload(srv) {
-            if (!window.currentMediaId || !window.currentMediaType) { alert("ID Media tidak ditemukan."); return; }
-            const type = window.currentMediaType;
-            const id = window.currentMediaId;
-            const title = encodeURIComponent(document.getElementById('mTitle').innerText.replace('Memuat...','').trim());
-            let url = '';
-            switch(srv) {
-                case 1: url = `https://dl.vidsrc.vip/${type}/${id}`; break;
-                case 2: url = `https://ww2.0123movie.net/dl/${type}/${id}`; break;
-                case 3: url = `https://www.soap2day.tf/search?q=${title}`; break;
-                case 4: url = `https://gomoviestv.to/search?q=${title}`; break;
-                default: url = `https://dl.vidsrc.vip/${type}/${id}`;
+        function handleDownload() {
+            if(window.currentMediaId && window.currentMediaType) {
+                const downloadUrl = `https://dl.vidsrc.vip/${window.currentMediaType}/${window.currentMediaId}`;
+                window.open(downloadUrl, '_blank');
+            } else {
+                alert("ID Media tidak ditemukan.");
             }
-            window.open(url, '_blank');
         }
 
         window.addEventListener('popstate', function(event) {
@@ -2099,6 +2080,9 @@
             for (let i = 1; i <= 20; i++) {
                 const active = (i === activeServerIdx) ? 'active-link' : '';
                 html += `<div class="ls-srv-btn ${active}" onclick="event.stopPropagation(); lsChangeServer(${i}, this)">Server ${i}</div>`;
+            }
+            if (currentDailymotionId) {
+                html += `<div class="ls-srv-btn ${activeServerIdx === 21 ? 'active-link' : ''}" onclick="event.stopPropagation(); lsChangeServer(21, this)">Trailer</div>`;
             }
             scroll.innerHTML = html;
         }
@@ -2284,27 +2268,16 @@
                 // Bio text (biography)
                 const bioText = details.biography || '';
                 const bioEl = document.getElementById('actorBiography');
-                // Bersihkan tombol lama kalau ada
-                const oldToggle = bioEl.nextElementSibling;
-                if (oldToggle && oldToggle.classList.contains('toggle-btn')) oldToggle.remove();
-
                 if (bioText) {
+                    const short = bioText.length > 120;
+                    bioEl.innerText = short ? bioText.substring(0, 120) + '...' : bioText;
                     bioEl.style.display = '';
-                    const SHORT_LEN = 120;
-                    let expanded = false;
-                    if (bioText.length > SHORT_LEN) {
-                        bioEl.innerText = bioText.substring(0, SHORT_LEN) + '...';
-                        const toggle = document.createElement('span');
-                        toggle.className = 'toggle-btn';
-                        toggle.innerText = 'selengkapnya';
-                        toggle.onclick = () => {
-                            expanded = !expanded;
-                            bioEl.innerText = expanded ? bioText : bioText.substring(0, SHORT_LEN) + '...';
-                            toggle.innerText = expanded ? 'ringkas' : 'selengkapnya';
-                        };
-                        bioEl.after(toggle);
-                    } else {
-                        bioEl.innerText = bioText;
+                    if (short) {
+                        const more = document.createElement('span');
+                        more.className = 'toggle-btn';
+                        more.innerText = 'selengkapnya';
+                        more.onclick = () => { bioEl.innerText = bioText; more.remove(); };
+                        bioEl.after(more);
                     }
                 } else {
                     bioEl.innerText = '';
@@ -2911,23 +2884,25 @@
             currentIdx = 0;
             document.querySelectorAll('.server-btn').forEach(b => b.classList.remove('active-link'));
 
-            function pickBestVideos(results) {
+            function pickBestYT(results) {
                 if (!results || !results.length) return [];
-                let trailers = results.filter(v => v.site === 'YouTube' && v.type === 'Trailer');
-                if (trailers.length) return trailers.sort((a,b) => b.official - a.official).slice(0,5);
-                let teasers = results.filter(v => v.site === 'YouTube' && v.type === 'Teaser');
-                if (teasers.length) return teasers.sort((a,b) => b.official - a.official).slice(0,5);
-                let anyYT = results.filter(v => v.site === 'YouTube');
-                return anyYT.slice(0,5);
+                const yt = results.filter(v => v.site === 'YouTube');
+                const trailers = yt.filter(v => v.type === 'Trailer').sort((a,b) => b.official - a.official);
+                if (trailers.length) return trailers.slice(0, 5);
+                const teasers = yt.filter(v => v.type === 'Teaser').sort((a,b) => b.official - a.official);
+                if (teasers.length) return teasers.slice(0, 5);
+                const clips = yt.filter(v => ['Clip','Behind the Scenes','Featurette'].includes(v.type));
+                if (clips.length) return clips.slice(0, 5);
+                return yt.slice(0, 5);
             }
 
             try {
                 const dId = await fetchWithCache(`https://api.themoviedb.org/3/${type}/${id}?api_key=${API_KEY}&language=id-ID&append_to_response=videos&include_video_language=en,id,hi,th,ko,ja,ru,null`);
-                let vidsToDisplay = pickBestVideos(dId.videos?.results || []);
+                let vidsToDisplay = pickBestYT(dId.videos?.results || []);
 
                 if (!vidsToDisplay.length) {
-                    const dEnV = await fetchWithCache(`https://api.themoviedb.org/3/${type}/${id}/videos?api_key=${API_KEY}&language=en-US`);
-                    vidsToDisplay = pickBestVideos(dEnV.results || []);
+                    const dVid = await fetchWithCache(`https://api.themoviedb.org/3/${type}/${id}/videos?api_key=${API_KEY}&language=en-US`);
+                    vidsToDisplay = pickBestYT(dVid.results || []);
                 }
 
                 if (vidsToDisplay.length > 0) {
@@ -2995,33 +2970,38 @@
             const dots = document.getElementById('carouselDots');
             track.innerHTML = ''; dots.innerHTML = ''; track.style.transform = 'translateX(0)';
 
-            // Fungsi pilih video terbaik dari list TMDb
-            function pickBestVideos(results) {
+            const handleTrailerError = async () => {
+                const fallbackUrl = buildEmbedUrl(type, id, 1, 1, 1); 
+                track.innerHTML = `<div class="carousel-slide"><iframe id="player-frame" src="${fallbackUrl}" class="w-full h-full" allowfullscreen allow="autoplay"></iframe></div>`; 
+                document.getElementById('swipeOverlay').style.display = 'none';
+            };
+
+            // Fungsi pilih video terbaik — tanpa syarat official
+            function pickBestYT(results) {
                 if (!results || !results.length) return [];
-                // Prioritas 1: Trailer YouTube (official atau tidak)
-                let trailers = results.filter(v => v.site === 'YouTube' && v.type === 'Trailer');
-                if (trailers.length) return trailers.sort((a,b) => b.official - a.official).slice(0,5);
-                // Prioritas 2: Teaser YouTube
-                let teasers = results.filter(v => v.site === 'YouTube' && v.type === 'Teaser');
-                if (teasers.length) return teasers.sort((a,b) => b.official - a.official).slice(0,5);
-                // Prioritas 3: Video YouTube apapun
-                let anyYT = results.filter(v => v.site === 'YouTube');
-                if (anyYT.length) return anyYT.slice(0,5);
-                return [];
+                const yt = results.filter(v => v.site === 'YouTube');
+                // Prioritas 1: Trailer (official dulu, lalu non-official)
+                const trailers = yt.filter(v => v.type === 'Trailer').sort((a,b) => b.official - a.official);
+                if (trailers.length) return trailers.slice(0, 5);
+                // Prioritas 2: Teaser
+                const teasers = yt.filter(v => v.type === 'Teaser').sort((a,b) => b.official - a.official);
+                if (teasers.length) return teasers.slice(0, 5);
+                // Prioritas 3: Clip atau Behind the Scenes
+                const clips = yt.filter(v => ['Clip','Behind the Scenes','Featurette'].includes(v.type));
+                if (clips.length) return clips.slice(0, 5);
+                // Prioritas 4: Video YouTube apapun
+                return yt.slice(0, 5);
             }
 
-            // Ambil video dari dId (sudah ada) + coba fetch English jika kosong
-            let allVideoResults = dId.videos?.results || [];
-            let vidsToDisplay = pickBestVideos(allVideoResults);
+            let vidsToDisplay = pickBestYT(dId.videos?.results || []);
 
-            // Jika masih kosong, coba fetch versi English
+            // Fallback: fetch endpoint /videos dengan bahasa en-US jika masih kosong
             if (!vidsToDisplay.length) {
                 try {
-                    const dEnVideo = await fetchWithCache(
+                    const dVid = await fetchWithCache(
                         `https://api.themoviedb.org/3/${type}/${id}/videos?api_key=${API_KEY}&language=en-US`
                     );
-                    allVideoResults = dEnVideo.results || [];
-                    vidsToDisplay = pickBestVideos(allVideoResults);
+                    vidsToDisplay = pickBestYT(dVid.results || []);
                 } catch(e) {}
             }
 
@@ -3032,12 +3012,23 @@
                     if (vidsToDisplay.length > 1) { dots.innerHTML += `<div class="dot w-1.5 h-1.5 rounded-full ${i===currentIdx?'bg-blue-500':'bg-zinc-700'}"></div>`; }
                 }); 
                 document.getElementById('swipeOverlay').style.display = vidsToDisplay.length > 1 ? 'block' : 'none'; 
-            } else {
-                // Fallback akhir: langsung ke streaming server
-                const fallbackUrl = buildEmbedUrl(type, id, 1, 1, 1); 
-                track.innerHTML = `<div class="carousel-slide"><iframe id="player-frame" src="${fallbackUrl}" class="w-full h-full" allowfullscreen allow="autoplay"></iframe></div>`; 
-                document.getElementById('swipeOverlay').style.display = 'none';
+            } else { 
+                await handleTrailerError();
             }
+
+            try {
+                const qName = dId.title || dId.name;
+                const qYear = (dId.release_date || dId.first_air_date || "").split('-')[0];
+                const searchQueryDaily = encodeURIComponent(`${qName} ${qYear} official trailer`);
+                const dailyRes = await fetch(`https://api.dailymotion.com/videos?search=${searchQueryDaily}&fields=id,title&limit=1`);
+                const dailyData = await dailyRes.json();
+                
+                if (dailyData.list && dailyData.list.length > 0) {
+                    currentDailymotionId = dailyData.list[0].id;
+                } else {
+                    currentDailymotionId = "";
+                }
+            } catch(e) { currentDailymotionId = ""; }
 
             document.getElementById('castContainer').innerHTML = (dCast.cast || []).slice(0, 10).map(c => {
                 const profileImg = c.profile_path ? `<img src="https://image.tmdb.org/t/p/w185${c.profile_path}" loading="lazy" class="rounded-full">` : `<div style="width:100%; height:100%; background:#222; display:flex; align-items:center; justify-content:center; color:#555;"><i class="fa-solid fa-user"></i></div>`;
@@ -3054,25 +3045,9 @@
             
             let serverButtonsHTML = '';
             for(let i=1; i<=20; i++) {
-                const label = i === 18 ? 'Dailymotion' : `Server ${i}`;
-                serverButtonsHTML += `<button class="server-btn ${i===1?'active-link':''}" onclick="changeServer(${i}, this)">${label}</button>`;
+                serverButtonsHTML += `<button class="server-btn ${i===1?'active-link':''}" onclick="changeServer(${i}, this)">Server ${i}</button>`;
             }
             document.getElementById('serverList').innerHTML = serverButtonsHTML;
-
-            // Fetch Dailymotion ID di background (non-blocking) untuk Server 18
-            window._dmId = '';
-            (async () => {
-                try {
-                    const qName = dId.title || dId.name || '';
-                    const qYear = (dId.release_date || dId.first_air_date || '').split('-')[0];
-                    const q = encodeURIComponent(`${qName} ${qYear} trailer`);
-                    const dmRes = await fetch(`https://api.dailymotion.com/videos?search=${q}&fields=id,title&limit=3&filter=official`);
-                    const dmData = await dmRes.json();
-                    if (dmData.list && dmData.list.length > 0) {
-                        window._dmId = dmData.list[0].id;
-                    }
-                } catch(e) { window._dmId = ''; }
-            })();
 
             if(type === 'tv') { document.getElementById('seriesControl').classList.remove('hidden'); document.getElementById('seasonSel').innerHTML = (dId.seasons||[]).filter(s=>s.season_number>0).map(s=>`<option value="${s.season_number}">Season ${s.season_number}</option>`).join(''); loadEpisodes(); } else { document.getElementById('seriesControl').classList.add('hidden'); }
             updateLibButtons(id);
@@ -3123,17 +3098,8 @@
                 </div>
                 <div id="serverList" class="server-scroll-wrapper mt-4 px-4"></div>
                 <div class="dl-grid">
-                    <div class="dl-row">
-                        <button class="dl-link-btn dl-primary" onclick="handleDownload(1)">⬇ vidsrc</button>
-                        <button class="dl-link-btn" onclick="handleDownload(2)">⬇ 0123movie</button>
-                    </div>
-                    <div class="dl-row">
-                        <button class="dl-link-btn" onclick="handleDownload(3)">⬇ soap2day</button>
-                        <button class="dl-link-btn" onclick="handleDownload(4)">⬇ gomoviestv</button>
-                    </div>
-                    <div class="dl-row">
-                        <button class="dl-link-btn btn-trailer-special dl-full" onclick="replayTrailer()">▶ Trailer</button>
-                    </div>
+                    <button id="btnDownload1" class="dl-link-btn" onclick="handleDownload()">Download</button>
+                    <button id="btnTrailerDailymotion" class="dl-link-btn btn-trailer-special" onclick="changeServer(21, this)">Trailer</button>
                 </div>`;
             }
             document.body.style.overflow = 'auto'; 
@@ -3216,9 +3182,10 @@
                 case 15: url = `https://vidsrc.net/embed/${type}/${id}${seriesSuffix}`; break;
                 case 16: url = `https://vidsrc.icu/embed/${type}/${id}${seriesSuffix}`; break;
                 case 17: url = `https://vidnest.fun/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`; break;
-                case 18: url = `https://www.dailymotion.com/embed/video/${window._dmId || ''}`; break;
+                case 18: url = `https://player.autoembed.cc/embed/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`; break;
                 case 19: url = `https://warezcdn.site/${type==='tv'?'serie':'filme'}/${id}${type==='tv'?`/${s}/${e}`:''}`; break;
                 case 20: url = `https://embed.smashystream.com/playere.php?tmdb=${id}${type==='tv'?`&season=${s}&episode=${e}`:''}`; break;
+                case 21: url = `https://www.dailymotion.com/embed/video/${currentDailymotionId}`; break;
                 default: url = `https://vidrock.net/embed/${type}/${id}${seriesSuffix}`;
             }
             return url.replace("http://", "https://");
