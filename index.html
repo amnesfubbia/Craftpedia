@@ -936,80 +936,221 @@
             display: none; position: fixed; inset: 0; z-index: 8500;
             background: #000; overflow: hidden;
         }
+        /* Container scroll vertikal snap */
         .reels-container {
-            width: 100%; height: 100%;
+            width: 100%; height: 100svh;
             overflow-y: scroll; scroll-snap-type: y mandatory;
             scrollbar-width: none; -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
         }
         .reels-container::-webkit-scrollbar { display: none; }
+
+        /* Tiap slide = 1 layar penuh */
         .reel-slide {
-            width: 100%; height: 100vh;
+            width: 100%; height: 100svh;
             scroll-snap-align: start; scroll-snap-stop: always;
-            position: relative; background: #000; flex-shrink: 0;
+            position: relative; background: #000;
             display: flex; align-items: center; justify-content: center;
+            overflow: hidden;
         }
+
+        /* Video iframe — penuh dan centered, portrait crop */
         .reel-slide iframe {
-            width: 100%; height: 100%; border: none;
-            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%;
+            position: absolute; top: 0; left: 0; border: none;
+            pointer-events: auto;
         }
-        /* Overlay info di bawah reel */
+
+        /* Gradient bawah untuk info teks agar terbaca */
+        .reel-gradient {
+            position: absolute; bottom: 0; left: 0; right: 0; height: 55%;
+            background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 50%, transparent 100%);
+            pointer-events: none; z-index: 5;
+        }
+
+        /* Info teks kiri bawah */
         .reel-info {
-            position: absolute; bottom: 80px; left: 0; right: 0;
-            padding: 0 16px; z-index: 20; pointer-events: none;
+            position: absolute; bottom: 80px; left: 0; right: 72px;
+            padding: 0 16px; z-index: 10; pointer-events: none;
         }
         .reel-title {
-            font-size: 14px; font-weight: 800; color: #fff;
-            text-shadow: 0 1px 6px rgba(0,0,0,0.8);
-            margin-bottom: 4px; line-height: 1.3;
+            font-size: 15px; font-weight: 800; color: #fff;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+            margin-bottom: 3px; line-height: 1.3;
             display: -webkit-box; -webkit-line-clamp: 2;
             -webkit-box-orient: vertical; overflow: hidden;
         }
-        .reel-meta {
-            font-size: 11px; color: rgba(255,255,255,0.6);
-            font-weight: 600; text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+        .reel-year {
+            font-size: 11px; color: rgba(255,255,255,0.55);
+            font-weight: 600; margin-bottom: 8px;
         }
-        .reel-open-btn {
-            pointer-events: auto; display: inline-block;
-            margin-top: 8px; padding: 6px 14px;
-            background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
-            backdrop-filter: blur(8px); border-radius: 20px;
+        .reel-detail-btn {
+            pointer-events: auto; display: inline-flex; align-items: center; gap: 5px;
+            padding: 6px 14px; border-radius: 20px;
+            background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.35);
+            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
             font-size: 11px; font-weight: 700; color: #fff; cursor: pointer;
-            -webkit-tap-highlight-color: transparent;
+            -webkit-tap-highlight-color: transparent; transition: background 0.15s;
         }
+        .reel-detail-btn:active { background: rgba(255,255,255,0.3); }
+
+        /* Tombol aksi kanan bawah (like, bookmark) */
+        .reel-actions {
+            position: absolute; bottom: 80px; right: 12px;
+            display: flex; flex-direction: column; align-items: center; gap: 18px;
+            z-index: 10;
+        }
+        .reel-action-btn {
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+            cursor: pointer; -webkit-tap-highlight-color: transparent;
+        }
+        .reel-action-btn i {
+            font-size: 26px; color: #fff;
+            filter: drop-shadow(0 1px 3px rgba(0,0,0,0.7));
+            transition: transform 0.15s;
+        }
+        .reel-action-btn:active i { transform: scale(1.25); }
+        .reel-action-label {
+            font-size: 10px; color: rgba(255,255,255,0.7); font-weight: 700;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.7);
+        }
+        .reel-action-btn.liked i { color: #ff3b30; }
+        .reel-action-btn.bookmarked i { color: #fff; }
+
         /* Topbar reels */
         .reels-topbar {
             position: fixed; top: 0; left: 0; right: 0; z-index: 9100;
-            display: flex; align-items: center; padding: 12px 16px;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, transparent 100%);
+            display: flex; align-items: center; padding: 14px 16px 10px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.65) 0%, transparent 100%);
             pointer-events: none;
         }
         .reels-topbar-title {
             flex: 1; text-align: center; font-size: 15px; font-weight: 800; color: #fff;
-            letter-spacing: -0.3px;
+            letter-spacing: -0.3px; text-shadow: 0 1px 4px rgba(0,0,0,0.5);
         }
         .reels-back-btn {
             font-size: 20px; color: #fff; cursor: pointer; pointer-events: auto;
             padding: 4px; -webkit-tap-highlight-color: transparent;
+            filter: drop-shadow(0 1px 3px rgba(0,0,0,0.7));
         }
-        /* Loading skeleton reel */
+
+        /* Loading state */
         .reel-loading {
             display: flex; align-items: center; justify-content: center;
-            width: 100%; height: 100vh; color: #333; font-size: 12px;
+            width: 100%; height: 100vh; color: #333;
         }
-        /* Bottom nav di reels — sama dengan halaman utama */
+
+        /* Bottom nav di reels — solid hitam, sama dengan nav utama */
         .reels-bottom-nav {
             position: fixed; bottom: 0; left: 0; right: 0; z-index: 9100;
-            display: flex; justify-content: space-around;
+            display: flex; justify-content: space-around; align-items: center;
             padding: 12px 0;
-            background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
+            background: #000; border-top: 1px solid #1c1c1c;
         }
         .reels-bottom-item {
             flex: 1; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; color: rgba(255,255,255,0.6);
+            cursor: pointer; color: #a8a8a8;
             -webkit-tap-highlight-color: transparent;
         }
         .reels-bottom-item i { font-size: 20px; transition: color 0.2s; }
         .reels-bottom-item.active-reel-nav i { color: #fff; }
+
+        /* ===== REEL DETAIL BOTTOM SHEET ===== */
+        #reelDetailSheet {
+            display: none;
+            position: fixed; bottom: 0; left: 0; right: 0;
+            z-index: 9800;
+            background: #141414;
+            border-radius: 20px 20px 0 0;
+            max-height: 55vh;
+            overflow-y: auto;
+            border-top: 1px solid #2a2a2a;
+            animation: slideUp 0.3s cubic-bezier(0.25,1,0.5,1);
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
+        }
+        #reelDetailSheet::-webkit-scrollbar { display: none; }
+        #reelDetailOverlay {
+            display: none;
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 9799;
+        }
+        .rds-handle {
+            width: 36px; height: 4px; background: #333;
+            border-radius: 99px; margin: 12px auto 0;
+        }
+        .rds-header {
+            display: flex; align-items: flex-start; gap: 12px;
+            padding: 14px 16px 10px;
+            border-bottom: 1px solid #1e1e1e;
+        }
+        .rds-poster {
+            width: 52px; height: 76px; border-radius: 10px;
+            object-fit: cover; background: #222; flex-shrink: 0;
+        }
+        .rds-poster-placeholder {
+            width: 52px; height: 76px; border-radius: 10px;
+            background: #222; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            color: #444; font-size: 20px;
+        }
+        .rds-title {
+            font-size: 15px; font-weight: 800; color: #fff;
+            line-height: 1.25; margin-bottom: 4px;
+        }
+        .rds-meta-row {
+            display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 5px;
+        }
+        .rds-badge {
+            font-size: 9px; font-weight: 800; text-transform: uppercase;
+            padding: 2px 7px; border-radius: 4px;
+            background: #222; color: #aaa; border: 0.5px solid #2e2e2e;
+        }
+        .rds-badge.type { background: #1a1a2e; color: #6c8efb; border-color: #2a2a4e; }
+        .rds-body { padding: 12px 16px 8px; }
+        .rds-section-label {
+            font-size: 9px; font-weight: 800; color: #555;
+            text-transform: uppercase; letter-spacing: 2px;
+            margin-bottom: 6px; margin-top: 12px;
+        }
+        .rds-synopsis {
+            font-size: 12px; color: #bbb; line-height: 1.55;
+        }
+        .rds-info-grid {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 0; border-radius: 10px; overflow: hidden;
+            border: 1px solid #1e1e1e;
+        }
+        .rds-info-cell {
+            background: #111; padding: 10px 12px;
+            border-bottom: 1px solid #1a1a1a;
+            border-right: 1px solid #1a1a1a;
+        }
+        .rds-info-cell:nth-child(even) { border-right: none; }
+        .rds-info-cell:nth-last-child(-n+2) { border-bottom: none; }
+        .rds-info-key {
+            font-size: 9px; font-weight: 800; color: #555;
+            text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px;
+        }
+        .rds-info-val {
+            font-size: 11px; font-weight: 600; color: #e0e0e0; line-height: 1.3;
+        }
+        .rds-btn-row {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 8px; padding: 14px 16px 24px;
+        }
+        .rds-btn {
+            padding: 11px; border-radius: 12px;
+            font-size: 11px; font-weight: 800;
+            text-align: center; cursor: pointer;
+            text-transform: uppercase; letter-spacing: 0.5px;
+            -webkit-tap-highlight-color: transparent;
+            transition: opacity 0.15s;
+        }
+        .rds-btn:active { opacity: 0.7; }
+        .rds-btn-stream { background: #fff; color: #000; }
+        .rds-btn-download { background: #1a1a1a; color: #fff; border: 1px solid #333; }
 
     </style>
 </head>
@@ -1551,6 +1692,34 @@
         </nav>
     </div>
 
+    <!-- ===== REEL DETAIL BOTTOM SHEET ===== -->
+    <div id="reelDetailOverlay" onclick="closeReelDetail()"></div>
+    <div id="reelDetailSheet">
+        <div class="rds-handle"></div>
+        <div class="rds-header">
+            <img id="rdsPoster" class="rds-poster" src="" alt="" onerror="this.style.display='none';document.getElementById('rdsPosterFallback').style.display='flex'">
+            <div id="rdsPosterFallback" class="rds-poster-placeholder" style="display:none"><i class="fa-solid fa-film"></i></div>
+            <div style="flex:1;min-width:0">
+                <div class="rds-title" id="rdsTitle"></div>
+                <div class="rds-meta-row" id="rdsMeta"></div>
+            </div>
+        </div>
+        <div class="rds-body">
+            <div class="rds-section-label">Sinopsis</div>
+            <div class="rds-synopsis" id="rdsSynopsis">Memuat...</div>
+            <div class="rds-section-label" style="margin-top:14px">Info Film</div>
+            <div class="rds-info-grid" id="rdsInfoGrid"></div>
+        </div>
+        <div class="rds-btn-row">
+            <div class="rds-btn rds-btn-stream" id="rdsBtnStream" onclick="openReelStream()">
+                <i class="fa-solid fa-play" style="margin-right:5px;font-size:10px"></i>Tonton
+            </div>
+            <div class="rds-btn rds-btn-download" id="rdsBtnDownload" onclick="openReelDownload()">
+                <i class="fa-solid fa-download" style="margin-right:5px;font-size:10px"></i>Download
+            </div>
+        </div>
+    </div>
+
     <nav class="bottom-nav">
         <i class="fa-solid fa-house cursor-pointer text-xl active-nav" id="homeBtnNav" onclick="updateActiveNav(this); backToHome()"></i>
         <i class="fa-solid fa-magnifying-glass cursor-pointer text-xl" id="searchBtnNav" onclick="updateActiveNav(this); openSearch()"></i>
@@ -1961,6 +2130,10 @@
 
         function openTvModal() {
             closeModal(); closeSearch();
+            // Tutup reels jika aktif
+            if (document.getElementById('reelsModal').style.display === 'block') {
+                _closeReelsSilent();
+            }
             document.getElementById('tvSearchInp').value = '';
             document.getElementById('tvSearchBox').style.display = 'none';
             renderTvList('');
@@ -1979,6 +2152,10 @@
         }
 
         function playTvChannel(name, url) {
+            // Tutup semua overlay yang mungkin aktif
+            if (document.getElementById('reelsModal').style.display === 'block') {
+                _closeReelsSilent();
+            }
             closeTvModal();
             const modal = document.getElementById('movieModal');
             modal.classList.add('tv-mode');
@@ -2736,6 +2913,31 @@
             history.replaceState({view: 'home'}, '');
         }
 
+        // Helper: cek like/bookmark status untuk reel
+        function getReelLibStatus(movieId) {
+            const isL = JSON.parse(localStorage.getItem('likes') || '[]').some(x => x.id == movieId);
+            const isB = JSON.parse(localStorage.getItem('bookmarks') || '[]').some(x => x.id == movieId);
+            return { liked: isL, bookmarked: isB };
+        }
+
+        function toggleReelLib(key, movieId, type, btn) {
+            let items = JSON.parse(localStorage.getItem(key) || '[]');
+            const idx = items.findIndex(x => x.id == movieId);
+            const isLike = key === 'likes';
+            const addCls = isLike ? 'liked' : 'bookmarked';
+            const icon = btn.querySelector('i');
+            if (idx > -1) {
+                items.splice(idx, 1);
+                btn.classList.remove(addCls);
+                if (icon) icon.className = `fa-regular fa-${isLike ? 'heart' : 'bookmark'}`;
+            } else {
+                items.push({ id: movieId, type: type });
+                btn.classList.add(addCls);
+                if (icon) icon.className = `fa-solid fa-${isLike ? 'heart' : 'bookmark'}`;
+            }
+            localStorage.setItem(key, JSON.stringify(items));
+        }
+
         async function loadReels(isNew = false) {
             if (_reelsLoading) return;
             _reelsLoading = true;
@@ -2749,31 +2951,41 @@
             }
 
             try {
-                // Ambil film trending untuk sumber video portrait
-                const res = await fetch(
-                    `https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}&language=id-ID&page=${_reelsPage}`
-                );
-                const data = await res.json();
-                const movies = data.results || [];
+                // Ambil film trending — gabung movie + tv untuk variasi konten
+                const [movRes, tvRes] = await Promise.allSettled([
+                    fetch(`https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}&language=en-US&page=${_reelsPage}`).then(r => r.json()),
+                    fetch(`https://api.themoviedb.org/3/trending/tv/week?api_key=${API_KEY}&language=en-US&page=${_reelsPage}`).then(r => r.json())
+                ]);
 
-                // Untuk tiap film, ambil video YouTube yang portrait
-                const videoPromises = movies.slice(0, 15).map(async m => {
+                const movies = (movRes.status === 'fulfilled' ? movRes.value.results || [] : []).map(m => ({...m, _mtype: 'movie'}));
+                const tvs    = (tvRes.status  === 'fulfilled' ? tvRes.value.results  || [] : []).map(m => ({...m, _mtype: 'tv'}));
+
+                // Selang-seling movie dan tv
+                const combined = [];
+                const maxLen = Math.max(movies.length, tvs.length);
+                for (let i = 0; i < maxLen; i++) {
+                    if (movies[i]) combined.push(movies[i]);
+                    if (tvs[i])    combined.push(tvs[i]);
+                }
+
+                // Untuk tiap film/serial, ambil video trailer pertama yang ada
+                const videoPromises = combined.slice(0, 20).map(async m => {
                     try {
+                        const mtype = m._mtype;
                         const vRes = await fetchWithCache(
-                            `https://api.themoviedb.org/3/movie/${m.id}/videos?api_key=${API_KEY}&language=en-US`
+                            `https://api.themoviedb.org/3/${mtype}/${m.id}/videos?api_key=${API_KEY}&language=en-US`
                         );
-                        const portraitVids = (vRes.results || []).filter(v =>
-                            v.site === 'YouTube' && PORTRAIT_REGEX.test(v.name || '')
-                            && (v.type === 'Trailer' || v.type === 'Teaser' || v.type === 'Clip')
-                        );
-                        if (portraitVids.length === 0) return null;
-                        return {
-                            movieId: m.id,
-                            type: 'movie',
-                            title: m.title || m.name || '',
-                            year: (m.release_date || '').split('-')[0],
-                            videoKey: portraitVids[0].key
-                        };
+                        // Prioritas: Official Trailer > Trailer > Teaser > Clip
+                        const allVids = (vRes.results || []).filter(v => v.site === 'YouTube');
+                        const scoreVid = v => (v.official?4:0) + (v.type==='Trailer'?3:0) + (v.type==='Teaser'?1:0);
+                        allVids.sort((a, b) => scoreVid(b) - scoreVid(a));
+                        const best = allVids[0];
+                        if (!best) return null;
+
+                        const title = m.title || m.name || '';
+                        const year  = (m.release_date || m.first_air_date || '').split('-')[0];
+                        const poster = m.poster_path || '';
+                        return { movieId: m.id, type: mtype, title, year, poster, videoKey: best.key };
                     } catch(e) { return null; }
                 });
 
@@ -2785,14 +2997,11 @@
                 if (isNew) container.innerHTML = '';
 
                 if (newReels.length === 0 && isNew) {
-                    // Tidak ada portrait video dari trending — tampilkan pesan
                     container.innerHTML = `
                         <div style="height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px">
                             <i class="fa-regular fa-circle-play" style="font-size:48px;color:#333"></i>
-                            <div style="font-size:14px;font-weight:700;color:#555">Belum Ada Reels</div>
-                            <div style="font-size:12px;color:#333;text-align:center;padding:0 40px">
-                                Trailer portrait/vertical belum tersedia untuk film trending saat ini
-                            </div>
+                            <div style="font-size:14px;font-weight:700;color:#555">Tidak Ada Konten</div>
+                            <div style="font-size:12px;color:#333;text-align:center;padding:0 40px">Gagal memuat trailer</div>
                         </div>`;
                     _reelsLoading = false;
                     return;
@@ -2801,35 +3010,51 @@
                 _reelsData.push(...newReels);
                 _reelsLoaded = true;
 
-                // Render slide tiap reel
-                newReels.forEach((reel, idx) => {
+                newReels.forEach(reel => {
+                    const lib = getReelLibStatus(reel.movieId);
                     const slide = document.createElement('div');
                     slide.className = 'reel-slide';
                     slide.dataset.movieId = reel.movieId;
                     slide.dataset.type = reel.type;
 
-                    const embedUrl = `https://www.youtube.com/embed/${reel.videoKey}?enablejsapi=1&autoplay=0&rel=0&modestbranding=1&mute=0&playsinline=1&loop=1&playlist=${reel.videoKey}`;
+                    // autoplay=1 agar langsung main saat slide pertama dimuat
+                    // js_api diaktifkan agar bisa pause via postMessage
+                    const embedUrl = `https://www.youtube.com/embed/${reel.videoKey}?enablejsapi=1&autoplay=0&rel=0&modestbranding=1&mute=0&playsinline=1`;
+
                     slide.innerHTML = `
-                        <iframe src="${embedUrl}"
-                            allow="autoplay; fullscreen; picture-in-picture" allowfullscreen
-                            loading="lazy"></iframe>
+                        <iframe src="${embedUrl}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+                        <div class="reel-gradient"></div>
                         <div class="reel-info">
                             <div class="reel-title">${reel.title}</div>
-                            <div class="reel-meta">${reel.year ? reel.year + ' · ' : ''}Trailer</div>
-                            <div class="reel-open-btn" onclick="openModal(${reel.movieId}, '${reel.type}')">
-                                <i class="fa-solid fa-circle-info" style="margin-right:5px;font-size:10px"></i>Detail Film
+                            <div class="reel-year">${reel.year || ''} · Trailer</div>
+                            <div class="reel-detail-btn" onclick="openReelDetail(${reel.movieId}, '${reel.type}')">
+                                <i class="fa-solid fa-circle-info" style="font-size:10px"></i>Detail Film
+                            </div>
+                        </div>
+                        <div class="reel-actions">
+                            <div class="reel-action-btn ${lib.liked ? 'liked' : ''}" 
+                                 id="reel-like-${reel.movieId}"
+                                 onclick="toggleReelLib('likes', ${reel.movieId}, '${reel.type}', this)">
+                                <i class="fa-${lib.liked ? 'solid' : 'regular'} fa-heart"></i>
+                                <span class="reel-action-label">Suka</span>
+                            </div>
+                            <div class="reel-action-btn ${lib.bookmarked ? 'bookmarked' : ''}"
+                                 id="reel-bm-${reel.movieId}"
+                                 onclick="toggleReelLib('bookmarks', ${reel.movieId}, '${reel.type}', this)">
+                                <i class="fa-${lib.bookmarked ? 'solid' : 'regular'} fa-bookmark"></i>
+                                <span class="reel-action-label">Simpan</span>
                             </div>
                         </div>`;
                     container.appendChild(slide);
                 });
 
-                // Lazy autoplay: mainkan reel yang sedang terlihat
                 setupReelsAutoplay();
+                setupReelSwipeLeft();
                 _reelsPage++;
 
             } catch(e) {
                 console.error('Reels error:', e);
-                if (isNew) container.innerHTML = '<div class="reel-loading" style="color:#555;font-size:12px">Gagal memuat Reels</div>';
+                if (isNew) container.innerHTML = '<div class="reel-loading" style="color:#555;font-size:12px">Gagal memuat</div>';
             }
 
             _reelsLoading = false;
@@ -2874,6 +3099,131 @@
         function updateActiveNav(el) { 
             document.querySelectorAll('.bottom-nav i').forEach(i => i.classList.remove('active-nav')); 
             if(el) el.classList.add('active-nav'); 
+        }
+
+        // ===== REEL DETAIL BOTTOM SHEET =====
+        let _rdsCurrentId = null;
+        let _rdsCurrentType = null;
+
+        async function openReelDetail(movieId, type) {
+            _rdsCurrentId = movieId;
+            _rdsCurrentType = type;
+
+            // Reset state
+            document.getElementById('rdsTitle').innerText = 'Memuat...';
+            document.getElementById('rdsMeta').innerHTML = '';
+            document.getElementById('rdsSynopsis').innerText = 'Memuat...';
+            document.getElementById('rdsInfoGrid').innerHTML = '';
+            document.getElementById('rdsPoster').src = '';
+            document.getElementById('rdsPoster').style.display = 'block';
+            document.getElementById('rdsPosterFallback').style.display = 'none';
+
+            // Tampilkan sheet
+            document.getElementById('reelDetailOverlay').style.display = 'block';
+            document.getElementById('reelDetailSheet').style.display = 'block';
+            document.getElementById('reelDetailSheet').scrollTop = 0;
+
+            try {
+                const data = await fetchWithCache(
+                    `https://api.themoviedb.org/3/${type}/${movieId}?api_key=${API_KEY}&language=id-ID&append_to_response=credits`
+                );
+
+                const title = data.title || data.name || '';
+                const year = (data.release_date || data.first_air_date || '').split('-')[0];
+                const rating = data.vote_average ? data.vote_average.toFixed(1) : '—';
+                const synopsis = data.overview || 'Tidak ada sinopsis tersedia.';
+                const poster = data.poster_path
+                    ? `https://image.tmdb.org/t/p/w185${data.poster_path}` : '';
+
+                // Director
+                const crew = (data.credits && data.credits.crew) || [];
+                const director = crew.find(c => c.job === 'Director');
+                const dirName = director ? director.name : (type === 'tv' ? (data.created_by && data.created_by[0] ? data.created_by[0].name : '—') : '—');
+
+                // Country
+                const countries = (data.production_countries || []).map(c => c.name).join(', ') || '—';
+
+                // Studio
+                const studios = (data.production_companies || []).slice(0,2).map(c => c.name).join(', ') || '—';
+
+                // Genre
+                const genres = (data.genres || []).slice(0,3).map(g => g.name).join(', ') || '—';
+
+                // Release
+                const releaseRaw = data.release_date || data.first_air_date || '';
+                const releaseStr = releaseRaw
+                    ? new Date(releaseRaw).toLocaleDateString('id-ID', {day:'numeric',month:'long',year:'numeric'})
+                    : '—';
+
+                // Poster
+                if (poster) {
+                    document.getElementById('rdsPoster').src = poster;
+                } else {
+                    document.getElementById('rdsPoster').style.display = 'none';
+                    document.getElementById('rdsPosterFallback').style.display = 'flex';
+                }
+
+                document.getElementById('rdsTitle').innerText = title;
+                document.getElementById('rdsMeta').innerHTML = `
+                    <span class="rds-badge type">${type === 'movie' ? 'Film' : 'Serial'}</span>
+                    ${year ? `<span class="rds-badge">${year}</span>` : ''}
+                    <span class="rds-badge">★ ${rating}</span>
+                `;
+                document.getElementById('rdsSynopsis').innerText = synopsis;
+                document.getElementById('rdsInfoGrid').innerHTML = `
+                    <div class="rds-info-cell"><div class="rds-info-key">Rilis</div><div class="rds-info-val">${releaseStr}</div></div>
+                    <div class="rds-info-cell"><div class="rds-info-key">Sutradara</div><div class="rds-info-val">${dirName}</div></div>
+                    <div class="rds-info-cell"><div class="rds-info-key">Negara</div><div class="rds-info-val">${countries}</div></div>
+                    <div class="rds-info-cell"><div class="rds-info-key">Studio</div><div class="rds-info-val">${studios}</div></div>
+                    <div class="rds-info-cell" style="grid-column:1/-1;border-right:none"><div class="rds-info-key">Genre</div><div class="rds-info-val">${genres}</div></div>
+                `;
+            } catch(e) {
+                document.getElementById('rdsSynopsis').innerText = 'Gagal memuat data.';
+            }
+        }
+
+        function closeReelDetail() {
+            document.getElementById('reelDetailOverlay').style.display = 'none';
+            document.getElementById('reelDetailSheet').style.display = 'none';
+            _rdsCurrentId = null;
+            _rdsCurrentType = null;
+        }
+
+        function openReelStream() {
+            if (!_rdsCurrentId || !_rdsCurrentType) return;
+            const id = _rdsCurrentId, type = _rdsCurrentType;
+            closeReelDetail();
+            // Buka langsung di server 1
+            const url = buildEmbedUrl(type, id, 1, 1, 1);
+            window.open(url, '_blank');
+        }
+
+        function openReelDownload() {
+            if (!_rdsCurrentId || !_rdsCurrentType) return;
+            const url = `https://dl.vidsrc.vip/${_rdsCurrentType}/${_rdsCurrentId}`;
+            window.open(url, '_blank');
+        }
+
+        // Setup swipe-left gesture on reel slides to open detail bottom sheet
+        function setupReelSwipeLeft() {
+            document.querySelectorAll('.reel-slide').forEach(slide => {
+                if (slide._swipeInit) return;
+                slide._swipeInit = true;
+                let sx = 0, sy = 0;
+                slide.addEventListener('touchstart', e => {
+                    sx = e.touches[0].clientX;
+                    sy = e.touches[0].clientY;
+                }, { passive: true });
+                slide.addEventListener('touchend', e => {
+                    const dx = sx - e.changedTouches[0].clientX;
+                    const dy = Math.abs(sy - e.changedTouches[0].clientY);
+                    if (dx > 60 && dx > dy) {
+                        const movieId = parseInt(slide.dataset.movieId);
+                        const type = slide.dataset.type;
+                        if (movieId && type) openReelDetail(movieId, type);
+                    }
+                }, { passive: true });
+            });
         }
 
         function toggleSideMenu() {
