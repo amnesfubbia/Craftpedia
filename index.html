@@ -1456,8 +1456,8 @@
                     <span class="dot-notify"></span>
                 </div>
                 <div class="flex gap-5">
-                    <i class="fa-regular fa-square-plus text-2xl cursor-pointer" onclick="openComingSoon()"></i>
-                    <i class="fa-solid fa-bars text-2xl cursor-pointer" onclick="toggleSideMenu()"></i>
+                    <i class="fa-regular fa-square-plus cursor-pointer" style="font-size:24px" onclick="openComingSoon()"></i>
+                    <i class="fa-solid fa-bars cursor-pointer" style="font-size:22px" onclick="toggleSideMenu()"></i>
                 </div>
             </div>
 
@@ -1724,13 +1724,13 @@
                 <i class="fa-solid fa-magnifying-glass cursor-pointer"></i>
             </div>
             <div class="tv-bottom-item" onclick="closeTvModal(); updateActiveNav(document.getElementById('reelsBtnNav')); openReels()">
-                <i class="fa-solid fa-circle-play cursor-pointer"></i>
-            </div>
-            <div class="tv-bottom-item tv-bottom-active">
                 <i class="fa-solid fa-clapperboard cursor-pointer"></i>
             </div>
+            <div class="tv-bottom-item tv-bottom-active">
+                <i class="fa-solid fa-tv cursor-pointer"></i>
+            </div>
             <div class="tv-bottom-item" onclick="closeTvModal(); updateActiveNav(document.getElementById('bookmarkBtnNav')); switchTab('bookmarks', document.getElementById('tabBookmark'))">
-                <i class="fa-solid fa-bookmark cursor-pointer"></i>
+                <i class="fa-regular fa-bookmark cursor-pointer"></i>
             </div>
         </nav>
     </div>
@@ -1762,13 +1762,13 @@
             <i class="fa-solid fa-magnifying-glass"></i>
         </div>
         <div class="reels-bottom-item active-reel-nav">
-            <i class="fa-solid fa-circle-play"></i>
-        </div>
-        <div class="reels-bottom-item" onclick="closeReels(); updateActiveNav(document.getElementById('tvBtnNav')); openTvModal()">
             <i class="fa-solid fa-clapperboard"></i>
         </div>
+        <div class="reels-bottom-item" onclick="closeReels(); updateActiveNav(document.getElementById('tvBtnNav')); openTvModal()">
+            <i class="fa-solid fa-tv"></i>
+        </div>
         <div class="reels-bottom-item" onclick="openBookmarksFromReels()">
-            <i class="fa-solid fa-bookmark"></i>
+            <i class="fa-regular fa-bookmark"></i>
         </div>
     </nav>
 
@@ -1824,9 +1824,9 @@
     <nav class="bottom-nav">
         <i class="fa-solid fa-house cursor-pointer text-xl active-nav" id="homeBtnNav" onclick="updateActiveNav(this); backToHome()"></i>
         <i class="fa-solid fa-magnifying-glass cursor-pointer text-xl" id="searchBtnNav" onclick="updateActiveNav(this); openSearch()"></i>
-        <i class="fa-solid fa-circle-play cursor-pointer text-xl" id="reelsBtnNav" onclick="updateActiveNav(this); openReels()"></i>
-        <i class="fa-solid fa-clapperboard cursor-pointer text-xl" id="tvBtnNav" onclick="updateActiveNav(this); openTvModal()"></i>
-        <i class="fa-solid fa-bookmark cursor-pointer text-xl" id="bookmarkBtnNav" onclick="updateActiveNav(this); switchTab('bookmarks', document.getElementById('tabBookmark'))"></i>
+        <i class="fa-solid fa-clapperboard cursor-pointer text-xl" id="reelsBtnNav" onclick="updateActiveNav(this); openReels()"></i>
+        <i class="fa-solid fa-tv cursor-pointer text-xl" id="tvBtnNav" onclick="updateActiveNav(this); openTvModal()"></i>
+        <i class="fa-regular fa-bookmark cursor-pointer text-xl" id="bookmarkBtnNav" onclick="updateActiveNav(this); switchTab('bookmarks', document.getElementById('tabBookmark'))"></i>
     </nav>
 
     <script>
@@ -1852,6 +1852,8 @@
 
         window.onload = () => {
             initFilters(); initHighlights(); loadFeed(); setupSwipe(); initSmartSearch(); initTvChannels();
+            // Pre-load YouTube IFrame API agar sudah siap saat reels dibuka
+            loadYTApi();
             // Isi popular chips
             const chips = ['Avengers','One Piece','Interstellar','Squid Game','Parasite','Dune','Breaking Bad','Inception'];
             const container = document.getElementById('popularChips');
@@ -3080,6 +3082,11 @@
             document.querySelectorAll('#reelsContainer iframe').forEach(f => {
                 try { f.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*'); } catch(e) {}
             });
+            // Reset agar setiap buka reels dapat konten baru/acak
+            _reelsLoaded = false;
+            _reelsData = [];
+            _reelsPage = 1;
+            document.getElementById('reelsContainer').innerHTML = '<div class="reel-loading"><div class="spinner"></div></div>';
             history.replaceState({view: 'home'}, '');
         }
 
@@ -3116,7 +3123,8 @@
             if (isNew) {
                 container.innerHTML = '<div class="reel-loading"><div class="spinner"></div></div>';
                 _reelsData = [];
-                _reelsPage = 1;
+                // Acak halaman awal (1-5) agar konten berbeda tiap buka
+                _reelsPage = Math.floor(Math.random() * 5) + 1;
                 _reelsLoaded = false;
             }
 
@@ -3139,25 +3147,36 @@
                 }
 
                 // Untuk tiap film/serial, ambil video trailer pertama yang ada
-                const videoPromises = combined.slice(0, 20).map(async m => {
+                const videoPromises = combined.slice(0, 30).map(async m => {
                     try {
                         const mtype = m._mtype;
+                        // Fetch dengan include_video_language agar dapat lebih banyak pilihan
                         const vRes = await fetchWithCache(
-                            `https://api.themoviedb.org/3/${mtype}/${m.id}/videos?api_key=${API_KEY}&language=en-US`
+                            `https://api.themoviedb.org/3/${mtype}/${m.id}/videos?api_key=${API_KEY}&language=en-US&include_video_language=en,null`
                         );
-                        // Prioritas: Official Trailer > Trailer > Teaser > Clip
-                        let allVids = (vRes.results || []).filter(v => v.site === 'YouTube');
-                        
-                        // Filter akun non-English (Korea, India, Jepang, dll)
+                        let allVids = (vRes.results || []).filter(v => v.site === 'YouTube' && (v.type === 'Trailer' || v.type === 'Teaser' || v.type === 'Clip'));
+
+                        // Jika tidak ada video sama sekali, coba endpoint tanpa filter bahasa
+                        if (allVids.length === 0) {
+                            const vRes2 = await fetchWithCache(
+                                `https://api.themoviedb.org/3/${mtype}/${m.id}/videos?api_key=${API_KEY}`
+                            );
+                            allVids = (vRes2.results || []).filter(v => v.site === 'YouTube' && (v.type === 'Trailer' || v.type === 'Teaser' || v.type === 'Clip'));
+                        }
+
+                        if (allVids.length === 0) return null;
+
+                        // Filter akun non-English (Korea, India, Jepang, dll) - hanya jika ada pilihan EN
                         const _nonLatinPat = /[\u0900-\u097F\u3040-\u30FF\u4E00-\u9FFF\uAC00-\uD7FF\u0600-\u06FF]/;
                         const _regionalKw = /\b(korean?|hindi|japanese|arabic|chinese|thai|dubbed?|dub|tamil|telugu|bengali|urdu|turkish)\b/i;
                         const _enVids = allVids.filter(v => {
                             const nm = v.name || '';
-                            return !_nonLatinPat.test(nm) && !_regionalKw.test(nm) && (!v.iso_639_1 || v.iso_639_1 === 'en' || v.iso_639_1 === 'null');
+                            return !_nonLatinPat.test(nm) && !_regionalKw.test(nm) && (!v.iso_639_1 || v.iso_639_1 === 'en' || v.iso_639_1 === 'null' || v.iso_639_1 === '');
                         });
+                        // Hanya filter jika ada video EN — jika tidak, pakai semua
                         if (_enVids.length > 0) allVids = _enVids;
-                        
-                        const scoreVid = v => (v.official?4:0) + (v.type==='Trailer'?3:0) + (v.type==='Teaser'?1:0);
+
+                        const scoreVid = v => (v.official ? 4 : 0) + (v.type === 'Trailer' ? 3 : v.type === 'Teaser' ? 1 : 0);
                         allVids.sort((a, b) => scoreVid(b) - scoreVid(a));
                         const best = allVids[0];
                         if (!best) return null;
@@ -3201,7 +3220,9 @@
 
                     // autoplay=1 agar langsung main saat slide pertama dimuat
                     // js_api diaktifkan agar bisa pause via postMessage
-                    const embedUrl = `https://www.youtube.com/embed/${reel.videoKey}?enablejsapi=1&autoplay=0&rel=0&modestbranding=1&showinfo=0&mute=0&playsinline=1&controls=0&disablekb=1&iv_load_policy=3&fs=0&color=white&branding=0&origin=${encodeURIComponent(location.origin || 'https://amnesfubbia.github.io')}`;
+                    // enablejsapi=1 wajib agar YT.Player onStateChange bekerja
+                    // controls=1 dibiarkan agar event state change tidak diblokir
+                    const embedUrl = `https://www.youtube.com/embed/${reel.videoKey}?enablejsapi=1&autoplay=0&rel=0&modestbranding=1&showinfo=0&playsinline=1&iv_load_policy=3&origin=${encodeURIComponent(location.origin || location.href.split('/').slice(0,3).join('/'))}`;
                     const typeLabel = reel.type === 'movie' ? 'Film' : 'Serial';
                     const ratingStr = reel.rating ? `· ★${reel.rating}` : '';
                     const synopsisId = `reel-syn-${reel.movieId}`;
@@ -3261,12 +3282,24 @@
 
             _reelsObserver = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
-                    const iframe = entry.target.querySelector('iframe');
+                    const slide = entry.target;
+                    const iframe = slide.querySelector('iframe');
                     if (!iframe) return;
                     if (entry.isIntersecting && entry.intersectionRatio >= 0.8) {
-                        try { iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*'); } catch(e) {}
+                        // Pakai YT.Player jika tersedia, fallback ke postMessage
+                        if (slide._ytPlayer && slide._ytPlayer.playVideo) {
+                            try { slide._ytPlayer.playVideo(); } catch(e) {}
+                        } else {
+                            try { iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*'); } catch(e) {}
+                        }
+                        // Attach YT Player jika belum
+                        if (!slide._ytPlayer) attachYTPlayer(iframe, slide);
                     } else {
-                        try { iframe.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*'); } catch(e) {}
+                        if (slide._ytPlayer && slide._ytPlayer.pauseVideo) {
+                            try { slide._ytPlayer.pauseVideo(); } catch(e) {}
+                        } else {
+                            try { iframe.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*'); } catch(e) {}
+                        }
                     }
                 });
             }, { threshold: 0.8 });
@@ -3289,67 +3322,110 @@
             }
         }
 
-        // Listener YouTube state change untuk auto-scroll reels saat video selesai
-        if (!window._reelsYTListenerAdded) {
-            window._reelsYTListenerAdded = true;
-            window.addEventListener('message', function(e) {
-                // Hanya proses pesan dari YouTube
-                if (!e.origin.includes('youtube.com')) return;
-                let data;
-                try { data = JSON.parse(e.data); } catch { return; }
+        // ===== AUTO-SCROLL REELS — YT IFrame API =====
+        // Load YT API script sekali saja
+        window._ytApiReady = false;
+        window._ytPlayers = {}; // map: slideIndex → YT.Player
+        window._ytPendingSlides = []; // antrian slide yg menunggu API ready
 
-                // State 0 = video ended
-                if (data.event === 'onStateChange' && data.info === 0) {
-                    // Jangan auto-scroll jika detail sheet terbuka
-                    const sheet = document.getElementById('reelDetailSheet');
-                    if (sheet && sheet.style.display === 'block') return;
-                    // Jangan auto-scroll jika reels tidak aktif
-                    if (document.getElementById('reelsModal').style.display !== 'block') return;
-
-                    // Temukan iframe yang mengirim pesan ini
-                    const iframes = document.querySelectorAll('#reelsContainer iframe');
-                    let currentSlide = null;
-                    iframes.forEach(iframe => {
-                        // iframe yang sedang visible (intersecting)
-                        const slide = iframe.closest('.reel-slide');
-                        if (slide) {
-                            const rect = slide.getBoundingClientRect();
-                            if (rect.top >= -50 && rect.top <= 50) currentSlide = slide;
-                        }
-                    });
-
-                    if (!currentSlide) {
-                        // Fallback: scroll slide pertama yang visible
-                        const allSlides = document.querySelectorAll('.reel-slide');
-                        allSlides.forEach(s => {
-                            const r = s.getBoundingClientRect();
-                            if (r.top >= -10 && r.top <= window.innerHeight * 0.5) currentSlide = s;
-                        });
-                    }
-
-                    if (currentSlide) {
-                        const next = currentSlide.nextElementSibling;
-                        if (next && next.classList.contains('reel-slide')) {
-                            next.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                        }
-                    } else {
-                        // Fallback: scroll container ke bawah satu layar
-                        const container = document.getElementById('reelsContainer');
-                        if (container) container.scrollBy({ top: window.innerHeight, behavior: 'smooth' });
-                    }
-                }
-
-                // Enable JS API pada iframe yang menerima ready event
-                if (data.event === 'onReady') {
-                    try { e.source.postMessage('{"event":"listening"}', '*'); } catch {}
-                }
-            });
+        function loadYTApi() {
+            if (document.getElementById('yt-api-script')) return;
+            const s = document.createElement('script');
+            s.id = 'yt-api-script';
+            s.src = 'https://www.youtube.com/iframe_api';
+            document.head.appendChild(s);
         }
 
+        // Callback dipanggil YT saat API siap
+        window.onYouTubeIframeAPIReady = function() {
+            window._ytApiReady = true;
+            // Proses semua slide yang menunggu
+            window._ytPendingSlides.forEach(fn => fn());
+            window._ytPendingSlides = [];
+        };
+
+        function attachYTPlayer(iframe, slide) {
+            const doAttach = () => {
+                if (!iframe.id) iframe.id = 'yt-reel-' + Date.now() + Math.random().toString(36).slice(2);
+                try {
+                    const player = new YT.Player(iframe, {
+                        events: {
+                            onStateChange: (event) => {
+                                // State 0 = ended
+                                if (event.data === 0) {
+                                    const sheet = document.getElementById('reelDetailSheet');
+                                    if (sheet && sheet.style.display === 'block') return;
+                                    if (document.getElementById('reelsModal').style.display !== 'block') return;
+                                    scrollToNextReel(slide);
+                                }
+                            }
+                        }
+                    });
+                    slide._ytPlayer = player;
+                } catch(e) {}
+            };
+
+            if (window._ytApiReady) {
+                doAttach();
+            } else {
+                window._ytPendingSlides.push(doAttach);
+                loadYTApi();
+            }
+        }
+
+        function scrollToNextReel(currentSlide) {
+            const container = document.getElementById('reelsContainer');
+            if (!container) return;
+
+            let slide = currentSlide;
+            if (!slide) {
+                // Cari slide yang sedang visible
+                container.querySelectorAll('.reel-slide').forEach(s => {
+                    const r = s.getBoundingClientRect();
+                    if (r.top >= -50 && r.top <= 50) slide = s;
+                });
+            }
+
+            const next = slide ? slide.nextElementSibling : null;
+            if (next && next.classList.contains('reel-slide')) {
+                next.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } else if (container && slide) {
+                container.scrollBy({ top: window.innerHeight, behavior: 'smooth' });
+            }
+        }
+
+        // Stop semua video saat tab/app ditutup atau disembunyikan
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                // Pause semua iframe YouTube yang aktif
+                document.querySelectorAll('iframe[src*="youtube.com"]').forEach(f => {
+                    try { f.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*'); } catch(e) {}
+                });
+                // Pause via YT.Player API juga
+                Object.values(window._ytPlayers || {}).forEach(p => {
+                    try { if (p && p.pauseVideo) p.pauseVideo(); } catch(e) {}
+                });
+            }
+        });
+
         // Tambah reels ke popstate handler
-        function updateActiveNav(el) { 
-            document.querySelectorAll('.bottom-nav i').forEach(i => i.classList.remove('active-nav')); 
-            if(el) el.classList.add('active-nav'); 
+        function updateActiveNav(el) {
+            document.querySelectorAll('.bottom-nav i').forEach(i => {
+                i.classList.remove('active-nav');
+                // Bookmark: outline saat tidak aktif, solid saat aktif
+                if (i.id === 'bookmarkBtnNav') {
+                    i.className = i.className.replace('fa-solid', 'fa-regular').replace('active-nav', '');
+                    i.classList.add('fa-regular', 'fa-bookmark', 'cursor-pointer', 'text-xl');
+                }
+            });
+            if (el) {
+                el.classList.add('active-nav');
+                // Jika bookmark aktif, ganti ke solid
+                if (el.id === 'bookmarkBtnNav') {
+                    el.classList.remove('fa-regular');
+                    el.classList.add('fa-solid');
+                }
+            }
         }
 
         // ===== REEL DETAIL BOTTOM SHEET =====
