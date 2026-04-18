@@ -2822,6 +2822,21 @@
             showLsUI();
         }
 
+        // Helper: pastikan judul selalu Latin/English
+        // Jika judul mengandung karakter non-Latin (Korea, Jepang, Arab, Hindi, Thai, dll), gunakan judul EN
+        function isNonLatin(str) {
+            return /[\u0900-\u097F\u0600-\u06FF\u0E00-\u0E7F\u3040-\u30FF\u4E00-\u9FFF\uAC00-\uD7FF\u0400-\u04FF\u0370-\u03FF]/.test(str || '');
+        }
+        async function getLatinTitle(idData, type, id) {
+            const rawTitle = idData.title || idData.name || '';
+            if (!isNonLatin(rawTitle)) return rawTitle; // sudah Latin
+            // Fetch versi EN untuk judul Latin
+            try {
+                const enData = await fetchWithCache(`https://api.themoviedb.org/3/${type}/${id}?api_key=${API_KEY}&language=en-US`);
+                return enData.title || enData.name || rawTitle;
+            } catch { return rawTitle; }
+        }
+
         async function fetchWithCache(url) {
             const cached = sessionStorage.getItem(url);
             if (cached) return JSON.parse(cached);
@@ -3181,7 +3196,10 @@
                         const best = allVids[0];
                         if (!best) return null;
 
-                        const title = m.title || m.name || '';
+                        const rawTitle = m.title || m.name || '';
+                        const title = isNonLatin(rawTitle)
+                            ? (await fetchWithCache(`https://api.themoviedb.org/3/${mtype}/${m.id}?api_key=${API_KEY}&language=en-US`).then(r => r.title || r.name || rawTitle).catch(() => rawTitle))
+                            : rawTitle;
                         const year  = (m.release_date || m.first_air_date || '').split('-')[0];
                         const poster = m.poster_path || '';
                         const synopsis = m.overview || '';
@@ -3467,7 +3485,10 @@
                 const ext = extRatings.status === 'fulfilled' ? extRatings.value : {};
                 const imdbId = ext.imdb_id || d.imdb_id || null;
 
-                const title = d.title || d.name || '';
+                const rawTitle = d.title || d.name || '';
+                const title = isNonLatin(rawTitle)
+                    ? (await fetchWithCache(`https://api.themoviedb.org/3/${type}/${movieId}?api_key=${API_KEY}&language=en-US`).then(r => r.title || r.name || rawTitle).catch(() => rawTitle))
+                    : rawTitle;
                 const year = (d.release_date || d.first_air_date || '').split('-')[0];
                 const tmdbRating = d.vote_average ? d.vote_average.toFixed(1) : null;
                 const voteCount = d.vote_count || 0;
@@ -3940,8 +3961,15 @@
                 const genreMap = {}; gData.genres.forEach(g => genreMap[g.id] = g.name);
 
                 list.innerHTML = '';
-                data.results.forEach(m => {
-                    const title = m.title || m.name || '';
+                // Untuk setiap item, pastikan judul Latin
+                const renderItems = data.results.map(async m => {
+                    let title = m.title || m.name || '';
+                    if (isNonLatin(title)) {
+                        try {
+                            const enM = await fetchWithCache(`https://api.themoviedb.org/3/${mediaType}/${m.id}?api_key=${API_KEY}&language=en-US`);
+                            title = enM.title || enM.name || title;
+                        } catch {}
+                    }
                     const releaseDate = m.release_date || m.first_air_date || '';
                     const year = releaseDate.split('-')[0];
                     const rating = (m.vote_average || 0).toFixed(1);
@@ -3966,6 +3994,7 @@
                         <i class="fa-solid fa-chevron-right" style="color:#2a2a2a;font-size:11px;flex-shrink:0"></i>`;
                     list.appendChild(item);
                 });
+                await Promise.allSettled(renderItems);
             } catch (e) { list.innerHTML = '<div class="text-center py-10 text-zinc-600 text-xs">Gagal memuat data.</div>'; }
         }
 
@@ -4576,8 +4605,16 @@
                 return `<div class="cast-item" onclick="openActorProfile(${c.id})"><div class="cast-img-border"><div class="inner-border">${profileImg}</div></div><span class="cast-name">${c.name}</span></div>`;
             }).join('');
             document.getElementById('mLikeDisplay').innerText = `${Math.floor((dId.vote_average || 0) * 1234).toLocaleString('id-ID')} suka`;
-            // Prioritaskan judul en-US agar selalu Latin (mencegah aksara India/Thai/Cyrillic dll)
-            const displayTitle = dEn.title || dEn.name || dId.title || dId.name || '';
+            // Prioritaskan judul en-US agar selalu Latin
+            // Jika dEn kosong atau masih non-Latin, coba ambil lagi
+            let displayTitle = dEn.title || dEn.name || dId.title || dId.name || '';
+            if (isNonLatin(displayTitle)) {
+                // Coba fetch EN sekali lagi dengan endpoint yang berbeda
+                try {
+                    const enFallback = await fetchWithCache(`https://api.themoviedb.org/3/${type}/${id}?api_key=${API_KEY}&language=en-US`);
+                    displayTitle = enFallback.title || enFallback.name || displayTitle;
+                } catch {}
+            }
             document.getElementById('mTitle').innerText = displayTitle;
             // Simpan info untuk soundtrack search yang akurat
             window.currentMediaTitle = displayTitle;
