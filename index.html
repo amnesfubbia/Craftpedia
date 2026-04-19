@@ -2,8 +2,19 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>amnesfubbia</title>
+    <meta name="description" content="Discover, watch & archive film dan serial favoritmu. Streaming 20+ server, trailer, Live TV Indonesia.">
+    <meta name="theme-color" content="#000000">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="amnesfubbia.png">
+    <meta property="og:title" content="amnesfubbia">
+    <meta property="og:description" content="Discover, watch & archive film dan serial favoritmu.">
+    <meta property="og:image" content="amnesfubbia.png">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="amnesfubbia">
+    <meta name="twitter:image" content="amnesfubbia.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
@@ -1236,6 +1247,14 @@
 </head>
 <body>
 
+    <noscript>
+        <div style="position:fixed;inset:0;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:99999;text-align:center;padding:30px">
+            <img src="amnesfubbia.png" style="width:64px;height:64px;margin-bottom:16px;border-radius:16px">
+            <div style="font-family:sans-serif;font-size:18px;font-weight:700;color:#fff;margin-bottom:8px">JavaScript Diperlukan</div>
+            <div style="font-family:sans-serif;font-size:13px;color:#8e8e8e;line-height:1.6">amnesfubbia memerlukan JavaScript untuk berjalan.<br>Aktifkan JavaScript di browser kamu dan muat ulang halaman.</div>
+        </div>
+    </noscript>
+
     <div id="splashScreen">
         <div class="splash-content">
             <img src="amnesfubbia.png" class="splash-logo" alt="Logo">
@@ -1854,13 +1873,25 @@
             initFilters(); initHighlights(); loadFeed(); setupSwipe(); initSmartSearch(); initTvChannels();
             // Pre-load YouTube IFrame API agar sudah siap saat reels dibuka
             loadYTApi();
-            // Isi popular chips
-            const chips = ['Avengers','One Piece','Interstellar','Squid Game','Parasite','Dune','Breaking Bad','Inception'];
+            // Isi popular chips dari trending TMDb
             const container = document.getElementById('popularChips');
             if (container) {
-                container.innerHTML = chips.map(t =>
-                    `<span onclick="quickSearch('${t}')" style="background:#111;border:1px solid #1c1c1c;border-radius:20px;padding:6px 14px;font-size:12px;color:#ccc;cursor:pointer;-webkit-tap-highlight-color:transparent">${t}</span>`
-                ).join('');
+                // Tampilkan fallback dulu selagi fetch
+                const fallbackChips = ['Avengers','One Piece','Interstellar','Squid Game','Parasite','Dune','Breaking Bad','Inception'];
+                const renderChips = (list) => {
+                    container.innerHTML = list.map(t =>
+                        `<span onclick="quickSearch('${t.replace(/'/g,"\\\'")}')" style="background:#111;border:1px solid #1c1c1c;border-radius:20px;padding:6px 14px;font-size:12px;color:#ccc;cursor:pointer;-webkit-tap-highlight-color:transparent">${t}</span>`
+                    ).join('');
+                };
+                renderChips(fallbackChips);
+                // Fetch trending untuk chips yang selalu relevan
+                fetch(`https://api.themoviedb.org/3/trending/all/day?api_key=${API_KEY}&language=id-ID`)
+                    .then(r => r.json())
+                    .then(data => {
+                        const trendChips = (data.results || []).slice(0, 8).map(m => m.title || m.name).filter(Boolean);
+                        if (trendChips.length >= 4) renderChips(trendChips);
+                    })
+                    .catch(() => {}); // fallback tetap tampil jika fetch gagal
             }
             window.addEventListener('scroll', () => { 
                 document.getElementById('backToTop').style.display = window.scrollY > 500 ? 'flex' : 'none'; 
@@ -2734,9 +2765,10 @@
         function lsChangeServer(srvIdx, el) {
             activeServerIdx = srvIdx;
             // update main server list
-            document.querySelectorAll('.server-btn').forEach(b => b.classList.remove('active-link'));
-            const mainBtn = document.querySelector(`.server-btn:nth-child(${srvIdx})`);
-            if (mainBtn) mainBtn.classList.add('active-link');
+            document.querySelectorAll('.server-btn').forEach((b, i) => {
+                b.classList.remove('active-link');
+                if (i + 1 === srvIdx) b.classList.add('active-link');
+            });
             // update ls panel
             document.querySelectorAll('.ls-srv-btn').forEach(b => b.classList.remove('active-link'));
             el.classList.add('active-link');
@@ -2842,7 +2874,7 @@
             if (cached) return JSON.parse(cached);
             const res = await fetch(url);
             const data = await res.json();
-            sessionStorage.setItem(url, JSON.stringify(data));
+            try { sessionStorage.setItem(url, JSON.stringify(data)); } catch(e) {}
             return data;
         }
 
@@ -3870,7 +3902,7 @@
                                 const meta = isPerson ? 'Pemeran / Aktor' : (mType === 'tv' ? 'tv' : 'movie');
                                 const imgPath = m.poster_path || m.profile_path || '';
                                 return `<div class="smart-item" onclick="${clickAction}; document.getElementById('smartSearchDropdown').style.display='none';">
-                                    <img src="https://image.tmdb.org/t/p/w92${imgPath}" onerror="this.src='https://via.placeholder.com/35x50?text=?'">
+                                    <img src="https://image.tmdb.org/t/p/w92${imgPath}" onerror="this.src='https://placehold.co/35x50/111/555?text=?'">
                                     <div class="smart-info">
                                         <span class="smart-name">${m.title || m.name}</span>
                                         <span class="smart-meta">${meta}</span>
@@ -4017,6 +4049,8 @@
                 {n: 'Pixar', com: '3', img: 'Pixar.png', t: 'movie', s: true},
                 {n: 'Dreamworks', com: '521|778', img: 'Dreamwork.png', t: 'movie', s: true},
                 {n: 'Ghibli', com: '10342', img: 'Ghibli.png', t: 'movie', s: true},
+                {n: 'Netflix', com: '213', img: 'Netflix.png', t: 'tv', s: true},
+                {n: 'K-Drama', c: 'KR', img: 'Korea.png', t: 'tv', s: false},
                 {n: 'Anime', g: 16, img: 'Anime.png', t: 'movie', c: 'JP', s: true},
                 {n: 'Indonesia', c: 'ID', img: 'Indonesia.png', t: 'movie', s: false},
                 {n: 'Korea', c: 'KR', img: 'Korea.png', t: 'movie', s: false},
@@ -4033,7 +4067,7 @@
                     currentLibMode = false; currentCastId = ''; searchQuery = ''; currentCountry = h.c || ''; currentGenre = h.g || ''; currentCompany = h.com || ''; currentSchedule = 'trending'; currentType = h.t; currentYear = ''; loadFeed(true); 
                 }; 
                 const circleClass = h.s ? 'highlight-circle logo-small' : 'highlight-circle';
-                div.innerHTML = `<div class="${circleClass}"><img src="${h.img}" onerror="this.src='https://via.placeholder.com/100?text=${h.n}'"></div><div class="highlight-text">${h.n}</div>`; 
+                div.innerHTML = `<div class="${circleClass}"><img src="${h.img}" onerror="this.src='https://placehold.co/100/111/555?text=${h.n}'"></div><div class="highlight-text">${h.n}</div>`; 
                 cont.appendChild(div); 
             }); 
         }
@@ -4130,7 +4164,6 @@
             const countrySeen = new Set();
             const countriesUniq = [countries[0]];
             countries.slice(1).forEach(c => { if (!countrySeen.has(c[0])) { countrySeen.add(c[0]); countriesUniq.push(c); }});
-            countriesUniq.slice(1).sort((a,b) => a[1].localeCompare(b[1], 'id'));
             const countriesFinal = [countriesUniq[0], ...countriesUniq.slice(1).sort((a,b) => a[1].localeCompare(b[1], 'id'))];
             const cD = document.getElementById('countryDropdown'); 
             let countryHTML = '<div class="filter-item sticky-reset" onclick="setCountry(\'\',\'Negara\')">Semua Negara</div>'; 
@@ -4814,7 +4847,7 @@
                 case 9: url = `https://moviesapi.club/${type}/${id}${seriesSuffix}`; break;
                 case 10: url = `https://vidsrc.cc/v2/embed/${type}/${id}${type==='tv'?`?s=${s}&e=${e}`:''}`; break;
                 case 11: url = `https://multiembed.mov/directstream.php?video_id=${id}${type==='tv'?`&s=${s}&e=${e}`:''}`; break;
-                case 12: url = `https://www.2embed.cc/embed${type==='tv'?'tv':''}/${id}${type==='tv'?`&s=${s}&e=${e}`:''}`; break;
+                case 12: url = `https://www.2embed.cc/embed${type==='tv'?'/tv':''}/${id}${type==='tv'?`?s=${s}&e=${e}`:''}`; break;
                 case 13: url = `https://vidsrc.xyz/embed/${type}/${id}${seriesSuffix}`; break;
                 case 14: url = `https://vidsrc.me/embed/${type}?tmdb=${id}${seriesSuffix}`; break;
                 case 15: url = `https://vidsrc.net/embed/${type}/${id}${seriesSuffix}`; break;
