@@ -1243,6 +1243,27 @@
             border-color: #fff; background: #111;
         }
 
+
+        /* ===== MOVIE INFO GRID (2 col, no border) ===== */
+        .minfo-grid {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 8px 12px; margin-top: 10px; margin-bottom: 10px;
+        }
+        .minfo-cell {
+            background: transparent;
+            padding: 0;
+        }
+        .minfo-cell.full-width { grid-column: 1 / -1; }
+        .minfo-key {
+            font-size: 9px; font-weight: 800; color: #555;
+            text-transform: uppercase; letter-spacing: 1.5px;
+            margin-bottom: 2px; display: block;
+        }
+        .minfo-val {
+            font-size: 12px; font-weight: 600; color: #ccc;
+            line-height: 1.4; display: block;
+        }
+
     </style>
 </head>
 <body>
@@ -1505,10 +1526,11 @@
             </div>
 
             <div id="filterBar">
-                <div class="pill-grid grid-cols-3">
+                <div class="pill-grid grid-cols-4">
                     <button class="pill" id="btnCountry" onclick="toggleFilter(event, 'countryDropdown')">Negara <i class="fa-solid fa-caret-down"></i></button>
                     <button class="pill" id="btnGenre" onclick="toggleFilter(event, 'genreDropdown')">Genre <i class="fa-solid fa-caret-down"></i></button>
                     <button class="pill" id="yearBtn" onclick="toggleFilter(event, 'yearDropdown')">Tahun <i class="fa-solid fa-caret-down"></i></button>
+                    <button class="pill" id="btnRating" onclick="toggleFilter(event, 'ratingDropdown')">Rating <i class="fa-solid fa-caret-down"></i></button>
                 </div>
             </div>
         </div>
@@ -1556,6 +1578,7 @@
         </div>
     </div>
 
+    <div id="ratingDropdown" class="filter-dropdown no-scrollbar"></div>
     <div id="backToTop" onclick="window.scrollTo({top: 0, behavior: 'smooth'})"><i class="fa-solid fa-arrow-up"></i></div>
     <div id="filterOverlay" onclick="closeD(); closeSoundtrack()"></div>
     <div id="countryDropdown" class="filter-dropdown no-scrollbar"></div>
@@ -1612,6 +1635,8 @@
                         <span id="mToggleBtn" class="toggle-btn hidden" onclick="handleToggleDesc()">selengkapnya</span>
                     </div>
                 </div>
+
+                <div id="mInfoGrid" class="minfo-grid" style="display:none"></div>
                 
                 <div id="mHashtags" class="ig-hashtags"></div>
 
@@ -1850,7 +1875,7 @@
 
     <script>
         const API_KEY = 'bfa7df5310c9974f62f26c6789a8c00d';
-        let page = 1, loading = false, currentType = 'multi', currentGenre = '', currentYear = '', currentCountry = '', currentSchedule = 'trending', searchQuery = '', currentCompany = '', currentLibMode = false, currentCastId = '';
+        let page = 1, loading = false, currentType = 'multi', currentGenre = '', currentYear = '', currentCountry = '', currentRating = '', currentSchedule = 'trending', searchQuery = '', currentCompany = '', currentLibMode = false, currentCastId = '';
         let isExpanded = false, globalFullDesc = "", globalEnDesc = "", currentIdx = 0, startX = 0, isTranslated = false, originalIndoDesc = "";
         let abortController = null;
         let isLsPaused = false, isLsMuted = false, lsControlTimer;
@@ -2528,6 +2553,7 @@
                 postContent.innerHTML = `
                 <div class="mb-1"><span class="ig-username">amnesfubbia</span><span id="mDesc" class="ig-caption"></span>
                 <div class="mt-1"><span id="mToggleBtn" class="toggle-btn hidden" onclick="handleToggleDesc()">selengkapnya</span></div></div>
+                <div id="mInfoGrid" class="minfo-grid" style="display:none"></div>
                 <div id="mHashtags" class="ig-hashtags"></div>
                 <div class="flex items-center gap-2 mt-1.5">
                     <div id="mDateDisplay" class="ig-date"></div>
@@ -2581,6 +2607,11 @@
             document.querySelectorAll('#reelsContainer iframe').forEach(f => {
                 try { f.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*'); } catch(e) {}
             });
+            // Reset reels state agar konten baru saat dibuka kembali
+            _reelsLoaded = false;
+            _reelsData = [];
+            _reelsPage = 1;
+            document.getElementById('reelsContainer').innerHTML = '<div class="reel-loading"><div class="spinner"></div></div>';
             document.body.style.overflow = 'auto';
         }
 
@@ -2614,6 +2645,12 @@
         window.addEventListener('popstate', function(event) {
             const state = event.state ? event.state.view : null;
 
+            // Soundtrack overlay — cek paling awal (z-index tertinggi)
+            if (document.getElementById('soundtrackModal').style.display === 'block') {
+                _closeSoundtrackSilent();
+                return;
+            }
+
             // Filter dropdown (negara/genre/tahun)
             const anyFilterOpen = document.querySelector('.filter-dropdown[style*="block"]');
             if (anyFilterOpen) {
@@ -2621,22 +2658,15 @@
                 return;
             }
 
-            // Soundtrack overlay
-            if (document.getElementById('soundtrackModal').style.display === 'block') {
-                _closeSoundtrackSilent();
-                return;
-            }
-
             // Reel detail sheet
             if (document.getElementById('reelDetailSheet').style.display === 'block') {
                 closeReelDetail();
-                history.pushState({view: 'reels'}, '');
                 return;
             }
 
-            // Reels modal
+            // Reels modal — pakai silent agar tidak reset state & tidak push history baru
             if (document.getElementById('reelsModal').style.display === 'block') {
-                closeReels();
+                _closeReelsSilent();
                 return;
             }
 
@@ -2656,7 +2686,6 @@
             if (document.getElementById('movieModal').style.display === 'block' &&
                 document.getElementById('movieModal').classList.contains('tv-mode')) {
                 _closeModalSilent();
-                // Buka kembali tvModal
                 document.getElementById('tvSearchInp').value = '';
                 document.getElementById('tvSearchBox').style.display = 'none';
                 renderTvList('');
@@ -2872,10 +2901,20 @@
         async function fetchWithCache(url) {
             const cached = sessionStorage.getItem(url);
             if (cached) return JSON.parse(cached);
-            const res = await fetch(url);
-            const data = await res.json();
-            try { sessionStorage.setItem(url, JSON.stringify(data)); } catch(e) {}
-            return data;
+            // Bungkus dalam Promise dengan timeout manual — tidak simpan AbortController di scope global
+            return new Promise(async (resolve, reject) => {
+                const timer = setTimeout(() => reject(new Error('fetch timeout')), 8000);
+                try {
+                    const res = await fetch(url);
+                    const data = await res.json();
+                    clearTimeout(timer);
+                    try { sessionStorage.setItem(url, JSON.stringify(data)); } catch(e) {}
+                    resolve(data);
+                } catch(e) {
+                    clearTimeout(timer);
+                    reject(e);
+                }
+            });
         }
 
         async function openActorProfile(actorId) {
@@ -3194,7 +3233,7 @@
                 }
 
                 // Untuk tiap film/serial, ambil video trailer pertama yang ada
-                const videoPromises = combined.slice(0, 30).map(async m => {
+                const videoPromises = combined.slice(0, 15).map(async m => {
                     try {
                         const mtype = m._mtype;
                         // Fetch dengan include_video_language agar dapat lebih banyak pilihan
@@ -3665,7 +3704,7 @@
 
             // Push history
             currentLibMode = true;
-            history.pushState({view: 'bookmarks'}, '');
+            history.replaceState({view: 'bookmarks'}, '');
 
             // Load bookmark grid
             const grid = document.getElementById('feedGrid');
@@ -3857,12 +3896,14 @@
         function backToHome() {
             closeModal(); closeSearch(); closeD(); closeActorModal(); closeTvModal();
             if(document.getElementById('reelsModal').style.display === 'block') closeReels();
-            currentGenre = ''; currentYear = ''; currentCountry = ''; currentSchedule = 'trending'; 
+            currentGenre = ''; currentYear = ''; currentCountry = ''; currentRating = ''; currentSchedule = 'trending'; 
             currentType = 'multi'; searchQuery = ''; currentCastId = ''; currentCompany = '';
             document.querySelectorAll('.highlight-item').forEach(i => i.classList.remove('active-hl'));
             const btnCountry = document.getElementById('btnCountry');
             const btnGenre = document.getElementById('btnGenre');
             const btnYear = document.getElementById('yearBtn');
+            const btnRatingEl = document.getElementById('btnRating');
+            if(btnRatingEl) { btnRatingEl.innerHTML = 'Rating <i class="fa-solid fa-caret-down"></i>'; btnRatingEl.classList.remove('active-pill'); }
             btnCountry.innerHTML = 'Negara <i class="fa-solid fa-caret-down"></i>';
             btnGenre.innerHTML = 'Genre <i class="fa-solid fa-caret-down"></i>';
             btnYear.innerHTML = 'Tahun <i class="fa-solid fa-caret-down"></i>';
@@ -4049,8 +4090,6 @@
                 {n: 'Pixar', com: '3', img: 'Pixar.png', t: 'movie', s: true},
                 {n: 'Dreamworks', com: '521|778', img: 'Dreamwork.png', t: 'movie', s: true},
                 {n: 'Ghibli', com: '10342', img: 'Ghibli.png', t: 'movie', s: true},
-                {n: 'Netflix', com: '213', img: 'Netflix.png', t: 'tv', s: true},
-                {n: 'K-Drama', c: 'KR', img: 'Korea.png', t: 'tv', s: false},
                 {n: 'Anime', g: 16, img: 'Anime.png', t: 'movie', c: 'JP', s: true},
                 {n: 'Indonesia', c: 'ID', img: 'Indonesia.png', t: 'movie', s: false},
                 {n: 'Korea', c: 'KR', img: 'Korea.png', t: 'movie', s: false},
@@ -4067,7 +4106,7 @@
                     currentLibMode = false; currentCastId = ''; searchQuery = ''; currentCountry = h.c || ''; currentGenre = h.g || ''; currentCompany = h.com || ''; currentSchedule = 'trending'; currentType = h.t; currentYear = ''; loadFeed(true); 
                 }; 
                 const circleClass = h.s ? 'highlight-circle logo-small' : 'highlight-circle';
-                div.innerHTML = `<div class="${circleClass}"><img src="${h.img}" onerror="this.src='https://placehold.co/100/111/555?text=${h.n}'"></div><div class="highlight-text">${h.n}</div>`; 
+                div.innerHTML = `<div class="${circleClass}"><img src="${h.img}" alt="${h.n}"></div><div class="highlight-text">${h.n}</div>`; 
                 cont.appendChild(div); 
             }); 
         }
@@ -4170,6 +4209,12 @@
             countriesFinal.forEach(c => countryHTML += `<div class="filter-item" onclick="setCountry('${c[0]}','${c[1]}')">${c[1]}</div>`); 
             cD.innerHTML = countryHTML; 
 
+            // Rating dropdown
+            const rD = document.getElementById('ratingDropdown');
+            let ratingHTML = '<div class="filter-item sticky-reset" onclick="setRating(\'\',\'Rating\')">Semua Rating</div>';
+            [['9','★ 9+'],['8','★ 8+'],['7','★ 7+'],['6','★ 6+'],['5','★ 5+'],['4','★ 4+']].forEach(r => ratingHTML += `<div class="filter-item" onclick="setRating('${r[0]}','${r[1]}')">${r[1]}</div>`);
+            rD.innerHTML = ratingHTML;
+
             // Genre — lengkap, urut abjad (ID TMDb)
             const genres = [
                 [28,'Action'],[12,'Adventure'],[16,'Animasi'],
@@ -4190,9 +4235,9 @@
         function closeD() { document.querySelectorAll('.filter-dropdown').forEach(d => d.style.display = 'none'); document.getElementById('filterOverlay').style.display = 'none'; document.body.style.overflow = 'auto'; }
 
         async function loadFeed(isNew = true) {
-            if(loading && isNew) { if(abortController) abortController.abort(); }
+            if(loading && isNew) { loading = false; } // reset flag agar request baru bisa jalan
             if(loading && !isNew) return;
-            loading = true; abortController = new AbortController();
+            loading = true;
             const grid = document.getElementById('searchOverlay').style.display === 'block' ? document.getElementById('searchGrid') : document.getElementById('feedGrid');
             if(isNew) { page = 1; grid.innerHTML = ''; }
             let url;
@@ -4209,6 +4254,7 @@
                 let endpoint = (currentType === 'tv') ? 'discover/tv' : 'discover/movie';
                 url = `https://api.themoviedb.org/3/${endpoint}?api_key=${API_KEY}&language=id-ID&page=${page}&include_adult=false&sort_by=popularity.desc`;
                 if(currentCountry) url += `&with_origin_country=${currentCountry}`;
+                if(currentRating) url += `&vote_average.gte=${currentRating}&vote_count.gte=50`;
                 if(currentGenre) url += `&with_genres=${currentGenre}`;
                 if(currentCompany) url += `&with_companies=${currentCompany}`;
                 if(currentType === 'short') { url += `&with_runtime.lte=20&with_runtime.gte=1&vote_count.lte=5000`; }
@@ -4235,6 +4281,7 @@
         }
 
         function renderGrid(items, grid) { 
+            const fragment = document.createDocumentFragment();
             items.forEach(m => { 
                 if(!m.poster_path || m.media_type === 'person') return; 
                 let mType = m.media_type;
@@ -4243,8 +4290,9 @@
                 card.className = 'post-card'; 
                 card.onclick = function() { openModal(m.id, mType); }; 
                 card.innerHTML = `<div class="badge-rating">★ ${(m.vote_average||0).toFixed(1)}</div><div class="badge-type">${currentType==='short'?'SHORT':(mType==='tv'?'tv':'movie')}</div><img src="https://image.tmdb.org/t/p/w342${m.poster_path}" loading="lazy" onload="this.style.opacity=1" style="opacity:0">`; 
-                grid.appendChild(card); 
-            }); 
+                fragment.appendChild(card); 
+            });
+            grid.appendChild(fragment);
         }
 
         // Search tab state
@@ -4351,6 +4399,15 @@
             loadFeed(true); 
         }
 
+        function setRating(r, n) {
+            currentRating = r;
+            const btn = document.getElementById('btnRating');
+            btn.innerHTML = n + ' <i class="fa-solid fa-caret-down"></i>';
+            r ? btn.classList.add('active-pill') : btn.classList.remove('active-pill');
+            if(currentType === 'multi') currentType = 'movie';
+            closeD(); loadFeed(true);
+        }
+
         function setYear(y) { 
             currentYear = y; 
             const btn = document.getElementById('yearBtn');
@@ -4382,29 +4439,25 @@
         // Cek apakah video YouTube bisa diembed (bukan age-restricted / unavailable)
         // YouTube oEmbed return 200 jika OK, 401/403/404 jika restricted
         async function checkYouTubeEmbeddable(key) {
-            try {
-                const res = await fetch(
-                    `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${key}&format=json`,
-                    { method: 'GET' }
-                );
-                return res.ok; // true = bisa diembed, false = restricted/error
-            } catch(e) {
-                return false; // gagal fetch = anggap tidak bisa
-            }
+            return new Promise(resolve => {
+                const timer = setTimeout(() => resolve(false), 4000);
+                fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${key}&format=json`, { method: 'GET' })
+                    .then(res => { clearTimeout(timer); resolve(res.ok); })
+                    .catch(() => { clearTimeout(timer); resolve(false); });
+            });
         }
 
-        // Filter list video: buang yang restricted, kembalikan yang valid
-        // Minimal tetap kembalikan 1 video jika semua restricted (fallback ke unfiltered)
         async function filterEmbeddableVideos(videos) {
             if (!videos || videos.length === 0) return [];
+            // Batasi ke 5 video saja untuk mengurangi jumlah request ke YouTube
+            const toCheck = videos.slice(0, 5);
             const results = await Promise.allSettled(
-                videos.map(v => checkYouTubeEmbeddable(v.key))
+                toCheck.map(v => checkYouTubeEmbeddable(v.key))
             );
-            const filtered = videos.filter((v, i) => 
+            const filtered = toCheck.filter((v, i) => 
                 results[i].status === 'fulfilled' && results[i].value === true
             );
-            // Jika semua diblokir (jarang terjadi), kembalikan list asli agar tidak kosong
-            return filtered.length > 0 ? filtered : videos;
+            return filtered.length > 0 ? filtered : toCheck;
         }
 
         async function replayTrailer() {
@@ -4618,20 +4671,25 @@
                 await handleTrailerError();
             }
 
-            try {
-                // Pakai judul en-US agar pencarian Dailymotion dapat hasil yang tepat
-                const qName = dEn.title || dEn.name || dId.title || dId.name;
-                const qYear = (dId.release_date || dId.first_air_date || "").split('-')[0];
-                const searchQueryDaily = encodeURIComponent(`${qName} ${qYear} official trailer`);
-                const dailyRes = await fetch(`https://api.dailymotion.com/videos?search=${searchQueryDaily}&fields=id,title&limit=1`);
-                const dailyData = await dailyRes.json();
-                
-                if (dailyData.list && dailyData.list.length > 0) {
-                    currentDailymotionId = dailyData.list[0].id;
-                } else {
-                    currentDailymotionId = "";
-                }
-            } catch(e) { currentDailymotionId = ""; }
+            // Fetch Dailymotion secara background — tidak blokir render konten utama
+            currentDailymotionId = "";
+            (async () => {
+                try {
+                    const qName = dEn.title || dEn.name || dId.title || dId.name;
+                    const qYear = (dId.release_date || dId.first_air_date || "").split('-')[0];
+                    const searchQueryDaily = encodeURIComponent(`${qName} ${qYear} official trailer`);
+                    const dailyData = await new Promise((resolve, reject) => {
+                        const timer = setTimeout(() => reject(new Error('timeout')), 5000);
+                        fetch(`https://api.dailymotion.com/videos?search=${searchQueryDaily}&fields=id,title&limit=1`)
+                            .then(r => r.json())
+                            .then(d => { clearTimeout(timer); resolve(d); })
+                            .catch(e => { clearTimeout(timer); reject(e); });
+                    });
+                    if (dailyData.list && dailyData.list.length > 0) {
+                        currentDailymotionId = dailyData.list[0].id;
+                    }
+                } catch(e) { currentDailymotionId = ""; }
+            })();
 
             document.getElementById('castContainer').innerHTML = (dCast.cast || []).slice(0, 10).map(c => {
                 const profileImg = c.profile_path ? `<img src="https://image.tmdb.org/t/p/w185${c.profile_path}" loading="lazy" class="rounded-full">` : `<div style="width:100%; height:100%; background:#222; display:flex; align-items:center; justify-content:center; color:#555;"><i class="fa-solid fa-user"></i></div>`;
@@ -4657,9 +4715,29 @@
             const relYear = (dId.release_date || dId.first_air_date || "2026").split('-')[0];
             const contentKind = (type === 'tv') ? 'tv' : 'movie';
             const genresArr = (dId.genres || []).map(g => `#${g.name.replace(/[^a-zA-Z0-9]/g, '')}`).slice(0, 3).join(' ');
-            document.getElementById('mHashtags').innerHTML = `<br> #${(displayTitle).replace(/[^a-zA-Z0-9]/g, '')} #${relYear} #${contentKind} <br> ${genresArr}`;
-            const rel = dId.release_date || dId.first_air_date || ""; 
+            const rel = dId.release_date || dId.first_air_date || "";
             document.getElementById('mDateDisplay').innerText = rel ? new Date(rel).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+            // Build movie info grid (2 col, no border)
+            const runTime = dId.runtime ? `${dId.runtime} menit` : (dId.episode_run_time && dId.episode_run_time[0] ? `${dId.episode_run_time[0]} menit/ep` : '—');
+            const miCountries = (dId.production_countries || []).map(c => c.name).join(', ') || '—';
+            const miStudios = (dId.production_companies || []).slice(0, 3).map(c => c.name).join(', ') || '—';
+            const miGenres = (dId.genres || []).map(g => g.name).join(', ') || '—';
+            const langMap = {'en':'English','id':'Indonesia','ko':'Korean','ja':'Japanese','zh':'Mandarin','hi':'Hindi','fr':'French','de':'German','es':'Spanish','it':'Italian','pt':'Portuguese','ru':'Russian','ar':'Arabic','th':'Thai','nl':'Dutch','tr':'Turkish','pl':'Polish','sv':'Swedish','da':'Danish','fi':'Finnish','no':'Norwegian','vi':'Vietnamese','ms':'Malay','tl':'Filipino'};
+            const langCode = dId.original_language || '';
+            const miLanguage = langMap[langCode] || (langCode ? langCode.toUpperCase() : '—');
+            const miReleaseStr = rel ? new Date(rel).toLocaleDateString('id-ID', {day:'numeric',month:'long',year:'numeric'}) : '—';
+            const infoGridEl = document.getElementById('mInfoGrid');
+            if (infoGridEl) {
+                infoGridEl.innerHTML = `
+                <div class="minfo-cell"><span class="minfo-key">Released</span><span class="minfo-val">${miReleaseStr}</span></div>
+                <div class="minfo-cell"><span class="minfo-key">Run Time</span><span class="minfo-val">${runTime}</span></div>
+                <div class="minfo-cell"><span class="minfo-key">Country</span><span class="minfo-val">${miCountries}</span></div>
+                <div class="minfo-cell"><span class="minfo-key">Language</span><span class="minfo-val">${miLanguage}</span></div>
+                <div class="minfo-cell full-width"><span class="minfo-key">Studios</span><span class="minfo-val">${miStudios}</span></div>
+                <div class="minfo-cell full-width"><span class="minfo-key">Genre</span><span class="minfo-val">${miGenres}</span></div>`;
+                infoGridEl.style.display = 'grid';
+            }
+            document.getElementById('mHashtags').innerHTML = `<br> #${(displayTitle).replace(/[^a-zA-Z0-9]/g, '')} #${relYear} #${contentKind} <br> ${genresArr}`;
             
             let serverButtonsHTML = '';
             for(let i=1; i<=17; i++) {
@@ -4704,6 +4782,7 @@
                     <span id="mDesc" class="ig-caption"></span>
                     <div class="mt-1"><span id="mToggleBtn" class="toggle-btn hidden" onclick="handleToggleDesc()">selengkapnya</span></div>
                 </div>
+                <div id="mInfoGrid" class="minfo-grid" style="display:none"></div>
                 <div id="mHashtags" class="ig-hashtags"></div>
                 <div class="flex items-center gap-2 mt-1.5">
                     <div id="mDateDisplay" class="ig-date"></div>
@@ -4924,7 +5003,17 @@
                 grid.appendChild(card);
             });
         }
-        window.onscroll = () => { if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 1000 && !loading && !searchQuery && !currentLibMode) { page++; loadFeed(false); } };
+        let _scrollTicking = false;
+        window.onscroll = () => {
+            if (_scrollTicking) return;
+            _scrollTicking = true;
+            requestAnimationFrame(() => {
+                if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 1000 && !loading && !searchQuery && !currentLibMode) {
+                    page++; loadFeed(false);
+                }
+                _scrollTicking = false;
+            });
+        };
 
         // ===== THEME TOGGLE (disabled - UI removed) =====
         function toggleTheme() {
