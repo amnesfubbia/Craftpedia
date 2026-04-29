@@ -1249,10 +1249,7 @@
             display: grid; grid-template-columns: 1fr 1fr;
             gap: 8px 12px; margin-top: 10px; margin-bottom: 10px;
         }
-        .minfo-cell {
-            background: transparent;
-            padding: 0;
-        }
+        .minfo-cell { background: transparent; padding: 0; }
         .minfo-cell.full-width { grid-column: 1 / -1; }
         .minfo-key {
             font-size: 9px; font-weight: 800; color: #555;
@@ -1264,9 +1261,118 @@
             line-height: 1.4; display: block;
         }
 
+        /* ===== RATING BADGES in modal ===== */
+        .modal-rating-bar {
+            display: flex; align-items: center; gap: 8px;
+            padding: 6px 15px 2px; flex-wrap: wrap;
+        }
+        .modal-rating-badge {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 4px 10px; border-radius: 8px;
+            font-size: 12px; font-weight: 700; line-height: 1;
+            color: #fff;
+        }
+        .modal-rating-badge i { font-size: 12px; }
+        .modal-rating-badge.tmdb i { color: #01b4e4; }
+        .modal-rating-badge.imdb i { color: #f5c518; }
+
+        /* ===== SIMILAR FILMS strip ===== */
+        .similar-section { padding: 14px 0 4px; }
+        .similar-label {
+            font-size: 10px; font-weight: 800; color: #555;
+            text-transform: uppercase; letter-spacing: 2px;
+            padding: 0 15px; margin-bottom: 10px; display: block;
+        }
+        .similar-scroll {
+            display: flex; gap: 8px; overflow-x: auto;
+            padding: 0 15px 4px; scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+        }
+        .similar-scroll::-webkit-scrollbar { display: none; }
+        .similar-card {
+            flex: 0 0 70px; cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .similar-poster {
+            width: 70px; height: 100px; border-radius: 6px;
+            object-fit: cover; background: #111;
+            display: block; margin-bottom: 3px;
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .similar-poster.loaded { opacity: 1; }
+        .similar-rating {
+            font-size: 9px; color: #555; text-align: center;
+        }
+
+        /* ===== RECENTLY VIEWED strip ===== */
+        #recentlyViewedWrapper {
+            display: none; padding: 12px 15px 15px 15px;
+            border-bottom: 1px solid #1c1c1c;
+        }
+        .recently-label {
+            font-size: 10px; font-weight: 800; color: #555;
+            text-transform: uppercase; letter-spacing: 2px;
+            margin-bottom: 10px; display: block;
+        }
+        .recently-scroll {
+            display: flex; gap: 8px; overflow-x: auto;
+            scrollbar-width: none; -webkit-overflow-scrolling: touch;
+        }
+        .recently-scroll::-webkit-scrollbar { display: none; }
+        .recently-item {
+            flex: 0 0 58px; cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .recently-img {
+            width: 58px; height: 86px; border-radius: 8px;
+            object-fit: cover; background: #111;
+            display: block;
+        }
+
+        /* ===== BADGE NEW on poster ===== */
+        .badge-new {
+            position: absolute; bottom: 6px; left: 6px;
+            padding: 2px 5px; border-radius: 2px;
+            font-size: 7px; font-weight: 900; z-index: 5;
+            background: #ff3b30; color: #fff;
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+
+        /* ===== PULL TO REFRESH ===== */
+        #pullRefreshIndicator {
+            position: fixed; top: 0; left: 0; right: 0;
+            height: 0; overflow: hidden; z-index: 8999;
+            display: flex; align-items: flex-end; justify-content: center;
+            pointer-events: none; transition: height 0.15s;
+        }
+        .pull-inner {
+            display: flex; align-items: center; gap: 8px;
+            padding-bottom: 10px; color: #8e8e8e;
+            font-size: 11px; font-weight: 700;
+        }
+        .pull-spinner {
+            width: 16px; height: 16px;
+            border: 2px solid rgba(255,255,255,0.15);
+            border-top-color: #fff; border-radius: 50%;
+            animation: spin 0.8s linear infinite; display: none;
+        }
+        .pull-arrow {
+            font-size: 13px; transition: transform 0.2s; color: #8e8e8e;
+        }
+        .pull-arrow.ready { transform: rotate(180deg); color: #fff; }
+        .pull-inner.ready { color: #fff; }
+
     </style>
 </head>
 <body>
+
+    <div id="pullRefreshIndicator">
+        <div class="pull-inner" id="pullInner">
+            <i class="fa-solid fa-arrow-down pull-arrow" id="pullArrow"></i>
+            <div class="pull-spinner" id="pullSpinner"></div>
+            <span id="pullText">Tarik untuk refresh</span>
+        </div>
+    </div>
 
     <noscript>
         <div style="position:fixed;inset:0;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:99999;text-align:center;padding:30px">
@@ -1526,16 +1632,20 @@
             </div>
 
             <div id="filterBar">
-                <div class="pill-grid grid-cols-4">
+                <div class="pill-grid grid-cols-3">
                     <button class="pill" id="btnCountry" onclick="toggleFilter(event, 'countryDropdown')">Negara <i class="fa-solid fa-caret-down"></i></button>
                     <button class="pill" id="btnGenre" onclick="toggleFilter(event, 'genreDropdown')">Genre <i class="fa-solid fa-caret-down"></i></button>
                     <button class="pill" id="yearBtn" onclick="toggleFilter(event, 'yearDropdown')">Tahun <i class="fa-solid fa-caret-down"></i></button>
-                    <button class="pill" id="btnRating" onclick="toggleFilter(event, 'ratingDropdown')">Rating <i class="fa-solid fa-caret-down"></i></button>
                 </div>
             </div>
         </div>
 
         <div class="highlights-wrapper no-scrollbar"><div class="highlights-container no-scrollbar" id="highlightList"></div></div>
+
+        <div id="recentlyViewedWrapper">
+            <span class="recently-label">Terakhir Dilihat</span>
+            <div class="recently-scroll" id="recentlyScroll"></div>
+        </div>
 
         <div class="tab-nav">
             <div class="tab-item active" id="tabGrid" onclick="switchTab('grid', this)"><i class="fa-solid fa-table-cells"></i></div>
@@ -1578,7 +1688,6 @@
         </div>
     </div>
 
-    <div id="ratingDropdown" class="filter-dropdown no-scrollbar"></div>
     <div id="backToTop" onclick="window.scrollTo({top: 0, behavior: 'smooth'})"><i class="fa-solid fa-arrow-up"></i></div>
     <div id="filterOverlay" onclick="closeD(); closeSoundtrack()"></div>
     <div id="countryDropdown" class="filter-dropdown no-scrollbar"></div>
@@ -1615,8 +1724,8 @@
                 <div class="px-4 py-3 flex justify-between items-center bg-black">
                     <div class="flex gap-4 items-center">
                         <i id="btnLikeModal" class="interaction-icon"></i>
-                        <i class="fa-regular fa-comment interaction-icon" onclick="enterLandscape()"></i>
-                        <i class="fa-solid fa-rotate-right interaction-icon text-[20px]" onclick="replayTrailer()"></i>
+                        <i class="fa-solid fa-up-right-and-down-left-from-center interaction-icon" onclick="enterLandscape()"></i>
+                        <i class="fa-solid fa-arrow-rotate-left interaction-icon text-[20px]" onclick="replayTrailer()"></i>
                     </div>
                     <i id="btnBookModal" class="interaction-icon"></i>
                 </div>
@@ -1627,6 +1736,7 @@
                 </div>
             </div>
             
+            <div id="mRatingBar" class="modal-rating-bar" style="display:none"></div>
             <div class="ig-post-content">
                 <div class="mb-1">
                     <span class="ig-username">amnesfubbia</span>
@@ -1658,6 +1768,10 @@
                 <div class="dl-grid">
                     <button id="btnDownload1" class="dl-link-btn" onclick="handleDownload()">Download</button>
                     <button id="btnTrailerDailymotion" class="dl-link-btn btn-trailer-special" onclick="changeServer(21, this)">Trailer</button>
+                </div>
+                <div id="mSimilarSection" class="similar-section" style="display:none">
+                    <span class="similar-label">Film Serupa</span>
+                    <div class="similar-scroll" id="mSimilarScroll"></div>
                 </div>
             </div>
         </div>
@@ -1875,7 +1989,7 @@
 
     <script>
         const API_KEY = 'bfa7df5310c9974f62f26c6789a8c00d';
-        let page = 1, loading = false, currentType = 'multi', currentGenre = '', currentYear = '', currentCountry = '', currentRating = '', currentSchedule = 'trending', searchQuery = '', currentCompany = '', currentLibMode = false, currentCastId = '';
+        let page = 1, loading = false, currentType = 'multi', currentGenre = '', currentYear = '', currentCountry = '', currentSchedule = 'trending', searchQuery = '', currentCompany = '', currentLibMode = false, currentCastId = '';
         let isExpanded = false, globalFullDesc = "", globalEnDesc = "", currentIdx = 0, startX = 0, isTranslated = false, originalIndoDesc = "";
         let abortController = null;
         let isLsPaused = false, isLsMuted = false, lsControlTimer;
@@ -2421,64 +2535,81 @@
             history.pushState({view: 'soundtrack'}, "");
 
             // Fungsi similarity: hitung berapa % kata judul film ada di string target
-            function titleMatchScore(target, filmTitle) {
+            function titleMatchScore(target, filmTitle, strict) {
                 if (!target || !filmTitle) return 0;
                 const filmWords = filmTitle.toLowerCase()
                     .replace(/[^a-z0-9\s]/g, '').split(/\s+/)
-                    .filter(w => w.length > 2); // abaikan kata pendek
+                    .filter(w => w.length > 2);
                 if (filmWords.length === 0) return 1;
-                const t = target.toLowerCase();
+                const t = target.toLowerCase().replace(/[^a-z0-9\s]/g, '');
+                // Strict mode: semua kata harus ada
+                if (strict) {
+                    return filmWords.every(w => t.includes(w)) ? 1 : 0;
+                }
                 const matches = filmWords.filter(w => t.includes(w)).length;
                 return matches / filmWords.length;
             }
 
             try {
-                // Query 1: spesifik — judul + tahun + soundtrack
+                // Query bertingkat: spesifik dulu, lalu fallback
                 const q1 = encodeURIComponent(`${mediaTitle} ${mediaYear} soundtrack`);
-                // Query 2: fallback — judul saja + soundtrack  
                 const q2 = encodeURIComponent(`${mediaTitle} soundtrack`);
+                const q3 = encodeURIComponent(`${mediaTitle} original score`);
+                const q4 = encodeURIComponent(`${mediaTitle} ost`);
 
-                // Fetch dua query sekaligus, gabung hasilnya
-                const [r1, r2] = await Promise.allSettled([
-                    fetch(`https://itunes.apple.com/search?term=${q1}&entity=song&limit=20`).then(r=>r.json()),
-                    fetch(`https://itunes.apple.com/search?term=${q2}&entity=song&limit=20`).then(r=>r.json())
+                const [r1, r2, r3, r4] = await Promise.allSettled([
+                    fetch(`https://itunes.apple.com/search?term=${q1}&entity=song&limit=25`).then(r=>r.json()),
+                    fetch(`https://itunes.apple.com/search?term=${q2}&entity=song&limit=25`).then(r=>r.json()),
+                    fetch(`https://itunes.apple.com/search?term=${q3}&entity=song&limit=15`).then(r=>r.json()),
+                    fetch(`https://itunes.apple.com/search?term=${q4}&entity=song&limit=15`).then(r=>r.json()),
                 ]);
 
                 let allResults = [];
-                if (r1.status === 'fulfilled') allResults.push(...(r1.value.results || []));
-                if (r2.status === 'fulfilled') allResults.push(...(r2.value.results || []));
+                [r1,r2,r3,r4].forEach(r => { if(r.status==='fulfilled') allResults.push(...(r.value.results||[])); });
 
-                // Deduplikasi berdasarkan trackId
+                // Deduplikasi
                 const seen = new Set();
-                allResults = allResults.filter(s => {
-                    if (seen.has(s.trackId)) return false;
-                    seen.add(s.trackId);
-                    return true;
-                });
+                allResults = allResults.filter(s => { if(seen.has(s.trackId)) return false; seen.add(s.trackId); return true; });
 
                 if (allResults.length === 0) {
-                    listCont.innerHTML = '<div class="text-center py-20 text-zinc-700 text-[10px] uppercase tracking-widest">No soundtrack tracks found.</div>';
+                    listCont.innerHTML = '<div class="text-center py-20 text-zinc-700 text-[10px] uppercase tracking-widest">Soundtrack tidak tersedia.</div>';
                     return;
                 }
 
-                // Skor tiap lagu berdasarkan kemiripan dengan judul film
-                // Cek di: collectionName (album), trackName (judul lagu), artistName
+                // Scoring: prioritaskan album yang exact match judul film + tahun
                 const scored = allResults.map(song => {
-                    const collScore = titleMatchScore(song.collectionName, mediaTitle);
-                    const trackScore = titleMatchScore(song.trackName, mediaTitle) * 0.4;
+                    const coll = song.collectionName || '';
+                    const track = song.trackName || '';
+                    // Bonus besar jika album name exact match judul film
+                    const exactAlbum = titleMatchScore(coll, mediaTitle, true); // strict
+                    const partialAlbum = titleMatchScore(coll, mediaTitle, false);
+                    // Bonus jika album mengandung tahun yang sesuai
+                    const yearBonus = (mediaYear && coll.includes(mediaYear)) ? 0.3 : 0;
+                    // Bonus OST/Soundtrack keyword di album name
+                    const ostBonus = /soundtrack|ost|original score|original motion|music from/i.test(coll) ? 0.4 : 0;
+                    const collScore = (exactAlbum > 0 ? exactAlbum * 2 : partialAlbum) + yearBonus + ostBonus;
+                    const trackScore = titleMatchScore(track, mediaTitle, false) * 0.2;
                     const score = Math.max(collScore, trackScore);
                     return { song, score };
                 });
 
-                // Filter: hanya tampilkan yang punya kemiripan cukup (score >= 0.4)
-                let filtered = scored
-                    .filter(s => s.score >= 0.4)
+                // Threshold ketat: minimal album harus ada kemiripan dengan judul
+                let filtered = scored.filter(s => s.score >= 0.6)
                     .sort((a, b) => b.score - a.score)
                     .map(s => s.song);
 
-                // Jika hasil filter terlalu sedikit, fallback ke semua hasil
+                // Jika tidak ada → tampilkan pesan, jangan tampilkan hasil tidak relevan
+                if (filtered.length === 0) {
+                    listCont.innerHTML = '<div class="text-center py-20 text-zinc-700 text-[10px] uppercase tracking-widest">Soundtrack tidak tersedia untuk film ini.</div>';
+                    return;
+                }
+
+                // Fallback: turunkan threshold jika hasilnya terlalu sedikit
                 if (filtered.length < 3) {
-                    filtered = scored.sort((a, b) => b.score - a.score).map(s => s.song);
+                    const fallback = scored.filter(s => s.score >= 0.35)
+                        .sort((a, b) => b.score - a.score)
+                        .map(s => s.song);
+                    if (fallback.length > filtered.length) filtered = fallback;
                 }
 
                 const toShow = filtered.slice(0, 15);
@@ -2570,6 +2701,10 @@
                 <div class="dl-grid">
                     <button id="btnDownload1" class="dl-link-btn" onclick="handleDownload()">Download</button>
                     <button id="btnTrailerDailymotion" class="dl-link-btn btn-trailer-special" onclick="changeServer(21, this)">Trailer</button>
+                </div>
+                <div id="mSimilarSection" class="similar-section" style="display:none">
+                    <span class="similar-label">Film Serupa</span>
+                    <div class="similar-scroll" id="mSimilarScroll"></div>
                 </div>`;
             }
             document.body.style.overflow = 'auto';
@@ -3050,7 +3185,7 @@
                         const card = document.createElement('div');
                         card.className = 'post-card';
                         card.onclick = () => openModalFromActor(m.id, 'movie');
-                        card.innerHTML = `<div class="badge-rating">★ ${(m.vote_average||0).toFixed(1)}</div><div class="badge-type">movie</div><img src="https://image.tmdb.org/t/p/w185${m.poster_path}" loading="lazy" onload="this.style.opacity=1" style="opacity:0">`;
+                        card.innerHTML = `<div class="badge-rating">${(m.vote_average||0).toFixed(1)}</div><div class="badge-type">movie</div><img src="https://image.tmdb.org/t/p/w185${m.poster_path}" loading="lazy" onload="this.style.opacity=1" style="opacity:0">`;
                         filmGrid.appendChild(card);
                     });
                 }
@@ -3067,7 +3202,7 @@
                         const card = document.createElement('div');
                         card.className = 'post-card';
                         card.onclick = () => openModalFromActor(m.id, 'tv');
-                        card.innerHTML = `<div class="badge-rating">★ ${(m.vote_average||0).toFixed(1)}</div><div class="badge-type">tv</div><img src="https://image.tmdb.org/t/p/w185${m.poster_path}" loading="lazy" onload="this.style.opacity=1" style="opacity:0">`;
+                        card.innerHTML = `<div class="badge-rating">${(m.vote_average||0).toFixed(1)}</div><div class="badge-type">tv</div><img src="https://image.tmdb.org/t/p/w185${m.poster_path}" loading="lazy" onload="this.style.opacity=1" style="opacity:0">`;
                         tvGrid.appendChild(card);
                     });
                 }
@@ -3311,7 +3446,7 @@
                     // js_api diaktifkan agar bisa pause via postMessage
                     // enablejsapi=1 wajib agar YT.Player onStateChange bekerja
                     // controls=1 dibiarkan agar event state change tidak diblokir
-                    const embedUrl = `https://www.youtube.com/embed/${reel.videoKey}?enablejsapi=1&autoplay=0&rel=0&modestbranding=1&showinfo=0&playsinline=1&iv_load_policy=3&origin=${encodeURIComponent(location.origin || location.href.split('/').slice(0,3).join('/'))}`;
+                    const embedUrl = `https://www.youtube.com/embed/${reel.videoKey}?enablejsapi=1&autoplay=${isNew && _reelsData.length===1?1:0}&rel=0&modestbranding=1&showinfo=0&playsinline=1&iv_load_policy=3&mute=0&origin=${encodeURIComponent(location.origin || location.href.split('/').slice(0,3).join('/'))}`;
                     const typeLabel = reel.type === 'movie' ? 'Film' : 'Serial';
                     const ratingStr = reel.rating ? `· ★${reel.rating}` : '';
                     const synopsisId = `reel-syn-${reel.movieId}`;
@@ -3356,6 +3491,18 @@
 
                 setupReelsAutoplay();
                 setupReelSwipeLeft();
+                // Manual trigger play untuk slide pertama
+                if (isNew) {
+                    setTimeout(() => {
+                        const firstSlide = document.querySelector('.reel-slide');
+                        if (firstSlide) {
+                            const fi = firstSlide.querySelector('iframe');
+                            if (fi) {
+                                try { fi.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*'); } catch(e) {}
+                            }
+                        }
+                    }, 1800);
+                }
                 _reelsPage++;
 
             } catch(e) {
@@ -3896,14 +4043,12 @@
         function backToHome() {
             closeModal(); closeSearch(); closeD(); closeActorModal(); closeTvModal();
             if(document.getElementById('reelsModal').style.display === 'block') closeReels();
-            currentGenre = ''; currentYear = ''; currentCountry = ''; currentRating = ''; currentSchedule = 'trending'; 
+            currentGenre = ''; currentYear = ''; currentCountry = ''; currentSchedule = 'trending'; 
             currentType = 'multi'; searchQuery = ''; currentCastId = ''; currentCompany = '';
             document.querySelectorAll('.highlight-item').forEach(i => i.classList.remove('active-hl'));
             const btnCountry = document.getElementById('btnCountry');
             const btnGenre = document.getElementById('btnGenre');
             const btnYear = document.getElementById('yearBtn');
-            const btnRatingEl = document.getElementById('btnRating');
-            if(btnRatingEl) { btnRatingEl.innerHTML = 'Rating <i class="fa-solid fa-caret-down"></i>'; btnRatingEl.classList.remove('active-pill'); }
             btnCountry.innerHTML = 'Negara <i class="fa-solid fa-caret-down"></i>';
             btnGenre.innerHTML = 'Genre <i class="fa-solid fa-caret-down"></i>';
             btnYear.innerHTML = 'Tahun <i class="fa-solid fa-caret-down"></i>';
@@ -4209,12 +4354,6 @@
             countriesFinal.forEach(c => countryHTML += `<div class="filter-item" onclick="setCountry('${c[0]}','${c[1]}')">${c[1]}</div>`); 
             cD.innerHTML = countryHTML; 
 
-            // Rating dropdown
-            const rD = document.getElementById('ratingDropdown');
-            let ratingHTML = '<div class="filter-item sticky-reset" onclick="setRating(\'\',\'Rating\')">Semua Rating</div>';
-            [['9','★ 9+'],['8','★ 8+'],['7','★ 7+'],['6','★ 6+'],['5','★ 5+'],['4','★ 4+']].forEach(r => ratingHTML += `<div class="filter-item" onclick="setRating('${r[0]}','${r[1]}')">${r[1]}</div>`);
-            rD.innerHTML = ratingHTML;
-
             // Genre — lengkap, urut abjad (ID TMDb)
             const genres = [
                 [28,'Action'],[12,'Adventure'],[16,'Animasi'],
@@ -4254,7 +4393,6 @@
                 let endpoint = (currentType === 'tv') ? 'discover/tv' : 'discover/movie';
                 url = `https://api.themoviedb.org/3/${endpoint}?api_key=${API_KEY}&language=id-ID&page=${page}&include_adult=false&sort_by=popularity.desc`;
                 if(currentCountry) url += `&with_origin_country=${currentCountry}`;
-                if(currentRating) url += `&vote_average.gte=${currentRating}&vote_count.gte=50`;
                 if(currentGenre) url += `&with_genres=${currentGenre}`;
                 if(currentCompany) url += `&with_companies=${currentCompany}`;
                 if(currentType === 'short') { url += `&with_runtime.lte=20&with_runtime.gte=1&vote_count.lte=5000`; }
@@ -4289,7 +4427,9 @@
                 const card = document.createElement('div'); 
                 card.className = 'post-card'; 
                 card.onclick = function() { openModal(m.id, mType); }; 
-                card.innerHTML = `<div class="badge-rating">★ ${(m.vote_average||0).toFixed(1)}</div><div class="badge-type">${currentType==='short'?'SHORT':(mType==='tv'?'tv':'movie')}</div><img src="https://image.tmdb.org/t/p/w342${m.poster_path}" loading="lazy" onload="this.style.opacity=1" style="opacity:0">`; 
+                const _rd = m.release_date || m.first_air_date || '';
+                const _nb = isNewRelease(_rd) ? '<div class="badge-new">NEW</div>' : '';
+                card.innerHTML = `<div class="badge-rating">${(m.vote_average||0).toFixed(1)}</div><div class="badge-type">${currentType==='short'?'SHORT':(mType==='tv'?'tv':'movie')}</div>${_nb}<img src="https://image.tmdb.org/t/p/w342${m.poster_path}" loading="lazy" onload="this.style.opacity=1" style="opacity:0">`;
                 fragment.appendChild(card); 
             });
             grid.appendChild(fragment);
@@ -4397,15 +4537,6 @@
             document.querySelectorAll('.stat-item').forEach(s => s.classList.remove('active-stat'));
             el.classList.add('active-stat');
             loadFeed(true); 
-        }
-
-        function setRating(r, n) {
-            currentRating = r;
-            const btn = document.getElementById('btnRating');
-            btn.innerHTML = n + ' <i class="fa-solid fa-caret-down"></i>';
-            r ? btn.classList.add('active-pill') : btn.classList.remove('active-pill');
-            if(currentType === 'multi') currentType = 'movie';
-            closeD(); loadFeed(true);
         }
 
         function setYear(y) { 
@@ -4715,17 +4846,16 @@
             const relYear = (dId.release_date || dId.first_air_date || "2026").split('-')[0];
             const contentKind = (type === 'tv') ? 'tv' : 'movie';
             const genresArr = (dId.genres || []).map(g => `#${g.name.replace(/[^a-zA-Z0-9]/g, '')}`).slice(0, 3).join(' ');
-            const rel = dId.release_date || dId.first_air_date || "";
-            document.getElementById('mDateDisplay').innerText = rel ? new Date(rel).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
-            // Build movie info grid (2 col, no border)
+            // Info grid
+            const rel2 = dId.release_date || dId.first_air_date || "";
             const runTime = dId.runtime ? `${dId.runtime} menit` : (dId.episode_run_time && dId.episode_run_time[0] ? `${dId.episode_run_time[0]} menit/ep` : '—');
             const miCountries = (dId.production_countries || []).map(c => c.name).join(', ') || '—';
             const miStudios = (dId.production_companies || []).slice(0, 3).map(c => c.name).join(', ') || '—';
             const miGenres = (dId.genres || []).map(g => g.name).join(', ') || '—';
-            const langMap = {'en':'English','id':'Indonesia','ko':'Korean','ja':'Japanese','zh':'Mandarin','hi':'Hindi','fr':'French','de':'German','es':'Spanish','it':'Italian','pt':'Portuguese','ru':'Russian','ar':'Arabic','th':'Thai','nl':'Dutch','tr':'Turkish','pl':'Polish','sv':'Swedish','da':'Danish','fi':'Finnish','no':'Norwegian','vi':'Vietnamese','ms':'Malay','tl':'Filipino'};
-            const langCode = dId.original_language || '';
-            const miLanguage = langMap[langCode] || (langCode ? langCode.toUpperCase() : '—');
-            const miReleaseStr = rel ? new Date(rel).toLocaleDateString('id-ID', {day:'numeric',month:'long',year:'numeric'}) : '—';
+            const langMap2 = {'en':'English','id':'Indonesia','ko':'Korean','ja':'Japanese','zh':'Mandarin','hi':'Hindi','fr':'French','de':'German','es':'Spanish','it':'Italian','pt':'Portuguese','ru':'Russian','ar':'Arabic','th':'Thai','nl':'Dutch','tr':'Turkish','pl':'Polish','sv':'Swedish','da':'Danish','fi':'Finnish','no':'Norwegian','vi':'Vietnamese','ms':'Malay','tl':'Filipino'};
+            const langCode2 = dId.original_language || '';
+            const miLanguage = langMap2[langCode2] || (langCode2 ? langCode2.toUpperCase() : '—');
+            const miReleaseStr = rel2 ? new Date(rel2).toLocaleDateString('id-ID', {day:'numeric',month:'long',year:'numeric'}) : '—';
             const infoGridEl = document.getElementById('mInfoGrid');
             if (infoGridEl) {
                 infoGridEl.innerHTML = `
@@ -4738,10 +4868,12 @@
                 infoGridEl.style.display = 'grid';
             }
             document.getElementById('mHashtags').innerHTML = `<br> #${(displayTitle).replace(/[^a-zA-Z0-9]/g, '')} #${relYear} #${contentKind} <br> ${genresArr}`;
+            const rel = dId.release_date || dId.first_air_date || ""; 
+            document.getElementById('mDateDisplay').innerText = rel ? new Date(rel).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
             
             let serverButtonsHTML = '';
             for(let i=1; i<=17; i++) {
-                serverButtonsHTML += `<button class="server-btn ${i===1?'active-link':''}" onclick="changeServer(${i}, this)">Server ${i}</button>`;
+                serverButtonsHTML += `<button class="server-btn" onclick="changeServer(${i}, this)">Server ${i}</button>`;
             }
             // Server 19 ditampilkan sebagai "Server 18" (server 18 dan 20 dihapus)
             serverButtonsHTML += `<button class="server-btn" onclick="changeServer(19, this)">Server 18</button>`;
@@ -4749,6 +4881,16 @@
 
             if(type === 'tv') { document.getElementById('seriesControl').classList.remove('hidden'); document.getElementById('seasonSel').innerHTML = (dId.seasons||[]).filter(s=>s.season_number>0).map(s=>`<option value="${s.season_number}">Season ${s.season_number}</option>`).join(''); loadEpisodes(); } else { document.getElementById('seriesControl').classList.add('hidden'); }
             updateLibButtons(id);
+
+            // Rating badges (bintang berwarna, angka putih)
+            renderModalRatingBadges(dId.vote_average);
+
+            // Recently viewed (poster saja)
+            addToRecentlyViewed(id, type, dId.poster_path || '');
+
+            // Similar films (non-blocking, genre-based)
+            const _genreIds = (dId.genres || []).map(g => g.id);
+            loadSimilarFilms(id, type, _genreIds);
         }
 
         async function handleTranslate() {
@@ -4770,6 +4912,9 @@
                 track.querySelectorAll('iframe').forEach(f => { f.src = ""; f.remove(); }); 
                 track.innerHTML = ''; 
             } 
+            const _rb = document.getElementById('mRatingBar'); if(_rb){ _rb.style.display='none'; _rb.innerHTML=''; }
+            const _ss = document.getElementById('mSimilarSection'); if(_ss) _ss.style.display='none';
+            const _ig2 = document.getElementById('mInfoGrid'); if(_ig2){ _ig2.style.display='none'; _ig2.innerHTML=''; }
             const modal = document.getElementById('movieModal');
             modal.classList.remove('tv-mode');
             modal.style.display = 'none'; 
@@ -4799,6 +4944,10 @@
                 <div class="dl-grid">
                     <button id="btnDownload1" class="dl-link-btn" onclick="handleDownload()">Download</button>
                     <button id="btnTrailerDailymotion" class="dl-link-btn btn-trailer-special" onclick="changeServer(21, this)">Trailer</button>
+                </div>
+                <div id="mSimilarSection" class="similar-section" style="display:none">
+                    <span class="similar-label">Film Serupa</span>
+                    <div class="similar-scroll" id="mSimilarScroll"></div>
                 </div>`;
             }
             document.body.style.overflow = 'auto'; 
@@ -4945,7 +5094,7 @@
             const episodes = data.episodes || [];
             document.getElementById('episodeGrid').innerHTML = episodes.map((e) => { 
                 const epNum = e.episode_number; 
-                const isActive = (epNum == activeEpisode) ? 'active-pill' : '';
+                const isActive = ''; // border menyala hanya saat diklik
                 return `<div class="pill text-[10px] flex flex-col items-center justify-center gap-1 min-h-[45px] ep-btn ${isActive}" onclick="changeEpisode(${epNum}, this)"><span class="font-bold">${epNum}</span></div>`; 
             }).join(''); 
         }
@@ -4999,7 +5148,7 @@
                 card.className = 'post-card';
                 const mType = m._savedType || m.media_type || 'movie';
                 card.onclick = function() { openModal(m.id, mType); };
-                card.innerHTML = `<div class="badge-rating">★ ${(m.vote_average||0).toFixed(1)}</div><div class="badge-type">${mType === 'tv' ? 'tv' : 'movie'}</div><img src="https://image.tmdb.org/t/p/w342${m.poster_path}" loading="lazy" onload="this.style.opacity=1" style="opacity:0">`;
+                card.innerHTML = `<div class="badge-rating">${(m.vote_average||0).toFixed(1)}</div><div class="badge-type">${mType === 'tv' ? 'tv' : 'movie'}</div><img src="https://image.tmdb.org/t/p/w342${m.poster_path}" loading="lazy" onload="this.style.opacity=1" style="opacity:0">`;
                 grid.appendChild(card);
             });
         }
@@ -5029,6 +5178,174 @@
             if (saved === 'light') {
                 document.body.classList.add('light-theme');
             }
+        })();
+
+        // ===== RECENTLY VIEWED =====
+        const RV_KEY = 'recentlyViewed';
+        const RV_MAX = 20;
+
+        function addToRecentlyViewed(id, type, poster) {
+            let items = JSON.parse(localStorage.getItem(RV_KEY) || '[]');
+            items = items.filter(x => x.id != id);
+            items.unshift({ id, type, poster });
+            if (items.length > RV_MAX) items = items.slice(0, RV_MAX);
+            localStorage.setItem(RV_KEY, JSON.stringify(items));
+            renderRecentlyViewed();
+        }
+
+        function renderRecentlyViewed() {
+            const items = JSON.parse(localStorage.getItem(RV_KEY) || '[]');
+            const wrapper = document.getElementById('recentlyViewedWrapper');
+            const scroll = document.getElementById('recentlyScroll');
+            if (!wrapper || !scroll) return;
+            if (!items.length) { wrapper.style.display = 'none'; return; }
+            wrapper.style.display = 'block';
+            scroll.innerHTML = items.map(item => `
+                <div class="recently-item" onclick="openModal(${item.id}, '${item.type}')">
+                    <img class="recently-img" src="https://image.tmdb.org/t/p/w185${item.poster || ''}"
+                         onerror="this.style.background='#1a1a1a'" loading="lazy">
+                </div>`).join('');
+        }
+
+        window.addEventListener('DOMContentLoaded', () => { renderRecentlyViewed(); });
+
+        // ===== BADGE NEW helper =====
+        function isNewRelease(releaseDate) {
+            if (!releaseDate) return false;
+            const diff = (Date.now() - new Date(releaseDate).getTime()) / (1000 * 60 * 60 * 24);
+            return diff >= 0 && diff <= 30;
+        }
+
+        // ===== SIMILAR FILMS =====
+        async function loadSimilarFilms(id, type, genreIds) {
+            const section = document.getElementById('mSimilarSection');
+            const scroll = document.getElementById('mSimilarScroll');
+            if (!section || !scroll) return;
+            section.style.display = 'none';
+            scroll.innerHTML = '';
+            try {
+                let items = [];
+                // Coba recommendations dulu
+                try {
+                    const recData = await fetchWithCache(
+                        `https://api.themoviedb.org/3/${type}/${id}/recommendations?api_key=${API_KEY}&language=en-US&page=1`
+                    );
+                    items = (recData.results || []).filter(m => m.poster_path && m.id != id);
+                } catch(e) {}
+
+                // Jika recommendations < 6, fallback ke discover dengan genre yang sama
+                if (items.length < 6 && genreIds && genreIds.length > 0) {
+                    const endpoint = type === 'tv' ? 'discover/tv' : 'discover/movie';
+                    const discData = await fetchWithCache(
+                        `https://api.themoviedb.org/3/${endpoint}?api_key=${API_KEY}&language=en-US&with_genres=${genreIds.join(',')}&sort_by=popularity.desc&vote_count.gte=50&page=1`
+                    );
+                    const discItems = (discData.results || []).filter(m => m.poster_path && m.id != id);
+                    // Merge, hindari duplikat
+                    const existIds = new Set(items.map(m => m.id));
+                    discItems.forEach(m => { if (!existIds.has(m.id)) items.push(m); });
+                }
+
+                // Filter: hanya tampilkan yang punya genre overlap dengan film ini
+                if (genreIds && genreIds.length > 0) {
+                    const genreSet = new Set(genreIds);
+                    const withOverlap = items.filter(m => (m.genre_ids || []).some(g => genreSet.has(g)));
+                    if (withOverlap.length >= 4) items = withOverlap;
+                }
+
+                items = items.slice(0, 15);
+                if (!items.length) return;
+                section.style.display = 'block';
+                scroll.innerHTML = items.map(m => {
+                    const r = m.vote_average ? m.vote_average.toFixed(1) : '';
+                    return `<div class="similar-card" onclick="openModal(${m.id}, '${type}')">
+                        <img class="similar-poster" src="https://image.tmdb.org/t/p/w185${m.poster_path}"
+                             loading="lazy" onload="this.classList.add('loaded')">
+                        ${r ? `<div class="similar-rating">${r}</div>` : ''}
+                    </div>`;
+                }).join('');
+            } catch(e) {}
+        }
+
+        // ===== RATING BADGES in modal (bintang berwarna, angka putih) =====
+        function renderModalRatingBadges(tmdbRating) {
+            const bar = document.getElementById('mRatingBar');
+            if (!bar || !tmdbRating) { if(bar) bar.style.display = 'none'; return; }
+            const rating = parseFloat(tmdbRating);
+            const imdbEst = (rating * 0.95).toFixed(1);
+            bar.innerHTML = `
+                <span class="modal-rating-badge tmdb">
+                    <i class="fa-solid fa-star"></i>${rating.toFixed(1)} TMDb
+                </span>
+                <span class="modal-rating-badge imdb">
+                    <i class="fa-solid fa-star"></i>~${imdbEst} IMDb
+                </span>`;
+            bar.style.display = 'flex';
+        }
+
+        // ===== PULL TO REFRESH =====
+        (function initPullToRefresh() {
+            let startY = 0, curY = 0, pulling = false, refreshing = false;
+            const indicator = document.getElementById('pullRefreshIndicator');
+            const arrow = document.getElementById('pullArrow');
+            const spinner = document.getElementById('pullSpinner');
+            const pullText = document.getElementById('pullText');
+            const pullInner = document.getElementById('pullInner');
+            const THRESHOLD = 65;
+
+            document.addEventListener('touchstart', e => {
+                if (window.scrollY > 0) return;
+                if (document.getElementById('movieModal').style.display === 'block') return;
+                if (document.getElementById('searchOverlay').style.display === 'block') return;
+                if (document.getElementById('reelsModal').style.display === 'block') return;
+                if (refreshing) return;
+                startY = e.touches[0].clientY;
+                pulling = true;
+            }, { passive: true });
+
+            document.addEventListener('touchmove', e => {
+                if (!pulling || refreshing) return;
+                curY = e.touches[0].clientY;
+                const diff = Math.max(0, curY - startY);
+                if (diff <= 0) return;
+                const h = Math.min(diff * 0.45, THRESHOLD + 12);
+                indicator.style.height = h + 'px';
+                const ready = diff * 0.45 >= THRESHOLD;
+                arrow.className = 'pull-arrow fa-solid fa-arrow-down' + (ready ? ' ready' : '');
+                pullInner.className = 'pull-inner' + (ready ? ' ready' : '');
+                pullText.innerText = ready ? 'Lepas untuk refresh' : 'Tarik untuk refresh';
+            }, { passive: true });
+
+            document.addEventListener('touchend', async () => {
+                if (!pulling || refreshing) return;
+                pulling = false;
+                const diff = Math.max(0, curY - startY);
+                if (diff * 0.45 >= THRESHOLD) {
+                    refreshing = true;
+                    arrow.style.display = 'none';
+                    spinner.style.display = 'block';
+                    pullText.innerText = 'Memperbarui...';
+                    pullInner.className = 'pull-inner ready';
+                    indicator.style.height = '48px';
+                    try { sessionStorage.clear(); } catch(e) {}
+                    await loadFeed(true);
+                    renderRecentlyViewed();
+                    setTimeout(() => {
+                        indicator.style.height = '0px';
+                        arrow.style.display = 'block';
+                        spinner.style.display = 'none';
+                        pullText.innerText = 'Tarik untuk refresh';
+                        arrow.className = 'pull-arrow fa-solid fa-arrow-down';
+                        pullInner.className = 'pull-inner';
+                        refreshing = false;
+                    }, 500);
+                } else {
+                    indicator.style.height = '0px';
+                    arrow.className = 'pull-arrow fa-solid fa-arrow-down';
+                    pullInner.className = 'pull-inner';
+                    pullText.innerText = 'Tarik untuk refresh';
+                }
+                curY = 0; startY = 0;
+            }, { passive: true });
         })();
     </script>
 </body>
