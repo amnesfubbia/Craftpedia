@@ -652,17 +652,14 @@
             scrollbar-width: none;
         }
         .actor-highlights-scroll::-webkit-scrollbar { display: none; }
-        .actor-hl-item { flex: 0 0 62px; text-align: center; cursor: pointer; }
+        .actor-hl-item { flex: 0 0 58px; text-align: center; cursor: pointer; }
         .actor-hl-circle {
-            width: 62px; height: 62px; border-radius: 50%;
-            border: 1.5px solid #333; overflow: hidden;
+            width: 58px; height: 84px; border-radius: 8px;
+            border: none; overflow: hidden;
             margin-bottom: 4px; background: #111;
         }
         .actor-hl-circle img { width: 100%; height: 100%; object-fit: cover; }
-        .actor-hl-label {
-            font-size: 10px; color: #fff; font-weight: 400;
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-        }
+        .actor-hl-label { display: none; }
 
         /* Tab nav (posts / reels style) */
         .actor-tab-nav {
@@ -1039,14 +1036,14 @@
         }
         .reel-translate-btn:active { color: rgba(255,255,255,0.9); }
         .reel-detail-btn {
-            pointer-events: auto; display: inline-flex; align-items: center; gap: 5px;
-            padding: 6px 14px; border-radius: 20px;
-            background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.35);
-            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-            font-size: 11px; font-weight: 700; color: #fff; cursor: pointer;
-            -webkit-tap-highlight-color: transparent; transition: background 0.15s;
+            pointer-events: auto; display: inline-block;
+            padding: 0; border-radius: 0;
+            background: transparent; border: none;
+            font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.6);
+            cursor: pointer; -webkit-tap-highlight-color: transparent;
+            transition: color 0.15s;
         }
-        .reel-detail-btn:active { background: rgba(255,255,255,0.3); }
+        .reel-detail-btn:active { color: #fff; }
 
         /* Tombol aksi kanan bawah (like, bookmark) */
         .reel-actions {
@@ -1235,13 +1232,11 @@
             text-align: center; cursor: pointer;
             text-transform: uppercase; letter-spacing: 0.5px;
             -webkit-tap-highlight-color: transparent;
-            border: 1px solid #333;
-            background: #000; color: #fff;
-            transition: border-color 0.15s, background 0.15s;
+            border: none; background: transparent;
+            color: #8e8e8e;
+            transition: color 0.15s;
         }
-        .rds-btn:active, .rds-btn.pressed {
-            border-color: #fff; background: #111;
-        }
+        .rds-btn:active, .rds-btn.pressed { color: #fff; }
 
 
         /* ===== MOVIE INFO GRID (2 col, no border) ===== */
@@ -1362,6 +1357,7 @@
         .pull-arrow.ready { transform: rotate(180deg); color: #fff; }
         .pull-inner.ready { color: #fff; }
 
+
     </style>
 </head>
 <body>
@@ -1370,7 +1366,7 @@
         <div class="pull-inner" id="pullInner">
             <i class="fa-solid fa-arrow-down pull-arrow" id="pullArrow"></i>
             <div class="pull-spinner" id="pullSpinner"></div>
-            <span id="pullText">Tarik untuk refresh</span>
+            <span id="pullText">Tarik untuk muat ulang</span>
         </div>
     </div>
 
@@ -1632,10 +1628,11 @@
             </div>
 
             <div id="filterBar">
-                <div class="pill-grid grid-cols-3">
+                <div class="pill-grid grid-cols-4">
                     <button class="pill" id="btnCountry" onclick="toggleFilter(event, 'countryDropdown')">Negara <i class="fa-solid fa-caret-down"></i></button>
                     <button class="pill" id="btnGenre" onclick="toggleFilter(event, 'genreDropdown')">Genre <i class="fa-solid fa-caret-down"></i></button>
                     <button class="pill" id="yearBtn" onclick="toggleFilter(event, 'yearDropdown')">Tahun <i class="fa-solid fa-caret-down"></i></button>
+                    <button class="pill" id="btnRating" onclick="toggleFilter(event, 'ratingDropdown')">Rating <i class="fa-solid fa-caret-down"></i></button>
                 </div>
             </div>
         </div>
@@ -1661,7 +1658,7 @@
             <i class="fa-solid fa-arrow-left text-xl text-white" onclick="closeSearch()"></i>
             <div class="search-input-box">
                 <i class="fa-solid fa-magnifying-glass text-zinc-500 text-xs"></i>
-                <input type="text" id="searchInp" autocomplete="off" placeholder="Cari movie, tv, atau aktor..." onkeydown="if(event.key==='Enter') searchAction()" oninput="handleSearchInput(this.value)">
+                <input type="text" id="searchInp" autocomplete="off" placeholder="Cari film, serial, atau aktor..." onkeydown="if(event.key==='Enter') searchAction()" oninput="handleSearchInput(this.value)">
                 <i class="fa-solid fa-xmark text-zinc-500 text-xs cursor-pointer" id="searchClearBtn" style="display:none;padding-left:6px" onclick="clearSearch()"></i>
                 <div id="smartSearchDropdown" class="no-scrollbar"></div>
             </div>
@@ -1688,6 +1685,7 @@
         </div>
     </div>
 
+    <div id="ratingDropdown" class="filter-dropdown no-scrollbar"></div>
     <div id="backToTop" onclick="window.scrollTo({top: 0, behavior: 'smooth'})"><i class="fa-solid fa-arrow-up"></i></div>
     <div id="filterOverlay" onclick="closeD(); closeSoundtrack()"></div>
     <div id="countryDropdown" class="filter-dropdown no-scrollbar"></div>
@@ -1698,7 +1696,7 @@
         <div class="w-12 h-1 bg-zinc-800 rounded-full mx-auto mt-3 mb-6"></div>
         <div class="px-5">
             <h3 class="text-[10px] font-black uppercase tracking-[4px] mb-8 text-center text-zinc-500">
-                Official Soundtrack
+                Soundtrack Resmi
             </h3>
             <div id="musicList" class="space-y-3 pb-12"></div>
         </div>
@@ -1724,7 +1722,7 @@
                 <div class="px-4 py-3 flex justify-between items-center bg-black">
                     <div class="flex gap-4 items-center">
                         <i id="btnLikeModal" class="interaction-icon"></i>
-                        <i class="fa-solid fa-up-right-and-down-left-from-center interaction-icon" onclick="enterLandscape()"></i>
+                        <i class="fa-solid fa-expand interaction-icon" onclick="enterLandscape()"></i>
                         <i class="fa-solid fa-arrow-rotate-left interaction-icon text-[20px]" onclick="replayTrailer()"></i>
                     </div>
                     <i id="btnBookModal" class="interaction-icon"></i>
@@ -1739,7 +1737,7 @@
             <div id="mRatingBar" class="modal-rating-bar" style="display:none"></div>
             <div class="ig-post-content">
                 <div class="mb-1">
-                    <span class="ig-username">amnesfubbia</span>
+                    <span class="ig-username" id="mModalTitle"></span>
                     <span id="mDesc" class="ig-caption"></span>
                     <div class="mt-1">
                         <span id="mToggleBtn" class="toggle-btn hidden" onclick="handleToggleDesc()">selengkapnya</span>
@@ -1757,7 +1755,7 @@
                 
                 <div id="seriesControl" class="hidden mt-4 p-4 bg-zinc-950 rounded-2xl border border-zinc-900">
                     <div class="flex justify-between items-center mb-4">
-                        <h4 class="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Episode List</h4>
+                        <h4 class="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Daftar Episode</h4>
                         <select id="seasonSel" class="bg-zinc-900 text-white text-[10px] px-2 py-1 rounded border border-zinc-700 appearance-none" onchange="loadEpisodes()"></select>
                     </div>
                     <div id="episodeGrid" class="grid grid-cols-5 gap-2"></div>
@@ -1766,7 +1764,7 @@
                 <div id="serverList" class="server-scroll-wrapper mt-4 px-4"></div>
                 
                 <div class="dl-grid">
-                    <button id="btnDownload1" class="dl-link-btn" onclick="handleDownload()">Download</button>
+                    <button id="btnDownload1" class="dl-link-btn" onclick="handleDownload()">Unduh</button>
                     <button id="btnTrailerDailymotion" class="dl-link-btn btn-trailer-special" onclick="changeServer(21, this)">Trailer</button>
                 </div>
                 <div id="mSimilarSection" class="similar-section" style="display:none">
@@ -1970,12 +1968,8 @@
             <div class="rds-info-grid" id="rdsInfoGrid"></div>
         </div>
         <div class="rds-btn-row">
-            <div class="rds-btn" id="rdsBtnStream" onclick="openReelStream(this)">
-                <i class="fa-solid fa-play" style="margin-right:5px;font-size:10px"></i>Tonton
-            </div>
-            <div class="rds-btn" id="rdsBtnDownload" onclick="openReelDownload(this)">
-                <i class="fa-solid fa-download" style="margin-right:5px;font-size:10px"></i>Download
-            </div>
+            <div class="rds-btn" id="rdsBtnStream" onclick="openReelStream(this)">Tonton</div>
+            <div class="rds-btn" id="rdsBtnDownload" onclick="openReelDownload(this)">Unduh</div>
         </div>
     </div>
 
@@ -1989,7 +1983,7 @@
 
     <script>
         const API_KEY = 'bfa7df5310c9974f62f26c6789a8c00d';
-        let page = 1, loading = false, currentType = 'multi', currentGenre = '', currentYear = '', currentCountry = '', currentSchedule = 'trending', searchQuery = '', currentCompany = '', currentLibMode = false, currentCastId = '';
+        let page = 1, loading = false, currentType = 'multi', currentGenre = '', currentYear = '', currentCountry = '', currentRating = '', currentSchedule = 'trending', searchQuery = '', currentCompany = '', currentLibMode = false, currentCastId = '';
         let isExpanded = false, globalFullDesc = "", globalEnDesc = "", currentIdx = 0, startX = 0, isTranslated = false, originalIndoDesc = "";
         let abortController = null;
         let isLsPaused = false, isLsMuted = false, lsControlTimer;
@@ -2528,7 +2522,7 @@
             const overlay     = document.getElementById('filterOverlay');
             const sheet       = document.getElementById('soundtrackModal');
 
-            listCont.innerHTML = '<div class="text-center py-10 text-zinc-600 text-[10px] tracking-widest uppercase animate-pulse">Scanning tracklist...</div>';
+            listCont.innerHTML = '<div class="text-center py-10 text-zinc-600 text-[10px] tracking-widest uppercase animate-pulse">Mencari soundtrack...</div>';
             sheet.style.display = 'block';
             overlay.style.display = 'block';
             document.body.style.overflow = 'hidden';
@@ -2600,7 +2594,7 @@
 
                 // Jika tidak ada → tampilkan pesan, jangan tampilkan hasil tidak relevan
                 if (filtered.length === 0) {
-                    listCont.innerHTML = '<div class="text-center py-20 text-zinc-700 text-[10px] uppercase tracking-widest">Soundtrack tidak tersedia untuk film ini.</div>';
+                    listCont.innerHTML = '<div class="text-center py-20 text-zinc-700 text-[10px] uppercase tracking-widest">Soundtrack tidak tersedia.</div>';
                     return;
                 }
 
@@ -2633,7 +2627,7 @@
                 `).join('');
 
             } catch (error) {
-                listCont.innerHTML = '<div class="text-center py-10 text-red-900 text-[10px] uppercase">Failed to retrieve audio.</div>';
+                listCont.innerHTML = '<div class="text-center py-10 text-red-900 text-[10px] uppercase">Gagal memuat audio.</div>';
             }
         }
 
@@ -2682,7 +2676,7 @@
             const postContent = document.querySelector('#movieModal .ig-post-content');
             if (postContent && document.getElementById('tvChannelSwitcher')) {
                 postContent.innerHTML = `
-                <div class="mb-1"><span class="ig-username">amnesfubbia</span><span id="mDesc" class="ig-caption"></span>
+                <div class="mb-1"><span class="ig-username" id="mModalTitle"></span><span id="mDesc" class="ig-caption"></span>
                 <div class="mt-1"><span id="mToggleBtn" class="toggle-btn hidden" onclick="handleToggleDesc()">selengkapnya</span></div></div>
                 <div id="mInfoGrid" class="minfo-grid" style="display:none"></div>
                 <div id="mHashtags" class="ig-hashtags"></div>
@@ -2692,14 +2686,14 @@
                 </div>
                 <div id="seriesControl" class="hidden mt-4 p-4 bg-zinc-950 rounded-2xl border border-zinc-900">
                     <div class="flex justify-between items-center mb-4">
-                        <h4 class="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Episode List</h4>
+                        <h4 class="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Daftar Episode</h4>
                         <select id="seasonSel" class="bg-zinc-900 text-white text-[10px] px-2 py-1 rounded border border-zinc-700 appearance-none" onchange="loadEpisodes()"></select>
                     </div>
                     <div id="episodeGrid" class="grid grid-cols-5 gap-2"></div>
                 </div>
                 <div id="serverList" class="server-scroll-wrapper mt-4 px-4"></div>
                 <div class="dl-grid">
-                    <button id="btnDownload1" class="dl-link-btn" onclick="handleDownload()">Download</button>
+                    <button id="btnDownload1" class="dl-link-btn" onclick="handleDownload()">Unduh</button>
                     <button id="btnTrailerDailymotion" class="dl-link-btn btn-trailer-special" onclick="changeServer(21, this)">Trailer</button>
                 </div>
                 <div id="mSimilarSection" class="similar-section" style="display:none">
@@ -3156,8 +3150,13 @@
                 window._actorImdbId = details.imdb_id || '';
 
                 // Known For highlights (top 6 by popularity)
+                const _seenTop = new Set();
                 const topWorks = [...allCast]
-                    .filter(c => c.poster_path)
+                    .filter(c => {
+                        if (!c.poster_path) return false;
+                        if (_seenTop.has(c.id)) return false;
+                        _seenTop.add(c.id); return true;
+                    })
                     .sort((a,b) => b.popularity - a.popularity)
                     .slice(0, 6);
 
@@ -3174,8 +3173,13 @@
                 }
 
                 // Film grid (movies)
-                const movieFilms = allCast.filter(m => m.media_type === 'movie' && m.poster_path)
-                    .sort((a,b) => b.popularity - a.popularity);
+                // Deduplikasi berdasarkan id (satu judul bisa muncul berkali-kali di credits)
+                const _seenMovie = new Set();
+                const movieFilms = allCast.filter(m => {
+                    if (m.media_type !== 'movie' || !m.poster_path) return false;
+                    if (_seenMovie.has(m.id)) return false;
+                    _seenMovie.add(m.id); return true;
+                }).sort((a,b) => b.popularity - a.popularity);
                 const filmGrid = document.getElementById('actorFilmGrid');
                 filmGrid.innerHTML = '';
                 if (movieFilms.length === 0) {
@@ -3191,8 +3195,12 @@
                 }
 
                 // TV grid
-                const tvFilms = allCast.filter(m => m.media_type === 'tv' && m.poster_path)
-                    .sort((a,b) => b.popularity - a.popularity);
+                const _seenTv = new Set();
+                const tvFilms = allCast.filter(m => {
+                    if (m.media_type !== 'tv' || !m.poster_path) return false;
+                    if (_seenTv.has(m.id)) return false;
+                    _seenTv.add(m.id); return true;
+                }).sort((a,b) => b.popularity - a.popularity);
                 const tvGrid = document.getElementById('actorTvGrid');
                 tvGrid.innerHTML = '';
                 if (tvFilms.length === 0) {
@@ -3284,6 +3292,15 @@
         const PORTRAIT_REGEX = /\bvertical\b|\bportrait\b|9\s*:\s*16|\breels?\b|\btiktok\b|#shorts|\bshorts\b/i;
 
         async function openReels() {
+            // Pause/mute semua video dari modal film yang mungkin masih main
+            document.querySelectorAll('#carouselTrack iframe').forEach(f => {
+                try { f.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*'); } catch(e) {}
+                try { f.contentWindow.postMessage('{"event":"command","func":"mute","args":""}', '*'); } catch(e) {}
+            });
+            document.querySelectorAll('#mainVideoArea iframe').forEach(f => {
+                try { f.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*'); } catch(e) {}
+                // Streaming server iframe - mute via src param tidak bisa, tapi remove src momentarily
+            });
             const modal = document.getElementById('reelsModal');
             modal.style.display = 'block';
             document.getElementById('reelsBottomNav').style.display = 'flex';
@@ -3468,9 +3485,7 @@
                                  data-translated="0" data-orig="${encodeURIComponent(reel.synopsis)}" data-trans="">
                                 Lihat terjemahan
                             </div>` : ''}
-                            <div class="reel-detail-btn" onclick="openReelDetail(${reel.movieId}, '${reel.type}')">
-                                <i class="fa-solid fa-circle-info" style="font-size:10px"></i>Detail Film
-                            </div>
+                            <div class="reel-detail-btn" onclick="openReelDetail(${reel.movieId}, '${reel.type}')">Detail Film</div>
                         </div>
                         <div class="reel-actions">
                             <div class="reel-action-btn ${lib.liked ? 'liked' : ''}" 
@@ -4043,7 +4058,7 @@
         function backToHome() {
             closeModal(); closeSearch(); closeD(); closeActorModal(); closeTvModal();
             if(document.getElementById('reelsModal').style.display === 'block') closeReels();
-            currentGenre = ''; currentYear = ''; currentCountry = ''; currentSchedule = 'trending'; 
+            currentGenre = ''; currentYear = ''; currentCountry = ''; currentRating = ''; currentSchedule = 'trending'; 
             currentType = 'multi'; searchQuery = ''; currentCastId = ''; currentCompany = '';
             document.querySelectorAll('.highlight-item').forEach(i => i.classList.remove('active-hl'));
             const btnCountry = document.getElementById('btnCountry');
@@ -4354,6 +4369,16 @@
             countriesFinal.forEach(c => countryHTML += `<div class="filter-item" onclick="setCountry('${c[0]}','${c[1]}')">${c[1]}</div>`); 
             cD.innerHTML = countryHTML; 
 
+            // Rating dropdown - per angka eksak
+            const rD = document.getElementById('ratingDropdown');
+            if (rD) {
+                let ratingHTML = '<div class="filter-item sticky-reset" onclick="setRating(\'\',\'Rating\')">Semua Rating</div>';
+                [['9','★ 9'],['8','★ 8'],['7','★ 7'],['6','★ 6'],['5','★ 5'],['4','★ 4']].forEach(r =>
+                    ratingHTML += `<div class="filter-item" onclick="setRating('${r[0]}','${r[1]}')">${r[1]}</div>`
+                );
+                rD.innerHTML = ratingHTML;
+            }
+
             // Genre — lengkap, urut abjad (ID TMDb)
             const genres = [
                 [28,'Action'],[12,'Adventure'],[16,'Animasi'],
@@ -4393,6 +4418,10 @@
                 let endpoint = (currentType === 'tv') ? 'discover/tv' : 'discover/movie';
                 url = `https://api.themoviedb.org/3/${endpoint}?api_key=${API_KEY}&language=id-ID&page=${page}&include_adult=false&sort_by=popularity.desc`;
                 if(currentCountry) url += `&with_origin_country=${currentCountry}`;
+                if(currentRating) {
+                    const rMin = parseFloat(currentRating);
+                    url += `&vote_average.gte=${rMin}&vote_average.lte=${rMin + 0.99}&vote_count.gte=100`;
+                }
                 if(currentGenre) url += `&with_genres=${currentGenre}`;
                 if(currentCompany) url += `&with_companies=${currentCompany}`;
                 if(currentType === 'short') { url += `&with_runtime.lte=20&with_runtime.gte=1&vote_count.lte=5000`; }
@@ -4537,6 +4566,14 @@
             document.querySelectorAll('.stat-item').forEach(s => s.classList.remove('active-stat'));
             el.classList.add('active-stat');
             loadFeed(true); 
+        }
+
+        function setRating(r, n) {
+            currentRating = r;
+            const btn = document.getElementById('btnRating');
+            if (btn) { btn.innerHTML = n + ' <i class="fa-solid fa-caret-down"></i>'; r ? btn.classList.add('active-pill') : btn.classList.remove('active-pill'); }
+            if(currentType === 'multi') currentType = 'movie';
+            closeD(); loadFeed(true);
         }
 
         function setYear(y) { 
@@ -4838,6 +4875,8 @@
                 } catch {}
             }
             document.getElementById('mTitle').innerText = displayTitle;
+            const _mu = document.getElementById('mModalTitle');
+            if (_mu) _mu.innerText = displayTitle;
             // Simpan info untuk soundtrack search yang akurat
             window.currentMediaTitle = displayTitle;
             window.currentMediaYear = (dId.release_date || dId.first_air_date || '').split('-')[0] || '';
@@ -4858,12 +4897,17 @@
             const miReleaseStr = rel2 ? new Date(rel2).toLocaleDateString('id-ID', {day:'numeric',month:'long',year:'numeric'}) : '—';
             const infoGridEl = document.getElementById('mInfoGrid');
             if (infoGridEl) {
+                // Director
+                const miCrew = (dCast.crew || []);
+                const miDir = miCrew.find(c => c.job === 'Director');
+                const miDirName = miDir ? miDir.name : (type === 'tv' ? ((dId.created_by && dId.created_by[0]) ? dId.created_by[0].name : '—') : '—');
                 infoGridEl.innerHTML = `
-                <div class="minfo-cell"><span class="minfo-key">Released</span><span class="minfo-val">${miReleaseStr}</span></div>
-                <div class="minfo-cell"><span class="minfo-key">Run Time</span><span class="minfo-val">${runTime}</span></div>
-                <div class="minfo-cell"><span class="minfo-key">Country</span><span class="minfo-val">${miCountries}</span></div>
-                <div class="minfo-cell"><span class="minfo-key">Language</span><span class="minfo-val">${miLanguage}</span></div>
-                <div class="minfo-cell full-width"><span class="minfo-key">Studios</span><span class="minfo-val">${miStudios}</span></div>
+                <div class="minfo-cell full-width"><span class="minfo-key">Sutradara</span><span class="minfo-val">${miDirName}</span></div>
+                <div class="minfo-cell"><span class="minfo-key">Rilis</span><span class="minfo-val">${miReleaseStr}</span></div>
+                <div class="minfo-cell"><span class="minfo-key">Durasi</span><span class="minfo-val">${runTime}</span></div>
+                <div class="minfo-cell"><span class="minfo-key">Negara</span><span class="minfo-val">${miCountries}</span></div>
+                <div class="minfo-cell"><span class="minfo-key">Bahasa</span><span class="minfo-val">${miLanguage}</span></div>
+                <div class="minfo-cell full-width"><span class="minfo-key">Studio</span><span class="minfo-val">${miStudios}</span></div>
                 <div class="minfo-cell full-width"><span class="minfo-key">Genre</span><span class="minfo-val">${miGenres}</span></div>`;
                 infoGridEl.style.display = 'grid';
             }
@@ -4923,7 +4967,7 @@
             if (postContent && document.getElementById('tvChannelSwitcher')) {
                 postContent.innerHTML = `
                 <div class="mb-1">
-                    <span class="ig-username">amnesfubbia</span>
+                    <span class="ig-username" id="mModalTitle"></span>
                     <span id="mDesc" class="ig-caption"></span>
                     <div class="mt-1"><span id="mToggleBtn" class="toggle-btn hidden" onclick="handleToggleDesc()">selengkapnya</span></div>
                 </div>
@@ -4935,14 +4979,14 @@
                 </div>
                 <div id="seriesControl" class="hidden mt-4 p-4 bg-zinc-950 rounded-2xl border border-zinc-900">
                     <div class="flex justify-between items-center mb-4">
-                        <h4 class="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Episode List</h4>
+                        <h4 class="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Daftar Episode</h4>
                         <select id="seasonSel" class="bg-zinc-900 text-white text-[10px] px-2 py-1 rounded border border-zinc-700 appearance-none" onchange="loadEpisodes()"></select>
                     </div>
                     <div id="episodeGrid" class="grid grid-cols-5 gap-2"></div>
                 </div>
                 <div id="serverList" class="server-scroll-wrapper mt-4 px-4"></div>
                 <div class="dl-grid">
-                    <button id="btnDownload1" class="dl-link-btn" onclick="handleDownload()">Download</button>
+                    <button id="btnDownload1" class="dl-link-btn" onclick="handleDownload()">Unduh</button>
                     <button id="btnTrailerDailymotion" class="dl-link-btn btn-trailer-special" onclick="changeServer(21, this)">Trailer</button>
                 </div>
                 <div id="mSimilarSection" class="similar-section" style="display:none">
@@ -5127,7 +5171,8 @@
                 history.pushState({view: mode}, '');
                 showLibrary(mode); 
             } else { 
-                currentLibMode = false; currentCastId = ''; searchQuery = ''; currentType='multi'; currentSchedule='trending'; currentCompany=''; loadFeed(true); 
+                currentLibMode = false; currentCastId = ''; searchQuery = ''; currentType='multi'; currentSchedule='trending'; currentCompany=''; currentRating='';
+                const _btnRt = document.getElementById('btnRating'); if(_btnRt){ _btnRt.innerHTML='Rating <i class="fa-solid fa-caret-down"></i>'; _btnRt.classList.remove('active-pill'); } loadFeed(true); 
             } 
         }
         async function showLibrary(k) { 
@@ -5135,7 +5180,7 @@
             const grid = document.getElementById('feedGrid'); 
             grid.innerHTML = ''; 
             if (!items.length) { 
-                grid.innerHTML = '<div class="col-span-3 text-center py-20 text-zinc-500 text-xs">Belum ada konten disimpan</div>'; 
+                grid.innerHTML = '<div class="col-span-3 text-center py-20 text-zinc-500 text-xs">Belum ada konten tersimpan</div>'; 
                 return; 
             } 
             const promises = items.map(i => 
@@ -5312,7 +5357,7 @@
                 const ready = diff * 0.45 >= THRESHOLD;
                 arrow.className = 'pull-arrow fa-solid fa-arrow-down' + (ready ? ' ready' : '');
                 pullInner.className = 'pull-inner' + (ready ? ' ready' : '');
-                pullText.innerText = ready ? 'Lepas untuk refresh' : 'Tarik untuk refresh';
+                pullText.innerText = ready ? 'Lepas untuk muat ulang' : 'Tarik untuk muat ulang';
             }, { passive: true });
 
             document.addEventListener('touchend', async () => {
@@ -5333,7 +5378,7 @@
                         indicator.style.height = '0px';
                         arrow.style.display = 'block';
                         spinner.style.display = 'none';
-                        pullText.innerText = 'Tarik untuk refresh';
+                        pullText.innerText = 'Tarik untuk muat ulang';
                         arrow.className = 'pull-arrow fa-solid fa-arrow-down';
                         pullInner.className = 'pull-inner';
                         refreshing = false;
@@ -5342,7 +5387,7 @@
                     indicator.style.height = '0px';
                     arrow.className = 'pull-arrow fa-solid fa-arrow-down';
                     pullInner.className = 'pull-inner';
-                    pullText.innerText = 'Tarik untuk refresh';
+                    pullText.innerText = 'Tarik untuk muat ulang';
                 }
                 curY = 0; startY = 0;
             }, { passive: true });
