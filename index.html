@@ -1358,6 +1358,114 @@
         .pull-inner.ready { color: #fff; }
 
 
+
+
+        /* ===== NOTIFIKASI FILM BARU ===== */
+        #notifModal {
+            display: none; position: fixed; inset: 0; z-index: 9700;
+            background: #000; overflow-y: auto;
+            animation: aboutSlideIn 0.3s cubic-bezier(0.25,1,0.5,1);
+        }
+        .notif-topbar {
+            position: sticky; top: 0; z-index: 100;
+            background: #000; border-bottom: 1px solid #1c1c1c;
+            display: flex; align-items: center; padding: 0 15px; height: 54px; gap: 10px;
+        }
+        .notif-topbar-title { flex: 1; font-size: 14px; font-weight: 800; color: #fff; }
+        .notif-date-badge {
+            font-size: 10px; font-weight: 700; color: #8e8e8e;
+            background: #111; border: 1px solid #1c1c1c;
+            border-radius: 20px; padding: 4px 10px;
+        }
+        .notif-section-label {
+            padding: 16px 15px 8px;
+            font-size: 10px; font-weight: 800; color: #555;
+            text-transform: uppercase; letter-spacing: 2px;
+        }
+        .notif-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 10px 15px; border-bottom: 1px solid #0f0f0f;
+            cursor: pointer; transition: background 0.15s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .notif-item:active { background: #0a0a0a; }
+        .notif-poster {
+            width: 48px; height: 70px; border-radius: 8px;
+            object-fit: cover; background: #111; flex-shrink: 0;
+        }
+        .notif-info { flex: 1; min-width: 0; }
+        .notif-title {
+            font-size: 13px; font-weight: 700; color: #fff;
+            margin-bottom: 3px; white-space: nowrap;
+            overflow: hidden; text-overflow: ellipsis;
+        }
+        .notif-meta { font-size: 11px; color: #8e8e8e; }
+        .notif-rating {
+            font-size: 10px; font-weight: 800;
+            background: rgba(255,255,255,0.9); color: #000;
+            border-radius: 3px; padding: 2px 5px; flex-shrink: 0;
+        }
+        .notif-empty {
+            text-align: center; padding: 60px 20px;
+            color: #555; font-size: 13px;
+        }
+        .notif-empty i { font-size: 40px; display: block; margin-bottom: 14px; color: #222; }
+
+        /* ===== FOTO PEMERAN MODAL ===== */
+        #actorPhotosModal {
+            display: none; position: fixed; inset: 0; z-index: 9000;
+            background: rgba(0,0,0,0.95); overflow-y: auto;
+            animation: lsFadeIn 0.2s ease-out;
+        }
+        .actor-photos-topbar {
+            position: sticky; top: 0; z-index: 100;
+            background: #000; border-bottom: 1px solid #1c1c1c;
+            display: flex; align-items: center; padding: 0 15px; height: 54px;
+        }
+        .actor-photos-title {
+            flex: 1; text-align: center;
+            font-size: 14px; font-weight: 800; color: #fff;
+        }
+        .actor-photos-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 2px; padding-bottom: 40px;
+        }
+        .actor-photo-item {
+            aspect-ratio: 2/3; overflow: hidden; background: #111; cursor: pointer;
+        }
+        .actor-photo-item img {
+            width: 100%; height: 100%; object-fit: cover;
+            transition: opacity 0.3s; opacity: 0;
+        }
+        .actor-photos-loading {
+            text-align: center; padding: 60px 20px; color: #555;
+        }
+
+
+        /* ===== POSTER GALLERY in modal ===== */
+        .poster-gallery-section { padding: 10px 0 4px; }
+        .poster-gallery-label {
+            font-size: 10px; font-weight: 800; color: #555;
+            text-transform: uppercase; letter-spacing: 2px;
+            padding: 0 15px; margin-bottom: 10px; display: block;
+        }
+        .poster-gallery-scroll {
+            display: flex; gap: 8px; overflow-x: auto;
+            padding: 0 15px 4px; scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+        }
+        .poster-gallery-scroll::-webkit-scrollbar { display: none; }
+        .poster-gallery-item {
+            flex: 0 0 auto; cursor: pointer; border-radius: 8px;
+            overflow: hidden; background: #111;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .poster-gallery-img {
+            display: block; height: 160px; width: auto;
+            object-fit: cover; opacity: 0; transition: opacity 0.3s;
+        }
+        .poster-gallery-img.loaded { opacity: 1; }
+
     </style>
 </head>
 <body>
@@ -1594,11 +1702,11 @@
             <div class="top-bar">
                 <div class="ig-logo-wrapper" onclick="backToHome()">
                     <h1 class="ig-logo">amnesfubbia</h1>
-                    <i class="fa-solid fa-chevron-down text-[10px] ml-0.5"></i>
+                    <i class="fa-solid fa-chevron-down text-[10px] ml-0.5" onclick="event.stopPropagation(); openNotif()" style="cursor:pointer" title="Film Baru Hari Ini"></i>
                     <span class="dot-notify"></span>
                 </div>
                 <div class="flex gap-5">
-                    <i class="fa-regular fa-square-plus cursor-pointer" style="font-size:24px" onclick="openComingSoon()"></i>
+                    <i class="fa-regular fa-calendar cursor-pointer" style="font-size:22px;color:#fff" onclick="openComingSoon()"></i>
                     <i class="fa-solid fa-bars cursor-pointer" style="font-size:22px" onclick="toggleSideMenu()"></i>
                 </div>
             </div>
@@ -1746,6 +1854,11 @@
 
                 <div id="mInfoGrid" class="minfo-grid" style="display:none"></div>
                 
+                <div id="mPosterGallery" class="poster-gallery-section" style="display:none">
+                    <span class="poster-gallery-label">Poster & Gambar</span>
+                    <div class="poster-gallery-scroll" id="mPosterScroll"></div>
+                </div>
+
                 <div id="mHashtags" class="ig-hashtags"></div>
 
                 <div class="flex items-center gap-2 mt-1.5">
@@ -1825,7 +1938,7 @@
         <div class="actor-action-row">
             <div class="actor-btn-follow" onclick="searchByCast(window._currentActorId)">Filmografi</div>
             <div class="actor-btn-msg" id="actorImdbBtn" onclick="openActorImdb()">IMDb</div>
-            <div class="actor-btn-sq"><i class="fa-solid fa-chevron-down"></i></div>
+            <div class="actor-btn-sq" onclick="openActorPhotos()" title="Foto"><i class="fa-regular fa-images"></i></div>
         </div>
 
         <!-- Bio block -->
@@ -1911,16 +2024,16 @@
 
     <!-- Bottom nav reels — terpisah dari reelsModal agar tidak tertutup overlay -->
     <nav class="reels-bottom-nav" id="reelsBottomNav" style="display:none">
-        <div class="reels-bottom-item" onclick="closeReels(); updateActiveNav(document.getElementById('homeBtnNav')); backToHome()">
+        <div class="reels-bottom-item" onclick="closeReelDetail(); closeReels(); updateActiveNav(document.getElementById('homeBtnNav')); backToHome()">
             <i class="fa-solid fa-house"></i>
         </div>
-        <div class="reels-bottom-item" onclick="closeReels(); openSearch()">
+        <div class="reels-bottom-item" onclick="closeReelDetail(); closeReels(); openSearch()">
             <i class="fa-solid fa-magnifying-glass"></i>
         </div>
         <div class="reels-bottom-item active-reel-nav">
             <i class="fa-solid fa-clapperboard"></i>
         </div>
-        <div class="reels-bottom-item" onclick="closeReels(); updateActiveNav(document.getElementById('tvBtnNav')); openTvModal()">
+        <div class="reels-bottom-item" onclick="closeReelDetail(); closeReels(); updateActiveNav(document.getElementById('tvBtnNav')); openTvModal()">
             <i class="fa-solid fa-tv"></i>
         </div>
         <div class="reels-bottom-item" onclick="openBookmarksFromReels()">
@@ -1973,12 +2086,35 @@
         </div>
     </div>
 
+    <!-- ===== NOTIFIKASI FILM BARU ===== -->
+    <div id="notifModal">
+        <div class="notif-topbar">
+            <i class="fa-solid fa-chevron-left" style="font-size:20px;color:#fff;cursor:pointer;padding:6px;margin-right:4px" onclick="closeNotif()"></i>
+            <div class="notif-topbar-title">Film Baru Hari Ini</div>
+            <span class="notif-date-badge" id="notifDateBadge"></span>
+        </div>
+        <div id="notifContent">
+            <div class="notif-empty"><i class="fa-solid fa-film"></i>Memuat...</div>
+        </div>
+    </div>
+
+    <!-- ===== FOTO PEMERAN ===== -->
+    <div id="actorPhotosModal">
+        <div class="actor-photos-topbar">
+            <i class="fa-solid fa-chevron-left" style="font-size:20px;color:#fff;cursor:pointer;padding:6px" onclick="closeActorPhotos()"></i>
+            <div class="actor-photos-title" id="actorPhotosTitle">Foto</div>
+            <div style="width:32px"></div>
+        </div>
+        <div id="actorPhotosGrid" class="actor-photos-grid"></div>
+    </div>
+
+
     <nav class="bottom-nav">
-        <i class="fa-solid fa-house cursor-pointer text-xl active-nav" id="homeBtnNav" onclick="updateActiveNav(this); backToHome()"></i>
-        <i class="fa-solid fa-magnifying-glass cursor-pointer text-xl" id="searchBtnNav" onclick="updateActiveNav(this); openSearch()"></i>
-        <i class="fa-solid fa-clapperboard cursor-pointer text-xl" id="reelsBtnNav" onclick="updateActiveNav(this); openReels()"></i>
-        <i class="fa-solid fa-tv cursor-pointer text-xl" id="tvBtnNav" onclick="updateActiveNav(this); openTvModal()"></i>
-        <i class="fa-regular fa-bookmark cursor-pointer text-xl" id="bookmarkBtnNav" onclick="updateActiveNav(this); switchTab('bookmarks', document.getElementById('tabBookmark'))"></i>
+        <i class="fa-solid fa-house cursor-pointer text-xl active-nav" id="homeBtnNav" onclick="closeActorPhotos(); updateActiveNav(this); backToHome()"></i>
+        <i class="fa-solid fa-magnifying-glass cursor-pointer text-xl" id="searchBtnNav" onclick="closeActorPhotos(); updateActiveNav(this); openSearch()"></i>
+        <i class="fa-solid fa-clapperboard cursor-pointer text-xl" id="reelsBtnNav" onclick="closeActorPhotos(); updateActiveNav(this); openReels()"></i>
+        <i class="fa-solid fa-tv cursor-pointer text-xl" id="tvBtnNav" onclick="closeActorPhotos(); updateActiveNav(this); openTvModal()"></i>
+        <i class="fa-regular fa-bookmark cursor-pointer text-xl" id="bookmarkBtnNav" onclick="closeActorPhotos(); updateActiveNav(this); switchTab('bookmarks', document.getElementById('tabBookmark'))"></i>
     </nav>
 
     <script>
@@ -2095,16 +2231,19 @@
         // =============================================
         const tvSchedules = {
             'RCTI': [
+                {time:'03:00',show:'Layar Drama Indonesia',genre:'Drama'},
                 {time:'04:30',show:'Seputar Indonesia Pagi',genre:'Berita'},
                 {time:'06:00',show:'Dahsyat',genre:'Hiburan'},
-                {time:'09:00',show:'Sinetron Pagi',genre:'Drama'},
+                {time:'09:30',show:'Sinetron Pagi',genre:'Drama'},
                 {time:'11:00',show:'Seputar Indonesia Siang',genre:'Berita'},
-                {time:'12:00',show:'Sinetron Siang',genre:'Drama'},
-                {time:'15:00',show:'Sinetron Sore',genre:'Drama'},
+                {time:'11:30',show:'Sinetron Siang',genre:'Drama'},
+                {time:'14:30',show:'Sinetron Sore',genre:'Drama'},
                 {time:'17:00',show:'Seputar Indonesia',genre:'Berita'},
-                {time:'19:00',show:'Sinetron Prime Time',genre:'Drama'},
-                {time:'21:00',show:'Infotainment',genre:'Hiburan'},
-                {time:'23:00',show:'Film Malam',genre:'Film'},
+                {time:'17:30',show:'Sinetron Sore',genre:'Drama'},
+                {time:'19:30',show:'Sinetron Prime Time',genre:'Drama'},
+                {time:'21:00',show:'Seputar Indonesia Malam',genre:'Berita'},
+                {time:'21:30',show:'Film Malam',genre:'Film'},
+                {time:'23:30',show:'Layar Drama Indonesia',genre:'Drama'},
             ],
             'GTV': [
                 {time:'05:00',show:'Morning Show',genre:'Hiburan'},
@@ -2320,7 +2459,7 @@
                 </div>`;
 
             let schedHTML = `<div class="tv-schedule-header">
-                <div class="tv-schedule-title">Jadwal Hari Ini</div>
+                <div class="tv-schedule-title">Jadwal Hari Ini <span style="font-weight:400;color:#444;font-size:8px;text-transform:none;letter-spacing:0">(perkiraan)</span></div>
                 <div class="tv-schedule-date">${wibStr}</div>
             </div>`;
 
@@ -2430,6 +2569,9 @@
             modal.classList.add('tv-mode');
             modal.style.display = 'block';
             document.getElementById('mTitle').innerText = '● LIVE: ' + name;
+            // Tandai tombol back agar kembali ke tvModal bukan home
+            const _mBackBtn = document.querySelector('#movieModal .fa-chevron-left');
+            if (_mBackBtn) _mBackBtn.setAttribute('onclick', 'handleModalBack()');
             document.getElementById('mDesc').innerText = '';
             document.getElementById('mLikeDisplay').innerText = '';
             document.getElementById('mDateDisplay').innerText = '';
@@ -2679,6 +2821,10 @@
                 <div class="mb-1"><span class="ig-username" id="mModalTitle"></span><span id="mDesc" class="ig-caption"></span>
                 <div class="mt-1"><span id="mToggleBtn" class="toggle-btn hidden" onclick="handleToggleDesc()">selengkapnya</span></div></div>
                 <div id="mInfoGrid" class="minfo-grid" style="display:none"></div>
+                <div id="mPosterGallery" class="poster-gallery-section" style="display:none">
+                    <span class="poster-gallery-label">Poster & Gambar</span>
+                    <div class="poster-gallery-scroll" id="mPosterScroll"></div>
+                </div>
                 <div id="mHashtags" class="ig-hashtags"></div>
                 <div class="flex items-center gap-2 mt-1.5">
                     <div id="mDateDisplay" class="ig-date"></div>
@@ -2773,6 +2919,18 @@
 
         window.addEventListener('popstate', function(event) {
             const state = event.state ? event.state.view : null;
+
+            // Foto pemeran
+            if (document.getElementById('actorPhotosModal') && document.getElementById('actorPhotosModal').style.display === 'block') {
+                closeActorPhotos();
+                return;
+            }
+
+            // Notifikasi
+            if (document.getElementById('notifModal') && document.getElementById('notifModal').style.display === 'block') {
+                closeNotif();
+                return;
+            }
 
             // Soundtrack overlay — cek paling awal (z-index tertinggi)
             if (document.getElementById('soundtrackModal').style.display === 'block') {
@@ -3232,6 +3390,25 @@
             }
         }
 
+        function openActorShare() {
+            const name = document.getElementById('actorName').innerText;
+            if (!name) return;
+            const imdbId = window._actorImdbId || '';
+            const searchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(name + ' actor interview')}`;
+            const imdbUrl = imdbId ? `https://www.imdb.com/name/${imdbId}` : `https://www.google.com/search?q=${encodeURIComponent(name + ' actor')}`;
+            // Share sheet native jika tersedia
+            if (navigator.share) {
+                navigator.share({
+                    title: name,
+                    text: `Lihat profil ${name} di amnesfubbia`,
+                    url: imdbUrl
+                }).catch(() => {});
+            } else {
+                // Fallback: buka YouTube search aktor
+                window.open(searchUrl, '_blank');
+            }
+        }
+
         function openActorImdb() {
             if (window._actorImdbId) {
                 window.open(`https://www.imdb.com/name/${window._actorImdbId}`, '_blank');
@@ -3313,6 +3490,10 @@
         }
 
         function closeReels() {
+            // Tutup detail sheet jika masih terbuka
+            document.getElementById('reelDetailOverlay').style.display = 'none';
+            document.getElementById('reelDetailSheet').style.display = 'none';
+            _rdsCurrentId = null; _rdsCurrentType = null;
             document.getElementById('reelsModal').style.display = 'none';
             document.getElementById('reelsBottomNav').style.display = 'none';
             document.body.style.overflow = 'auto';
@@ -4064,6 +4245,8 @@
             const btnCountry = document.getElementById('btnCountry');
             const btnGenre = document.getElementById('btnGenre');
             const btnYear = document.getElementById('yearBtn');
+            const btnRatingEl = document.getElementById('btnRating');
+            if(btnRatingEl) { btnRatingEl.innerHTML = 'Rating <i class="fa-solid fa-caret-down"></i>'; btnRatingEl.classList.remove('active-pill'); }
             btnCountry.innerHTML = 'Negara <i class="fa-solid fa-caret-down"></i>';
             btnGenre.innerHTML = 'Genre <i class="fa-solid fa-caret-down"></i>';
             btnYear.innerHTML = 'Tahun <i class="fa-solid fa-caret-down"></i>';
@@ -4251,10 +4434,6 @@
                 {n: 'Dreamworks', com: '521|778', img: 'Dreamwork.png', t: 'movie', s: true},
                 {n: 'Ghibli', com: '10342', img: 'Ghibli.png', t: 'movie', s: true},
                 {n: 'Anime', g: 16, img: 'Anime.png', t: 'movie', c: 'JP', s: true},
-                {n: 'Indonesia', c: 'ID', img: 'Indonesia.png', t: 'movie', s: false},
-                {n: 'Korea', c: 'KR', img: 'Korea.png', t: 'movie', s: false},
-                {n: 'India', c: 'IN', img: 'India.png', t: 'movie', s: false},
-                {n: 'Thailand', c: 'TH', img: 'Thailand.png', t: 'movie', s: false}
             ]; 
             const cont = document.getElementById('highlightList'); 
             hls.forEach(h => { 
@@ -4935,6 +5114,9 @@
             // Similar films (non-blocking, genre-based)
             const _genreIds = (dId.genres || []).map(g => g.id);
             loadSimilarFilms(id, type, _genreIds);
+
+            // Poster gallery (non-blocking)
+            loadPosterGallery(id, type);
         }
 
         async function handleTranslate() {
@@ -4950,6 +5132,22 @@
             renderSynopsis();
         }
         
+        function handleModalBack() {
+            // Jika TV mode aktif, kembali ke tvModal
+            if (document.getElementById('movieModal').classList.contains('tv-mode')) {
+                _closeModalSilent();
+                document.getElementById('tvSearchInp').value = '';
+                document.getElementById('tvSearchBox').style.display = 'none';
+                renderTvList('');
+                document.getElementById('tvModal').style.display = 'block';
+                document.getElementById('tvModal').scrollTop = 0;
+                document.body.style.overflow = 'hidden';
+                history.replaceState({view: 'tv'}, '');
+            } else {
+                closeModal();
+            }
+        }
+
         function closeModal() { 
             const track = document.getElementById('carouselTrack'); 
             if(track) { 
@@ -4958,6 +5156,7 @@
             } 
             const _rb = document.getElementById('mRatingBar'); if(_rb){ _rb.style.display='none'; _rb.innerHTML=''; }
             const _ss = document.getElementById('mSimilarSection'); if(_ss) _ss.style.display='none';
+            const _pg = document.getElementById('mPosterGallery'); if(_pg){ _pg.style.display='none'; document.getElementById('mPosterScroll').innerHTML=''; }
             const _ig2 = document.getElementById('mInfoGrid'); if(_ig2){ _ig2.style.display='none'; _ig2.innerHTML=''; }
             const modal = document.getElementById('movieModal');
             modal.classList.remove('tv-mode');
@@ -4972,6 +5171,10 @@
                     <div class="mt-1"><span id="mToggleBtn" class="toggle-btn hidden" onclick="handleToggleDesc()">selengkapnya</span></div>
                 </div>
                 <div id="mInfoGrid" class="minfo-grid" style="display:none"></div>
+                <div id="mPosterGallery" class="poster-gallery-section" style="display:none">
+                    <span class="poster-gallery-label">Poster & Gambar</span>
+                    <div class="poster-gallery-scroll" id="mPosterScroll"></div>
+                </div>
                 <div id="mHashtags" class="ig-hashtags"></div>
                 <div class="flex items-center gap-2 mt-1.5">
                     <div id="mDateDisplay" class="ig-date"></div>
@@ -5060,6 +5263,7 @@
             newIframe.className = "w-full h-full";
             newIframe.allowFullscreen = true;
             newIframe.setAttribute('allow', 'autoplay; fullscreen; picture-in-picture');
+            newIframe.setAttribute('referrerpolicy', 'no-referrer-when-downgrade');
             // Tanpa sandbox — server streaming butuh akses penuh untuk load video
             
             // FIX BUG 2: fallback timer — loader pasti sembunyi setelah 6 detik
@@ -5133,7 +5337,8 @@
         }
 
         async function loadEpisodes() { 
-            activeSeason = document.getElementById('seasonSel').value; 
+            activeSeason = document.getElementById('seasonSel').value;
+            activeEpisode = 1;
             const data = await fetchWithCache(`https://api.themoviedb.org/3/tv/${window.currentMediaId}/season/${activeSeason}?api_key=${API_KEY}`); 
             const episodes = data.episodes || [];
             document.getElementById('episodeGrid').innerHTML = episodes.map((e) => { 
@@ -5209,6 +5414,141 @@
             });
         };
 
+        // ===== NOTIFIKASI FILM BARU =====
+        async function openNotif() {
+            const modal = document.getElementById('notifModal');
+            const content = document.getElementById('notifContent');
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            history.pushState({view: 'notif'}, '');
+
+            // Set tanggal hari ini
+            const today = new Date();
+            const todayStr = today.toISOString().split('T')[0];
+            const todayLabel = today.toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'});
+            document.getElementById('notifDateBadge').innerText = todayLabel;
+
+            content.innerHTML = '<div class="notif-empty"><i class="fa-solid fa-spinner fa-spin"></i>Memuat film baru...</div>';
+
+            try {
+                // Fetch film rilis hari ini (movie + tv)
+                const [movRes, tvRes] = await Promise.allSettled([
+                    fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=id-ID&sort_by=popularity.desc&primary_release_date.gte=${todayStr}&primary_release_date.lte=${todayStr}&include_adult=false`).then(r=>r.json()),
+                    fetch(`https://api.themoviedb.org/3/discover/tv?api_key=${API_KEY}&language=id-ID&sort_by=popularity.desc&first_air_date.gte=${todayStr}&first_air_date.lte=${todayStr}&include_adult=false`).then(r=>r.json()),
+                ]);
+
+                const movies = (movRes.status==='fulfilled' ? movRes.value.results||[] : []).map(m=>({...m,_mtype:'movie'}));
+                const tvs = (tvRes.status==='fulfilled' ? tvRes.value.results||[] : []).map(m=>({...m,_mtype:'tv'}));
+
+                // Jika hari ini kosong, coba 3 hari ke belakang
+                let allItems = [...movies, ...tvs];
+                if (allItems.length === 0) {
+                    const prev = new Date(Date.now() - 3*24*60*60*1000).toISOString().split('T')[0];
+                    const [m2, t2] = await Promise.allSettled([
+                        fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=id-ID&sort_by=popularity.desc&primary_release_date.gte=${prev}&primary_release_date.lte=${todayStr}&include_adult=false`).then(r=>r.json()),
+                        fetch(`https://api.themoviedb.org/3/discover/tv?api_key=${API_KEY}&language=id-ID&sort_by=popularity.desc&first_air_date.gte=${prev}&first_air_date.lte=${todayStr}&include_adult=false`).then(r=>r.json()),
+                    ]);
+                    allItems = [
+                        ...(m2.status==='fulfilled'?m2.value.results||[]:[]).map(m=>({...m,_mtype:'movie'})),
+                        ...(t2.status==='fulfilled'?t2.value.results||[]:[]).map(m=>({...m,_mtype:'tv'})),
+                    ];
+                }
+
+                allItems = allItems.filter(m=>m.poster_path).sort((a,b)=>b.popularity-a.popularity);
+
+                if (allItems.length === 0) {
+                    content.innerHTML = '<div class="notif-empty"><i class="fa-regular fa-bell-slash"></i>Tidak ada film baru hari ini</div>';
+                    return;
+                }
+
+                const movieItems = allItems.filter(m=>m._mtype==='movie');
+                const tvItems = allItems.filter(m=>m._mtype==='tv');
+
+                let html2 = '';
+                if (movieItems.length) {
+                    html2 += `<div class="notif-section-label">🎬 Film (${movieItems.length})</div>`;
+                    html2 += movieItems.map(m => {
+                        const title = m.title || m.name || '';
+                        const rating = (m.vote_average||0).toFixed(1);
+                        const genre = m._mtype === 'tv' ? 'Serial' : 'Film';
+                        return `<div class="notif-item" onclick="closeNotif(); openModal(${m.id},'${m._mtype}')">
+                            <img class="notif-poster" src="https://image.tmdb.org/t/p/w185${m.poster_path}" loading="lazy" onload="this.style.opacity=1">
+                            <div class="notif-info">
+                                <div class="notif-title">${title}</div>
+                                <div class="notif-meta">${genre} · Rilis hari ini</div>
+                            </div>
+                            <span class="notif-rating">${rating}</span>
+                        </div>`;
+                    }).join('');
+                }
+                if (tvItems.length) {
+                    html2 += `<div class="notif-section-label">📺 Serial (${tvItems.length})</div>`;
+                    html2 += tvItems.map(m => {
+                        const title = m.title || m.name || '';
+                        const rating = (m.vote_average||0).toFixed(1);
+                        return `<div class="notif-item" onclick="closeNotif(); openModal(${m.id},'tv')">
+                            <img class="notif-poster" src="https://image.tmdb.org/t/p/w185${m.poster_path}" loading="lazy" onload="this.style.opacity=1">
+                            <div class="notif-info">
+                                <div class="notif-title">${title}</div>
+                                <div class="notif-meta">Serial · Tayang hari ini</div>
+                            </div>
+                            <span class="notif-rating">${rating}</span>
+                        </div>`;
+                    }).join('');
+                }
+                content.innerHTML = html2;
+            } catch(e) {
+                content.innerHTML = '<div class="notif-empty"><i class="fa-regular fa-circle-xmark"></i>Gagal memuat data</div>';
+            }
+        }
+
+        function closeNotif() {
+            document.getElementById('notifModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+            history.replaceState({view:'home'}, '');
+        }
+
+        // ===== FOTO PEMERAN =====
+        async function openActorPhotos() {
+            const actorId = window._currentActorId;
+            const actorName = document.getElementById('actorName').innerText;
+            if (!actorId) return;
+
+            const modal = document.getElementById('actorPhotosModal');
+            const grid = document.getElementById('actorPhotosGrid');
+            document.getElementById('actorPhotosTitle').innerText = actorName || 'Foto';
+            grid.innerHTML = '<div class="actor-photos-loading"><i class="fa-solid fa-spinner fa-spin" style="font-size:24px;color:#333"></i></div>';
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            history.pushState({view:'actorPhotos'}, '');
+
+            try {
+                const data = await fetchWithCache(`https://api.themoviedb.org/3/person/${actorId}/images?api_key=${API_KEY}`);
+                const profiles = (data.profiles || []).slice(0, 30);
+                if (!profiles.length) {
+                    grid.innerHTML = '<div class="actor-photos-loading" style="color:#555">Foto tidak tersedia</div>';
+                    return;
+                }
+                grid.innerHTML = profiles.map(p => `
+                    <div class="actor-photo-item">
+                        <img src="https://image.tmdb.org/t/p/w342${p.file_path}" loading="lazy" onload="this.style.opacity=1">
+                    </div>`).join('');
+            } catch(e) {
+                grid.innerHTML = '<div class="actor-photos-loading" style="color:#555">Gagal memuat foto</div>';
+            }
+        }
+
+        function closeActorPhotos() {
+            const m = document.getElementById('actorPhotosModal');
+            if (m) m.style.display = 'none';
+            // Cek apakah actor modal masih terbuka
+            if (document.getElementById('actorModal').style.display === 'block') {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = 'auto';
+            }
+        }
+
         // ===== THEME TOGGLE (disabled - UI removed) =====
         function toggleTheme() {
             const isLight = document.body.classList.toggle('light-theme');
@@ -5224,6 +5564,7 @@
                 document.body.classList.add('light-theme');
             }
         })();
+
 
         // ===== RECENTLY VIEWED =====
         const RV_KEY = 'recentlyViewed';
@@ -5309,6 +5650,41 @@
                     </div>`;
                 }).join('');
             } catch(e) {}
+        }
+
+        // ===== POSTER GALLERY =====
+        async function loadPosterGallery(id, type) {
+            const section = document.getElementById('mPosterGallery');
+            const scroll = document.getElementById('mPosterScroll');
+            if (!section || !scroll) return;
+            section.style.display = 'none';
+            scroll.innerHTML = '';
+            try {
+                const data = await fetchWithCache(
+                    `https://api.themoviedb.org/3/${type}/${id}/images?api_key=${API_KEY}&include_image_language=en,id,null`
+                );
+                // Gabung posters + backdrops
+                const posters = (data.posters || []).slice(0, 10);
+                const backdrops = (data.backdrops || []).slice(0, 6);
+                const all = [...posters, ...backdrops].filter(img => img.file_path);
+                if (all.length <= 1) return; // sudah ada poster utama, skip jika cuma 1
+                section.style.display = 'block';
+                scroll.innerHTML = all.map(img => {
+                    const isBackdrop = img.aspect_ratio > 1;
+                    const w = isBackdrop ? 'w500' : 'w185';
+                    return `<div class="poster-gallery-item" onclick="openPosterFullscreen('${img.file_path}', ${isBackdrop})">
+                        <img class="poster-gallery-img" src="https://image.tmdb.org/t/p/${w}${img.file_path}"
+                             loading="lazy" onload="this.classList.add('loaded')"
+                             style="${isBackdrop ? 'height:100px;width:auto' : 'height:160px;width:auto'}">
+                    </div>`;
+                }).join('');
+            } catch(e) {}
+        }
+
+        function openPosterFullscreen(filePath, isBackdrop) {
+            const size = isBackdrop ? 'original' : 'w500';
+            const url = `https://image.tmdb.org/t/p/${size}${filePath}`;
+            window.open(url, '_blank');
         }
 
         // ===== RATING BADGES in modal (bintang berwarna, angka putih) =====
