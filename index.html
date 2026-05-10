@@ -1461,10 +1461,69 @@
             -webkit-tap-highlight-color: transparent;
         }
         .poster-gallery-img {
-            display: block; height: 160px; width: auto;
+            display: block; height: 110px; width: auto;
             object-fit: cover; opacity: 0; transition: opacity 0.3s;
         }
         .poster-gallery-img.loaded { opacity: 1; }
+
+
+        /* ===== YOUTUBE CONTROLS HIDE AFTER PLAY ===== */
+        .yt-overlay-mask {
+            position: absolute; inset: 0; z-index: 8;
+            background: transparent; pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        /* Saat video sedang play, overlay aktif menghalangi kontrol YT */
+        .carousel-slide.playing .yt-overlay-mask {
+            pointer-events: auto;
+        }
+
+
+        /* ===== CUSTOM LIGHTBOX ===== */
+        #lightboxModal {
+            display: none; position: fixed; inset: 0; z-index: 10000;
+            background: #000; flex-direction: column;
+            touch-action: pan-y;
+        }
+        .lb-topbar {
+            position: absolute; top: 0; left: 0; right: 0; z-index: 10;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 14px 16px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, transparent 100%);
+        }
+        .lb-close { font-size: 22px; color: #fff; cursor: pointer; padding: 4px; }
+        .lb-counter { font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.7); }
+        .lb-download { font-size: 20px; color: #fff; cursor: pointer; padding: 4px; }
+        .lb-slides {
+            width: 100%; height: 100%;
+            display: flex; align-items: center; overflow: hidden;
+            position: relative;
+        }
+        .lb-slide {
+            min-width: 100%; height: 100%;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .lb-slide img {
+            max-width: 100%; max-height: 100%;
+            object-fit: contain; user-select: none;
+            -webkit-user-drag: none;
+        }
+        .lb-track {
+            display: flex; height: 100%;
+            width: max-content;
+            will-change: transform;
+        }
+        /* Dots */
+        .lb-dots {
+            position: absolute; bottom: 20px; left: 0; right: 0;
+            display: flex; justify-content: center; gap: 6px; z-index: 10;
+        }
+        .lb-dot {
+            width: 6px; height: 6px; border-radius: 50%;
+            background: rgba(255,255,255,0.3); transition: background 0.2s;
+        }
+        .lb-dot.active { background: #fff; }
 
     </style>
 </head>
@@ -1849,6 +1908,7 @@
                     <span id="mDesc" class="ig-caption"></span>
                     <div class="mt-1">
                         <span id="mToggleBtn" class="toggle-btn hidden" onclick="handleToggleDesc()">selengkapnya</span>
+                        <p id="mTranslateBtn" class="hidden" onclick="handleTranslate()" style="margin-top:2px;font-size:11px;color:#fff;font-weight:700;cursor:pointer;display:inline-block"></p>
                     </div>
                 </div>
 
@@ -1859,12 +1919,8 @@
                     <div class="poster-gallery-scroll" id="mPosterScroll"></div>
                 </div>
 
-                <div id="mHashtags" class="ig-hashtags"></div>
-
-                <div class="flex items-center gap-2 mt-1.5">
-                    <div id="mDateDisplay" class="ig-date"></div>
-                    <p id="mTranslateBtn" class="hidden" onclick="handleTranslate()">Lihat terjemahan</p>
-                </div>
+<div id="mHashtags" style="display:none"></div>
+                <div id="mDateDisplay" style="display:none"></div>
                 
                 <div id="seriesControl" class="hidden mt-4 p-4 bg-zinc-950 rounded-2xl border border-zinc-900">
                     <div class="flex justify-between items-center mb-4">
@@ -2085,6 +2141,20 @@
             <div class="rds-btn" id="rdsBtnDownload" onclick="openReelDownload(this)">Unduh</div>
         </div>
     </div>
+
+    <!-- ===== CUSTOM LIGHTBOX ===== -->
+    <div id="lightboxModal">
+        <div class="lb-topbar">
+            <i class="fa-solid fa-xmark lb-close" onclick="closeLightbox()"></i>
+            <span class="lb-counter" id="lbCounter"></span>
+            <i class="fa-solid fa-download lb-download" onclick="downloadLbImage()" id="lbDownloadBtn"></i>
+        </div>
+        <div class="lb-slides">
+            <div class="lb-track" id="lbTrack"></div>
+        </div>
+        <div class="lb-dots" id="lbDots"></div>
+    </div>
+
 
     <!-- ===== NOTIFIKASI FILM BARU ===== -->
     <div id="notifModal">
@@ -2668,7 +2738,10 @@
             sheet.style.display = 'block';
             overlay.style.display = 'block';
             document.body.style.overflow = 'hidden';
-            history.pushState({view: 'soundtrack'}, "");
+            // Hanya push jika belum di state soundtrack
+            if (!history.state || history.state.view !== 'soundtrack') {
+                history.pushState({view: 'soundtrack'}, "");
+            }
 
             // Fungsi similarity: hitung berapa % kata judul film ada di string target
             function titleMatchScore(target, filmTitle, strict) {
@@ -2819,17 +2892,15 @@
             if (postContent && document.getElementById('tvChannelSwitcher')) {
                 postContent.innerHTML = `
                 <div class="mb-1"><span class="ig-username" id="mModalTitle"></span><span id="mDesc" class="ig-caption"></span>
-                <div class="mt-1"><span id="mToggleBtn" class="toggle-btn hidden" onclick="handleToggleDesc()">selengkapnya</span></div></div>
+                <div class="mt-1"><span id="mToggleBtn" class="toggle-btn hidden" onclick="handleToggleDesc()">selengkapnya</span><p id="mTranslateBtn" class="hidden" onclick="handleTranslate()" style="margin-top:2px;font-size:11px;color:#fff;font-weight:700;cursor:pointer;display:inline-block"></p></div></div>
                 <div id="mInfoGrid" class="minfo-grid" style="display:none"></div>
                 <div id="mPosterGallery" class="poster-gallery-section" style="display:none">
                     <span class="poster-gallery-label">Poster & Gambar</span>
                     <div class="poster-gallery-scroll" id="mPosterScroll"></div>
                 </div>
-                <div id="mHashtags" class="ig-hashtags"></div>
-                <div class="flex items-center gap-2 mt-1.5">
-                    <div id="mDateDisplay" class="ig-date"></div>
-                    <p id="mTranslateBtn" class="hidden" onclick="handleTranslate()">Lihat terjemahan</p>
-                </div>
+<div id="mHashtags" style="display:none"></div>
+                <p id="mTranslateBtn" class="hidden" onclick="handleTranslate()" style="margin-top:4px"></p>
+                <div id="mDateDisplay" style="display:none"></div>
                 <div id="seriesControl" class="hidden mt-4 p-4 bg-zinc-950 rounded-2xl border border-zinc-900">
                     <div class="flex justify-between items-center mb-4">
                         <h4 class="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Daftar Episode</h4>
@@ -2919,6 +2990,12 @@
 
         window.addEventListener('popstate', function(event) {
             const state = event.state ? event.state.view : null;
+
+            // Lightbox gambar
+            if (document.getElementById('lightboxModal') && document.getElementById('lightboxModal').style.display === 'flex') {
+                closeLightbox();
+                return;
+            }
 
             // Foto pemeran
             if (document.getElementById('actorPhotosModal') && document.getElementById('actorPhotosModal').style.display === 'block') {
@@ -4847,8 +4924,9 @@
                         const embedUrl = `https://www.youtube.com/embed/${v.key}?enablejsapi=1&autoplay=${i===0?1:0}&rel=0&modestbranding=1&mute=0&playsinline=1`;
                         const slideDiv = document.createElement('div');
                         slideDiv.className = 'carousel-slide';
-                        slideDiv.innerHTML = `<iframe id="vid-${i}" src="${embedUrl}" class="w-full h-full" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
+                        slideDiv.innerHTML = `<iframe id="vid-${i}" src="${embedUrl}" class="w-full h-full" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe><div class="yt-overlay-mask" onclick="void(0)"></div>`;
                         track.appendChild(slideDiv);
+                        setTimeout(() => { slideDiv.classList.add('playing'); }, 3000);
                         if(vidsToDisplay.length > 1) { dots.innerHTML += `<div class="dot w-1.5 h-1.5 rounded-full ${i===currentIdx?'bg-blue-500':'bg-zinc-700'}"></div>`; }
                     });
                     const soR = document.getElementById('swipeOverlay');
@@ -5007,8 +5085,10 @@
                     const embedUrl = `https://www.youtube.com/embed/${v.key}?enablejsapi=1&autoplay=${i===0?1:0}&rel=0&modestbranding=1&mute=0&playsinline=1`;
                     const slideDiv = document.createElement('div');
                     slideDiv.className = 'carousel-slide';
-                    slideDiv.innerHTML = `<iframe id="vid-${i}" src="${embedUrl}" class="w-full h-full" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
+                    slideDiv.innerHTML = `<iframe id="vid-${i}" src="${embedUrl}" class="w-full h-full" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe><div class="yt-overlay-mask" onclick="void(0)"></div>`;
                     track.appendChild(slideDiv);
+                    // Hide YT controls after video starts playing (3 detik)
+                    setTimeout(() => { slideDiv.classList.add('playing'); }, 3000);
                     if(vidsToDisplay.length > 1) { dots.innerHTML += `<div class="dot w-1.5 h-1.5 rounded-full ${i===currentIdx?'bg-blue-500':'bg-zinc-700'}"></div>`; }
                 }); 
                 const so = document.getElementById('swipeOverlay');
@@ -5090,9 +5170,8 @@
                 <div class="minfo-cell full-width"><span class="minfo-key">Genre</span><span class="minfo-val">${miGenres}</span></div>`;
                 infoGridEl.style.display = 'grid';
             }
-            document.getElementById('mHashtags').innerHTML = `<br> #${(displayTitle).replace(/[^a-zA-Z0-9]/g, '')} #${relYear} #${contentKind} <br> ${genresArr}`;
-            const rel = dId.release_date || dId.first_air_date || ""; 
-            document.getElementById('mDateDisplay').innerText = rel ? new Date(rel).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+            // hashtag disembunyikan
+            // tanggal dihapus dari modal (sudah ada di info grid)
             
             let serverButtonsHTML = '';
             for(let i=1; i<=17; i++) {
@@ -5168,18 +5247,15 @@
                 <div class="mb-1">
                     <span class="ig-username" id="mModalTitle"></span>
                     <span id="mDesc" class="ig-caption"></span>
-                    <div class="mt-1"><span id="mToggleBtn" class="toggle-btn hidden" onclick="handleToggleDesc()">selengkapnya</span></div>
+                    <div class="mt-1"><span id="mToggleBtn" class="toggle-btn hidden" onclick="handleToggleDesc()">selengkapnya</span><p id="mTranslateBtn" class="hidden" onclick="handleTranslate()" style="margin-top:2px;font-size:11px;color:#fff;font-weight:700;cursor:pointer;display:inline-block"></p></div>
                 </div>
                 <div id="mInfoGrid" class="minfo-grid" style="display:none"></div>
                 <div id="mPosterGallery" class="poster-gallery-section" style="display:none">
                     <span class="poster-gallery-label">Poster & Gambar</span>
                     <div class="poster-gallery-scroll" id="mPosterScroll"></div>
                 </div>
-                <div id="mHashtags" class="ig-hashtags"></div>
-                <div class="flex items-center gap-2 mt-1.5">
-                    <div id="mDateDisplay" class="ig-date"></div>
-                    <p id="mTranslateBtn" class="hidden" onclick="handleTranslate()">Lihat terjemahan</p>
-                </div>
+<div id="mHashtags" style="display:none"></div>
+                <div id="mDateDisplay" style="display:none"></div>
                 <div id="seriesControl" class="hidden mt-4 p-4 bg-zinc-950 rounded-2xl border border-zinc-900">
                     <div class="flex justify-between items-center mb-4">
                         <h4 class="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Daftar Episode</h4>
@@ -5349,16 +5425,31 @@
         }
         
         function setupSwipe() { 
-            const overlay = document.getElementById('swipeOverlay'); overlay.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, {passive:true}); 
+            const overlay = document.getElementById('swipeOverlay');
+            let _swSx = 0;
+            overlay.addEventListener('touchstart', e => { _swSx = e.touches[0].clientX; }, {passive:true}); 
             overlay.addEventListener('touchend', e => { 
-                let diff = startX - e.changedTouches[0].clientX; const slides = document.querySelectorAll('.carousel-slide'); 
+                let diff = _swSx - e.changedTouches[0].clientX;
+                const slides = document.querySelectorAll('.carousel-slide'); 
                 if(Math.abs(diff) > 50 && slides.length > 1) { 
-                    let oldIdx = currentIdx; if(diff > 0 && currentIdx < slides.length - 1) currentIdx++; else if(diff < 0 && currentIdx > 0) currentIdx--; 
+                    let oldIdx = currentIdx;
+                    if(diff > 0 && currentIdx < slides.length - 1) currentIdx++;
+                    else if(diff < 0 && currentIdx > 0) currentIdx--;
+                    if(oldIdx === currentIdx) return;
                     document.getElementById('carouselTrack').style.transform = `translateX(-${currentIdx * 100}%)`; 
-                    document.querySelectorAll('.dot').forEach((d, i) => { d.className = `dot w-1.5 h-1.5 rounded-full ${i===currentIdx?'bg-blue-500':'bg-zinc-700'}`; }); 
-                    const oldVid = document.getElementById(`vid-${oldIdx}`), newVid = document.getElementById(`vid-${currentIdx}`);
-                    if(oldVid) try{oldVid.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');}catch(e){}
-                    if(newVid) try{newVid.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');}catch(e){}
+                    document.querySelectorAll('.dot').forEach((d, i) => { d.className = `dot w-1.5 h-1.5 rounded-full ${i===currentIdx?'bg-blue-500':'bg-zinc-700'}`; });
+                    // Pause SEMUA slide dulu, baru play yang aktif
+                    slides.forEach(s => {
+                        const f = s.querySelector('iframe');
+                        if (!f) return;
+                        try { f.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*'); } catch(e) {}
+                        s.classList.remove('playing');
+                    });
+                    const newVid = document.getElementById(`vid-${currentIdx}`);
+                    if(newVid) {
+                        try { newVid.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*'); } catch(e) {}
+                        newVid.closest('.carousel-slide')?.classList.add('playing');
+                    }
                 } 
             }); 
         }
@@ -5413,6 +5504,181 @@
                 _scrollTicking = false;
             });
         };
+
+        // ===== CUSTOM LIGHTBOX =====
+        let _lbIdx = 0;
+        let _lbSx = 0, _lbSy = 0, _lbDx = 0;
+        let _lbDragging = false;
+
+        function openLightbox(startIdx) {
+            const images = window._galleryImages || [];
+            if (!images.length) return;
+            // Pause semua video yang sedang main
+            document.querySelectorAll('#carouselTrack iframe, #mainVideoArea iframe').forEach(f => {
+                try { f.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*'); } catch(e) {}
+                try { f.contentWindow.postMessage('{"event":"command","func":"mute","args":""}', '*'); } catch(e) {}
+            });
+            _lbIdx = Math.max(0, Math.min(startIdx || 0, images.length - 1));
+            const modal = document.getElementById('lightboxModal');
+            const track = document.getElementById('lbTrack');
+            const dots = document.getElementById('lbDots');
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            history.pushState({view:'lightbox'}, '');
+
+            // Build slides - semua portrait/landscape fit screen
+            track.innerHTML = images.map((img, i) => {
+                const size = img.isBackdrop ? 'original' : 'w780';
+                return `<div class="lb-slide" style="min-width:100vw;height:100vh;display:flex;align-items:center;justify-content:center;background:#000">
+                    <img src="https://image.tmdb.org/t/p/${size}${img.path}"
+                         loading="${Math.abs(i - _lbIdx) <= 1 ? 'eager' : 'lazy'}"
+                         draggable="false"
+                         style="max-width:100vw;max-height:100vh;object-fit:contain;display:block">
+                </div>`;
+            }).join('');
+
+            // Dots
+            if (images.length > 1 && images.length <= 15) {
+                dots.innerHTML = images.map((_, i) => `<div class="lb-dot"></div>`).join('');
+                dots.style.display = 'flex';
+            } else { dots.style.display = 'none'; }
+
+            lbGoTo(_lbIdx, false);
+            setupLbSwipe();
+        }
+
+        function lbGoTo(idx, animate=true) {
+            const images = window._galleryImages || [];
+            _lbIdx = Math.max(0, Math.min(idx, images.length - 1));
+            const track = document.getElementById('lbTrack');
+            if (!track) return;
+            track.style.transition = animate ? 'transform 0.28s cubic-bezier(0.25,1,0.5,1)' : 'none';
+            track.style.transform = `translateX(calc(-${_lbIdx} * 100vw))`;
+            const counter = document.getElementById('lbCounter');
+            if (counter) counter.innerText = `${_lbIdx + 1} / ${images.length}`;
+            document.querySelectorAll('.lb-dot').forEach((d, i) => {
+                d.style.background = i === _lbIdx ? '#fff' : 'rgba(255,255,255,0.3)';
+            });
+        }
+
+        function closeLightbox() {
+            const modal = document.getElementById('lightboxModal');
+            if (modal) modal.style.display = 'none';
+            
+            // Cek apakah dibuka dari actor photos
+            if (window._prevGalleryImages !== undefined) {
+                // Restore gallery film
+                window._galleryImages = window._prevGalleryImages;
+                window._prevGalleryImages = undefined;
+                // Kembalikan actor photos modal
+                const actorPhotos = document.getElementById('actorPhotosModal');
+                if (actorPhotos) actorPhotos.style.display = 'block';
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = 'hidden';
+                // Un-mute trailer setelah lightbox ditutup
+                document.querySelectorAll('#carouselTrack iframe').forEach(f => {
+                    try { f.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*'); } catch(e) {}
+                });
+            }
+        }
+
+        async function downloadLbImage() {
+            const images = window._galleryImages || [];
+            if (!images[_lbIdx]) return;
+            const img = images[_lbIdx];
+            const size = img.isBackdrop ? 'original' : 'w780';
+            const directUrl = `https://image.tmdb.org/t/p/${size}${img.path}`;
+            const btn = document.getElementById('lbDownloadBtn');
+            if (btn) btn.className = 'fa-solid fa-spinner fa-spin lb-download';
+            
+            // Coba via CORS proxy untuk download langsung
+            const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(directUrl)}`;
+            const filename = 'amnesfubbia' + img.path.replace(/[^a-zA-Z0-9.]/g, '_') + '.jpg';
+            
+            try {
+                const resp = await fetch(proxyUrl);
+                if (!resp.ok) throw new Error('proxy failed');
+                const blob = await resp.blob();
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+            } catch(e) {
+                // Fallback: canvas dengan proxy
+                try {
+                    const imgEl = new Image();
+                    imgEl.crossOrigin = 'anonymous';
+                    await new Promise((res, rej) => {
+                        imgEl.onload = res;
+                        imgEl.onerror = rej;
+                        imgEl.src = proxyUrl;
+                    });
+                    const canvas = document.createElement('canvas');
+                    canvas.width = imgEl.naturalWidth;
+                    canvas.height = imgEl.naturalHeight;
+                    canvas.getContext('2d').drawImage(imgEl, 0, 0);
+                    canvas.toBlob(blob => {
+                        if (!blob) { window.open(directUrl, '_blank'); return; }
+                        const a = document.createElement('a');
+                        a.href = URL.createObjectURL(blob);
+                        a.download = filename;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+                    }, 'image/jpeg', 0.95);
+                } catch(e2) {
+                    // Final fallback: buka di tab baru, user bisa long-press save
+                    window.open(directUrl, '_blank');
+                }
+            } finally {
+                if (btn) btn.className = 'fa-solid fa-download lb-download';
+            }
+        }
+
+        function setupLbSwipe() {
+            const slides = document.querySelector('#lightboxModal .lb-slides');
+            if (!slides || slides._lbSwipeInit) return;
+            slides._lbSwipeInit = true;
+            const track = document.getElementById('lbTrack');
+
+            slides.addEventListener('touchstart', e => {
+                _lbSx = e.touches[0].clientX;
+                _lbSy = e.touches[0].clientY;
+                _lbDx = 0;
+                _lbDragging = true;
+                if (track) track.style.transition = 'none';
+            }, { passive: true });
+
+            slides.addEventListener('touchmove', e => {
+                if (!_lbDragging) return;
+                _lbDx = e.touches[0].clientX - _lbSx;
+                const dy = Math.abs(e.touches[0].clientY - _lbSy);
+                if (Math.abs(_lbDx) < dy) return; // vertical scroll
+                // Live drag feedback
+                if (track) {
+                    track.style.transform = `translateX(calc(-${_lbIdx} * 100vw + ${_lbDx}px))`;
+                }
+            }, { passive: true });
+
+            slides.addEventListener('touchend', () => {
+                if (!_lbDragging) return;
+                _lbDragging = false;
+                const images = window._galleryImages || [];
+                if (Math.abs(_lbDx) > window.innerWidth * 0.3) {
+                    if (_lbDx < 0 && _lbIdx < images.length - 1) lbGoTo(_lbIdx + 1);
+                    else if (_lbDx > 0 && _lbIdx > 0) lbGoTo(_lbIdx - 1);
+                    else lbGoTo(_lbIdx); // snap back
+                } else {
+                    lbGoTo(_lbIdx); // snap back
+                }
+                _lbDx = 0;
+            }, { passive: true });
+        }
 
         // ===== NOTIFIKASI FILM BARU =====
         async function openNotif() {
@@ -5529,14 +5795,56 @@
                     grid.innerHTML = '<div class="actor-photos-loading" style="color:#555">Foto tidak tersedia</div>';
                     return;
                 }
-                grid.innerHTML = profiles.map(p => `
-                    <div class="actor-photo-item">
+                // Simpan ke _actorGallery untuk lightbox khusus aktor
+                window._actorGallery = profiles.map(p => ({
+                    path: p.file_path,
+                    isBackdrop: false
+                }));
+                grid.innerHTML = profiles.map((p, idx) => `
+                    <div class="actor-photo-item" onclick="openActorLightbox(${idx})">
                         <img src="https://image.tmdb.org/t/p/w342${p.file_path}" loading="lazy" onload="this.style.opacity=1">
                     </div>`).join('');
             } catch(e) {
                 grid.innerHTML = '<div class="actor-photos-loading" style="color:#555">Gagal memuat foto</div>';
             }
         }
+
+        // Lightbox khusus foto pemeran (pakai lightbox yang sudah ada)
+        function openActorLightbox(startIdx) {
+            // Simpan gallery film ke temp, ganti dengan actor gallery
+            window._prevGalleryImages = window._galleryImages;
+            window._galleryImages = window._actorGallery || [];
+            if (!window._galleryImages.length) return;
+            
+            // Sembunyikan actor photos modal sementara
+            document.getElementById('actorPhotosModal').style.display = 'none';
+            
+            // Buka lightbox
+            const modal = document.getElementById('lightboxModal');
+            const track = document.getElementById('lbTrack');
+            const dots = document.getElementById('lbDots');
+            _lbIdx = Math.max(0, Math.min(startIdx, window._galleryImages.length - 1));
+            modal.style.display = 'flex';
+            // Tidak perlu push history lagi karena actorPhotos sudah push
+
+            track.innerHTML = window._galleryImages.map((img, i) => {
+                return `<div class="lb-slide" style="min-width:100vw;height:100vh;display:flex;align-items:center;justify-content:center;background:#000">
+                    <img src="https://image.tmdb.org/t/p/w780${img.path}"
+                         loading="${Math.abs(i - _lbIdx) <= 1 ? 'eager' : 'lazy'}"
+                         draggable="false"
+                         style="max-width:100vw;max-height:100vh;object-fit:contain;display:block">
+                </div>`;
+            }).join('');
+
+            if (window._galleryImages.length > 1 && window._galleryImages.length <= 15) {
+                dots.innerHTML = window._galleryImages.map(() => `<div class="lb-dot"></div>`).join('');
+                dots.style.display = 'flex';
+            } else { dots.style.display = 'none'; }
+
+            lbGoTo(_lbIdx, false);
+            setupLbSwipe();
+        }
+
 
         function closeActorPhotos() {
             const m = document.getElementById('actorPhotosModal');
@@ -5663,28 +5971,34 @@
                 const data = await fetchWithCache(
                     `https://api.themoviedb.org/3/${type}/${id}/images?api_key=${API_KEY}&include_image_language=en,id,null`
                 );
-                // Gabung posters + backdrops
-                const posters = (data.posters || []).slice(0, 10);
-                const backdrops = (data.backdrops || []).slice(0, 6);
-                const all = [...posters, ...backdrops].filter(img => img.file_path);
-                if (all.length <= 1) return; // sudah ada poster utama, skip jika cuma 1
+                // Gabung posters + backdrops, deduplikasi berdasarkan file_path
+                const seenPaths = new Set();
+                const posters = (data.posters || []).filter(img => {
+                    if (!img.file_path || seenPaths.has(img.file_path)) return false;
+                    seenPaths.add(img.file_path); return true;
+                }).slice(0, 10);
+                const backdrops = (data.backdrops || []).filter(img => {
+                    if (!img.file_path || seenPaths.has(img.file_path)) return false;
+                    seenPaths.add(img.file_path); return true;
+                }).slice(0, 6);
+                const all = [...posters, ...backdrops];
+                if (all.length <= 1) return;
+                // Simpan list untuk lightbox
+                window._galleryImages = all.map(img => ({
+                    path: img.file_path,
+                    isBackdrop: img.aspect_ratio > 1
+                }));
                 section.style.display = 'block';
-                scroll.innerHTML = all.map(img => {
+                scroll.innerHTML = all.map((img, idx) => {
                     const isBackdrop = img.aspect_ratio > 1;
                     const w = isBackdrop ? 'w500' : 'w185';
-                    return `<div class="poster-gallery-item" onclick="openPosterFullscreen('${img.file_path}', ${isBackdrop})">
+                    return `<div class="poster-gallery-item" onclick="openLightbox(${idx})">
                         <img class="poster-gallery-img" src="https://image.tmdb.org/t/p/${w}${img.file_path}"
                              loading="lazy" onload="this.classList.add('loaded')"
-                             style="${isBackdrop ? 'height:100px;width:auto' : 'height:160px;width:auto'}">
+                             style="${isBackdrop ? 'height:80px;width:auto' : 'height:110px;width:auto'}">
                     </div>`;
                 }).join('');
             } catch(e) {}
-        }
-
-        function openPosterFullscreen(filePath, isBackdrop) {
-            const size = isBackdrop ? 'original' : 'w500';
-            const url = `https://image.tmdb.org/t/p/${size}${filePath}`;
-            window.open(url, '_blank');
         }
 
         // ===== RATING BADGES in modal (bintang berwarna, angka putih) =====
