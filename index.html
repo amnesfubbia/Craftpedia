@@ -102,7 +102,7 @@
         .movie-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; padding-bottom: 80px; }
         .post-card { position: relative; aspect-ratio: 2/3; background: #0a0a0a; overflow: hidden; cursor: pointer; }
         .post-card img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.3s; }
-        .badge-rating { position: absolute; top: 6px; left: 6px; padding: 2px 5px; border-radius: 2px; font-size: 7px; font-weight: 900; z-index: 5; background: rgba(255,255,255,0.9); color: #000; }
+        .badge-rating { position: absolute; top: 6px; left: 6px; padding: 2px 5px; border-radius: 2px; font-size: 7px; font-weight: 900; z-index: 5; background: rgba(0,0,0,0.7); color: #fff; border: 0.5px solid rgba(255,255,255,0.3); }
         .badge-type { position: absolute; top: 6px; right: 6px; padding: 2px 5px; border-radius: 2px; font-size: 7px; font-weight: 900; z-index: 5; background: rgba(0,0,0,0.7); color: #fff; text-transform: uppercase; border: 0.5px solid rgba(255,255,255,0.3); }
 
         #searchOverlay { display: none; position: fixed; inset: 0; background: #000; z-index: 4500; overflow-y: auto; }
@@ -1317,20 +1317,43 @@
         .recently-item {
             flex: 0 0 58px; cursor: pointer;
             -webkit-tap-highlight-color: transparent;
+            position: relative;
         }
         .recently-img {
             width: 58px; height: 86px; border-radius: 8px;
             object-fit: cover; background: #111;
             display: block;
         }
+        .recently-del {
+            position: absolute; top: -5px; right: -5px;
+            width: 18px; height: 18px; border-radius: 50%;
+            background: rgba(0,0,0,0.85); border: 1.5px solid #333;
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 8px; cursor: pointer;
+            -webkit-tap-highlight-color: transparent; z-index: 10;
+        }
+        .recently-del:active { background: #ff3b30; }
+        /* Recently viewed header row */
+        .recently-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .recently-clear-btn {
+            font-size: 10px; font-weight: 700; color: #555;
+            cursor: pointer; -webkit-tap-highlight-color: transparent;
+            padding: 2px 0;
+        }
+        .recently-clear-btn:active { color: #ff3b30; }
+
 
         /* ===== BADGE NEW on poster ===== */
         .badge-new {
             position: absolute; bottom: 6px; left: 6px;
             padding: 2px 5px; border-radius: 2px;
             font-size: 7px; font-weight: 900; z-index: 5;
-            background: #ff3b30; color: #fff;
+            background: rgba(0,0,0,0.7); color: #ff3b30;
             text-transform: uppercase; letter-spacing: 0.5px;
+            border: 0.5px solid rgba(255,255,255,0.3);
         }
 
         /* ===== PULL TO REFRESH ===== */
@@ -1477,6 +1500,7 @@
         .carousel-slide.playing .yt-overlay-mask {
             pointer-events: auto;
         }
+
 
 
         /* ===== CUSTOM LIGHTBOX ===== */
@@ -1807,7 +1831,10 @@
         <div class="highlights-wrapper no-scrollbar"><div class="highlights-container no-scrollbar" id="highlightList"></div></div>
 
         <div id="recentlyViewedWrapper">
-            <span class="recently-label">Terakhir Dilihat</span>
+            <div class="recently-header">
+                <span class="recently-label" style="margin-bottom:0">Terakhir Dilihat</span>
+                <span class="recently-clear-btn" onclick="clearAllRecentlyViewed()">Hapus Semua</span>
+            </div>
             <div class="recently-scroll" id="recentlyScroll"></div>
         </div>
 
@@ -4992,6 +5019,8 @@
                         dots.innerHTML += `<div class="dot w-1.5 h-1.5 rounded-full ${i===0?'bg-blue-500':'bg-zinc-700'}"></div>`;
                     }
                 });
+                // Start YT error detector
+                if (window._startYtFallbackTimer) window._startYtFallbackTimer(0);
 
                 const soR = document.getElementById('swipeOverlay');
                 soR.style.display = vidsToDisplay.length > 1 ? 'block' : 'none';
@@ -5147,10 +5176,11 @@
                     slideDiv.className = 'carousel-slide';
                     slideDiv.innerHTML = `<iframe id="vid-${i}" src="${embedUrl}" class="w-full h-full" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe><div class="yt-overlay-mask" onclick="void(0)"></div>`;
                     track.appendChild(slideDiv);
-                    // Hide YT controls after video starts playing (3 detik)
                     setTimeout(() => { slideDiv.classList.add('playing'); }, 3000);
                     if(vidsToDisplay.length > 1) { dots.innerHTML += `<div class="dot w-1.5 h-1.5 rounded-full ${i===currentIdx?'bg-blue-500':'bg-zinc-700'}"></div>`; }
-                }); 
+                });
+                // Start YT error detector
+                if (window._startYtFallbackTimer) window._startYtFallbackTimer(0); 
                 const so = document.getElementById('swipeOverlay');
                 so.style.display = vidsToDisplay.length > 1 ? 'block' : 'none';
                 so.style.pointerEvents = 'auto'; // aktifkan kembali untuk swipe trailer
@@ -5512,6 +5542,102 @@
                     }
                 } 
             }); 
+        }
+
+        // ===== DETEKSI ERROR YOUTUBE via postMessage =====
+        // Tanpa cover hitam — deteksi onError dari YT dan langsung replace dengan streaming
+        // Timeout 8 detik jika tidak ada playing state → fallback
+        (function setupYTErrorDetector() {
+            const _ytTimers = {};
+            const _ytOkSlides = new Set();
+
+            window.addEventListener('message', function(e) {
+                try {
+                    const data = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
+                    if (!data) return;
+
+                    const iframes = document.querySelectorAll('#carouselTrack iframe');
+                    let senderIframe = null;
+                    iframes.forEach(f => { try { if (f.contentWindow === e.source) senderIframe = f; } catch(err) {} });
+                    if (!senderIframe) return;
+
+                    const slideEl = senderIframe.closest('.carousel-slide');
+                    if (!slideEl) return;
+                    const allSlides = [...document.querySelectorAll('#carouselTrack .carousel-slide')];
+                    const slideIdx = allSlides.indexOf(slideEl);
+
+                    // YT error: 101/150 = embed not allowed (region/age), 100 = not found
+                    if (data.event === 'onError') {
+                        const code = data.info;
+                        if (code === 101 || code === 150 || code === 100 || code === 2 || code === 5) {
+                            _onSlideError(slideEl, slideIdx, allSlides);
+                        }
+                        return;
+                    }
+
+                    // playerState 1 = playing → OK
+                    const state = data.info && data.info.playerState !== undefined
+                        ? data.info.playerState
+                        : (data.event === 'onStateChange' ? data.info : null);
+                    if (state === 1) {
+                        _ytOkSlides.add(slideIdx);
+                        if (_ytTimers[slideIdx]) { clearTimeout(_ytTimers[slideIdx]); delete _ytTimers[slideIdx]; }
+                    }
+                } catch(err) {}
+            });
+
+            window._startYtFallbackTimer = function(slideIdx) {
+                if (_ytTimers[slideIdx]) clearTimeout(_ytTimers[slideIdx]);
+                _ytOkSlides.delete(slideIdx);
+                _ytTimers[slideIdx] = setTimeout(() => {
+                    if (!_ytOkSlides.has(slideIdx)) {
+                        const slides = [...document.querySelectorAll('#carouselTrack .carousel-slide')];
+                        if (slides[slideIdx]) _onSlideError(slides[slideIdx], slideIdx, slides);
+                    }
+                }, 8000);
+            };
+
+            function _onSlideError(slideEl, slideIdx, allSlides) {
+                if (_ytOkSlides.has(slideIdx)) return;
+                slideEl.dataset.ytError = '1';
+                const errorCount = allSlides.filter(s => s.dataset.ytError === '1').length;
+                if (errorCount >= allSlides.length) {
+                    _fallbackToStreaming();
+                } else if (slideIdx === currentIdx) {
+                    // Geser ke slide berikutnya yang OK
+                    let nextOk = allSlides.findIndex((s, i) => i !== slideIdx && s.dataset.ytError !== '1');
+                    if (nextOk !== -1) {
+                        currentIdx = nextOk;
+                        document.getElementById('carouselTrack').style.transform = `translateX(-${currentIdx * 100}%)`;
+                        document.querySelectorAll('.dot').forEach((d, i) => {
+                            d.className = `dot w-1.5 h-1.5 rounded-full ${i===currentIdx?'bg-blue-500':'bg-zinc-700'}`;
+                        });
+                        const nf = document.getElementById(`vid-${currentIdx}`);
+                        if (nf) try { nf.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*'); } catch(e) {}
+                        window._startYtFallbackTimer(currentIdx);
+                    } else {
+                        _fallbackToStreaming();
+                    }
+                }
+            }
+        })();
+
+        function _fallbackToStreaming() {
+            if (!window.currentMediaId || !window.currentMediaType) return;
+            const url = buildEmbedUrl(window.currentMediaType, window.currentMediaId, activeSeason, activeEpisode, 1);
+            const track = document.getElementById('carouselTrack');
+            const dots = document.getElementById('carouselDots');
+            track.querySelectorAll('iframe').forEach(f => { f.src = ''; f.remove(); });
+            track.innerHTML = ''; dots.innerHTML = ''; currentIdx = 0;
+            const slide = document.createElement('div');
+            slide.className = 'carousel-slide';
+            slide.innerHTML = `<iframe id="player-frame" src="${url}" class="w-full h-full" allowfullscreen allow="autoplay; fullscreen; picture-in-picture" referrerpolicy="no-referrer-when-downgrade"></iframe>`;
+            track.appendChild(slide);
+            track.style.transform = 'translateX(0)';
+            document.getElementById('swipeOverlay').style.display = 'none';
+            document.querySelectorAll('.server-btn').forEach((b, i) => {
+                b.classList.toggle('active-link', i === 0);
+            });
         }
         function updateLibButtons(id) { const isL = JSON.parse(localStorage.getItem('likes') || '[]').some(x=>x.id==id); const isB = JSON.parse(localStorage.getItem('bookmarks') || '[]').some(x=>x.id==id); document.getElementById('btnLikeModal').className = isL ? 'fa-solid fa-heart text-red-500 interaction-icon' : 'fa-regular fa-heart interaction-icon'; document.getElementById('btnBookModal').className = isB ? 'fa-solid fa-bookmark text-white interaction-icon' : 'fa-regular fa-bookmark interaction-icon'; document.getElementById('btnLikeModal').onclick = () => toggleLib('likes'); document.getElementById('btnBookModal').onclick = () => toggleLib('bookmarks'); }
         function toggleLib(k) { let items = JSON.parse(localStorage.getItem(k) || '[]'); const idx = items.findIndex(x => x.id == window.currentMediaId); idx > -1 ? items.splice(idx,1) : items.push({id: window.currentMediaId, type: window.currentMediaType}); localStorage.setItem(k, JSON.stringify(items)); updateLibButtons(window.currentMediaId); }
@@ -5964,12 +6090,30 @@
             if (!wrapper || !scroll) return;
             if (!items.length) { wrapper.style.display = 'none'; return; }
             wrapper.style.display = 'block';
-            scroll.innerHTML = items.map(item => `
+            scroll.innerHTML = items.map((item, idx) => `
                 <div class="recently-item" onclick="openModal(${item.id}, '${item.type}')">
                     <img class="recently-img" src="https://image.tmdb.org/t/p/w185${item.poster || ''}"
                          onerror="this.style.background='#1a1a1a'" loading="lazy">
+                    <div class="recently-del" onclick="event.stopPropagation(); deleteRecentlyViewed(${idx})">
+                        <i class="fa-solid fa-xmark"></i>
+                    </div>
                 </div>`).join('');
         }
+
+        function deleteRecentlyViewed(idx) {
+            let items = JSON.parse(localStorage.getItem(RV_KEY) || '[]');
+            items.splice(idx, 1);
+            localStorage.setItem(RV_KEY, JSON.stringify(items));
+            renderRecentlyViewed();
+        }
+
+        function clearAllRecentlyViewed() {
+            localStorage.removeItem(RV_KEY);
+            renderRecentlyViewed();
+        }
+
+        // ===== LIBRARY FILTER (removed) =====
+
 
         window.addEventListener('DOMContentLoaded', () => { renderRecentlyViewed(); });
 
