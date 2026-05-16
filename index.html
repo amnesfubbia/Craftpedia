@@ -5490,9 +5490,9 @@
                 case 12: url = `https://111movies.net/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`; break;
                 case 13: url = `https://vidsrcme.ru/embed/${type}/${id}${seriesSuffix}`; break;
                 case 14: url = `https://vidsrc.me/embed/${type}?tmdb=${id}${seriesSuffix}`; break;
-                case 15: url = `https://vidsrc.net/embed/${type}/${id}${seriesSuffix}`; break;
+                case 15: url = `https://warezcdn.site/${type==='tv'?'serie':'filme'}/${id}${type==='tv'?`/${s}/${e}`:''}`; break;
                 case 16: url = `https://vidsrc.icu/embed/${type}/${id}${seriesSuffix}`; break;
-                case 17: url = `https://vidsrc.ru/${type}/${currentImdbId || id}${type==='tv'?`?s=${s}&e=${e}`:''}`; break;
+                case 17: url = `https://multiembed.mov/?video_id${type}/${currentImdbId || id}${type==='tv'?`?s=${s}&e=${e}`:''}`; break;
                 case 19: url = `https://warezcdn.site/${type==='tv'?'serie':'filme'}/${id}${type==='tv'?`/${s}/${e}`:''}`; break;
                 case 21: url = `https://www.dailymotion.com/embed/video/${currentDailymotionId}`; break;
                 default: url = `https://vidrock.net/embed/${type}/${id}${seriesSuffix}`;
