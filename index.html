@@ -15,6 +15,10 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="amnesfubbia">
     <meta name="twitter:image" content="amnesfubbia.png">
+    <link rel="preconnect" href="https://api.themoviedb.org">
+    <link rel="preconnect" href="https://image.tmdb.org">
+    <link rel="dns-prefetch" href="https://www.youtube.com">
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
@@ -100,8 +104,8 @@
         .tab-item.active { color: #fff; border-bottom: 1px solid #fff; }
 
         .movie-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; padding-bottom: 80px; }
-        .post-card { position: relative; aspect-ratio: 2/3; background: #0a0a0a; overflow: hidden; cursor: pointer; }
-        .post-card img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.3s; }
+        .post-card { position: relative; aspect-ratio: 2/3; background: #0a0a0a; overflow: hidden; cursor: pointer; content-visibility: auto; contain-intrinsic-size: auto 160px 240px; }
+        .post-card img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.3s; image-rendering: auto; }
         .badge-rating { position: absolute; top: 6px; left: 6px; padding: 2px 5px; border-radius: 2px; font-size: 7px; font-weight: 900; z-index: 5; background: rgba(0,0,0,0.7); color: #fff; border: 0.5px solid rgba(255,255,255,0.3); }
         .badge-type { position: absolute; top: 6px; right: 6px; padding: 2px 5px; border-radius: 2px; font-size: 7px; font-weight: 900; z-index: 5; background: rgba(0,0,0,0.7); color: #fff; text-transform: uppercase; border: 0.5px solid rgba(255,255,255,0.3); }
 
@@ -150,7 +154,7 @@
         .modal-player { display: none; position: fixed; inset: 0; z-index: 8000; background: #000; overflow-y: auto; }
         .carousel-track { display: flex; transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1); width: 100%; }
         .carousel-slide { min-width: 100%; aspect-ratio: 16/9; position: relative; background: #000; overflow: hidden; }
-        .carousel-slide iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+        .carousel-slide iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; display: block; }
         .swipe-overlay { position: absolute; inset: 0; z-index: 10; background: transparent; }
         .interaction-icon { font-size: 24px; cursor: pointer; color: #fff; transition: transform 0.1s; }
         .interaction-icon:active { transform: scale(1.2); }
@@ -1961,7 +1965,7 @@
                 
                 <div class="dl-grid">
                     <button id="btnDownload1" class="dl-link-btn" onclick="handleDownload()">Unduh</button>
-                    <button id="btnTrailerDailymotion" class="dl-link-btn btn-trailer-special" onclick="changeServer(21, this)">Trailer</button>
+                    <button id="btnTrailerDailymotion" class="dl-link-btn btn-trailer-special" onclick="changeServer(99, this)">Trailer</button>
                 </div>
                 <div id="mSimilarSection" class="similar-section" style="display:none">
                     <span class="similar-label">Film Serupa</span>
@@ -2229,10 +2233,14 @@
         let activeSeason = 1;
 
         document.addEventListener('DOMContentLoaded', () => {
-            setTimeout(() => {
-                document.getElementById('splashScreen').style.display = 'none';
-                document.getElementById('mainProfile').style.display = 'block';
-            }, 1200);
+            const _hideSplash = () => {
+                const s = document.getElementById('splashScreen');
+                const m = document.getElementById('mainProfile');
+                if (s) s.style.display = 'none';
+                if (m) m.style.display = 'block';
+            };
+            setTimeout(_hideSplash, 1200);
+            setTimeout(_hideSplash, 3000);
         });
 
         window.onload = () => {
@@ -3157,12 +3165,10 @@
         function buildLsServerList() {
             const scroll = document.getElementById('lsServerScroll');
             let html = '';
-            for (let i = 1; i <= 20; i++) {
+            for (let i = 1; i <= 22; i++) {
                 const active = (i === activeServerIdx) ? 'active-link' : '';
                 html += `<div class="ls-srv-btn ${active}" onclick="event.stopPropagation(); lsChangeServer(${i}, this)">Server ${i}</div>`;
             }
-            html += `<div class="ls-srv-btn ${activeServerIdx===22?'active-link':''}" onclick="event.stopPropagation(); lsChangeServer(22, this)">Server 21</div>`;
-            html += `<div class="ls-srv-btn ${activeServerIdx===23?'active-link':''}" onclick="event.stopPropagation(); lsChangeServer(23, this)">Server 22</div>`;
             if (currentDailymotionId) {
                 html += `<div class="ls-srv-btn ${activeServerIdx === 21 ? 'active-link' : ''}" onclick="event.stopPropagation(); lsChangeServer(21, this)">Trailer</div>`;
             }
@@ -4683,7 +4689,7 @@
         function closeD() { document.querySelectorAll('.filter-dropdown').forEach(d => d.style.display = 'none'); document.getElementById('filterOverlay').style.display = 'none'; document.body.style.overflow = 'auto'; }
 
         async function loadFeed(isNew = true) {
-            if(loading && isNew) { loading = false; } // reset flag agar request baru bisa jalan
+            if(isNew) loading = false;
             if(loading && !isNew) return;
             loading = true;
             const grid = document.getElementById('searchOverlay').style.display === 'block' ? document.getElementById('searchGrid') : document.getElementById('feedGrid');
@@ -4733,16 +4739,23 @@
 
         function renderGrid(items, grid) { 
             const fragment = document.createDocumentFragment();
+            // Dedup: hindari poster sama tampil dua kali
+            const _existingIds = new Set(
+                [...grid.querySelectorAll('.post-card')].map(c => c.dataset.mid)
+            );
             items.forEach(m => { 
-                if(!m.poster_path || m.media_type === 'person') return; 
+                if(!m.poster_path || m.media_type === 'person') return;
+                if(_existingIds.has(String(m.id))) return; // skip duplikat
+                _existingIds.add(String(m.id));
                 let mType = m.media_type;
                 if(!mType) { if(currentType === 'tv') mType = 'tv'; else mType = 'movie'; }
                 const card = document.createElement('div'); 
-                card.className = 'post-card'; 
+                card.className = 'post-card';
+                card.dataset.mid = m.id; // simpan id untuk dedup
                 card.onclick = function() { openModal(m.id, mType); }; 
                 const _rd = m.release_date || m.first_air_date || '';
                 const _nb = isNewRelease(_rd) ? '<div class="badge-new">NEW</div>' : '';
-                card.innerHTML = `<div class="badge-rating">${(m.vote_average||0).toFixed(1)}</div><div class="badge-type">${currentType==='short'?'SHORT':(mType==='tv'?'tv':'movie')}</div>${_nb}<img src="https://image.tmdb.org/t/p/w342${m.poster_path}" loading="lazy" onload="this.style.opacity=1" style="opacity:0">`;
+                card.innerHTML = `<div class="badge-rating">${(m.vote_average||0).toFixed(1)}</div><div class="badge-type">${currentType==='short'?'SHORT':(mType==='tv'?'tv':'movie')}</div>${_nb}<img src="https://image.tmdb.org/t/p/w342${m.poster_path}" loading="lazy" decoding="async" onload="this.style.opacity=1" style="opacity:0">`;
                 fragment.appendChild(card); 
             });
             grid.appendChild(fragment);
@@ -5011,7 +5024,7 @@
                     const embedUrl = `https://www.youtube.com/embed/${v.key}?enablejsapi=1&autoplay=${i===0?1:0}&rel=0&modestbranding=1&mute=0&playsinline=1`;
                     const slideDiv = document.createElement('div');
                     slideDiv.className = 'carousel-slide';
-                    slideDiv.innerHTML = `<iframe id="vid-${i}" src="${embedUrl}" class="w-full h-full" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe><div class="yt-overlay-mask" onclick="void(0)"></div>`;
+                    slideDiv.innerHTML = `<iframe id="vid-${i}" src="${embedUrl}" class="w-full h-full" allow="autoplay; fullscreen; picture-in-picture; encrypted-media; gyroscope; accelerometer" allowfullscreen webkitallowfullscreen mozallowfullscreen frameborder="0" scrolling="no"></iframe><div class="yt-overlay-mask" onclick="void(0)"></div>`;
                     track.appendChild(slideDiv);
                     setTimeout(() => { slideDiv.classList.add('playing'); }, 3000);
                     if (vidsToDisplay.length > 1) {
@@ -5172,7 +5185,7 @@
                     const embedUrl = `https://www.youtube.com/embed/${v.key}?enablejsapi=1&autoplay=${i===0?1:0}&rel=0&modestbranding=1&mute=0&playsinline=1`;
                     const slideDiv = document.createElement('div');
                     slideDiv.className = 'carousel-slide';
-                    slideDiv.innerHTML = `<iframe id="vid-${i}" src="${embedUrl}" class="w-full h-full" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe><div class="yt-overlay-mask" onclick="void(0)"></div>`;
+                    slideDiv.innerHTML = `<iframe id="vid-${i}" src="${embedUrl}" class="w-full h-full" allow="autoplay; fullscreen; picture-in-picture; encrypted-media; gyroscope; accelerometer" allowfullscreen webkitallowfullscreen mozallowfullscreen frameborder="0" scrolling="no"></iframe><div class="yt-overlay-mask" onclick="void(0)"></div>`;
                     track.appendChild(slideDiv);
                     setTimeout(() => { slideDiv.classList.add('playing'); }, 3000);
                     if(vidsToDisplay.length > 1) { dots.innerHTML += `<div class="dot w-1.5 h-1.5 rounded-full ${i===currentIdx?'bg-blue-500':'bg-zinc-700'}"></div>`; }
@@ -5261,12 +5274,9 @@
             // tanggal dihapus dari modal (sudah ada di info grid)
             
             let serverButtonsHTML = '';
-            for(let i=1; i<=20; i++) {
+            for(let i=1; i<=22; i++) {
                 serverButtonsHTML += `<button class="server-btn" onclick="changeServer(${i}, this)">Server ${i}</button>`;
             }
-            // Server 22 & 23 sebagai server tambahan
-            serverButtonsHTML += `<button class="server-btn" onclick="changeServer(22, this)">Server 21</button>`;
-            serverButtonsHTML += `<button class="server-btn" onclick="changeServer(23, this)">Server 22</button>`;
             document.getElementById('serverList').innerHTML = serverButtonsHTML;
 
             if(type === 'tv') { document.getElementById('seriesControl').classList.remove('hidden'); document.getElementById('seasonSel').innerHTML = (dId.seasons||[]).filter(s=>s.season_number>0).map(s=>`<option value="${s.season_number}">Season ${s.season_number}</option>`).join(''); loadEpisodes(); } else { document.getElementById('seriesControl').classList.add('hidden'); }
@@ -5426,8 +5436,13 @@
             newIframe.src = finalUrl;
             newIframe.className = "w-full h-full";
             newIframe.allowFullscreen = true;
-            newIframe.setAttribute('allow', 'autoplay; fullscreen; picture-in-picture');
+            newIframe.setAttribute('allowfullscreen', '');
+            newIframe.setAttribute('webkitallowfullscreen', '');
+            newIframe.setAttribute('mozallowfullscreen', '');
+            newIframe.setAttribute('allow', 'autoplay; fullscreen; picture-in-picture; encrypted-media; gyroscope; accelerometer');
             newIframe.setAttribute('referrerpolicy', 'no-referrer-when-downgrade');
+            newIframe.setAttribute('scrolling', 'no');
+            newIframe.setAttribute('frameborder', '0');
             // Tanpa sandbox — server streaming butuh akses penuh untuk load video
             
             // FIX BUG 2: fallback timer — loader pasti sembunyi setelah 6 detik
@@ -5477,37 +5492,28 @@
             let url = "";
             switch(srv) {
                 case 1:  url = `https://vidrock.net/embed/${type}/${id}${seriesSuffix}`; break;
-                case 2:  url = `https://vidstorm.ru/embed/${type}/${id}${seriesSuffix}`; break;
-                // Server 3: player.vidzee.wtf - hanya support movie, TV/anime tidak didukung servernya
-                case 3:  url = `https://player.vidzee.wtf/embed/${type}/${id}${seriesSuffix}`; break;
-                case 4:  url = `https://vidlink.pro/${type}/${id}${seriesSuffix}`; break;
-                case 5:  url = `https://vidsrc.wtf/1/${type}/${id}${seriesSuffix}`; break;
-                case 6:  url = `https://vidnest.fun/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`; break;
-                case 7:  url = `https://111movies.com/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`; break;
-                case 8:  url = `https://vidfast.pro/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`; break;
-                case 9:  url = `https://www.2embed.online/embed/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`; break;
-                case 10: url = `https://player.videasy.net/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`; break;
-                case 11: url = `https://www.nontongo.win/embed/${type}/${id}${seriesSuffix}`; break;
-                case 12: url = `https://vidsrcme.ru/embed/${type}/${id}${seriesSuffix}`; break;
-                case 13: url = `https://vidfast.net/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`; break;
-                case 14: url = `https://111movies.net/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`; break;
-                // Server 15: vidify.top - path format benar + autoplay
-                case 15: url = `https://player.vidify.top/embed/${type}/${id}${type==='tv'?`/${s}/${e}`:''}?autoplay=1`; break;
-                // Server 16: vidplus.to - tanpa ?tmdb=1, path saja
-                case 16: url = `https://player.vidplus.to/embed/${type}/${id}${seriesSuffix}`; break;
-                // Server 17: vidsrc.ru - format RESMI dari docs vidsrcme.ru
-                case 17: url = type==='tv'
-                    ? `https://vidsrc.ru/embed/tv?tmdb=${id}&season=${s}&episode=${e}`
-                    : `https://vidsrc.ru/embed/movie?tmdb=${id}`; break;
-                case 18: url = `https://multiembed.mov/?video_id=${id}&tmdb=1${type==='tv'?`&s=${s}&e=${e}`:''}`; break;
-                // Server 19: 2embed.cc format resmi - movie=/embed/IMDB, tv=/embedtv/ID?s=S&e=E
-                case 19: url = type==='tv'
-                    ? `https://www.2embed.cc/embedtv/${id}?s=${s}&e=${e}`
-                    : `https://www.2embed.cc/embed/${currentImdbId || id}`; break;
-                case 20: url = `https://vidsrc.cc/v2/embed/${type}/${id}${type==='tv'?`?s=${s}&e=${e}`:''}`; break;
-                case 22: url = `https://vidsrc.me/embed/${type}?tmdb=${id}${type==='tv'?`&s=${s}&e=${e}`:''}`; break;
-                case 23: url = `https://warezcdn.site/${type==='tv'?'serie':'filme'}/${id}${type==='tv'?`/${s}/${e}`:''}`; break;
-                case 21: url = `https://www.dailymotion.com/embed/video/${currentDailymotionId}`; break;
+                case 2:  url = `https://vidlink.pro/${type}/${id}${seriesSuffix}`; break;
+                case 3:  url = `https://vidnest.fun/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`; break;
+                case 4:  url = `https://vidfast.pro/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`; break;
+                case 5:  url = `https://player.videasy.net/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`; break;
+                case 6:  url = `https://111movies.com/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`; break;
+                case 7:  url = `https://player.vidzee.wtf/embed/${type}/${id}${seriesSuffix}`; break;
+                case 8:  url = `https://vidstorm.ru/embed/${type}/${id}${seriesSuffix}`; break;
+                case 9:  url = `https://vidsrc.wtf/1/${type}/${id}${seriesSuffix}`; break;
+                case 10: url = `https://www.nontongo.win/embed/${type}/${id}${seriesSuffix}`; break;
+                case 11: url = `https://111movies.net/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`; break;
+                case 12: url = `https://vidfast.net/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`; break;
+                case 13: url = `https://vidsrcme.ru/embed/${type}/${id}${seriesSuffix}`; break;
+                case 14: url = `https://player.vidify.top/embed/${type}/${id}${type==='tv'?`/${s}/${e}`:''}?autoplay=1`; break;
+                case 15: url = `https://player.vidplus.to/embed/${type}/${id}${seriesSuffix}`; break;
+                case 16: url = `https://multiembed.mov/?video_id=${id}&tmdb=1${type==='tv'?`&s=${s}&e=${e}`:''}`; break;
+                case 17: url = `https://vidsrc.cc/v2/embed/${type}/${id}${type==='tv'?`?s=${s}&e=${e}`:''}`; break;
+                case 18: url = `https://vidsrc.me/embed/${type}?tmdb=${id}${type==='tv'?`&s=${s}&e=${e}`:''}`; break;
+                case 19: url = `https://vidsrc.ru/${type}/${currentImdbId || id}${type==='tv'?`?s=${s}&e=${e}`:''}` ; break;
+                case 20: url = `https://www.2embed.cc/embed/${type}/${id}${seriesSuffix}`; break;
+                case 21: url = `https://embed.su/embed/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`; break;
+                case 22: url = `https://warezcdn.site/${type==='tv'?'serie':'filme'}/${id}${type==='tv'?`/${s}/${e}`:''}`; break;
+                case 99: url = `https://www.dailymotion.com/embed/video/${currentDailymotionId}`; break;
                 default: url = `https://vidrock.net/embed/${type}/${id}${seriesSuffix}`;
             }
             return url.replace("http://", "https://");
