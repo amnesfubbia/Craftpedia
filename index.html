@@ -162,11 +162,9 @@
         /* SERVER LIST SCROLL HORIZONTAL - DIPERKECIL */
         .server-scroll-wrapper { display: flex; overflow-x: auto; gap: 8px; padding: 10px 0; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
         .server-scroll-wrapper::-webkit-scrollbar { display: none; }
-        .server-btn { flex: 0 0 auto; min-width: 80px; padding: 8px 10px; border-radius: 10px; font-size: 9px; font-weight: 800; text-transform: uppercase; border: 1px solid #1c1c1c; text-align: center; cursor: pointer; background: #0a0a0a; color: #aaa; transition: all 0.2s; position: relative; }
+        .server-btn { flex: 0 0 auto; min-width: 80px; padding: 8px 10px; border-radius: 10px; font-size: 9px; font-weight: 800; text-transform: uppercase; border: 1px solid #1c1c1c; text-align: center; cursor: pointer; background: #0a0a0a; color: #aaa; transition: all 0.2s; }
         .server-btn:active { background: #1c1c1c; transform: scale(0.95); }
         .server-btn.active-link { border: 1.5px solid #fff !important; background: rgba(255,255,255,0.08); color: #fff; }
-        .server-btn::before { content:''; position:absolute; top:5px; right:5px; width:5px; height:5px; border-radius:50%; background:#2a2a2a; }
-        .server-btn.active-link::before { background:#4ade80; box-shadow:0 0 4px #4ade80; }
         
         /* DOWNLOAD & TRAILER GRID - DIPERKECIL */
         .dl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; margin-bottom: 2px; }
@@ -652,7 +650,7 @@
             border-bottom: 1px solid #1a1a1a;
         }
         .actor-highlights-scroll {
-            display: flex; gap: 14px; overflow-x: auto;
+            display: flex; gap: 8px; overflow-x: auto;
             padding-bottom: 14px;
             -webkit-overflow-scrolling: touch;
             scrollbar-width: none;
@@ -1369,8 +1367,9 @@
             width: 100%;
             aspect-ratio: 16/9;
             object-fit: cover;
-            background: #0a0a0a;
+            background: #111;
             display: block;
+            min-height: 78px;
         }
         .ep-thumb-placeholder {
             width: 100%;
@@ -2008,7 +2007,7 @@
                 <div id="mInfoGrid" class="minfo-grid" style="display:none"></div>
                 
                 <div id="mPosterGallery" class="poster-gallery-section" style="display:none">
-                    <span class="poster-gallery-label">Poster & Gambar</span>
+                    <span class="poster-gallery-label">Poster & Backdrop</span>
                     <div class="poster-gallery-scroll" id="mPosterScroll"></div>
                 </div>
 
@@ -2100,7 +2099,7 @@
         <!-- Known For highlights strip -->
         <div class="actor-highlights-wrapper" id="actorKnownForWrapper" style="display:none">
             <div class="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-3">Dikenal Lewat</div>
-            <div class="actor-highlights-scroll" id="actorKnownFor"></div>
+            <div class="actor-highlights-scroll similar-scroll" id="actorKnownFor"></div>
         </div>
 
         <!-- Tab nav -->
@@ -3227,7 +3226,7 @@
         function buildLsServerList() {
             const scroll = document.getElementById('lsServerScroll');
             let html = '';
-            for (let i = 1; i <= 22; i++) {
+            for (let i = 1; i <= 23; i++) {
                 const active = (i === activeServerIdx) ? 'active-link' : '';
                 html += `<div class="ls-srv-btn ${active}" onclick="event.stopPropagation(); lsChangeServer(${i}, this)">Server ${i}</div>`;
             }
@@ -3493,14 +3492,16 @@
 
                 if (topWorks.length > 0) {
                     document.getElementById('actorKnownForWrapper').style.display = 'block';
-                    document.getElementById('actorKnownFor').innerHTML = topWorks.map(w => `
-                        <div class="actor-hl-item" onclick="openModalFromActor(${w.id}, '${w.media_type}')">
-                            <div class="actor-hl-circle">
-                                <img src="https://image.tmdb.org/t/p/w185${w.poster_path}" loading="lazy">
-                            </div>
-                            <div class="actor-hl-label">${w.title || w.name || ''}</div>
-                        </div>
-                    `).join('');
+                    document.getElementById('actorKnownFor').innerHTML = topWorks.map(w => {
+                        const wTitle = w.title || w.name || '';
+                        const shortTitle = wTitle.length > 12 ? wTitle.substring(0,12)+'…' : wTitle;
+                        const wRating = w.vote_average ? w.vote_average.toFixed(1) : '';
+                        return `<div class="similar-card" onclick="openModalFromActor(${w.id}, '${w.media_type}')" style="position:relative;flex:0 0 70px">
+                            ${wRating ? `<div class="badge-rating">${wRating}</div>` : ''}
+                            <img class="similar-poster loaded" src="https://image.tmdb.org/t/p/w185${w.poster_path}" loading="lazy">
+                            <div style="font-size:8px;font-weight:600;color:#aaa;text-align:center;padding:0 2px;line-height:1.2;margin-top:3px">${shortTitle}</div>
+                        </div>`;
+                    }).join('');
                 }
 
                 // Film grid (movies)
@@ -5299,21 +5300,9 @@
             document.getElementById('mTitle').innerText = displayTitle;
             const _mu = document.getElementById('mModalTitle');
             if (_mu) _mu.innerText = displayTitle;
-            // Genre pills di bawah judul
-            const _genrePills = (dId.genres || []).slice(0,3).map(g =>
-                `<span style="display:inline-block;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:20px;padding:2px 8px;font-size:9px;font-weight:700;color:#8e8e8e;margin-right:4px;margin-bottom:4px">${g.name}</span>`
-            ).join('');
-            const _yearBadge = window.currentMediaYear ? `<span style="display:inline-block;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:20px;padding:2px 8px;font-size:9px;font-weight:700;color:#555;margin-right:4px">${window.currentMediaYear}</span>` : '';
-            const _typeBadge = `<span style="display:inline-block;background:#1a1a2e;border:1px solid #2a2a4e;border-radius:20px;padding:2px 8px;font-size:9px;font-weight:700;color:#6c8efb;margin-right:4px">${type==='tv'?'SERIAL':'FILM'}</span>`;
-            let _pillsEl = document.getElementById('_mGenrePills');
-            if (!_pillsEl) {
-                _pillsEl = document.createElement('div');
-                _pillsEl.id = '_mGenrePills';
-                _pillsEl.style.cssText = 'padding:4px 15px 0;flex-wrap:wrap;display:flex;';
-                const _rb = document.getElementById('mRatingBar');
-                if (_rb) _rb.before(_pillsEl);
-            }
-            _pillsEl.innerHTML = _typeBadge + _yearBadge + _genrePills;
+
+            // Simpan poster series untuk fallback thumbnail episode
+            window._currentSeriesPoster = dId.poster_path || '';
             // Simpan info untuk soundtrack search yang akurat
             window.currentMediaTitle = displayTitle;
             window.currentMediaYear = (dId.release_date || dId.first_air_date || '').split('-')[0] || '';
@@ -5339,20 +5328,20 @@
                 const miDir = miCrew.find(c => c.job === 'Director');
                 const miDirName = miDir ? miDir.name : (type === 'tv' ? ((dId.created_by && dId.created_by[0]) ? dId.created_by[0].name : '—') : '—');
                 infoGridEl.innerHTML = `
-                <div class="minfo-cell full-width"><span class="minfo-key"><i class="fa-solid fa-clapperboard" style="width:10px;margin-right:4px;color:#555"></i>Sutradara</span><span class="minfo-val">${miDirName}</span></div>
-                <div class="minfo-cell"><span class="minfo-key"><i class="fa-regular fa-calendar" style="width:10px;margin-right:4px;color:#555"></i>Rilis</span><span class="minfo-val">${miReleaseStr}</span></div>
-                <div class="minfo-cell"><span class="minfo-key"><i class="fa-regular fa-clock" style="width:10px;margin-right:4px;color:#555"></i>Durasi</span><span class="minfo-val">${runTime}</span></div>
-                <div class="minfo-cell"><span class="minfo-key"><i class="fa-solid fa-earth-asia" style="width:10px;margin-right:4px;color:#555"></i>Negara</span><span class="minfo-val">${miCountries}</span></div>
-                <div class="minfo-cell"><span class="minfo-key"><i class="fa-solid fa-language" style="width:10px;margin-right:4px;color:#555"></i>Bahasa</span><span class="minfo-val">${miLanguage}</span></div>
-                <div class="minfo-cell full-width"><span class="minfo-key"><i class="fa-solid fa-building" style="width:10px;margin-right:4px;color:#555"></i>Studio</span><span class="minfo-val">${miStudios}</span></div>
-                <div class="minfo-cell full-width"><span class="minfo-key"><i class="fa-solid fa-tags" style="width:10px;margin-right:4px;color:#555"></i>Genre</span><span class="minfo-val">${miGenres}</span></div>`;
+                <div class="minfo-cell full-width"><span class="minfo-key">Sutradara</span><span class="minfo-val">${miDirName}</span></div>
+                <div class="minfo-cell"><span class="minfo-key">Rilis</span><span class="minfo-val">${miReleaseStr}</span></div>
+                <div class="minfo-cell"><span class="minfo-key">Durasi</span><span class="minfo-val">${runTime}</span></div>
+                <div class="minfo-cell"><span class="minfo-key">Negara</span><span class="minfo-val">${miCountries}</span></div>
+                <div class="minfo-cell"><span class="minfo-key">Bahasa</span><span class="minfo-val">${miLanguage}</span></div>
+                <div class="minfo-cell full-width"><span class="minfo-key">Studio</span><span class="minfo-val">${miStudios}</span></div>
+                <div class="minfo-cell full-width"><span class="minfo-key">Genre</span><span class="minfo-val">${miGenres}</span></div>`;
                 infoGridEl.style.display = 'grid';
             }
             // hashtag disembunyikan
             // tanggal dihapus dari modal (sudah ada di info grid)
             
             let serverButtonsHTML = '';
-            for(let i=1; i<=22; i++) {
+            for(let i=1; i<=23; i++) {
                 serverButtonsHTML += `<button class="server-btn" onclick="changeServer(${i}, this)">Server ${i}</button>`;
             }
             document.getElementById('serverList').innerHTML = serverButtonsHTML;
@@ -5572,7 +5561,6 @@
             let url = "";
             switch(srv) {
                 case 1:  url = `https://vidrock.net/embed/${type}/${id}${seriesSuffix}`; break;
-                // Server 2 vidlink.pro: tambah autoplay=true dari docs resmi
                 case 2:  url = `https://vidlink.pro/${type}/${id}${seriesSuffix}?autoplay=true&title=true&poster=true`; break;
                 case 3:  url = `https://vidnest.fun/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`; break;
                 case 4:  url = `https://vidfast.pro/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`; break;
@@ -5581,22 +5569,20 @@
                 case 7:  url = `https://player.vidzee.wtf/embed/${type}/${id}${seriesSuffix}`; break;
                 case 8:  url = `https://vidstorm.ru/embed/${type}/${id}${seriesSuffix}`; break;
                 case 9:  url = `https://vidsrc.wtf/1/${type}/${id}${seriesSuffix}`; break;
-                // Server 10 nontongo: tambah trailing slash agar tidak redirect
                 case 10: url = `https://www.nontongo.win/embed/${type}/${id}${seriesSuffix}`; break;
                 case 11: url = `https://111movies.net/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`; break;
                 case 12: url = `https://vidfast.net/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`; break;
                 case 13: url = `https://vidsrcme.ru/embed/${type}/${id}${seriesSuffix}`; break;
-                case 14: url = `https://player.vidify.top/embed/${type}/${id}${type==='tv'?`/${s}/${e}`:''}?autoplay=1`; break;
-                case 15: url = `https://player.vidplus.to/embed/${type}/${id}${seriesSuffix}`; break;
-                case 16: url = `https://multiembed.mov/?video_id=${id}&tmdb=1${type==='tv'?`&s=${s}&e=${e}`:''}`; break;
-                case 17: url = `https://vidsrc.cc/v2/embed/${type}/${id}${type==='tv'?`?s=${s}&e=${e}`:''}`; break;
-                case 18: url = `https://vidsrc.me/embed/${type}?tmdb=${id}${type==='tv'?`&s=${s}&e=${e}`:''}`; break;
-                // Server 19 vidsrc.ru: fix fallback - jika currentImdbId kosong/undefined gunakan TMDB id saja
-                case 19: url = `https://vidsrc.ru/${type}/${(currentImdbId && currentImdbId !== 'undefined' && currentImdbId !== '') ? currentImdbId : id}${type==='tv'?`?s=${s}&e=${e}`:''}` ; break;
-                case 20: url = `https://www.2embed.cc/embed/${type}/${id}${seriesSuffix}`; break;
-                // Server 21 embed.su: tambah ?autoplay=1
-                case 21: url = `https://embed.su/embed/${type}/${id}${type==='tv'?`/${s}/${e}`:''}?autoplay=1`; break;
-                case 22: url = `https://warezcdn.site/${type==='tv'?'serie':'filme'}/${id}${type==='tv'?`/${s}/${e}`:''}`; break;
+                case 14: url = `https://multiembed.mov/?video_id=${id}&tmdb=1${type==='tv'?`&s=${s}&e=${e}`:''}`; break;
+                case 15: url = `https://vidsrc.cc/v2/embed/${type}/${id}${type==='tv'?`?s=${s}&e=${e}`:''}`; break;
+                case 16: url = `https://vidsrc.me/embed/${type}?tmdb=${id}${type==='tv'?`&s=${s}&e=${e}`:''}`; break;
+                case 17: url = `https://www.2embed.cc/embed/${type}/${id}${seriesSuffix}`; break;
+                case 18: url = `https://warezcdn.site/${type==='tv'?'serie':'filme'}/${id}${type==='tv'?`/${s}/${e}`:''}`; break;
+                case 19: url = `https://www.vidking.net/embed/${type}/${id}${type==='tv'?`/${s}/${e}`:''}?autoplay=1`; break;
+                case 20: url = `https://player.vidify.top/embed/${type}/${id}${type==='tv'?`/${s}/${e}`:''}?autoplay=1`; break;
+                case 21: url = `https://player.vidplus.to/embed/${type}/${id}${seriesSuffix}`; break;
+                case 22: url = `https://vidsrc.ru/embed/${type}/${(currentImdbId && currentImdbId !== 'undefined' && currentImdbId !== '') ? currentImdbId : id}${type==='tv'?`/${s}/${e}`:''}` ; break;
+                case 23: url = `https://embed.su/embed/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`; break;
                 case 99: url = `https://www.dailymotion.com/embed/video/${currentDailymotionId}`; break;
                 default: url = `https://vidrock.net/embed/${type}/${id}${seriesSuffix}`;
             }
@@ -5606,19 +5592,31 @@
         async function loadEpisodes() { 
             activeSeason = document.getElementById('seasonSel').value;
             activeEpisode = 1;
-            const data = await fetchWithCache(`https://api.themoviedb.org/3/tv/${window.currentMediaId}/season/${activeSeason}?api_key=${API_KEY}`); 
+            // Fetch season detail + language fallback
+            let data = await fetchWithCache(`https://api.themoviedb.org/3/tv/${window.currentMediaId}/season/${activeSeason}?api_key=${API_KEY}&language=en-US`);
+            // Jika masih ada episode tanpa still_path, coba fetch ulang tanpa language filter
             const episodes = data.episodes || [];
             const grid = document.getElementById('episodeGrid');
+
+            // Ambil poster series sebagai fallback thumbnail
+            const seriesPoster = window._currentSeriesPoster || '';
+
             grid.innerHTML = episodes.map((ep) => { 
                 const epNum = ep.episode_number;
                 const epTitle = ep.name || `Episode ${epNum}`;
                 const epDate = ep.air_date ? new Date(ep.air_date).toLocaleDateString('id-ID', {day:'numeric',month:'long',year:'numeric'}) : '';
-                const thumbSrc = ep.still_path
-                    ? `https://image.tmdb.org/t/p/w300${ep.still_path}`
-                    : '';
-                const thumbHTML = thumbSrc
-                    ? `<img class="ep-thumb" src="${thumbSrc}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\'ep-thumb-placeholder\'><i class=\'fa-solid fa-play\'></i></div>'">`
-                    : `<div class="ep-thumb-placeholder"><i class="fa-solid fa-play"></i></div>`;
+                
+                // still_path → w300, fallback ke poster series, fallback ke placeholder
+                let thumbHTML;
+                if (ep.still_path) {
+                    thumbHTML = `<img class="ep-thumb" src="https://image.tmdb.org/t/p/w300${ep.still_path}" loading="lazy" decoding="async"
+                        onerror="this.src='${seriesPoster ? `https://image.tmdb.org/t/p/w300${seriesPoster}` : ''}'; this.onerror=null; this.style.objectFit='contain'; this.style.background='#111'">`;
+                } else if (seriesPoster) {
+                    thumbHTML = `<img class="ep-thumb" src="https://image.tmdb.org/t/p/w300${seriesPoster}" loading="lazy" decoding="async" style="object-fit:contain;background:#111">`;
+                } else {
+                    thumbHTML = `<div class="ep-thumb-placeholder"><i class="fa-solid fa-play"></i><div style="font-size:9px;margin-top:4px;color:#444">Ep ${epNum}</div></div>`;
+                }
+
                 return `<div class="ep-card ep-btn" onclick="changeEpisode(${epNum}, this)">
                     ${thumbHTML}
                     <div class="ep-info">
@@ -6192,11 +6190,11 @@
                     const r = m.vote_average ? m.vote_average.toFixed(1) : '';
                     const title = m.title || m.name || '';
                     const shortTitle = title.length > 12 ? title.substring(0,12)+'…' : title;
-                    return `<div class="similar-card" onclick="openModal(${m.id}, '${type}')">
+                    return `<div class="similar-card" onclick="openModal(${m.id}, '${type}')" style="position:relative">
+                        ${r ? `<div class="badge-rating">${r}</div>` : ''}
                         <img class="similar-poster" src="https://image.tmdb.org/t/p/w185${m.poster_path}"
                              loading="lazy" onload="this.classList.add('loaded')">
-                        ${r ? `<div class="similar-rating" style="display:flex;align-items:center;gap:2px;justify-content:center"><i class="fa-solid fa-star" style="color:#f5c518;font-size:7px"></i>${r}</div>` : ''}
-                        <div style="font-size:8px;font-weight:600;color:#aaa;text-align:center;padding:0 2px;line-height:1.2;margin-top:1px">${shortTitle}</div>
+                        <div style="font-size:8px;font-weight:600;color:#aaa;text-align:center;padding:0 2px;line-height:1.2;margin-top:3px">${shortTitle}</div>
                     </div>`;
                 }).join('');
             } catch(e) {}
@@ -6251,35 +6249,13 @@
             if (!bar || !tmdbRating) { if(bar) bar.style.display = 'none'; return; }
             const rating = parseFloat(tmdbRating);
             const imdbEst = (rating * 0.95).toFixed(1);
-            // Bintang visual (dari 5)
-            const stars = rating / 2;
-            const fullStars = Math.floor(stars);
-            const halfStar = stars - fullStars >= 0.5;
-            let starsHTML = '';
-            for(let i=0; i<5; i++){
-                if(i < fullStars) starsHTML += '<i class="fa-solid fa-star" style="color:#f5c518;font-size:11px"></i>';
-                else if(i === fullStars && halfStar) starsHTML += '<i class="fa-solid fa-star-half-stroke" style="color:#f5c518;font-size:11px"></i>';
-                else starsHTML += '<i class="fa-regular fa-star" style="color:#333;font-size:11px"></i>';
-            }
             bar.innerHTML = `
-                <div style="display:flex;flex-direction:column;gap:6px;width:100%;padding:2px 0">
-                    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-                        <span class="modal-rating-badge tmdb" style="background:#0d253f;padding:5px 12px;border-radius:20px">
-                            <i class="fa-solid fa-star" style="color:#01b4e4"></i>
-                            <span style="font-size:14px;font-weight:900">${rating.toFixed(1)}</span>
-                            <span style="font-size:10px;color:#8e8e8e">/10 TMDb</span>
-                        </span>
-                        <span class="modal-rating-badge imdb" style="background:#261d00;padding:5px 12px;border-radius:20px">
-                            <i class="fa-solid fa-star" style="color:#f5c518"></i>
-                            <span style="font-size:14px;font-weight:900">~${imdbEst}</span>
-                            <span style="font-size:10px;color:#8e8e8e">/10 IMDb</span>
-                        </span>
-                    </div>
-                    <div style="display:flex;align-items:center;gap:6px">
-                        <div style="display:flex;gap:2px">${starsHTML}</div>
-                        <span style="font-size:10px;color:#555">${stars.toFixed(1)} dari 5</span>
-                    </div>
-                </div>`;
+                <span class="modal-rating-badge tmdb">
+                    <i class="fa-solid fa-star"></i>${rating.toFixed(1)} TMDb
+                </span>
+                <span class="modal-rating-badge imdb">
+                    <i class="fa-solid fa-star"></i>~${imdbEst} IMDb
+                </span>`;
             bar.style.display = 'flex';
         }
 
