@@ -182,7 +182,7 @@
         
         .ig-post-content { padding: 0 15px; margin-top: 5px; }
         .ig-likes-count { font-weight: 700; font-size: 13px; margin-bottom: 5px; display: inline-block; padding-right: 5px; }
-        .ig-username { font-weight: 900; font-size: 20px; margin-right: 0; display: block; margin-bottom: 6px; letter-spacing: -0.5px; line-height: 1.2; }
+        .ig-username { font-weight: 700; font-size: 13px; margin-right: 8px; }
         .ig-caption { font-size: 13px; line-height: 1.4; color: #efefef; }
         
         .toggle-btn { display: block; color: #a8a8a8; cursor: pointer; font-size: 13px; margin-top: 4px; font-weight: 500; }
@@ -1171,8 +1171,8 @@
             color: #444; font-size: 20px;
         }
         .rds-title {
-            font-size: 15px; font-weight: 800; color: #fff;
-            line-height: 1.25; margin-bottom: 5px;
+            font-size: 19px; font-weight: 900; color: #fff;
+            line-height: 1.2; margin-bottom: 6px; letter-spacing: -0.3px;
         }
         .rds-meta-row {
             display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 6px;
@@ -1236,20 +1236,26 @@
             font-size: 11px; font-weight: 600; color: #e0e0e0; line-height: 1.3;
         }
         .rds-btn-row {
-            display: grid; grid-template-columns: 1fr 1fr;
-            gap: 8px; padding: 14px 16px 80px;
+            display: flex; gap: 10px; padding: 14px 16px 80px;
         }
-        .rds-btn {
-            padding: 12px; border-radius: 12px;
-            font-size: 11px; font-weight: 800;
-            text-align: center; cursor: pointer;
-            text-transform: uppercase; letter-spacing: 0.5px;
-            -webkit-tap-highlight-color: transparent;
-            border: none; background: transparent;
-            color: #8e8e8e;
-            transition: color 0.15s;
+        .rds-btn-watch {
+            flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;
+            background: #fff; color: #000; border: none;
+            border-radius: 30px; padding: 14px 16px;
+            font-size: 15px; font-weight: 800;
+            cursor: pointer; -webkit-tap-highlight-color: transparent;
+            transition: opacity 0.15s;
         }
-        .rds-btn:active, .rds-btn.pressed { color: #fff; }
+        .rds-btn-watch:active { opacity: 0.8; }
+        .rds-btn-info {
+            flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;
+            background: rgba(255,255,255,0.15); color: #fff; border: none;
+            border-radius: 30px; padding: 14px 16px;
+            font-size: 15px; font-weight: 700;
+            cursor: pointer; -webkit-tap-highlight-color: transparent;
+            backdrop-filter: blur(4px); transition: opacity 0.15s;
+        }
+        .rds-btn-info:active { opacity: 0.8; }
 
 
         /* ===== MOVIE INFO GRID (2 col, no border) ===== */
@@ -1985,15 +1991,6 @@
                     </div>
                 </div>
 
-                <!-- Tombol Watch Now & More Info -->
-                <div id="mActionBtns" style="display:flex;gap:10px;margin:12px 0 4px">
-                    <button onclick="changeServer(1, document.querySelector('.server-btn'))" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;background:#fff;color:#000;border:none;border-radius:30px;padding:13px 16px;font-size:14px;font-weight:800;cursor:pointer;-webkit-tap-highlight-color:transparent">
-                        <i class="fa-solid fa-play" style="font-size:12px"></i> Tonton
-                    </button>
-                    <button onclick="document.getElementById('mInfoGrid').scrollIntoView({behavior:'smooth'})" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;background:rgba(255,255,255,0.15);color:#fff;border:none;border-radius:30px;padding:13px 16px;font-size:14px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;backdrop-filter:blur(4px)">
-                        <i class="fa-solid fa-circle-info" style="font-size:13px"></i> Detail
-                    </button>
-                </div>
                 <div id="mInfoGrid" class="minfo-grid" style="display:none"></div>
                 
                 <div id="mPosterGallery" class="poster-gallery-section" style="display:none">
@@ -2219,8 +2216,12 @@
             <div class="rds-info-grid" id="rdsInfoGrid"></div>
         </div>
         <div class="rds-btn-row">
-            <div class="rds-btn" id="rdsBtnStream" onclick="openReelStream(this)">Tonton</div>
-            <div class="rds-btn" id="rdsBtnDownload" onclick="openReelDownload(this)">Unduh</div>
+            <button class="rds-btn-watch" id="rdsBtnStream" onclick="openReelStream(this)">
+                <i class="fa-solid fa-play" style="font-size:12px"></i> Tonton
+            </button>
+            <button class="rds-btn-info" id="rdsBtnDownload" onclick="openReelDownload(this)">
+                <i class="fa-solid fa-circle-info" style="font-size:13px"></i> Detail
+            </button>
         </div>
     </div>
 
