@@ -198,7 +198,7 @@
         /* ===== SAFE AREA INSET FIX (Android status bar) ===== */
         /* Semua overlay fixed perlu padding-top agar tidak tertutup status bar */
         .modal-player, #actorModal, #tvModal, #notifModal, #sideMenu, #searchOverlay,
-        #reelsModal, #reelDetailSheet, #soundtrackModal, #actorPhotosModal, #reelsBottomNav {
+        #reelsModal, #reelDetailSheet, #soundtrackModal, #actorPhotosModal {
             padding-top: env(safe-area-inset-top, 0px);
         }
         /* Landscape dan lightbox: inset sudah handle safe area */
@@ -1020,13 +1020,13 @@
 
         /* Info teks kiri bawah */
         .reel-info {
-            position: absolute; bottom: 72px; left: 0; right: 72px;
+            position: absolute; bottom: 72px; left: 0; right: 0;
             padding: 0 16px; z-index: 10; pointer-events: none;
         }
         .reel-title {
-            font-size: 15px; font-weight: 800; color: #fff;
+            font-size: 22px; font-weight: 900; color: #fff;
             text-shadow: 0 1px 4px rgba(0,0,0,0.6);
-            margin-bottom: 2px; line-height: 1.3;
+            margin-bottom: 4px; line-height: 1.2; letter-spacing: -0.5px;
             display: -webkit-box; -webkit-line-clamp: 2;
             -webkit-box-orient: vertical; overflow: hidden;
         }
@@ -1048,15 +1048,27 @@
             -webkit-tap-highlight-color: transparent;
         }
         .reel-translate-btn:active { color: rgba(255,255,255,0.9); }
-        .reel-detail-btn {
-            pointer-events: auto; display: inline-block;
-            padding: 0; border-radius: 0;
-            background: transparent; border: none;
-            font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.6);
-            cursor: pointer; -webkit-tap-highlight-color: transparent;
-            transition: color 0.15s;
+        .reel-action-buttons {
+            display: flex; gap: 10px; margin-top: 10px;
+            pointer-events: auto;
         }
-        .reel-detail-btn:active { color: #fff; }
+        .reel-btn-watch {
+            flex: 1; display: flex; align-items: center; justify-content: center; gap: 7px;
+            background: #fff; color: #000; border: none;
+            border-radius: 30px; padding: 12px 16px;
+            font-size: 14px; font-weight: 800;
+            cursor: pointer; -webkit-tap-highlight-color: transparent;
+        }
+        .reel-btn-watch:active { opacity: 0.85; }
+        .reel-btn-detail {
+            flex: 1; display: flex; align-items: center; justify-content: center; gap: 7px;
+            background: rgba(255,255,255,0.18); color: #fff; border: none;
+            border-radius: 30px; padding: 12px 16px;
+            font-size: 14px; font-weight: 700;
+            cursor: pointer; -webkit-tap-highlight-color: transparent;
+            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+        }
+        .reel-btn-detail:active { opacity: 0.85; }
 
         /* Tombol aksi kanan bawah (like, bookmark) */
         .reel-actions {
@@ -3825,7 +3837,14 @@
                                  data-translated="0" data-orig="${encodeURIComponent(reel.synopsis)}" data-trans="">
                                 Lihat terjemahan
                             </div>` : ''}
-                            <div class="reel-detail-btn" onclick="openReelDetail(${reel.movieId}, '${reel.type}')">Detail Film</div>
+                            <div class="reel-action-buttons">
+                            <button class="reel-btn-watch" onclick="openReelStream(null, ${reel.movieId}, '${reel.type}')">
+                                <i class="fa-solid fa-play" style="font-size:11px"></i> Tonton
+                            </button>
+                            <button class="reel-btn-detail" onclick="openReelDetail(${reel.movieId}, '${reel.type}')">
+                                <i class="fa-solid fa-circle-info" style="font-size:12px"></i> Detail
+                            </button>
+                        </div>
                         </div>
                         <div class="reel-actions">
                             <div class="reel-action-btn ${lib.liked ? 'liked' : ''}" 
@@ -4309,10 +4328,13 @@
             }
         }
 
-        function openReelStream(btn) {
-            if (!_rdsCurrentId || !_rdsCurrentType) return;
-            if (btn) { btn.classList.add('pressed'); setTimeout(() => btn.classList.remove('pressed'), 300); }
-            const url = buildEmbedUrl(_rdsCurrentType, _rdsCurrentId, 1, 1, 1);
+        function openReelStream(btn, directId, directType) {
+            // Bisa dipanggil dari sheet (pakai _rdsCurrentId) atau dari slide langsung
+            const id = directId || _rdsCurrentId;
+            const type = directType || _rdsCurrentType;
+            if (!id || !type) return;
+            if (btn && btn.classList) { btn.classList.add('pressed'); setTimeout(() => btn && btn.classList.remove('pressed'), 300); }
+            const url = buildEmbedUrl(type, id, 1, 1, 1);
             window.open(url, '_blank');
         }
 
