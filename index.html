@@ -46,6 +46,15 @@
         @keyframes fadeIn { to { opacity: 1; } }
 
         .profile-header { padding: 15px 15px 0 15px; background: #000; }
+        @media all and (display-mode: standalone) {
+            .profile-header { padding-top: max(44px, calc(env(safe-area-inset-top, 0px) + 15px)); }
+            .modal-player .sticky, #actorModal .actor-topbar,
+            #tvModal .tv-topbar, #notifModal .notif-topbar,
+            #sideMenu .about-topbar, #searchOverlay .search-header {
+                padding-top: max(44px, calc(env(safe-area-inset-top, 0px) + 10px)) !important;
+                height: auto !important;
+            }
+        }
         .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .ig-logo-wrapper { display: flex; align-items: center; gap: 4px; position: relative; cursor: pointer; }
         .ig-logo { font-family: 'Inter', sans-serif; font-weight: 700; font-size: 19px; letter-spacing: -1px; }
@@ -182,7 +191,7 @@
         
         .ig-post-content { padding: 0 15px; margin-top: 5px; }
         .ig-likes-count { font-weight: 700; font-size: 13px; margin-bottom: 5px; display: inline-block; padding-right: 5px; }
-        .ig-username { font-weight: 700; font-size: 13px; margin-right: 8px; }
+        .ig-username { font-weight: 800; font-size: 16px; margin-right: 8px; }
         .ig-caption { font-size: 13px; line-height: 1.4; color: #efefef; }
         
         .toggle-btn { display: block; color: #a8a8a8; cursor: pointer; font-size: 13px; margin-top: 4px; font-weight: 500; }
@@ -191,12 +200,12 @@
         .ig-hashtags { color: #e0f1ff; display: block; margin-top: 4px; font-size: 13px; line-height: 1.4; }
         .ig-date { color: #a8a8a8; font-size: 11px; text-transform: uppercase; }
         
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: #000; border-top: 1px solid #1c1c1c; display: flex; justify-content: space-around; padding: 12px 0; z-index: 9000; }
-        .bottom-nav i { color: #a8a8a8; transition: color 0.3s; }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; width: 100%; background: #000; border-top: 1px solid #1c1c1c; display: flex; justify-content: space-around; align-items: center; padding: 0; height: 52px; z-index: 9000; }
+        .bottom-nav i { color: #a8a8a8; transition: color 0.3s; font-size: 20px; }
         .bottom-nav i.active-nav { color: #fff; }
 
         /* ===== SAFE AREA INSET FIX (Android status bar) ===== */
-        /* Semua overlay fixed perlu padding-top agar tidak tertutup status bar */
+        /* All overlay fixed perlu padding-top agar tidak tertutup status bar */
         .modal-player, #actorModal, #tvModal, #notifModal, #sideMenu, #searchOverlay,
         #reelsModal, #reelDetailSheet, #soundtrackModal, #actorPhotosModal {
             padding-top: env(safe-area-inset-top, 0px);
@@ -204,9 +213,7 @@
         /* Landscape dan lightbox: inset sudah handle safe area */
         #landscapeOverlay, #lightboxModal { padding-top: 0; }
         /* Bottom nav: padding bottom untuk gesture bar */
-        .bottom-nav, .tv-bottom-nav, .reels-bottom-nav {
-            padding-bottom: max(12px, env(safe-area-inset-bottom, 12px));
-        }
+        /* Nav padding seragam - tidak ada extra safe-area */
 
         /* LOADING SPINNER FOR IFRAME */
         .iframe-loader { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: #000; z-index: 5; }
@@ -688,7 +695,7 @@
         }
         .actor-tab-item.active { color: #fff; border-bottom-color: #fff; }
 
-        /* Film grids */
+        /* Movie grids */
         .actor-film-grid {
             display: grid; grid-template-columns: repeat(3, 1fr);
             gap: 1px; padding-bottom: 80px;
@@ -937,8 +944,8 @@
         .tv-bottom-nav {
             position: fixed; bottom: 0; left: 0; right: 0;
             background: #000; border-top: 1px solid #1c1c1c;
-            display: flex; justify-content: space-around;
-            padding: 12px 0; z-index: 9700;
+            display: flex; justify-content: space-around; align-items: center;
+            padding: 0; height: 52px; z-index: 9700;
             width: 100%;
         }
         .tv-bottom-item {
@@ -981,8 +988,8 @@
             top: 0; left: 50%;
             transform: translateX(-50%);
             width: 100%;
-            aspect-ratio: 4/5;
-            max-height: 78svh;
+            aspect-ratio: 9/16;
+            max-height: 100svh;
             background: #000;
             overflow: hidden;
         }
@@ -1013,14 +1020,14 @@
 
         /* Gradient bawah lebih tinggi untuk sinopsis */
         .reel-gradient {
-            position: absolute; bottom: 0; left: 0; right: 0; height: 65%;
-            background: linear-gradient(to top, rgba(0,0,0,0.97) 0%, rgba(0,0,0,0.7) 35%, rgba(0,0,0,0.3) 60%, transparent 100%);
+            position: absolute; bottom: 0; left: 0; right: 0; height: 45%;
+            background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.6) 50%, transparent 100%);
             pointer-events: none; z-index: 5;
         }
 
         /* Info teks kiri bawah */
         .reel-info {
-            position: absolute; bottom: 72px; left: 0; right: 0;
+            position: absolute; bottom: 62px; left: 0; right: 0;
             padding: 0 16px; z-index: 10; pointer-events: none;
         }
         .reel-title {
@@ -1049,30 +1056,26 @@
         }
         .reel-translate-btn:active { color: rgba(255,255,255,0.9); }
         .reel-action-buttons {
-            display: flex; gap: 10px; margin-top: 10px;
-            pointer-events: auto;
+            display: flex; gap: 8px; margin-top: 10px;
+            pointer-events: auto; flex-wrap: wrap;
         }
-        .reel-btn-watch {
-            flex: 1; display: flex; align-items: center; justify-content: center; gap: 7px;
-            background: #fff; color: #000; border: none;
-            border-radius: 30px; padding: 12px 16px;
-            font-size: 14px; font-weight: 800;
-            cursor: pointer; -webkit-tap-highlight-color: transparent;
+        .reel-btn-watch, .reel-btn-detail {
+            flex: 0 0 auto; padding: 7px 14px;
+            border-radius: 10px; background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.25); color: #fff;
+            font-size: 10px; font-weight: 800; text-transform: uppercase;
+            letter-spacing: 0.5px; cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+            transition: all 0.2s; backdrop-filter: blur(4px);
         }
-        .reel-btn-watch:active { opacity: 0.85; }
-        .reel-btn-detail {
-            flex: 1; display: flex; align-items: center; justify-content: center; gap: 7px;
-            background: rgba(255,255,255,0.18); color: #fff; border: none;
-            border-radius: 30px; padding: 12px 16px;
-            font-size: 14px; font-weight: 700;
-            cursor: pointer; -webkit-tap-highlight-color: transparent;
-            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+        .reel-btn-watch:active, .reel-btn-detail:active {
+            background: rgba(255,255,255,0.2); transform: scale(0.95);
         }
-        .reel-btn-detail:active { opacity: 0.85; }
 
         /* Tombol aksi kanan bawah (like, bookmark) */
         .reel-actions {
-            position: absolute; bottom: 72px; right: 12px;
+            position: absolute; top: 35%; right: 12px;
+            transform: translateY(-50%);
             display: flex; flex-direction: column; align-items: center; gap: 18px;
             z-index: 10;
         }
@@ -1120,7 +1123,7 @@
         .reels-bottom-nav {
             position: fixed; bottom: 0; left: 0; right: 0; z-index: 9810;
             display: flex; justify-content: space-around; align-items: center;
-            padding: 12px 0;
+            padding: 0; height: 52px;
             background: #000; border-top: 1px solid #1c1c1c;
         }
         .reels-bottom-item {
@@ -1248,26 +1251,19 @@
             font-size: 11px; font-weight: 600; color: #e0e0e0; line-height: 1.3;
         }
         .rds-btn-row {
-            display: flex; gap: 10px; padding: 14px 16px 80px;
+            display: flex; gap: 8px; padding: 14px 16px 80px; flex-wrap: wrap;
         }
-        .rds-btn-watch {
-            flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;
-            background: #fff; color: #000; border: none;
-            border-radius: 30px; padding: 14px 16px;
-            font-size: 15px; font-weight: 800;
-            cursor: pointer; -webkit-tap-highlight-color: transparent;
-            transition: opacity 0.15s;
+        .rds-btn-watch, .rds-btn-info {
+            flex: 0 0 auto; padding: 8px 16px;
+            border-radius: 10px; background: #0a0a0a;
+            border: 1px solid #1c1c1c; color: #aaa;
+            font-size: 9px; font-weight: 800; text-transform: uppercase;
+            letter-spacing: 0.5px; cursor: pointer; text-align: center;
+            -webkit-tap-highlight-color: transparent; transition: all 0.2s;
         }
-        .rds-btn-watch:active { opacity: 0.8; }
-        .rds-btn-info {
-            flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;
-            background: rgba(255,255,255,0.15); color: #fff; border: none;
-            border-radius: 30px; padding: 14px 16px;
-            font-size: 15px; font-weight: 700;
-            cursor: pointer; -webkit-tap-highlight-color: transparent;
-            backdrop-filter: blur(4px); transition: opacity 0.15s;
+        .rds-btn-watch:active, .rds-btn-info:active {
+            background: #1c1c1c; transform: scale(0.95);
         }
-        .rds-btn-info:active { opacity: 0.8; }
 
 
         /* ===== MOVIE INFO GRID (2 col, no border) ===== */
@@ -1316,14 +1312,14 @@
         }
         .similar-scroll::-webkit-scrollbar { display: none; }
         .similar-card {
-            flex: 0 0 160px; cursor: pointer;
+            flex: 0 0 110px; cursor: pointer;
             -webkit-tap-highlight-color: transparent;
-            border-radius: 14px; overflow: hidden;
+            border-radius: 10px; overflow: hidden;
             position: relative; background: #111;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
         }
         .similar-poster {
-            width: 160px; height: 240px;
+            width: 110px; height: 165px;
             object-fit: cover; background: #111;
             display: block;
             opacity: 0; transition: opacity 0.3s;
@@ -1621,7 +1617,7 @@
         <div class="pull-inner" id="pullInner">
             <i class="fa-solid fa-arrow-down pull-arrow" id="pullArrow"></i>
             <div class="pull-spinner" id="pullSpinner"></div>
-            <span id="pullText">Tarik untuk muat ulang</span>
+            <span id="pullText">Pull to refresh</span>
         </div>
     </div>
 
@@ -1649,7 +1645,7 @@
         <div id="lsLockLayer" class="ls-lock-screen" style="display:none">
             <div class="ls-lock-badge" onclick="event.stopPropagation(); unlockScreen()">
                 <i class="fa-solid fa-lock"></i>
-                <span>Terkunci</span>
+                <span>Locked</span>
             </div>
         </div>
 
@@ -1680,14 +1676,14 @@
                         <i class="fa-solid fa-expand ls-btn ls-btn-sm" onclick="event.stopPropagation(); tryFullscreen()" title="Fullscreen"></i>
                     </div>
                 </div>
-                <div class="ls-hint">Tap layar untuk sembunyikan kontrol</div>
+                <div class="ls-hint">Tap screen to hide controls</div>
             </div>
         </div>
 
         <!-- Server panel (slide-up) -->
         <div id="lsServerPanel" class="ls-server-panel">
             <div class="ls-server-panel-handle"></div>
-            <div class="ls-server-panel-title">Pilih Server</div>
+            <div class="ls-server-panel-title">Select Server</div>
             <div class="ls-server-scroll" id="lsServerScroll"></div>
         </div>
     </div>
@@ -1712,11 +1708,11 @@
         <div class="about-stats-row">
             <div class="about-stat-card">
                 <span class="about-stat-num">25rb+</span>
-                <span class="about-stat-lbl">Film</span>
+                <span class="about-stat-lbl">Movie</span>
             </div>
             <div class="about-stat-card">
                 <span class="about-stat-num">8rb+</span>
-                <span class="about-stat-lbl">Serial</span>
+                <span class="about-stat-lbl">Series</span>
             </div>
             <div class="about-stat-card">
                 <span class="about-stat-num">20+</span>
@@ -1782,7 +1778,7 @@
         <div class="about-section-label">Sumber Data</div>
         <div class="about-info-list">
             <div class="about-info-row">
-                <span class="about-info-label">Database Film & TV</span>
+                <span class="about-info-label">Database Movie & TV</span>
                 <span class="about-info-value">TMDb API</span>
             </div>
             <div class="about-info-row">
@@ -1811,7 +1807,7 @@
                 <span class="about-info-value">Web App (PWA)</span>
             </div>
             <div class="about-info-row">
-                <span class="about-info-label">Bahasa</span>
+                <span class="about-info-label">Language</span>
                 <span class="about-info-value">Indonesia / Inggris</span>
             </div>
         </div>
@@ -1840,7 +1836,7 @@
             </div>
             <div class="about-credits-made">Dibuat dengan ❤️ oleh</div>
             <div class="about-credits-by">Anasteas</div>
-            <div class="about-credits-copy">© 2026 Amnesfubbia Network · Semua hak dilindungi</div>
+            <div class="about-credits-copy">© 2026 Amnesfubbia Network · All hak dilindungi</div>
         </div>
     </div>
 
@@ -1849,7 +1845,7 @@
             <div class="top-bar">
                 <div class="ig-logo-wrapper" onclick="backToHome()">
                     <h1 class="ig-logo">amnesfubbia</h1>
-                    <i class="fa-solid fa-chevron-down text-[10px] ml-0.5" onclick="event.stopPropagation(); openNotif()" style="cursor:pointer" title="Film Baru Hari Ini"></i>
+                    <i class="fa-solid fa-chevron-down text-[10px] ml-0.5" onclick="event.stopPropagation(); openNotif()" style="cursor:pointer" title="Movie Baru Hari Ini"></i>
                     <span class="dot-notify"></span>
                 </div>
                 <div class="flex gap-5">
@@ -1877,8 +1873,8 @@
             </div>
 
             <div class="action-buttons">
-                <div class="btn-ig" id="btnNowPlaying" onclick="setSchedule('now_playing', this)">Sedang Tayang</div>
-                <div class="btn-ig" id="btnUpcoming" onclick="setSchedule('upcoming', this)">Segera Tayang</div>
+                <div class="btn-ig" id="btnNowPlaying" onclick="setSchedule('now_playing', this)">Now Playing</div>
+                <div class="btn-ig" id="btnUpcoming" onclick="setSchedule('upcoming', this)">Coming Soon</div>
                 <div class="btn-icon-sq" onclick="toggleFilterBar()"><i class="fa-solid fa-sliders text-sm"></i></div>
             </div>
 
@@ -1896,8 +1892,8 @@
 
         <div id="recentlyViewedWrapper">
             <div class="recently-header">
-                <span class="recently-label" style="margin-bottom:0">Terakhir Dilihat</span>
-                <span class="recently-clear-btn" onclick="clearAllRecentlyViewed()">Hapus Semua</span>
+                <span class="recently-label" style="margin-bottom:0">Recently Viewed</span>
+                <span class="recently-clear-btn" onclick="clearAllRecentlyViewed()">Clear All</span>
             </div>
             <div class="recently-scroll" id="recentlyScroll"></div>
         </div>
@@ -1916,24 +1912,24 @@
             <i class="fa-solid fa-arrow-left text-xl text-white" onclick="closeSearch()"></i>
             <div class="search-input-box">
                 <i class="fa-solid fa-magnifying-glass text-zinc-500 text-xs"></i>
-                <input type="text" id="searchInp" autocomplete="off" placeholder="Cari film, serial, atau aktor..." onkeydown="if(event.key==='Enter') searchAction()" oninput="handleSearchInput(this.value)">
+                <input type="text" id="searchInp" autocomplete="off" placeholder="Search movies, series, or actors..." onkeydown="if(event.key==='Enter') searchAction()" oninput="handleSearchInput(this.value)">
                 <i class="fa-solid fa-xmark text-zinc-500 text-xs cursor-pointer" id="searchClearBtn" style="display:none;padding-left:6px" onclick="clearSearch()"></i>
                 <div id="smartSearchDropdown" class="no-scrollbar"></div>
             </div>
         </div>
         <!-- Search type tabs (tampil saat ada hasil) -->
         <div id="searchTypeTabs" style="display:none; border-bottom:1px solid #1c1c1c; background:#000; position:sticky; top:54px; z-index:90; flex-direction:row;">
-            <div class="search-tab active" id="stab-all" onclick="setSearchTab('multi',this)">Semua</div>
-            <div class="search-tab" id="stab-movie" onclick="setSearchTab('movie',this)">Film</div>
-            <div class="search-tab" id="stab-tv" onclick="setSearchTab('tv',this)">Serial</div>
+            <div class="search-tab active" id="stab-all" onclick="setSearchTab('multi',this)">All</div>
+            <div class="search-tab" id="stab-movie" onclick="setSearchTab('movie',this)">Movie</div>
+            <div class="search-tab" id="stab-tv" onclick="setSearchTab('tv',this)">Series</div>
         </div>
         <!-- Empty/idle state -->
         <div id="searchEmptyState" style="padding:40px 20px; text-align:center;">
             <i class="fa-solid fa-magnifying-glass" style="font-size:40px;color:#222;margin-bottom:16px;display:block"></i>
-            <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:6px">Cari Film & Serial</div>
-            <div style="font-size:13px;color:#555;line-height:1.5">Ketik judul film, nama serial,<br>nama aktor, atau nama studio</div>
+            <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:6px">Search Movies & Shows</div>
+            <div style="font-size:13px;color:#555;line-height:1.5">Type a title, series name,<br>actor name, or studio</div>
             <div style="margin-top:28px;text-align:left">
-                <div style="font-size:10px;font-weight:800;color:#333;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;padding:0 4px">Pencarian Populer</div>
+                <div style="font-size:10px;font-weight:800;color:#333;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;padding:0 4px">Popular Searches</div>
                 <div id="popularChips" style="display:flex;flex-wrap:wrap;gap:8px"></div>
             </div>
         </div>
@@ -1954,13 +1950,21 @@
         <div class="w-12 h-1 bg-zinc-800 rounded-full mx-auto mt-3 mb-6"></div>
         <div class="px-5">
             <h3 class="text-[10px] font-black uppercase tracking-[4px] mb-8 text-center text-zinc-500">
-                Soundtrack Resmi
+                Official Soundtrack
             </h3>
             <div id="musicList" class="space-y-3 pb-12"></div>
         </div>
     </div>
 
     <div id="movieModal" class="modal-player">
+        <!-- Back to top button inside modal -->
+        <div id="modalBackToTop" onclick="document.getElementById('movieModal').scrollTo({top:0,behavior:'smooth'})"
+             style="display:none;position:fixed;bottom:90px;right:20px;z-index:8100;
+                    background:rgba(255,255,255,0.2);width:38px;height:38px;border-radius:50%;
+                    align-items:center;justify-content:center;backdrop-filter:blur(10px);
+                    border:1px solid rgba(255,255,255,0.2);cursor:pointer;">
+            <i class="fa-solid fa-arrow-up" style="color:#fff;font-size:14px"></i>
+        </div>
         <div id="modalScrollTop" class="max-w-xl mx-auto pb-20">
             <div class="sticky top-0 bg-black z-[100] border-b border-zinc-900">
                 <div class="px-4 h-[54px] flex items-center">
@@ -1988,7 +1992,10 @@
                 
                 <div class="px-4 bg-black pb-1 flex justify-between items-end">
                     <span id="mLikeDisplay" class="ig-likes-count"></span>
-                    <span class="text-[11px] font-bold text-white cursor-pointer mb-[5px] uppercase tracking-tighter" onclick="openSoundtrack()">Soundtrack</span>
+                    <div style="display:flex;align-items:center;gap:14px;margin-bottom:5px">
+                        <span class="text-[11px] font-bold text-white cursor-pointer uppercase tracking-tighter" onclick="changeServer(99, this)" id="btnTrailerTop">Trailer</span>
+                        <span class="text-[11px] font-bold text-white cursor-pointer uppercase tracking-tighter" onclick="openSoundtrack()">Soundtrack</span>
+                    </div>
                 </div>
             </div>
             
@@ -1998,7 +2005,7 @@
                     <span class="ig-username" id="mModalTitle"></span>
                     <span id="mDesc" class="ig-caption"></span>
                     <div class="mt-1">
-                        <span id="mToggleBtn" class="toggle-btn hidden" onclick="handleToggleDesc()">selengkapnya</span>
+                        <span id="mToggleBtn" class="toggle-btn hidden" onclick="handleToggleDesc()">more</span>
                         <p id="mTranslateBtn" class="hidden" onclick="handleTranslate()" style="margin-top:2px;font-size:11px;color:#fff;font-weight:700;cursor:pointer;display:inline-block"></p>
                     </div>
                 </div>
@@ -2006,7 +2013,7 @@
                 <div id="mInfoGrid" class="minfo-grid" style="display:none"></div>
                 
                 <div id="mPosterGallery" class="poster-gallery-section" style="display:none">
-                    <span class="poster-gallery-label">Poster & Gambar</span>
+                    <span class="poster-gallery-label">Poster & Images</span>
                     <div class="poster-gallery-scroll" id="mPosterScroll"></div>
                 </div>
 
@@ -2015,7 +2022,7 @@
                 
                 <div id="seriesControl" class="hidden mt-4 p-4 bg-zinc-950 rounded-2xl border border-zinc-900">
                     <div class="flex justify-between items-center mb-4">
-                        <h4 class="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Daftar Episode</h4>
+                        <h4 class="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Episodes</h4>
                         <select id="seasonSel" class="bg-zinc-900 text-white text-[10px] px-2 py-1 rounded border border-zinc-700 appearance-none" onchange="loadEpisodes()"></select>
                     </div>
                     <div id="episodeGrid" class="flex gap-3 overflow-x-auto pb-2" style="scrollbar-width:none;-webkit-overflow-scrolling:touch;"></div>
@@ -2024,11 +2031,11 @@
                 <div id="serverList" class="server-scroll-wrapper mt-4 px-4"></div>
                 
                 <div class="dl-grid">
-                    <button id="btnDownload1" class="dl-link-btn" onclick="handleDownload()">Unduh</button>
-                    <button id="btnTrailerDailymotion" class="dl-link-btn btn-trailer-special" onclick="changeServer(99, this)">Trailer</button>
+                    <button class="dl-link-btn" onclick="handleDownload()"><i class="fa-solid fa-download" style="margin-right:6px;font-size:10px"></i>Download 1</button>
+                    <button class="dl-link-btn" onclick="handleDownload2()"><i class="fa-solid fa-download" style="margin-right:6px;font-size:10px"></i>Download 2</button>
                 </div>
                 <div id="mSimilarSection" class="similar-section" style="display:none">
-                    <span class="similar-label">Film Serupa</span>
+                    <span class="similar-label">Movie Serupa</span>
                     <div class="similar-scroll" id="mSimilarScroll"></div>
                 </div>
             </div>
@@ -2066,24 +2073,24 @@
         <!-- Stats bar (IG style) -->
         <div class="actor-stats-bar">
             <div class="actor-stat-col">
-                <span class="actor-stat-num" id="statKarya">—</span>
-                <span class="actor-stat-lbl">Karya</span>
+                <span class="actor-stat-num" id="statWorks">—</span>
+                <span class="actor-stat-lbl">Works</span>
             </div>
             <div class="actor-stat-divider"></div>
             <div class="actor-stat-col">
                 <span class="actor-stat-num" id="statPop">—</span>
-                <span class="actor-stat-lbl">Popularitas</span>
+                <span class="actor-stat-lbl">Popularity</span>
             </div>
             <div class="actor-stat-divider"></div>
             <div class="actor-stat-col">
-                <span class="actor-stat-num" id="statUsia">—</span>
-                <span class="actor-stat-lbl">Usia</span>
+                <span class="actor-stat-num" id="statAge">—</span>
+                <span class="actor-stat-lbl">Age</span>
             </div>
         </div>
 
         <!-- Action buttons (IG style) -->
         <div class="actor-action-row">
-            <div class="actor-btn-follow" onclick="searchByCast(window._currentActorId)">Filmografi</div>
+            <div class="actor-btn-follow" onclick="searchByCast(window._currentActorId)">Movieografi</div>
             <div class="actor-btn-msg" id="actorImdbBtn" onclick="openActorImdb()">IMDb</div>
             <div class="actor-btn-sq" onclick="openActorPhotos()" title="Foto"><i class="fa-regular fa-images"></i></div>
         </div>
@@ -2097,7 +2104,7 @@
 
         <!-- Known For highlights strip -->
         <div class="actor-highlights-wrapper" id="actorKnownForWrapper" style="display:none">
-            <div class="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-3">Dikenal Lewat</div>
+            <div class="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-3">Known For</div>
             <div class="actor-highlights-scroll" id="actorKnownFor"></div>
         </div>
 
@@ -2111,8 +2118,8 @@
             </div>
         </div>
 
-        <!-- Film grids -->
-        <div id="actorFilmGrid" class="actor-film-grid"></div>
+        <!-- Movie grids -->
+        <div id="actorMovieGrid" class="actor-film-grid"></div>
         <div id="actorTvGrid" class="actor-film-grid-alt"></div>
 
     </div>
@@ -2126,7 +2133,7 @@
         </div>
         <div class="tv-search-box" id="tvSearchBox" style="display:none">
             <i class="fa-solid fa-magnifying-glass text-zinc-500 text-xs"></i>
-            <input type="text" id="tvSearchInp" placeholder="Cari channel TV..." autocomplete="off" oninput="filterTvChannels(this.value)">
+            <input type="text" id="tvSearchInp" placeholder="Search TV channels..." autocomplete="off" oninput="filterTvChannels(this.value)">
             <i class="fa-solid fa-xmark" style="color:#8e8e8e;font-size:14px;cursor:pointer;padding:2px 0 2px 4px" onclick="closeTvSearch()"></i>
         </div>
         <div id="tvChannelList" style="padding-bottom:70px"></div>
@@ -2205,13 +2212,13 @@
                 </div>
             </div>
             <div style="flex:1;min-width:0">
-                <div class="rds-title" id="rdsTitle">Memuat...</div>
+                <div class="rds-title" id="rdsTitle">Loading...</div>
                 <div class="rds-meta-row" id="rdsMeta"></div>
                 <div class="rds-ratings-row" id="rdsRatings"></div>
             </div>
         </div>
         <div class="rds-body">
-            <div class="rds-section-label">Sinopsis</div>
+            <div class="rds-section-label">Synopsis</div>
             <div id="rdsSynopsisWrap">
                 <div id="rdsSynopsisSkeleton">
                     <div class="rds-synopsis-skeleton" style="width:100%"></div>
@@ -2221,10 +2228,10 @@
                 <div class="rds-synopsis" id="rdsSynopsis" style="display:none"></div>
                 <div id="rdsTranslateBtn" onclick="toggleRdsSynTranslate()"
                      style="display:none;margin-top:6px;font-size:10px;font-weight:700;color:#8e8e8e;cursor:pointer;-webkit-tap-highlight-color:transparent;">
-                    Lihat terjemahan
+                    See translation
                 </div>
             </div>
-            <div class="rds-section-label" style="margin-top:14px">Info Film</div>
+            <div class="rds-section-label" style="margin-top:14px">Info Movie</div>
             <div class="rds-info-grid" id="rdsInfoGrid"></div>
         </div>
         <div class="rds-btn-row">
@@ -2232,7 +2239,7 @@
                 <i class="fa-solid fa-play" style="font-size:12px"></i> Tonton
             </button>
             <button class="rds-btn-info" id="rdsBtnDownload" onclick="openReelDownload(this)">
-                <i class="fa-solid fa-circle-info" style="font-size:13px"></i> Detail
+                <i class="fa-solid fa-download" style="font-size:13px"></i> Download
             </button>
         </div>
     </div>
@@ -2255,11 +2262,11 @@
     <div id="notifModal">
         <div class="notif-topbar">
             <i class="fa-solid fa-chevron-left" style="font-size:20px;color:#fff;cursor:pointer;padding:6px;margin-right:4px" onclick="closeNotif()"></i>
-            <div class="notif-topbar-title">Film Baru Hari Ini</div>
+            <div class="notif-topbar-title">Movie Baru Hari Ini</div>
             <span class="notif-date-badge" id="notifDateBadge"></span>
         </div>
         <div id="notifContent">
-            <div class="notif-empty"><i class="fa-solid fa-film"></i>Memuat...</div>
+            <div class="notif-empty"><i class="fa-solid fa-film"></i>Loading...</div>
         </div>
     </div>
 
@@ -2407,19 +2414,19 @@
                 {time:'17:30',show:'Sinetron Sore',genre:'Drama'},
                 {time:'19:30',show:'Sinetron Prime Time',genre:'Drama'},
                 {time:'21:00',show:'Seputar Indonesia Malam',genre:'Berita'},
-                {time:'21:30',show:'Film Malam',genre:'Film'},
+                {time:'21:30',show:'Movie Malam',genre:'Movie'},
                 {time:'23:30',show:'Layar Drama Indonesia',genre:'Drama'},
             ],
             'GTV': [
                 {time:'05:00',show:'Morning Show',genre:'Hiburan'},
                 {time:'07:00',show:'Kartun Pagi',genre:'Animasi'},
                 {time:'10:00',show:'Variety Show',genre:'Hiburan'},
-                {time:'12:00',show:'Film Siang',genre:'Film'},
+                {time:'12:00',show:'Movie Siang',genre:'Movie'},
                 {time:'14:00',show:'Drama Korea',genre:'Drama'},
                 {time:'16:00',show:'Kartun Sore',genre:'Animasi'},
-                {time:'19:00',show:'Film Prime Time',genre:'Film'},
+                {time:'19:00',show:'Movie Prime Time',genre:'Movie'},
                 {time:'21:00',show:'Reality Show',genre:'Hiburan'},
-                {time:'23:00',show:'Film Malam',genre:'Film'},
+                {time:'23:00',show:'Movie Malam',genre:'Movie'},
             ],
             'MNCTV': [
                 {time:'05:00',show:'Khotbah Pagi',genre:'Religi'},
@@ -2431,24 +2438,24 @@
                 {time:'17:00',show:'Sinetron Sore',genre:'Drama'},
                 {time:'19:00',show:'Upin & Ipin',genre:'Animasi'},
                 {time:'20:00',show:'Sinetron Malam',genre:'Drama'},
-                {time:'22:00',show:'Film Malam',genre:'Film'},
+                {time:'22:00',show:'Movie Malam',genre:'Movie'},
             ],
             'SCTV': [
                 {time:'05:00',show:'Liputan 6 Pagi',genre:'Berita'},
                 {time:'06:30',show:'Sinetron Pagi',genre:'Drama'},
-                {time:'09:00',show:'FTV Pagi',genre:'Film'},
+                {time:'09:00',show:'FTV Pagi',genre:'Movie'},
                 {time:'11:30',show:'Liputan 6 Siang',genre:'Berita'},
-                {time:'12:00',show:'FTV Siang',genre:'Film'},
-                {time:'15:30',show:'FTV Sore',genre:'Film'},
+                {time:'12:00',show:'FTV Siang',genre:'Movie'},
+                {time:'15:30',show:'FTV Sore',genre:'Movie'},
                 {time:'17:30',show:'Liputan 6 Sore',genre:'Berita'},
                 {time:'19:00',show:'Sinetron Malam',genre:'Drama'},
                 {time:'21:30',show:'Liputan 6 Malam',genre:'Berita'},
-                {time:'22:30',show:'FTV Malam',genre:'Film'},
+                {time:'22:30',show:'FTV Malam',genre:'Movie'},
             ],
             'INDOSIAR': [
                 {time:'05:00',show:'Fokus Pagi',genre:'Berita'},
                 {time:'06:00',show:'Sinetron Pagi',genre:'Drama'},
-                {time:'09:00',show:'FTV Pagi',genre:'Film'},
+                {time:'09:00',show:'FTV Pagi',genre:'Movie'},
                 {time:'11:30',show:'Fokus Siang',genre:'Berita'},
                 {time:'13:00',show:'Liga 1 / Hiburan',genre:'Olahraga'},
                 {time:'15:30',show:'Kisah Nyata',genre:'Drama'},
@@ -2459,13 +2466,13 @@
             'ANTV': [
                 {time:'05:00',show:'Topik Pagi',genre:'Berita'},
                 {time:'07:00',show:'Drama India',genre:'Drama'},
-                {time:'10:00',show:'FTV',genre:'Film'},
+                {time:'10:00',show:'FTV',genre:'Movie'},
                 {time:'12:00',show:'Topik Siang',genre:'Berita'},
                 {time:'13:00',show:'Drama India',genre:'Drama'},
                 {time:'16:00',show:'Animasi',genre:'Animasi'},
                 {time:'18:00',show:'Topik Petang',genre:'Berita'},
                 {time:'19:00',show:'Drama India Prime',genre:'Drama'},
-                {time:'22:00',show:'Film Malam',genre:'Film'},
+                {time:'22:00',show:'Movie Malam',genre:'Movie'},
             ],
             'Trans 7': [
                 {time:'05:00',show:'Redaksi Pagi',genre:'Berita'},
@@ -2483,15 +2490,15 @@
             ],
             'Trans TV': [
                 {time:'05:00',show:'CNN Indonesia Pagi',genre:'Berita'},
-                {time:'07:00',show:'Sinema Pagi',genre:'Film'},
-                {time:'09:00',show:'Bioskop Trans',genre:'Film'},
+                {time:'07:00',show:'Sinema Pagi',genre:'Movie'},
+                {time:'09:00',show:'Bioskop Trans',genre:'Movie'},
                 {time:'12:00',show:'CNN Indonesia Siang',genre:'Berita'},
-                {time:'13:00',show:'Sinema Siang',genre:'Film'},
-                {time:'15:00',show:'Bioskop Trans',genre:'Film'},
+                {time:'13:00',show:'Sinema Siang',genre:'Movie'},
+                {time:'15:00',show:'Bioskop Trans',genre:'Movie'},
                 {time:'17:00',show:'CNN Indonesia Sore',genre:'Berita'},
-                {time:'19:00',show:'Bioskop Prime',genre:'Film'},
+                {time:'19:00',show:'Bioskop Prime',genre:'Movie'},
                 {time:'21:30',show:'CNN Indonesia Malam',genre:'Berita'},
-                {time:'22:30',show:'Sinema Malam',genre:'Film'},
+                {time:'22:30',show:'Sinema Malam',genre:'Movie'},
             ],
             'NET TV': [
                 {time:'06:00',show:'NET Pagi',genre:'Hiburan'},
@@ -2500,7 +2507,7 @@
                 {time:'14:00',show:'NET 12',genre:'Hiburan'},
                 {time:'16:00',show:'The Comment',genre:'Talkshow'},
                 {time:'18:00',show:'Ini Talk Show',genre:'Talkshow'},
-                {time:'20:00',show:'Film Prime',genre:'Film'},
+                {time:'20:00',show:'Movie Prime',genre:'Movie'},
                 {time:'22:00',show:'Tonight Show',genre:'Talkshow'},
             ],
             'METRO TV': [
@@ -2612,19 +2619,19 @@
                 <div class="tv-now-bar">
                     <div class="tv-now-dot"></div>
                     <div class="tv-now-info">
-                        <div class="tv-now-label">Sedang Tayang</div>
+                        <div class="tv-now-label">Now Playing</div>
                         <div class="tv-now-show">${current.show}</div>
                         <div class="tv-now-time">${current.time} WIB · ${current.genre}</div>
                     </div>
                     <div class="tv-now-next">
-                        <div class="tv-now-next-label">Berikutnya</div>
+                        <div class="tv-now-next-label">Next</div>
                         <div class="tv-now-next-show">${next.show}</div>
                         <div class="tv-now-time">${next.time} WIB</div>
                     </div>
                 </div>`;
 
             let schedHTML = `<div class="tv-schedule-header">
-                <div class="tv-schedule-title">Jadwal Hari Ini <span style="font-weight:400;color:#444;font-size:8px;text-transform:none;letter-spacing:0">(perkiraan)</span></div>
+                <div class="tv-schedule-title">Today's Schedule <span style="font-weight:400;color:#444;font-size:8px;text-transform:none;letter-spacing:0">(estimated)</span></div>
                 <div class="tv-schedule-date">${wibStr}</div>
             </div>`;
 
@@ -2671,7 +2678,7 @@
                 });
                 html += `</div>`;
             });
-            if (!html) html = '<div class="text-center py-10 text-zinc-600 text-xs">Channel tidak ditemukan.</div>';
+            if (!html) html = '<div class="text-center py-10 text-zinc-600 text-xs">Channel not found.</div>';
             cont.innerHTML = html;
         }
 
@@ -2832,7 +2839,7 @@
             const overlay     = document.getElementById('filterOverlay');
             const sheet       = document.getElementById('soundtrackModal');
 
-            listCont.innerHTML = '<div class="text-center py-10 text-zinc-600 text-[10px] tracking-widest uppercase animate-pulse">Mencari soundtrack...</div>';
+            listCont.innerHTML = '<div class="text-center py-10 text-zinc-600 text-[10px] tracking-widest uppercase animate-pulse">Searching soundtrack...</div>';
             sheet.style.display = 'block';
             overlay.style.display = 'block';
             document.body.style.overflow = 'hidden';
@@ -2879,7 +2886,7 @@
                 allResults = allResults.filter(s => { if(seen.has(s.trackId)) return false; seen.add(s.trackId); return true; });
 
                 if (allResults.length === 0) {
-                    listCont.innerHTML = '<div class="text-center py-20 text-zinc-700 text-[10px] uppercase tracking-widest">Soundtrack tidak tersedia.</div>';
+                    listCont.innerHTML = '<div class="text-center py-20 text-zinc-700 text-[10px] uppercase tracking-widest">Soundtrack not available.</div>';
                     return;
                 }
 
@@ -2907,7 +2914,7 @@
 
                 // Jika tidak ada → tampilkan pesan, jangan tampilkan hasil tidak relevan
                 if (filtered.length === 0) {
-                    listCont.innerHTML = '<div class="text-center py-20 text-zinc-700 text-[10px] uppercase tracking-widest">Soundtrack tidak tersedia.</div>';
+                    listCont.innerHTML = '<div class="text-center py-20 text-zinc-700 text-[10px] uppercase tracking-widest">Soundtrack not available.</div>';
                     return;
                 }
 
@@ -2940,7 +2947,7 @@
                 `).join('');
 
             } catch (error) {
-                listCont.innerHTML = '<div class="text-center py-10 text-red-900 text-[10px] uppercase">Gagal memuat audio.</div>';
+                listCont.innerHTML = '<div class="text-center py-10 text-red-900 text-[10px] uppercase">Failed to load audio.</div>';
             }
         }
 
@@ -2971,10 +2978,25 @@
 
         function handleDownload() {
             if(window.currentMediaId && window.currentMediaType) {
-                const downloadUrl = `https://vidvault.ru/${window.currentMediaType}/${window.currentMediaId}`;
+                const isTV = window.currentMediaType === 'tv';
+                const downloadUrl = isTV
+                    ? `https://vidvault.ru/tv/${window.currentMediaId}/${activeSeason || 1}/${activeEpisode || 1}`
+                    : `https://vidvault.ru/movie/${window.currentMediaId}`;
                 window.open(downloadUrl, '_blank');
             } else {
-                alert("ID Media tidak ditemukan.");
+                alert("Media ID not found.");
+            }
+        }
+
+        function handleDownload2() {
+            if(window.currentMediaId && window.currentMediaType) {
+                const isTV = window.currentMediaType === 'tv';
+                const downloadUrl = isTV
+                    ? `https://02moviedownloader.site/api/download/tv/${window.currentMediaId}/${activeSeason || 1}/${activeEpisode || 1}`
+                    : `https://02moviedownloader.site/api/download/movie/${window.currentMediaId}`;
+                window.open(downloadUrl, '_blank');
+            } else {
+                alert("Media ID not found.");
             }
         }
 
@@ -2990,28 +3012,28 @@
             if (postContent && document.getElementById('tvChannelSwitcher')) {
                 postContent.innerHTML = `
                 <div class="mb-1"><span class="ig-username" id="mModalTitle"></span><span id="mDesc" class="ig-caption"></span>
-                <div class="mt-1"><span id="mToggleBtn" class="toggle-btn hidden" onclick="handleToggleDesc()">selengkapnya</span><p id="mTranslateBtn" class="hidden" onclick="handleTranslate()" style="margin-top:2px;font-size:11px;color:#fff;font-weight:700;cursor:pointer;display:inline-block"></p></div></div>
+                <div class="mt-1"><span id="mToggleBtn" class="toggle-btn hidden" onclick="handleToggleDesc()">more</span><p id="mTranslateBtn" class="hidden" onclick="handleTranslate()" style="margin-top:2px;font-size:11px;color:#fff;font-weight:700;cursor:pointer;display:inline-block"></p></div></div>
                 <div id="mInfoGrid" class="minfo-grid" style="display:none"></div>
                 <div id="mPosterGallery" class="poster-gallery-section" style="display:none">
-                    <span class="poster-gallery-label">Poster & Gambar</span>
+                    <span class="poster-gallery-label">Poster & Images</span>
                     <div class="poster-gallery-scroll" id="mPosterScroll"></div>
                 </div>
 <div id="mHashtags" style="display:none"></div>
                 <div id="mDateDisplay" style="display:none"></div>
                 <div id="seriesControl" class="hidden mt-4 p-4 bg-zinc-950 rounded-2xl border border-zinc-900">
                     <div class="flex justify-between items-center mb-4">
-                        <h4 class="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Daftar Episode</h4>
+                        <h4 class="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Episodes</h4>
                         <select id="seasonSel" class="bg-zinc-900 text-white text-[10px] px-2 py-1 rounded border border-zinc-700 appearance-none" onchange="loadEpisodes()"></select>
                     </div>
                     <div id="episodeGrid" class="flex gap-3 overflow-x-auto pb-2" style="scrollbar-width:none;-webkit-overflow-scrolling:touch;"></div>
                 </div>
                 <div id="serverList" class="server-scroll-wrapper mt-4 px-4"></div>
                 <div class="dl-grid">
-                    <button id="btnDownload1" class="dl-link-btn" onclick="handleDownload()">Unduh</button>
+                    <button id="btnDownload1" class="dl-link-btn" onclick="handleDownload()">Download</button>
                     <button id="btnTrailerDailymotion" class="dl-link-btn btn-trailer-special" onclick="changeServer(99, this)">Trailer</button>
                 </div>
                 <div id="mSimilarSection" class="similar-section" style="display:none">
-                    <span class="similar-label">Film Serupa</span>
+                    <span class="similar-label">Movie Serupa</span>
                     <div class="similar-scroll" id="mSimilarScroll"></div>
                 </div>`;
             }
@@ -3397,12 +3419,12 @@
             document.getElementById('actorDept').innerText = '';
             document.getElementById('actorBiography').innerText = '';
             document.getElementById('actorBioMeta').innerHTML = '';
-            document.getElementById('statKarya').innerText = '—';
+            document.getElementById('statWorks').innerText = '—';
             document.getElementById('statPop').innerText = '—';
-            document.getElementById('statUsia').innerText = '—';
+            document.getElementById('statAge').innerText = '—';
             document.getElementById('actorPic').src = '';
             document.getElementById('actorCoverBlur').style.backgroundImage = '';
-            document.getElementById('actorFilmGrid').innerHTML = '<div class="col-span-3 py-16 text-center text-zinc-600 text-xs">Memuat...</div>';
+            document.getElementById('actorMovieGrid').innerHTML = '<div class="col-span-3 py-16 text-center text-zinc-600 text-xs">Loading...</div>';
             document.getElementById('actorTvGrid').innerHTML = '';
             document.getElementById('actorKnownForWrapper').style.display = 'none';
             document.getElementById('actorKnownFor').innerHTML = '';
@@ -3435,9 +3457,9 @@
                 const allCast = credits.cast || [];
                 const movieCount = allCast.filter(c => c.media_type === 'movie').length;
                 const tvCount = allCast.filter(c => c.media_type === 'tv').length;
-                document.getElementById('statKarya').innerText = allCast.length;
+                document.getElementById('statWorks').innerText = allCast.length;
                 document.getElementById('statPop').innerText = Math.floor(details.popularity || 0);
-                document.getElementById('statUsia').innerText = age;
+                document.getElementById('statAge').innerText = age;
 
                 // Bio text (biography)
                 const bioText = details.biography || '';
@@ -3449,7 +3471,7 @@
                     if (short) {
                         const more = document.createElement('span');
                         more.className = 'toggle-btn';
-                        more.innerText = 'selengkapnya';
+                        more.innerText = 'more';
                         more.onclick = () => { bioEl.innerText = bioText; more.remove(); };
                         bioEl.after(more);
                     }
@@ -3472,7 +3494,7 @@
                 if (details.gender && genderMap[details.gender]) {
                     metaHTML += `<span><i class="fa-solid fa-user"></i> ${genderMap[details.gender]}</span>`;
                 }
-                metaHTML += `<span><i class="fa-solid fa-film"></i> ${movieCount} Film · ${tvCount} Serial</span>`;
+                metaHTML += `<span><i class="fa-solid fa-film"></i> ${movieCount} Movie · ${tvCount} Series</span>`;
                 document.getElementById('actorBioMeta').innerHTML = metaHTML;
 
                 // Store imdb id for IMDb button
@@ -3501,20 +3523,20 @@
                     `).join('');
                 }
 
-                // Film grid (movies)
+                // Movie grid (movies)
                 // Deduplikasi berdasarkan id (satu judul bisa muncul berkali-kali di credits)
                 const _seenMovie = new Set();
-                const movieFilms = allCast.filter(m => {
+                const movieMovies = allCast.filter(m => {
                     if (m.media_type !== 'movie' || !m.poster_path) return false;
                     if (_seenMovie.has(m.id)) return false;
                     _seenMovie.add(m.id); return true;
                 }).sort((a,b) => b.popularity - a.popularity);
-                const filmGrid = document.getElementById('actorFilmGrid');
+                const filmGrid = document.getElementById('actorMovieGrid');
                 filmGrid.innerHTML = '';
-                if (movieFilms.length === 0) {
+                if (movieMovies.length === 0) {
                     filmGrid.innerHTML = '<div class="col-span-3 py-16 text-center text-zinc-600 text-xs">Tidak ada data film.</div>';
                 } else {
-                    movieFilms.forEach(m => {
+                    movieMovies.forEach(m => {
                         const card = document.createElement('div');
                         card.className = 'post-card';
                         card.onclick = () => openModalFromActor(m.id, 'movie');
@@ -3525,17 +3547,17 @@
 
                 // TV grid
                 const _seenTv = new Set();
-                const tvFilms = allCast.filter(m => {
+                const tvMovies = allCast.filter(m => {
                     if (m.media_type !== 'tv' || !m.poster_path) return false;
                     if (_seenTv.has(m.id)) return false;
                     _seenTv.add(m.id); return true;
                 }).sort((a,b) => b.popularity - a.popularity);
                 const tvGrid = document.getElementById('actorTvGrid');
                 tvGrid.innerHTML = '';
-                if (tvFilms.length === 0) {
+                if (tvMovies.length === 0) {
                     tvGrid.innerHTML = '<div class="col-span-3 py-16 text-center text-zinc-600 text-xs">Tidak ada data serial.</div>';
                 } else {
-                    tvFilms.forEach(m => {
+                    tvMovies.forEach(m => {
                         const card = document.createElement('div');
                         card.className = 'post-card';
                         card.onclick = () => openModalFromActor(m.id, 'tv');
@@ -3550,7 +3572,7 @@
         function switchActorTab(tab) {
             const gridTab = document.getElementById('actorTabGrid');
             const tvTab = document.getElementById('actorTabReels');
-            const filmGrid = document.getElementById('actorFilmGrid');
+            const filmGrid = document.getElementById('actorMovieGrid');
             const tvGrid = document.getElementById('actorTvGrid');
             if (tab === 'grid') {
                 gridTab.classList.add('active'); tvTab.classList.remove('active');
@@ -3772,9 +3794,19 @@
                         if (!best) return null;
 
                         const rawTitle = m.title || m.name || '';
-                        const title = isNonLatin(rawTitle)
-                            ? (await fetchWithCache(`https://api.themoviedb.org/3/${mtype}/${m.id}?api_key=${API_KEY}&language=en-US`).then(r => r.title || r.name || rawTitle).catch(() => rawTitle))
-                            : rawTitle;
+                        let title = rawTitle;
+                        if (isNonLatin(rawTitle)) {
+                            try {
+                                const enData = await fetchWithCache(`https://api.themoviedb.org/3/${mtype}/${m.id}?api_key=${API_KEY}&language=en-US`);
+                                // Coba title EN dulu, fallback ke original_title (biasanya latin)
+                                const enTitle = enData.title || enData.name || '';
+                                const origTitle = enData.original_title || enData.original_name || '';
+                                // Pilih yang latin: EN title > original title > rawTitle
+                                if (enTitle && !isNonLatin(enTitle)) title = enTitle;
+                                else if (origTitle && !isNonLatin(origTitle)) title = origTitle;
+                                else title = enTitle || rawTitle;
+                            } catch { title = rawTitle; }
+                        }
                         const year  = (m.release_date || m.first_air_date || '').split('-')[0];
                         const poster = m.poster_path || '';
                         const synopsis = m.overview || '';
@@ -3815,8 +3847,9 @@
                     // js_api diaktifkan agar bisa pause via postMessage
                     // enablejsapi=1 wajib agar YT.Player onStateChange bekerja
                     // controls=1 dibiarkan agar event state change tidak diblokir
-                    const embedUrl = `https://www.youtube.com/embed/${reel.videoKey}?enablejsapi=1&autoplay=${isNew && _reelsData.length===1?1:0}&rel=0&modestbranding=1&showinfo=0&playsinline=1&iv_load_policy=3&mute=0&origin=${encodeURIComponent(location.origin || location.href.split('/').slice(0,3).join('/'))}`;
-                    const typeLabel = reel.type === 'movie' ? 'Film' : 'Serial';
+                    const isFirstReel = isNew && _reelsData.length === 1;
+                    const embedUrl = `https://www.youtube.com/embed/${reel.videoKey}?enablejsapi=1&autoplay=${isFirstReel?1:0}&rel=0&modestbranding=1&showinfo=0&playsinline=1&iv_load_policy=3&mute=0&controls=0&origin=${encodeURIComponent(location.origin || location.href.split('/').slice(0,3).join('/'))}`;
+                    const typeLabel = reel.type === 'movie' ? 'Movie' : 'Series';
                     const ratingStr = reel.rating ? `· ★${reel.rating}` : '';
                     const synopsisId = `reel-syn-${reel.movieId}`;
                     const synTransId = `reel-trans-${reel.movieId}`;
@@ -3824,6 +3857,10 @@
                     slide.innerHTML = `
                         <div class="reel-video-wrap">
                             <iframe src="${embedUrl}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+                            <!-- Tutup header YouTube (atas) -->
+                            <div style="position:absolute;top:0;left:0;right:0;height:52px;background:#000;z-index:2;pointer-events:none"></div>
+                            <!-- Tutup UI bawah YouTube (share, thumbnail, logo) -->
+                            <div style="position:absolute;bottom:0;left:0;right:0;height:50px;background:#000;z-index:2;pointer-events:none"></div>
                         </div>
                         <div class="reel-heart-pop" id="heart-${reel.movieId}"><i class="fa-solid fa-heart"></i></div>
                         <div class="reel-gradient"></div>
@@ -3835,14 +3872,17 @@
                             <div class="reel-translate-btn" id="${synTransId}"
                                  onclick="toggleReelSynTranslate(${reel.movieId}, '${reel.type}', this)"
                                  data-translated="0" data-orig="${encodeURIComponent(reel.synopsis)}" data-trans="">
-                                Lihat terjemahan
+                                See translation
                             </div>` : ''}
                             <div class="reel-action-buttons">
                             <button class="reel-btn-watch" onclick="openReelStream(null, ${reel.movieId}, '${reel.type}')">
-                                <i class="fa-solid fa-play" style="font-size:11px"></i> Tonton
+                                <i class="fa-solid fa-play" style="font-size:9px"></i> Watch
+                            </button>
+                            <button class="reel-btn-detail" onclick="openReelDetailDownload(${reel.movieId}, '${reel.type}')">
+                                <i class="fa-solid fa-download" style="font-size:9px"></i> Download
                             </button>
                             <button class="reel-btn-detail" onclick="openReelDetail(${reel.movieId}, '${reel.type}')">
-                                <i class="fa-solid fa-circle-info" style="font-size:12px"></i> Detail
+                                <i class="fa-solid fa-circle-info" style="font-size:9px"></i> Detail
                             </button>
                         </div>
                         </div>
@@ -4047,7 +4087,7 @@
             _rdsCurrentType = type;
 
             // Reset — show skeletons
-            document.getElementById('rdsTitle').innerText = 'Memuat...';
+            document.getElementById('rdsTitle').innerText = 'Loading...';
             document.getElementById('rdsMeta').innerHTML = '';
             document.getElementById('rdsRatings').innerHTML = '';
             document.getElementById('rdsSynopsis').style.display = 'none';
@@ -4143,7 +4183,7 @@
 
                 document.getElementById('rdsTitle').innerText = title;
                 document.getElementById('rdsMeta').innerHTML = `
-                    <span class="rds-badge type">${type === 'movie' ? 'Film' : 'Serial'}</span>
+                    <span class="rds-badge type">${type === 'movie' ? 'Movie' : 'Series'}</span>
                     ${year ? `<span class="rds-badge">${year}</span>` : ''}
                 `;
 
@@ -4173,20 +4213,20 @@
                 document.getElementById('rdsSynopsis').dataset.lang = synopsisLang;
                 // Tampilkan tombol terjemahan jika sinopsis bukan bahasa Indonesia
                 document.getElementById('rdsTranslateBtn').style.display = (synopsisLang === 'en' || !/[A-Z]/.test(synopsis.slice(0,3))) ? 'inline-block' : 'inline-block';
-                document.getElementById('rdsTranslateBtn').innerText = 'Lihat terjemahan';
+                document.getElementById('rdsTranslateBtn').innerText = 'See translation';
 
                 // Info grid
                 document.getElementById('rdsInfoGrid').innerHTML = `
-                    <div class="rds-info-cell"><div class="rds-info-key">Rilis</div><div class="rds-info-val">${releaseStr}</div></div>
-                    <div class="rds-info-cell"><div class="rds-info-key">Sutradara</div><div class="rds-info-val">${dirName}</div></div>
-                    <div class="rds-info-cell"><div class="rds-info-key">Negara</div><div class="rds-info-val">${countries}</div></div>
+                    <div class="rds-info-cell"><div class="rds-info-key">Release</div><div class="rds-info-val">${releaseStr}</div></div>
+                    <div class="rds-info-cell"><div class="rds-info-key">Director</div><div class="rds-info-val">${dirName}</div></div>
+                    <div class="rds-info-cell"><div class="rds-info-key">Country</div><div class="rds-info-val">${countries}</div></div>
                     <div class="rds-info-cell"><div class="rds-info-key">Studio</div><div class="rds-info-val">${studios}</div></div>
                     <div class="rds-info-cell" style="grid-column:1/-1;border-right:none"><div class="rds-info-key">Genre</div><div class="rds-info-val">${genres}</div></div>
                 `;
             } catch(e) {
                 document.getElementById('rdsSynopsisSkeleton').style.display = 'none';
                 document.getElementById('rdsSynopsis').style.display = 'block';
-                document.getElementById('rdsSynopsis').innerText = 'Gagal memuat data.';
+                document.getElementById('rdsSynopsis').innerText = 'Failed to load data.';
             }
         }
 
@@ -4276,25 +4316,25 @@
             if (el.dataset.translated === '1') {
                 el.innerText = el.dataset.orig;
                 el.dataset.translated = '0';
-                btn.innerText = 'Lihat terjemahan';
+                btn.innerText = 'See translation';
                 return;
             }
             if (el.dataset.trans) {
                 el.innerText = el.dataset.trans;
                 el.dataset.translated = '1';
-                btn.innerText = 'Lihat versi asli';
+                btn.innerText = 'View original';
                 return;
             }
 
-            btn.innerText = 'Menerjemahkan...';
+            btn.innerText = 'Translating...';
             try {
                 const translated = await translateTextChunked(el.dataset.orig, 'en', 'id');
                 el.dataset.trans = translated;
                 el.innerText = translated;
                 el.dataset.translated = '1';
-                btn.innerText = 'Lihat versi asli';
+                btn.innerText = 'View original';
             } catch {
-                btn.innerText = 'Gagal menerjemahkan';
+                btn.innerText = 'Translation failed';
             }
         }
 
@@ -4306,26 +4346,37 @@
             if (btn.dataset.translated === '1') {
                 synEl.innerText = decodeURIComponent(btn.dataset.orig);
                 btn.dataset.translated = '0';
-                btn.innerText = 'Lihat terjemahan';
+                btn.innerText = 'See translation';
                 return;
             }
             if (btn.dataset.trans) {
                 synEl.innerText = btn.dataset.trans;
                 btn.dataset.translated = '1';
-                btn.innerText = 'Lihat versi asli';
+                btn.innerText = 'View original';
                 return;
             }
-            btn.innerText = 'Menerjemahkan...';
+            btn.innerText = 'Translating...';
             try {
                 const orig = decodeURIComponent(btn.dataset.orig);
                 const translated = await translateTextChunked(orig, 'en', 'id');
                 btn.dataset.trans = translated;
                 synEl.innerText = translated;
                 btn.dataset.translated = '1';
-                btn.innerText = 'Lihat versi asli';
+                btn.innerText = 'View original';
             } catch {
-                btn.innerText = 'Gagal menerjemahkan';
+                btn.innerText = 'Translation failed';
             }
+        }
+
+        function openReelDetailDownload(directId, directType) {
+            const id = directId || _rdsCurrentId;
+            const type = directType || _rdsCurrentType;
+            if (!id || !type) return;
+            const isTV = type === 'tv';
+            const url = isTV
+                ? `https://vidvault.ru/tv/${id}/1/1`
+                : `https://vidvault.ru/movie/${id}`;
+            window.open(url, '_blank');
         }
 
         function openReelStream(btn, directId, directType) {
@@ -4464,7 +4515,7 @@
                                 const mId = m.id;
                                 const isPerson = mType === 'person';
                                 const clickAction = isPerson ? `openActorProfile(${mId})` : `openModal(${mId}, '${mType}')`;
-                                const meta = isPerson ? 'Pemeran / Aktor' : (mType === 'tv' ? 'tv' : 'movie');
+                                const meta = isPerson ? 'Actor / Cast' : (mType === 'tv' ? 'tv' : 'movie');
                                 const imgPath = m.poster_path || m.profile_path || '';
                                 return `<div class="smart-item" onclick="${clickAction}; document.getElementById('smartSearchDropdown').style.display='none';">
                                     <img src="https://image.tmdb.org/t/p/w92${imgPath}" onerror="this.src='https://placehold.co/35x50/111/555?text=?'">
@@ -4503,8 +4554,8 @@
             const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
             let headerHTML = `
                 <div style="display:flex;border-bottom:1px solid #1c1c1c;background:#000">
-                    <div class="search-tab active" id="calTabMovie" onclick="switchCalTab('movie',this)" style="flex:1">Film</div>
-                    <div class="search-tab" id="calTabTv" onclick="switchCalTab('tv',this)" style="flex:1">Serial</div>
+                    <div class="search-tab active" id="calTabMovie" onclick="switchCalTab('movie',this)" style="flex:1">Movie</div>
+                    <div class="search-tab" id="calTabTv" onclick="switchCalTab('tv',this)" style="flex:1">Series</div>
                 </div>
                 <div class="date-strip no-scrollbar" id="calDateStrip">`;
             for(let i = 0; i < 30; i++) {
@@ -4530,7 +4581,7 @@
         async function filterByDate(dateStr, el) {
             if(el) { document.querySelectorAll('.date-chip').forEach(c => c.classList.remove('active-date')); el.classList.add('active-date'); }
             const list = document.getElementById('calendarList');
-            list.innerHTML = '<div class="text-center py-10 text-zinc-500 text-xs animate-pulse">Mencari tayangan...</div>';
+            list.innerHTML = '<div class="text-center py-10 text-zinc-500 text-xs animate-pulse">Loading...</div>';
             try {
                 const mediaType = calendarMediaType || 'movie';
                 let apiUrl;
@@ -4546,8 +4597,8 @@
                     const typeLabel = mediaType === 'tv' ? 'serial' : 'film';
                     list.innerHTML = `<div style="text-align:center;padding:60px 20px">
                         <i class="fa-regular fa-calendar-xmark" style="font-size:36px;color:#222;margin-bottom:14px;display:block"></i>
-                        <div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:6px">Tidak ada jadwal</div>
-                        <div style="font-size:12px;color:#555">Belum ada ${typeLabel} yang rilis<br>pada tanggal ini.</div>
+                        <div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:6px">No schedule</div>
+                        <div style="font-size:12px;color:#555">Belum ada ${typeLabel} yang rilis<br>on this date.</div>
                     </div>`;
                     return;
                 }
@@ -4584,7 +4635,7 @@
                                 <span class="text-zinc-600">·</span>
                                 <span style="font-size:11px;color:#8e8e8e">${year}</span>
                                 <span class="text-zinc-600">·</span>
-                                <span style="font-size:10px;color:#555;text-transform:uppercase;font-weight:700">${mediaType === 'tv' ? 'Serial' : 'Film'}</span>
+                                <span style="font-size:10px;color:#555;text-transform:uppercase;font-weight:700">${mediaType === 'tv' ? 'Series' : 'Movie'}</span>
                             </div>
                             <div class="flex gap-1 mt-1 flex-wrap">${genres}</div>
                         </div>
@@ -4592,7 +4643,7 @@
                     list.appendChild(item);
                 });
                 await Promise.allSettled(renderItems);
-            } catch (e) { list.innerHTML = '<div class="text-center py-10 text-zinc-600 text-xs">Gagal memuat data.</div>'; }
+            } catch (e) { list.innerHTML = '<div class="text-center py-10 text-zinc-600 text-xs">Failed to load data.</div>'; }
         }
 
         function searchByCast(castId) { 
@@ -4633,7 +4684,7 @@
 
         function initFilters() { 
             const yD = document.getElementById('yearDropdown'); 
-            let yearHTML = '<div class="filter-item sticky-reset" onclick="setYear(\'\')">Semua Tahun</div>'; 
+            let yearHTML = '<div class="filter-item sticky-reset" onclick="setYear(\'\')">All Tahun</div>'; 
             for(let y=2026; y>=1930; y--) yearHTML += `<div class="filter-item" onclick="setYear(${y})">${y}</div>`; 
             yD.innerHTML = yearHTML; 
 
@@ -4725,14 +4776,14 @@
             countries.slice(1).forEach(c => { if (!countrySeen.has(c[0])) { countrySeen.add(c[0]); countriesUniq.push(c); }});
             const countriesFinal = [countriesUniq[0], ...countriesUniq.slice(1).sort((a,b) => a[1].localeCompare(b[1], 'id'))];
             const cD = document.getElementById('countryDropdown'); 
-            let countryHTML = '<div class="filter-item sticky-reset" onclick="setCountry(\'\',\'Negara\')">Semua Negara</div>'; 
+            let countryHTML = '<div class="filter-item sticky-reset" onclick="setCountry(\'\',\'Negara\')">All Negara</div>'; 
             countriesFinal.forEach(c => countryHTML += `<div class="filter-item" onclick="setCountry('${c[0]}','${c[1]}')">${c[1]}</div>`); 
             cD.innerHTML = countryHTML; 
 
             // Rating dropdown - per angka eksak
             const rD = document.getElementById('ratingDropdown');
             if (rD) {
-                let ratingHTML = '<div class="filter-item sticky-reset" onclick="setRating(\'\',\'Rating\')">Semua Rating</div>';
+                let ratingHTML = '<div class="filter-item sticky-reset" onclick="setRating(\'\',\'Rating\')">All Rating</div>';
                 [['9','★ 9'],['8','★ 8'],['7','★ 7'],['6','★ 6'],['5','★ 5'],['4','★ 4']].forEach(r =>
                     ratingHTML += `<div class="filter-item" onclick="setRating('${r[0]}','${r[1]}')">${r[1]}</div>`
                 );
@@ -4750,7 +4801,7 @@
                 [10752,'War'],[37,'Western']
             ].sort((a,b) => a[1].localeCompare(b[1]));
             const gD = document.getElementById('genreDropdown'); 
-            let genreHTML = '<div class="filter-item sticky-reset" onclick="setGenre(\'\',\'Genre\')">Semua Genre</div>'; 
+            let genreHTML = '<div class="filter-item sticky-reset" onclick="setGenre(\'\',\'Genre\')">All Genre</div>'; 
             genres.forEach(g => genreHTML += `<div class="filter-item" onclick="setGenre('${g[0]}','${g[1]}')">${g[1]}</div>`); 
             gD.innerHTML = genreHTML; 
         }
@@ -4801,7 +4852,7 @@
                 const data = await fetchWithCache(url); 
                 let items = data.results || data.cast || []; 
                 if(currentCastId) items.sort((a,b) => b.popularity - a.popularity);
-                if(items.length === 0 && isNew) { grid.innerHTML = `<div class="col-span-3 text-center py-20 text-zinc-600 text-xs">Konten tidak ditemukan.</div>`; } 
+                if(items.length === 0 && isNew) { grid.innerHTML = `<div class="col-span-3 text-center py-20 text-zinc-600 text-xs">Content not found.</div>`; } 
                 else { renderGrid(items, grid); }
             } catch(e) { if(e.name !== 'AbortError') console.error(e); }
             loading = false;
@@ -4818,7 +4869,7 @@
                 card.onclick = function() { openModal(m.id, mType); }; 
                 const _rd = m.release_date || m.first_air_date || '';
                 const _nb = isNewRelease(_rd) ? '<div class="badge-new">NEW</div>' : '';
-                card.innerHTML = `<div class="badge-rating">${(m.vote_average||0).toFixed(1)}</div><div class="badge-type">${currentType==='short'?'SHORT':(mType==='tv'?'tv':'movie')}</div>${_nb}<img src="https://image.tmdb.org/t/p/w342${m.poster_path}" loading="lazy" onload="this.style.opacity=1" style="opacity:0">`;
+                card.innerHTML = `<div class="badge-rating">${(m.vote_average||0).toFixed(1)}</div><div class="badge-type">${currentType==='short'?'SHORT':(mType==='tv'?'tv':'movie')}</div>${_nb}<img src="https://image.tmdb.org/t/p/w185${m.poster_path}" loading="lazy" onload="this.style.opacity=1" style="opacity:0">`;
                 fragment.appendChild(card); 
             });
             grid.appendChild(fragment);
@@ -5112,7 +5163,7 @@
             activeEpisode = 1;
             activeSeason = 1;
             
-            document.getElementById('mTitle').innerText = "Memuat...";
+            document.getElementById('mTitle').innerText = "Loading...";
             document.getElementById('mDesc').innerText = "";
             document.getElementById('mLikeDisplay').innerText = "";
             document.getElementById('mDateDisplay').innerText = "";
@@ -5148,7 +5199,7 @@
             originalIndoDesc = dId.overview || "";
             globalEnDesc = dEn.overview || "";
             const translateBtn = document.getElementById('mTranslateBtn');
-            if (originalIndoDesc.trim() !== "") { globalFullDesc = originalIndoDesc; translateBtn.innerText = "Lihat versi asli"; translateBtn.classList.remove('hidden'); } else { globalFullDesc = globalEnDesc || "Sinopsis belum tersedia."; translateBtn.innerText = "Lihat terjemahan"; if(globalEnDesc) translateBtn.classList.remove('hidden'); }
+            if (originalIndoDesc.trim() !== "") { globalFullDesc = originalIndoDesc; translateBtn.innerText = "View original"; translateBtn.classList.remove('hidden'); } else { globalFullDesc = globalEnDesc || "Synopsis belum tersedia."; translateBtn.innerText = "See translation"; if(globalEnDesc) translateBtn.classList.remove('hidden'); }
             
             const dots = document.getElementById('carouselDots');
             track.innerHTML = ''; dots.innerHTML = ''; track.style.transform = 'translateX(0)';
@@ -5309,7 +5360,7 @@
             const genresArr = (dId.genres || []).map(g => `#${g.name.replace(/[^a-zA-Z0-9]/g, '')}`).slice(0, 3).join(' ');
             // Info grid
             const rel2 = dId.release_date || dId.first_air_date || "";
-            const runTime = dId.runtime ? `${dId.runtime} menit` : (dId.episode_run_time && dId.episode_run_time[0] ? `${dId.episode_run_time[0]} menit/ep` : '—');
+            const runTime = dId.runtime ? `${dId.runtime} min` : (dId.episode_run_time && dId.episode_run_time[0] ? `${dId.episode_run_time[0]} min/ep` : '—');
             const miCountries = (dId.production_countries || []).map(c => c.name).join(', ') || '—';
             const miStudios = (dId.production_companies || []).slice(0, 3).map(c => c.name).join(', ') || '—';
             const miGenres = (dId.genres || []).map(g => g.name).join(', ') || '—';
@@ -5324,11 +5375,11 @@
                 const miDir = miCrew.find(c => c.job === 'Director');
                 const miDirName = miDir ? miDir.name : (type === 'tv' ? ((dId.created_by && dId.created_by[0]) ? dId.created_by[0].name : '—') : '—');
                 infoGridEl.innerHTML = `
-                <div class="minfo-cell full-width"><span class="minfo-key">Sutradara</span><span class="minfo-val">${miDirName}</span></div>
-                <div class="minfo-cell"><span class="minfo-key">Rilis</span><span class="minfo-val">${miReleaseStr}</span></div>
-                <div class="minfo-cell"><span class="minfo-key">Durasi</span><span class="minfo-val">${runTime}</span></div>
-                <div class="minfo-cell"><span class="minfo-key">Negara</span><span class="minfo-val">${miCountries}</span></div>
-                <div class="minfo-cell"><span class="minfo-key">Bahasa</span><span class="minfo-val">${miLanguage}</span></div>
+                <div class="minfo-cell full-width"><span class="minfo-key">Director</span><span class="minfo-val">${miDirName}</span></div>
+                <div class="minfo-cell"><span class="minfo-key">Release</span><span class="minfo-val">${miReleaseStr}</span></div>
+                <div class="minfo-cell"><span class="minfo-key">Runtime</span><span class="minfo-val">${runTime}</span></div>
+                <div class="minfo-cell"><span class="minfo-key">Country</span><span class="minfo-val">${miCountries}</span></div>
+                <div class="minfo-cell"><span class="minfo-key">Language</span><span class="minfo-val">${miLanguage}</span></div>
                 <div class="minfo-cell full-width"><span class="minfo-key">Studio</span><span class="minfo-val">${miStudios}</span></div>
                 <div class="minfo-cell full-width"><span class="minfo-key">Genre</span><span class="minfo-val">${miGenres}</span></div>`;
                 infoGridEl.style.display = 'grid';
@@ -5353,7 +5404,7 @@
 
             // Similar films (non-blocking, genre-based)
             const _genreIds = (dId.genres || []).map(g => g.id);
-            loadSimilarFilms(id, type, _genreIds);
+            loadSimilarMovies(id, type, _genreIds);
 
             // Poster gallery (non-blocking)
             loadPosterGallery(id, type);
@@ -5361,13 +5412,13 @@
 
         async function handleTranslate() {
             const btn = document.getElementById('mTranslateBtn');
-            if (originalIndoDesc && globalEnDesc) { if (globalFullDesc === originalIndoDesc) { globalFullDesc = globalEnDesc; btn.innerText = "Lihat versi asli"; } else { globalFullDesc = originalIndoDesc; btn.innerText = "Lihat versi asli"; } } 
+            if (originalIndoDesc && globalEnDesc) { if (globalFullDesc === originalIndoDesc) { globalFullDesc = globalEnDesc; btn.innerText = "View original"; } else { globalFullDesc = originalIndoDesc; btn.innerText = "View original"; } } 
             else if (!originalIndoDesc && globalEnDesc) {
                 if(!isTranslated) {
-                    const oldText = btn.innerText; btn.innerText = "Menerjemahkan...";
-                    try { const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=id&dt=t&q=${encodeURIComponent(globalEnDesc)}`); const data = await res.json(); globalFullDesc = data[0].map(x => x[0]).join(''); isTranslated = true; btn.innerText = "Lihat versi asli"; } 
-                    catch(e) { btn.innerText = "Gagal menerjemahkan"; setTimeout(()=>btn.innerText=oldText, 2000); }
-                } else { globalFullDesc = globalEnDesc; isTranslated = false; btn.innerText = "Lihat terjemahan"; }
+                    const oldText = btn.innerText; btn.innerText = "Translating...";
+                    try { const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=id&dt=t&q=${encodeURIComponent(globalEnDesc)}`); const data = await res.json(); globalFullDesc = data[0].map(x => x[0]).join(''); isTranslated = true; btn.innerText = "View original"; } 
+                    catch(e) { btn.innerText = "Translation failed"; setTimeout(()=>btn.innerText=oldText, 2000); }
+                } else { globalFullDesc = globalEnDesc; isTranslated = false; btn.innerText = "See translation"; }
             }
             renderSynopsis();
         }
@@ -5408,29 +5459,29 @@
                 <div class="mb-1">
                     <span class="ig-username" id="mModalTitle"></span>
                     <span id="mDesc" class="ig-caption"></span>
-                    <div class="mt-1"><span id="mToggleBtn" class="toggle-btn hidden" onclick="handleToggleDesc()">selengkapnya</span><p id="mTranslateBtn" class="hidden" onclick="handleTranslate()" style="margin-top:2px;font-size:11px;color:#fff;font-weight:700;cursor:pointer;display:inline-block"></p></div>
+                    <div class="mt-1"><span id="mToggleBtn" class="toggle-btn hidden" onclick="handleToggleDesc()">more</span><p id="mTranslateBtn" class="hidden" onclick="handleTranslate()" style="margin-top:2px;font-size:11px;color:#fff;font-weight:700;cursor:pointer;display:inline-block"></p></div>
                 </div>
                 <div id="mInfoGrid" class="minfo-grid" style="display:none"></div>
                 <div id="mPosterGallery" class="poster-gallery-section" style="display:none">
-                    <span class="poster-gallery-label">Poster & Gambar</span>
+                    <span class="poster-gallery-label">Poster & Images</span>
                     <div class="poster-gallery-scroll" id="mPosterScroll"></div>
                 </div>
 <div id="mHashtags" style="display:none"></div>
                 <div id="mDateDisplay" style="display:none"></div>
                 <div id="seriesControl" class="hidden mt-4 p-4 bg-zinc-950 rounded-2xl border border-zinc-900">
                     <div class="flex justify-between items-center mb-4">
-                        <h4 class="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Daftar Episode</h4>
+                        <h4 class="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Episodes</h4>
                         <select id="seasonSel" class="bg-zinc-900 text-white text-[10px] px-2 py-1 rounded border border-zinc-700 appearance-none" onchange="loadEpisodes()"></select>
                     </div>
                     <div id="episodeGrid" class="flex gap-3 overflow-x-auto pb-2" style="scrollbar-width:none;-webkit-overflow-scrolling:touch;"></div>
                 </div>
                 <div id="serverList" class="server-scroll-wrapper mt-4 px-4"></div>
                 <div class="dl-grid">
-                    <button id="btnDownload1" class="dl-link-btn" onclick="handleDownload()">Unduh</button>
+                    <button id="btnDownload1" class="dl-link-btn" onclick="handleDownload()">Download</button>
                     <button id="btnTrailerDailymotion" class="dl-link-btn btn-trailer-special" onclick="changeServer(99, this)">Trailer</button>
                 </div>
                 <div id="mSimilarSection" class="similar-section" style="display:none">
-                    <span class="similar-label">Film Serupa</span>
+                    <span class="similar-label">Movie Serupa</span>
                     <div class="similar-scroll" id="mSimilarScroll"></div>
                 </div>`;
             }
@@ -5440,7 +5491,7 @@
             history.replaceState({view: 'home'}, '');
         }
 
-        function renderSynopsis() { const descEl = document.getElementById('mDesc'), toggleBtn = document.getElementById('mToggleBtn'); if (globalFullDesc.length > 90) { toggleBtn.classList.remove('hidden'); descEl.innerText = isExpanded ? globalFullDesc : globalFullDesc.substring(0, 90) + "..."; toggleBtn.innerText = isExpanded ? "ringkas" : "selengkapnya"; } else { descEl.innerText = globalFullDesc; toggleBtn.classList.add('hidden'); } }
+        function renderSynopsis() { const descEl = document.getElementById('mDesc'), toggleBtn = document.getElementById('mToggleBtn'); if (globalFullDesc.length > 90) { toggleBtn.classList.remove('hidden'); descEl.innerText = isExpanded ? globalFullDesc : globalFullDesc.substring(0, 90) + "..."; toggleBtn.innerText = isExpanded ? "less" : "more"; } else { descEl.innerText = globalFullDesc; toggleBtn.classList.add('hidden'); } }
         function handleToggleDesc() { isExpanded = !isExpanded; renderSynopsis(); }
         
         let _loaderTimer = null;
@@ -5709,6 +5760,12 @@
             });
         }
         let _scrollTicking = false;
+        // Modal film scroll listener untuk back-to-top
+        document.getElementById('movieModal').addEventListener('scroll', () => {
+            const btn = document.getElementById('modalBackToTop');
+            if (btn) btn.style.display = document.getElementById('movieModal').scrollTop > 400 ? 'flex' : 'none';
+        }, { passive: true });
+
         window.onscroll = () => {
             if (_scrollTicking) return;
             _scrollTicking = true;
@@ -5913,7 +5970,7 @@
             const todayLabel = today.toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'});
             document.getElementById('notifDateBadge').innerText = todayLabel;
 
-            content.innerHTML = '<div class="notif-empty"><i class="fa-solid fa-spinner fa-spin"></i>Memuat film baru...</div>';
+            content.innerHTML = '<div class="notif-empty"><i class="fa-solid fa-spinner fa-spin"></i>Loading new releases...</div>';
 
             try {
                 // Fetch film rilis hari ini (movie + tv)
@@ -5942,7 +5999,7 @@
                 allItems = allItems.filter(m=>m.poster_path).sort((a,b)=>b.popularity-a.popularity);
 
                 if (allItems.length === 0) {
-                    content.innerHTML = '<div class="notif-empty"><i class="fa-regular fa-bell-slash"></i>Tidak ada film baru hari ini</div>';
+                    content.innerHTML = '<div class="notif-empty"><i class="fa-regular fa-bell-slash"></i>No new releases today</div>';
                     return;
                 }
 
@@ -5951,11 +6008,11 @@
 
                 let html2 = '';
                 if (movieItems.length) {
-                    html2 += `<div class="notif-section-label">🎬 Film (${movieItems.length})</div>`;
+                    html2 += `<div class="notif-section-label">🎬 Movie (${movieItems.length})</div>`;
                     html2 += movieItems.map(m => {
                         const title = m.title || m.name || '';
                         const rating = (m.vote_average||0).toFixed(1);
-                        const genre = m._mtype === 'tv' ? 'Serial' : 'Film';
+                        const genre = m._mtype === 'tv' ? 'Series' : 'Movie';
                         return `<div class="notif-item" onclick="closeNotif(); openModal(${m.id},'${m._mtype}')">
                             <img class="notif-poster" src="https://image.tmdb.org/t/p/w185${m.poster_path}" loading="lazy" onload="this.style.opacity=1">
                             <div class="notif-info">
@@ -5967,7 +6024,7 @@
                     }).join('');
                 }
                 if (tvItems.length) {
-                    html2 += `<div class="notif-section-label">📺 Serial (${tvItems.length})</div>`;
+                    html2 += `<div class="notif-section-label">📺 Series (${tvItems.length})</div>`;
                     html2 += tvItems.map(m => {
                         const title = m.title || m.name || '';
                         const rating = (m.vote_average||0).toFixed(1);
@@ -5975,7 +6032,7 @@
                             <img class="notif-poster" src="https://image.tmdb.org/t/p/w185${m.poster_path}" loading="lazy" onload="this.style.opacity=1">
                             <div class="notif-info">
                                 <div class="notif-title">${title}</div>
-                                <div class="notif-meta">Serial · Tayang hari ini</div>
+                                <div class="notif-meta">Series · Tayang hari ini</div>
                             </div>
                             <span class="notif-rating">${rating}</span>
                         </div>`;
@@ -5983,7 +6040,7 @@
                 }
                 content.innerHTML = html2;
             } catch(e) {
-                content.innerHTML = '<div class="notif-empty"><i class="fa-regular fa-circle-xmark"></i>Gagal memuat data</div>';
+                content.innerHTML = '<div class="notif-empty"><i class="fa-regular fa-circle-xmark"></i>Failed to load data</div>';
             }
         }
 
@@ -6011,7 +6068,7 @@
                 const data = await fetchWithCache(`https://api.themoviedb.org/3/person/${actorId}/images?api_key=${API_KEY}`);
                 const profiles = (data.profiles || []).slice(0, 30);
                 if (!profiles.length) {
-                    grid.innerHTML = '<div class="actor-photos-loading" style="color:#555">Foto tidak tersedia</div>';
+                    grid.innerHTML = '<div class="actor-photos-loading" style="color:#555">No photos available</div>';
                     return;
                 }
                 // Simpan ke _actorGallery untuk lightbox khusus aktor
@@ -6024,7 +6081,7 @@
                         <img src="https://image.tmdb.org/t/p/w342${p.file_path}" loading="lazy" onload="this.style.opacity=1">
                     </div>`).join('');
             } catch(e) {
-                grid.innerHTML = '<div class="actor-photos-loading" style="color:#555">Gagal memuat foto</div>';
+                grid.innerHTML = '<div class="actor-photos-loading" style="color:#555">Failed to load photos</div>';
             }
         }
 
@@ -6154,7 +6211,7 @@
         }
 
         // ===== SIMILAR FILMS =====
-        async function loadSimilarFilms(id, type, genreIds) {
+        async function loadSimilarMovies(id, type, genreIds) {
             const section = document.getElementById('mSimilarSection');
             const scroll = document.getElementById('mSimilarScroll');
             if (!section || !scroll) return;
@@ -6298,7 +6355,7 @@
                 const ready = diff * 0.45 >= THRESHOLD;
                 arrow.className = 'pull-arrow fa-solid fa-arrow-down' + (ready ? ' ready' : '');
                 pullInner.className = 'pull-inner' + (ready ? ' ready' : '');
-                pullText.innerText = ready ? 'Lepas untuk muat ulang' : 'Tarik untuk muat ulang';
+                pullText.innerText = ready ? 'Release to refresh' : 'Pull to refresh';
             }, { passive: true });
 
             document.addEventListener('touchend', async () => {
@@ -6309,7 +6366,7 @@
                     refreshing = true;
                     arrow.style.display = 'none';
                     spinner.style.display = 'block';
-                    pullText.innerText = 'Memperbarui...';
+                    pullText.innerText = 'Refreshing...';
                     pullInner.className = 'pull-inner ready';
                     indicator.style.height = '48px';
                     try { sessionStorage.clear(); } catch(e) {}
@@ -6319,7 +6376,7 @@
                         indicator.style.height = '0px';
                         arrow.style.display = 'block';
                         spinner.style.display = 'none';
-                        pullText.innerText = 'Tarik untuk muat ulang';
+                        pullText.innerText = 'Pull to refresh';
                         arrow.className = 'pull-arrow fa-solid fa-arrow-down';
                         pullInner.className = 'pull-inner';
                         refreshing = false;
@@ -6328,7 +6385,7 @@
                     indicator.style.height = '0px';
                     arrow.className = 'pull-arrow fa-solid fa-arrow-down';
                     pullInner.className = 'pull-inner';
-                    pullText.innerText = 'Tarik untuk muat ulang';
+                    pullText.innerText = 'Pull to refresh';
                 }
                 curY = 0; startY = 0;
             }, { passive: true });
