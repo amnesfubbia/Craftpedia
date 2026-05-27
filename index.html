@@ -2043,6 +2043,14 @@
     </div>
 
     <div id="actorModal" class="actor-modal">
+        <!-- Back to top button inside actor modal -->
+        <div id="actorBackToTop" onclick="document.getElementById('actorModal').scrollTo({top:0,behavior:'smooth'})"
+             style="display:none;position:fixed;bottom:90px;right:20px;z-index:8600;
+                    background:rgba(255,255,255,0.2);width:38px;height:38px;border-radius:50%;
+                    align-items:center;justify-content:center;backdrop-filter:blur(10px);
+                    border:1px solid rgba(255,255,255,0.2);cursor:pointer;">
+            <i class="fa-solid fa-arrow-up" style="color:#fff;font-size:14px"></i>
+        </div>
 
         <!-- Sticky top bar -->
         <div class="actor-topbar">
@@ -2161,10 +2169,12 @@
 
     <!-- ===== REELS MODAL ===== -->
     <div id="reelsModal">
-        <!-- Topbar — hanya tombol back, tanpa judul -->
+        <!-- Topbar — tombol back + judul Reels -->
         <div class="reels-topbar">
-            <i class="fa-solid fa-chevron-left reels-back-btn" onclick="closeReels()"></i>
-            <div style="width:32px"></div>
+            <div style="display:flex;align-items:center;gap:8px;pointer-events:auto">
+                <i class="fa-solid fa-chevron-left reels-back-btn" onclick="closeReels()" style="pointer-events:auto"></i>
+                <span style="font-size:16px;font-weight:800;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,0.5);letter-spacing:-0.3px">Reels</span>
+            </div>
             <div style="width:32px"></div>
         </div>
 
@@ -2235,11 +2245,14 @@
             <div class="rds-info-grid" id="rdsInfoGrid"></div>
         </div>
         <div class="rds-btn-row">
-            <button class="rds-btn-watch" id="rdsBtnStream" onclick="openReelStream(this)">
-                <i class="fa-solid fa-play" style="font-size:12px"></i> Tonton
+            <button class="reel-btn-watch" id="rdsBtnStream" onclick="openReelStream(this)">
+                <i class="fa-solid fa-play" style="font-size:9px"></i> Watch
             </button>
-            <button class="rds-btn-info" id="rdsBtnDownload" onclick="openReelDownload(this)">
-                <i class="fa-solid fa-download" style="font-size:13px"></i> Download
+            <button class="reel-btn-detail" id="rdsBtnDownload" onclick="openReelDownload(this)">
+                <i class="fa-solid fa-download" style="font-size:9px"></i> Download 1
+            </button>
+            <button class="reel-btn-detail" onclick="openReelDownload2(this)">
+                <i class="fa-solid fa-download" style="font-size:9px"></i> Download 2
             </button>
         </div>
     </div>
@@ -4391,8 +4404,21 @@
 
         function openReelDownload(btn) {
             if (!_rdsCurrentId || !_rdsCurrentType) return;
-            if (btn) { btn.classList.add('pressed'); setTimeout(() => btn.classList.remove('pressed'), 300); }
-            const url = `https://vidvault.ru/${_rdsCurrentType}/${_rdsCurrentId}`;
+            if (btn && btn.classList) { btn.classList.add('pressed'); setTimeout(() => btn && btn.classList.remove('pressed'), 300); }
+            const isTV = _rdsCurrentType === 'tv';
+            const url = isTV
+                ? `https://vidvault.ru/tv/${_rdsCurrentId}/1/1`
+                : `https://vidvault.ru/movie/${_rdsCurrentId}`;
+            window.open(url, '_blank');
+        }
+
+        function openReelDownload2(btn) {
+            if (!_rdsCurrentId || !_rdsCurrentType) return;
+            if (btn && btn.classList) { btn.classList.add('pressed'); setTimeout(() => btn && btn.classList.remove('pressed'), 300); }
+            const isTV = _rdsCurrentType === 'tv';
+            const url = isTV
+                ? `https://02moviedownloader.site/api/download/tv/${_rdsCurrentId}/1/1`
+                : `https://02moviedownloader.site/api/download/movie/${_rdsCurrentId}`;
             window.open(url, '_blank');
         }
 
@@ -5764,6 +5790,12 @@
         document.getElementById('movieModal').addEventListener('scroll', () => {
             const btn = document.getElementById('modalBackToTop');
             if (btn) btn.style.display = document.getElementById('movieModal').scrollTop > 400 ? 'flex' : 'none';
+        }, { passive: true });
+
+        // Actor modal scroll listener untuk back-to-top
+        document.getElementById('actorModal').addEventListener('scroll', () => {
+            const btn = document.getElementById('actorBackToTop');
+            if (btn) btn.style.display = document.getElementById('actorModal').scrollTop > 400 ? 'flex' : 'none';
         }, { passive: true });
 
         window.onscroll = () => {
