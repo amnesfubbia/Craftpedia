@@ -8,6 +8,12 @@
     <meta name="theme-color" content="#000000">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="amnesfubbia.png">
+    <link rel="preconnect" href="https://api.themoviedb.org">
+    <link rel="preconnect" href="https://image.tmdb.org">
+    <link rel="preconnect" href="https://www.youtube.com">
+    <link rel="dns-prefetch" href="https://www.youtube.com">
+    <link rel="dns-prefetch" href="https://vidrock.net">
+    <link rel="dns-prefetch" href="https://vidlink.pro">
     <meta property="og:title" content="amnesfubbia">
     <meta property="og:description" content="Discover, watch & archive film dan serial favoritmu.">
     <meta property="og:image" content="amnesfubbia.png">
@@ -27,8 +33,9 @@
             --text: #fff; --text2: #efefef; --text3: #8e8e8e; --text4: #555;
             --card: #111; --card2: #1a1a1a;
         }
-        body { background-color: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; overflow-x: hidden; transition: background-color 0.3s, color 0.3s; -webkit-tap-highlight-color: transparent; padding-top: env(safe-area-inset-top, 0px); }
+        body { background-color: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; overflow-x: hidden; transition: background-color 0.3s, color 0.3s; -webkit-tap-highlight-color: transparent; }
 
+        :root { --status-bar-height: 28px; }
         /* Fix Horizontal Scroll & Safari Smoothness */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -webkit-overflow-scrolling: touch; }
@@ -46,15 +53,8 @@
         @keyframes fadeIn { to { opacity: 1; } }
 
         .profile-header { padding: 15px 15px 0 15px; background: #000; }
-        @media all and (display-mode: standalone) {
-            .profile-header { padding-top: max(44px, calc(env(safe-area-inset-top, 0px) + 15px)); }
-            .modal-player .sticky, #actorModal .actor-topbar,
-            #tvModal .tv-topbar, #notifModal .notif-topbar,
-            #sideMenu .about-topbar, #searchOverlay .search-header {
-                padding-top: max(44px, calc(env(safe-area-inset-top, 0px) + 10px)) !important;
-                height: auto !important;
-            }
-        }
+        /* PWA Status Bar Fix */
+        body.pwa-mode { padding-top: var(--status-bar-height); }
         .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .ig-logo-wrapper { display: flex; align-items: center; gap: 4px; position: relative; cursor: pointer; }
         .ig-logo { font-family: 'Inter', sans-serif; font-weight: 700; font-size: 19px; letter-spacing: -1px; }
@@ -160,6 +160,7 @@
         .carousel-track { display: flex; transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1); width: 100%; }
         .carousel-slide { min-width: 100%; aspect-ratio: 16/9; position: relative; background: #000; overflow: hidden; }
         .carousel-slide iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+        .carousel-slide::after { content:''; position:absolute; inset:44px 0 44px 0; z-index:6; background:transparent; pointer-events:none; }
         .swipe-overlay { position: absolute; inset: 0; z-index: 10; background: transparent; }
         .interaction-icon { font-size: 24px; cursor: pointer; color: #fff; transition: transform 0.1s; }
         .interaction-icon:active { transform: scale(1.2); }
@@ -983,15 +984,35 @@
         }
 
         /* Video wrapper 4:5 — posisi agak ke atas agar beri ruang sinopsis */
+        /* Blur background seperti Instagram Reels */
+        .reel-blur-bg {
+            position: absolute; inset: 0; z-index: 0;
+            overflow: hidden; background: #000;
+        }
+        .reel-blur-bg img {
+            position: absolute; top: -10%; left: -10%;
+            width: 120%; height: 120%;
+            object-fit: cover; pointer-events: none;
+            filter: blur(24px) brightness(0.35) saturate(1.8);
+            transform: scale(1.1);
+        }
         .reel-video-wrap {
             position: absolute;
-            top: 0; left: 50%;
-            transform: translateX(-50%);
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
             width: 100%;
             aspect-ratio: 9/16;
             max-height: 100svh;
-            background: #000;
+            background: transparent;
             overflow: hidden;
+            z-index: 1;
+        }
+        /* Overlay transparan di atas video reel - blokir tap ke kontrol YT */
+        .reel-video-wrap::after {
+            content: '';
+            position: absolute; inset: 0;
+            z-index: 3; background: transparent;
+            pointer-events: auto;
         }
         .reel-video-wrap iframe {
             width: 100%; height: 100%;
@@ -1056,17 +1077,18 @@
         }
         .reel-translate-btn:active { color: rgba(255,255,255,0.9); }
         .reel-action-buttons {
-            display: flex; gap: 8px; margin-top: 10px;
-            pointer-events: auto; flex-wrap: wrap;
+            display: grid; grid-template-columns: 1fr 1fr 1fr;
+            gap: 6px; margin-top: 10px; pointer-events: auto;
         }
         .reel-btn-watch, .reel-btn-detail {
-            flex: 0 0 auto; padding: 7px 14px;
-            border-radius: 10px; background: rgba(255,255,255,0.08);
+            padding: 7px 4px; border-radius: 10px;
+            background: rgba(255,255,255,0.08);
             border: 1px solid rgba(255,255,255,0.25); color: #fff;
-            font-size: 10px; font-weight: 800; text-transform: uppercase;
-            letter-spacing: 0.5px; cursor: pointer;
+            font-size: 9px; font-weight: 800; text-transform: uppercase;
+            letter-spacing: 0.3px; cursor: pointer; text-align: center;
             -webkit-tap-highlight-color: transparent;
             transition: all 0.2s; backdrop-filter: blur(4px);
+            display: flex; align-items: center; justify-content: center; gap: 5px;
         }
         .reel-btn-watch:active, .reel-btn-detail:active {
             background: rgba(255,255,255,0.2); transform: scale(0.95);
@@ -1074,7 +1096,7 @@
 
         /* Tombol aksi kanan bawah (like, bookmark) */
         .reel-actions {
-            position: absolute; top: 35%; right: 12px;
+            position: absolute; top: 42%; right: 12px;
             transform: translateY(-50%);
             display: flex; flex-direction: column; align-items: center; gap: 18px;
             z-index: 10;
@@ -1251,7 +1273,8 @@
             font-size: 11px; font-weight: 600; color: #e0e0e0; line-height: 1.3;
         }
         .rds-btn-row {
-            display: flex; gap: 8px; padding: 14px 16px 80px; flex-wrap: wrap;
+            display: grid; grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px; padding: 14px 16px 80px;
         }
         .rds-btn-watch, .rds-btn-info {
             flex: 0 0 auto; padding: 8px 16px;
@@ -1335,7 +1358,7 @@
             padding: 10px 10px 10px;
         }
         .similar-card-title {
-            font-size: 13px; font-weight: 800; color: #fff;
+            font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.75);
             line-height: 1.3; margin-bottom: 6px;
             display: -webkit-box; -webkit-line-clamp: 2;
             -webkit-box-orient: vertical; overflow: hidden;
@@ -1845,7 +1868,7 @@
             <div class="top-bar">
                 <div class="ig-logo-wrapper" onclick="backToHome()">
                     <h1 class="ig-logo">amnesfubbia</h1>
-                    <i class="fa-solid fa-chevron-down text-[10px] ml-0.5" onclick="event.stopPropagation(); openNotif()" style="cursor:pointer" title="Movie Baru Hari Ini"></i>
+                    <i class="fa-solid fa-chevron-down text-[10px] ml-0.5" onclick="event.stopPropagation(); openNotif()" style="cursor:pointer" title="New Movies Today"></i>
                     <span class="dot-notify"></span>
                 </div>
                 <div class="flex gap-5">
@@ -2030,12 +2053,15 @@
 
                 <div id="serverList" class="server-scroll-wrapper mt-4 px-4"></div>
                 
-                <div class="dl-grid">
+                <div class="dl-grid" style="grid-template-columns:1fr 1fr;">
                     <button class="dl-link-btn" onclick="handleDownload()"><i class="fa-solid fa-download" style="margin-right:6px;font-size:10px"></i>Download 1</button>
                     <button class="dl-link-btn" onclick="handleDownload2()"><i class="fa-solid fa-download" style="margin-right:6px;font-size:10px"></i>Download 2</button>
+                    <button class="dl-link-btn" onclick="handleDownload3()"><i class="fa-solid fa-download" style="margin-right:6px;font-size:10px"></i>Download 3</button>
+                    <button class="dl-link-btn" onclick="handleDownload4()"><i class="fa-solid fa-download" style="margin-right:6px;font-size:10px"></i>Download 4</button>
+                    <button class="dl-link-btn" onclick="handleDownload5()"><i class="fa-solid fa-download" style="margin-right:6px;font-size:10px"></i>Download 5</button>
                 </div>
                 <div id="mSimilarSection" class="similar-section" style="display:none">
-                    <span class="similar-label">Movie Serupa</span>
+                    <span class="similar-label">Similar Movies</span>
                     <div class="similar-scroll" id="mSimilarScroll"></div>
                 </div>
             </div>
@@ -2172,8 +2198,8 @@
         <!-- Topbar — tombol back + judul Reels -->
         <div class="reels-topbar">
             <div style="display:flex;align-items:center;gap:8px;pointer-events:auto">
-                <i class="fa-solid fa-chevron-left reels-back-btn" onclick="closeReels()" style="pointer-events:auto"></i>
-                <span style="font-size:16px;font-weight:800;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,0.5);letter-spacing:-0.3px">Reels</span>
+                <i class="fa-solid fa-chevron-left reels-back-btn" onclick="closeReels()" style="pointer-events:auto;font-size:20px"></i>
+                <span style="font-size:22px;font-weight:800;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,0.5);letter-spacing:-0.5px">Reels</span>
             </div>
             <div style="width:32px"></div>
         </div>
@@ -2275,7 +2301,7 @@
     <div id="notifModal">
         <div class="notif-topbar">
             <i class="fa-solid fa-chevron-left" style="font-size:20px;color:#fff;cursor:pointer;padding:6px;margin-right:4px" onclick="closeNotif()"></i>
-            <div class="notif-topbar-title">Movie Baru Hari Ini</div>
+            <div class="notif-topbar-title">New Movies Today</div>
             <span class="notif-date-badge" id="notifDateBadge"></span>
         </div>
         <div id="notifContent">
@@ -2321,6 +2347,19 @@
                 document.getElementById('splashScreen').style.display = 'none';
                 document.getElementById('mainProfile').style.display = 'block';
             }, 1200);
+
+            // PWA Status Bar Fix
+            (function() {
+                const isPWA = window.matchMedia('(display-mode: standalone)').matches
+                    || window.navigator.standalone === true
+                    || document.referrer.includes('android-app://');
+                if (isPWA) {
+                    document.body.classList.add('pwa-mode');
+                    // Pakai screenY sebagai tinggi status bar di Android
+                    const h = window.screenY > 0 ? window.screenY : 28;
+                    document.documentElement.style.setProperty('--status-bar-height', h + 'px');
+                }
+            })();
         });
 
         window.onload = () => {
@@ -3008,9 +3047,37 @@
                     ? `https://02moviedownloader.site/api/download/tv/${window.currentMediaId}/${activeSeason || 1}/${activeEpisode || 1}`
                     : `https://02moviedownloader.site/api/download/movie/${window.currentMediaId}`;
                 window.open(downloadUrl, '_blank');
-            } else {
-                alert("Media ID not found.");
-            }
+            } else { alert("Media ID not found."); }
+        }
+
+        function handleDownload3() {
+            if(window.currentMediaId && window.currentMediaType) {
+                const isTV = window.currentMediaType === 'tv';
+                const url = isTV
+                    ? `https://rivestream.ru/download?type=tv&id=${window.currentMediaId}`
+                    : `https://dl.peachify.top/movie/${window.currentMediaId}`;
+                window.open(url, '_blank');
+            } else { alert("Media ID not found."); }
+        }
+
+        function handleDownload4() {
+            if(window.currentMediaId && window.currentMediaType) {
+                const isTV = window.currentMediaType === 'tv';
+                const url = isTV
+                    ? `https://rivestream.ru/download?type=tv&id=${window.currentMediaId}`
+                    : `https://rivestream.ru/download?type=movie&id=${window.currentMediaId}`;
+                window.open(url, '_blank');
+            } else { alert("Media ID not found."); }
+        }
+
+        function handleDownload5() {
+            if(window.currentMediaId && window.currentMediaType) {
+                const isTV = window.currentMediaType === 'tv';
+                const url = isTV
+                    ? `https://cinesrc.st/download/tv/${window.currentMediaId}`
+                    : `https://cinesrc.st/download/movie/${window.currentMediaId}`;
+                window.open(url, '_blank');
+            } else { alert("Media ID not found."); }
         }
 
         // ===== BACK BUTTON LOGIC (diperbaiki) =====
@@ -3046,7 +3113,7 @@
                     <button id="btnTrailerDailymotion" class="dl-link-btn btn-trailer-special" onclick="changeServer(99, this)">Trailer</button>
                 </div>
                 <div id="mSimilarSection" class="similar-section" style="display:none">
-                    <span class="similar-label">Movie Serupa</span>
+                    <span class="similar-label">Similar Movies</span>
                     <div class="similar-scroll" id="mSimilarScroll"></div>
                 </div>`;
             }
@@ -3260,7 +3327,7 @@
         function buildLsServerList() {
             const scroll = document.getElementById('lsServerScroll');
             let html = '';
-            for (let i = 1; i <= 23; i++) {
+            for (let i = 1; i <= 31; i++) {
                 const active = (i === activeServerIdx) ? 'active-link' : '';
                 html += `<div class="ls-srv-btn ${active}" onclick="event.stopPropagation(); lsChangeServer(${i}, this)">Server ${i}</div>`;
             }
@@ -3527,11 +3594,11 @@
                 if (topWorks.length > 0) {
                     document.getElementById('actorKnownForWrapper').style.display = 'block';
                     document.getElementById('actorKnownFor').innerHTML = topWorks.map(w => `
-                        <div class="actor-hl-item" onclick="openModalFromActor(${w.id}, '${w.media_type}')">
-                            <div class="actor-hl-circle">
-                                <img src="https://image.tmdb.org/t/p/w185${w.poster_path}" loading="lazy">
+                        <div class="actor-hl-item" onclick="openModalFromActor(${w.id}, '${w.media_type}')" style="position:relative;flex:0 0 75px;border-radius:8px;overflow:hidden;background:#111;cursor:pointer">
+                            <img src="https://image.tmdb.org/t/p/w185${w.poster_path}" loading="lazy" style="width:75px;height:110px;object-fit:cover;display:block">
+                            <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(to top,rgba(0,0,0,0.9) 0%,transparent 100%);padding:18px 4px 4px">
+                                <div style="font-size:9px;font-weight:500;color:rgba(255,255,255,0.75);line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${w.title || w.name || ''}</div>
                             </div>
-                            <div class="actor-hl-label">${w.title || w.name || ''}</div>
                         </div>
                     `).join('');
                 }
@@ -3868,12 +3935,18 @@
                     const synTransId = `reel-trans-${reel.movieId}`;
 
                     slide.innerHTML = `
+                        <!-- Blurred background - pakai thumbnail YouTube -->
+                        <div class="reel-blur-bg">
+                            <img src="https://img.youtube.com/vi/${reel.videoKey}/maxresdefault.jpg"
+                                 onerror="this.src='https://img.youtube.com/vi/${reel.videoKey}/hqdefault.jpg'"
+                                 alt="" loading="lazy">
+                        </div>
                         <div class="reel-video-wrap">
                             <iframe src="${embedUrl}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen loading="lazy"></iframe>
                             <!-- Tutup header YouTube (atas) -->
-                            <div style="position:absolute;top:0;left:0;right:0;height:52px;background:#000;z-index:2;pointer-events:none"></div>
+                            <div style="position:absolute;top:0;left:0;right:0;height:52px;background:transparent;z-index:2;pointer-events:none"></div>
                             <!-- Tutup UI bawah YouTube (share, thumbnail, logo) -->
-                            <div style="position:absolute;bottom:0;left:0;right:0;height:50px;background:#000;z-index:2;pointer-events:none"></div>
+                            <div style="position:absolute;bottom:0;left:0;right:0;height:50px;background:transparent;z-index:2;pointer-events:none"></div>
                         </div>
                         <div class="reel-heart-pop" id="heart-${reel.movieId}"><i class="fa-solid fa-heart"></i></div>
                         <div class="reel-gradient"></div>
@@ -4630,7 +4703,7 @@
                 }
 
                 const gEndpoint = mediaType === 'tv' ? 'tv' : 'movie';
-                const gRes = await fetch(`https://api.themoviedb.org/3/genre/${gEndpoint}/list?api_key=${API_KEY}&language=id-ID`);
+                const gRes = await fetch(`https://api.themoviedb.org/3/genre/${gEndpoint}/list?api_key=${API_KEY}&language=en-US`);
                 const gData = await gRes.json();
                 const genreMap = {}; gData.genres.forEach(g => genreMap[g.id] = g.name);
 
@@ -5389,7 +5462,7 @@
             const runTime = dId.runtime ? `${dId.runtime} min` : (dId.episode_run_time && dId.episode_run_time[0] ? `${dId.episode_run_time[0]} min/ep` : '—');
             const miCountries = (dId.production_countries || []).map(c => c.name).join(', ') || '—';
             const miStudios = (dId.production_companies || []).slice(0, 3).map(c => c.name).join(', ') || '—';
-            const miGenres = (dId.genres || []).map(g => g.name).join(', ') || '—';
+            const miGenres = (dEn.genres && dEn.genres.length ? dEn.genres : dId.genres || []).map(g => g.name).join(', ') || '—';
             const langMap2 = {'en':'English','id':'Indonesia','ko':'Korean','ja':'Japanese','zh':'Mandarin','hi':'Hindi','fr':'French','de':'German','es':'Spanish','it':'Italian','pt':'Portuguese','ru':'Russian','ar':'Arabic','th':'Thai','nl':'Dutch','tr':'Turkish','pl':'Polish','sv':'Swedish','da':'Danish','fi':'Finnish','no':'Norwegian','vi':'Vietnamese','ms':'Malay','tl':'Filipino'};
             const langCode2 = dId.original_language || '';
             const miLanguage = langMap2[langCode2] || (langCode2 ? langCode2.toUpperCase() : '—');
@@ -5414,7 +5487,7 @@
             // tanggal dihapus dari modal (sudah ada di info grid)
             
             let serverButtonsHTML = '';
-            for(let i=1; i<=23; i++) {
+            for(let i=1; i<=31; i++) {
                 serverButtonsHTML += `<button class="server-btn" onclick="changeServer(${i}, this)">Server ${i}</button>`;
             }
             document.getElementById('serverList').innerHTML = serverButtonsHTML;
@@ -5507,7 +5580,7 @@
                     <button id="btnTrailerDailymotion" class="dl-link-btn btn-trailer-special" onclick="changeServer(99, this)">Trailer</button>
                 </div>
                 <div id="mSimilarSection" class="similar-section" style="display:none">
-                    <span class="similar-label">Movie Serupa</span>
+                    <span class="similar-label">Similar Movies</span>
                     <div class="similar-scroll" id="mSimilarScroll"></div>
                 </div>`;
             }
@@ -5655,6 +5728,14 @@
                 case 21: url = `https://player.vidplus.to/embed/${type}/${id}${seriesSuffix}`; break;
                 case 22: url = `https://vidsrc.ru/${type}/${currentImdbId || id}${type==='tv'?`?s=${s}&e=${e}`:''}`; break;
                 case 23: url = `https://moviesmod.club/embed/${type}/${id}${seriesSuffix}`; break;
+                case 24: url = `https://vidcore.net/${type}/${id}${type==='tv'?`/${s}/${e}`:''}?autoPlay=true`; break;
+                case 25: url = `https://vidup.to/${type}/${id}${type==='tv'?`/${s}/${e}`:''}?autoPlay=true`; break;
+                case 26: url = `https://vidlux.xyz/embed/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`; break;
+                case 27: url = `https://cinesrc.st/embed/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`; break;
+                case 28: url = `https://player.cinezo.live/embed/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`; break;
+                case 29: url = `https://vixsrc.to/${type}/${id}${type==='tv'?`/${s}/${e}`:''}/`; break;
+                case 30: url = `https://vidsync.xyz/embed/${type}/${id}${type==='tv'?`/${s}/${e}`:''}?autoPlay=true${type==='tv'?'&autoNext=true':''}`; break;
+                case 31: url = `https://mgeb.top/embed/${id}${type==='tv'?`/${s}/${e}`:''}`; break;
                 case 99: url = `https://www.dailymotion.com/embed/video/${currentDailymotionId}`; break;
                 default: url = `https://vidrock.net/embed/${type}/${id}${seriesSuffix}`;
             }
@@ -5999,7 +6080,7 @@
             // Set tanggal hari ini
             const today = new Date();
             const todayStr = today.toISOString().split('T')[0];
-            const todayLabel = today.toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'});
+            const todayLabel = today.toLocaleDateString('en-US', {day:'numeric', month:'long', year:'numeric'});
             document.getElementById('notifDateBadge').innerText = todayLabel;
 
             content.innerHTML = '<div class="notif-empty"><i class="fa-solid fa-spinner fa-spin"></i>Loading new releases...</div>';
@@ -6039,32 +6120,47 @@
                 const tvItems = allItems.filter(m=>m._mtype==='tv');
 
                 let html2 = '';
-                if (movieItems.length) {
-                    html2 += `<div class="notif-section-label">🎬 Movie (${movieItems.length})</div>`;
-                    html2 += movieItems.map(m => {
-                        const title = m.title || m.name || '';
+                // Resolve latin titles async
+                const resolveTitle = async (m) => {
+                    let title = m.title || m.name || '';
+                    if (isNonLatin(title)) {
+                        try {
+                            const en = await fetchWithCache(`https://api.themoviedb.org/3/${m._mtype}/${m.id}?api_key=${API_KEY}&language=en-US`);
+                            const enT = en.title || en.name || '';
+                            const origT = en.original_title || en.original_name || '';
+                            if (enT && !isNonLatin(enT)) title = enT;
+                            else if (origT && !isNonLatin(origT)) title = origT;
+                        } catch {}
+                    }
+                    return { ...m, _resolvedTitle: title };
+                };
+                const allResolved = await Promise.all(allItems.map(resolveTitle));
+                const movieResolved = allResolved.filter(m => m._mtype === 'movie');
+                const tvResolved = allResolved.filter(m => m._mtype === 'tv');
+
+                if (movieResolved.length) {
+                    html2 += `<div class="notif-section-label">🎬 Movies (${movieResolved.length})</div>`;
+                    html2 += movieResolved.map(m => {
                         const rating = (m.vote_average||0).toFixed(1);
-                        const genre = m._mtype === 'tv' ? 'Series' : 'Movie';
                         return `<div class="notif-item" onclick="closeNotif(); openModal(${m.id},'${m._mtype}')">
                             <img class="notif-poster" src="https://image.tmdb.org/t/p/w185${m.poster_path}" loading="lazy" onload="this.style.opacity=1">
                             <div class="notif-info">
-                                <div class="notif-title">${title}</div>
-                                <div class="notif-meta">${genre} · Rilis hari ini</div>
+                                <div class="notif-title">${m._resolvedTitle}</div>
+                                <div class="notif-meta">Movie · Released today</div>
                             </div>
                             <span class="notif-rating">${rating}</span>
                         </div>`;
                     }).join('');
                 }
-                if (tvItems.length) {
-                    html2 += `<div class="notif-section-label">📺 Series (${tvItems.length})</div>`;
-                    html2 += tvItems.map(m => {
-                        const title = m.title || m.name || '';
+                if (tvResolved.length) {
+                    html2 += `<div class="notif-section-label">📺 Series (${tvResolved.length})</div>`;
+                    html2 += tvResolved.map(m => {
                         const rating = (m.vote_average||0).toFixed(1);
                         return `<div class="notif-item" onclick="closeNotif(); openModal(${m.id},'tv')">
                             <img class="notif-poster" src="https://image.tmdb.org/t/p/w185${m.poster_path}" loading="lazy" onload="this.style.opacity=1">
                             <div class="notif-info">
-                                <div class="notif-title">${title}</div>
-                                <div class="notif-meta">Series · Tayang hari ini</div>
+                                <div class="notif-title">${m._resolvedTitle}</div>
+                                <div class="notif-meta">Series · Airing today</div>
                             </div>
                             <span class="notif-rating">${rating}</span>
                         </div>`;
