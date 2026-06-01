@@ -978,7 +978,7 @@
         .reel-slide {
             width: 100%; height: 100svh;
             scroll-snap-align: start; scroll-snap-stop: always;
-            position: relative; background: #000;
+            position: relative; background: transparent;
             display: flex; align-items: center; justify-content: center;
             overflow: hidden;
         }
@@ -987,14 +987,14 @@
         /* Blur background seperti Instagram Reels */
         .reel-blur-bg {
             position: absolute; inset: 0; z-index: 0;
-            overflow: hidden; background: #000;
+            overflow: hidden; background: #111;
         }
         .reel-blur-bg img {
             position: absolute; top: -10%; left: -10%;
             width: 120%; height: 120%;
             object-fit: cover; pointer-events: none;
-            filter: blur(24px) brightness(0.35) saturate(1.8);
-            transform: scale(1.1);
+            filter: blur(30px) brightness(0.5) saturate(2);
+            transform: scale(1.15);
         }
         .reel-video-wrap {
             position: absolute;
@@ -2053,12 +2053,12 @@
 
                 <div id="serverList" class="server-scroll-wrapper mt-4 px-4"></div>
                 
-                <div class="dl-grid" style="grid-template-columns:1fr 1fr;">
-                    <button class="dl-link-btn" onclick="handleDownload()"><i class="fa-solid fa-download" style="margin-right:6px;font-size:10px"></i>Download 1</button>
-                    <button class="dl-link-btn" onclick="handleDownload2()"><i class="fa-solid fa-download" style="margin-right:6px;font-size:10px"></i>Download 2</button>
-                    <button class="dl-link-btn" onclick="handleDownload3()"><i class="fa-solid fa-download" style="margin-right:6px;font-size:10px"></i>Download 3</button>
-                    <button class="dl-link-btn" onclick="handleDownload4()"><i class="fa-solid fa-download" style="margin-right:6px;font-size:10px"></i>Download 4</button>
-                    <button class="dl-link-btn" onclick="handleDownload5()"><i class="fa-solid fa-download" style="margin-right:6px;font-size:10px"></i>Download 5</button>
+                <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-top:8px;margin-bottom:2px;">
+                    <button class="dl-link-btn" onclick="handleDownload()" style="padding:10px 4px;font-size:10px">Down1</button>
+                    <button class="dl-link-btn" onclick="handleDownload2()" style="padding:10px 4px;font-size:10px">Down2</button>
+                    <button class="dl-link-btn" onclick="handleDownload3()" style="padding:10px 4px;font-size:10px">Down3</button>
+                    <button class="dl-link-btn" onclick="handleDownload4()" style="padding:10px 4px;font-size:10px">Down4</button>
+                    <button class="dl-link-btn" onclick="handleDownload5()" style="padding:10px 4px;font-size:10px">Down5</button>
                 </div>
                 <div id="mSimilarSection" class="similar-section" style="display:none">
                     <span class="similar-label">Similar Movies</span>
@@ -3935,18 +3935,16 @@
                     const synTransId = `reel-trans-${reel.movieId}`;
 
                     slide.innerHTML = `
-                        <!-- Blurred background - pakai thumbnail YouTube -->
+                        <!-- Blurred background - pakai poster TMDb -->
                         <div class="reel-blur-bg">
-                            <img src="https://img.youtube.com/vi/${reel.videoKey}/maxresdefault.jpg"
-                                 onerror="this.src='https://img.youtube.com/vi/${reel.videoKey}/hqdefault.jpg'"
-                                 alt="" loading="lazy">
+                            ${reel.poster ? `<img src="https://image.tmdb.org/t/p/w500${reel.poster}" alt="" loading="lazy">` : ''}
                         </div>
                         <div class="reel-video-wrap">
                             <iframe src="${embedUrl}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen loading="lazy"></iframe>
-                            <!-- Tutup header YouTube (atas) -->
-                            <div style="position:absolute;top:0;left:0;right:0;height:52px;background:transparent;z-index:2;pointer-events:none"></div>
+                            <!-- Tutup header YouTube (atas) - pakai warna blur bg agar seamless -->
+                            <div style="position:absolute;top:0;left:0;right:0;height:52px;z-index:2;pointer-events:none;background:linear-gradient(to bottom,rgba(0,0,0,0.85) 0%,transparent 100%)"></div>
                             <!-- Tutup UI bawah YouTube (share, thumbnail, logo) -->
-                            <div style="position:absolute;bottom:0;left:0;right:0;height:50px;background:transparent;z-index:2;pointer-events:none"></div>
+                            <div style="position:absolute;bottom:0;left:0;right:0;height:52px;z-index:2;pointer-events:none;background:linear-gradient(to top,rgba(0,0,0,0.85) 0%,transparent 100%)"></div>
                         </div>
                         <div class="reel-heart-pop" id="heart-${reel.movieId}"><i class="fa-solid fa-heart"></i></div>
                         <div class="reel-gradient"></div>
@@ -3977,13 +3975,13 @@
                                  id="reel-like-${reel.movieId}"
                                  onclick="toggleReelLib('likes', ${reel.movieId}, '${reel.type}', this)">
                                 <i class="fa-${lib.liked ? 'solid' : 'regular'} fa-heart"></i>
-                                <span class="reel-action-label">Suka</span>
+                                <span class="reel-action-label">Like</span>
                             </div>
                             <div class="reel-action-btn ${lib.bookmarked ? 'bookmarked' : ''}"
                                  id="reel-bm-${reel.movieId}"
                                  onclick="toggleReelLib('bookmarks', ${reel.movieId}, '${reel.type}', this)">
                                 <i class="fa-${lib.bookmarked ? 'solid' : 'regular'} fa-bookmark"></i>
-                                <span class="reel-action-label">Simpan</span>
+                                <span class="reel-action-label">Save</span>
                             </div>
                         </div>`;
                     container.appendChild(slide);
@@ -5433,7 +5431,8 @@
 
             document.getElementById('castContainer').innerHTML = (dCast.cast || []).slice(0, 10).map(c => {
                 const profileImg = c.profile_path ? `<img src="https://image.tmdb.org/t/p/w185${c.profile_path}" loading="lazy" class="rounded-full">` : `<div style="width:100%; height:100%; background:#222; display:flex; align-items:center; justify-content:center; color:#555;"><i class="fa-solid fa-user"></i></div>`;
-                return `<div class="cast-item" onclick="openActorProfile(${c.id})"><div class="cast-img-border"><div class="inner-border">${profileImg}</div></div><span class="cast-name">${c.name}</span></div>`;
+                const charName = c.character ? c.character.replace(/\s*\(.*?\)/g,'').trim() : '';
+                return `<div class="cast-item" onclick="openActorProfile(${c.id})"><div class="cast-img-border"><div class="inner-border">${profileImg}</div></div><span class="cast-name">${c.name}</span>${charName ? `<span style="font-size:8px;color:#555;display:block;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:65px">${charName}</span>` : ''}</div>`;
             }).join('');
             document.getElementById('mLikeDisplay').innerText = `${Math.floor((dId.vote_average || 0) * 1234).toLocaleString('id-ID')} suka`;
             // Prioritaskan judul en-US agar selalu Latin
@@ -5714,30 +5713,29 @@
                 case 7:  url = `https://player.vidzee.wtf/embed/${type}/${id}${seriesSuffix}`; break;
                 case 8:  url = `https://vidstorm.ru/embed/${type}/${id}${seriesSuffix}`; break;
                 case 9:  url = `https://vidsrc.wtf/1/${type}/${id}${seriesSuffix}`; break;
-                case 10: url = `https://nontongo.win/embed/${type}/${id}${seriesSuffix}`; break;
-                case 11: url = `https://111movies.net/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`; break;
-                case 12: url = `https://vidfast.net/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`; break;
-                case 13: url = `https://vidsrcme.ru/embed/${type}/${id}${seriesSuffix}`; break;
-                case 14: url = `https://multiembed.mov/?video_id=${id}&tmdb=1${type==='tv'?`&s=${s}&e=${e}`:''}`; break;
-                case 15: url = `https://vidsrc.cc/v2/embed/${type}/${id}${type==='tv'?`?s=${s}&e=${e}`:''}`; break;
-                case 16: url = `https://vidsrc.me/embed/${type}?tmdb=${id}${type==='tv'?`&s=${s}&e=${e}`:''}`; break;
-                case 17: url = `https://2embed.cc/embed/${type}/${id}${seriesSuffix}`; break;
-                case 18: url = `https://warezcdn.site/${type==='tv'?'serie':'filme'}/${id}${type==='tv'?`/${s}/${e}`:''}`; break;
-                case 19: url = `https://vidking.net/embed/${type}/${id}${seriesSuffix}`; break;
-                case 20: url = `https://player.vidify.top/embed/${type}/${id}${type==='tv'?`?s=${s}&e=${e}`:''}`; break;
-                case 21: url = `https://player.vidplus.to/embed/${type}/${id}${seriesSuffix}`; break;
-                case 22: url = `https://vidsrc.ru/${type}/${currentImdbId || id}${type==='tv'?`?s=${s}&e=${e}`:''}`; break;
-                case 23: url = `https://moviesmod.club/embed/${type}/${id}${seriesSuffix}`; break;
-                case 24: url = `https://vidcore.net/${type}/${id}${type==='tv'?`/${s}/${e}`:''}?autoPlay=true`; break;
-                case 25: url = `https://vidup.to/${type}/${id}${type==='tv'?`/${s}/${e}`:''}?autoPlay=true`; break;
-                case 26: url = `https://vidlux.xyz/embed/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`; break;
-                case 27: url = `https://cinesrc.st/embed/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`; break;
-                case 28: url = `https://player.cinezo.live/embed/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`; break;
-                case 29: url = `https://vixsrc.to/${type}/${id}${type==='tv'?`/${s}/${e}`:''}/`; break;
-                case 30: url = `https://vidsync.xyz/embed/${type}/${id}${type==='tv'?`/${s}/${e}`:''}?autoPlay=true${type==='tv'?'&autoNext=true':''}`; break;
-                case 31: url = `https://mgeb.top/embed/${id}${type==='tv'?`/${s}/${e}`:''}`; break;
-                case 99: url = `https://www.dailymotion.com/embed/video/${currentDailymotionId}`; break;
-                default: url = `https://vidrock.net/embed/${type}/${id}${seriesSuffix}`;
+                case 10: url = `https://vidsync.xyz/embed/${type}/${id}${type==='tv'?`/${s}/${e}`:''}?autoPlay=true${type==='tv'?'&autoNext=true':''}`; break;
+                case 11: url = `https://vidup.to/${type}/${id}${type==='tv'?`/${s}/${e}`:''}?autoPlay=true`; break;
+                case 12: url = `https://vidcore.net/${type}/${id}${type==='tv'?`/${s}/${e}`:''}?autoPlay=true`; break;
+                case 13: url = `https://vixsrc.to/${type}/${id}${type==='tv'?`/${s}/${e}`:''}/`; break;
+                case 14: url = `https://cinesrc.st/embed/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`; break;
+                case 15: url = `https://vidlux.xyz/embed/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`; break;
+                case 16: url = `https://nontongo.win/embed/${type}/${id}${seriesSuffix}`; break;
+                case 17: url = `https://111movies.net/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`; break;
+                case 18: url = `https://vidfast.net/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`; break;
+                case 19: url = `https://vidsrcme.ru/embed/${type}/${id}${seriesSuffix}`; break;
+                case 20: url = `https://vidking.net/embed/${type}/${id}${seriesSuffix}`; break;
+                case 21: url = `https://multiembed.mov/?video_id=${id}&tmdb=1${type==='tv'?`&s=${s}&e=${e}`:''}`; break;
+                case 22: url = `https://2embed.cc/embed/${type}/${id}${seriesSuffix}`; break;
+                case 23: url = `https://vidsrc.ru/${type}/${currentImdbId || id}${type==='tv'?`?s=${s}&e=${e}`:''}`; break;
+                case 24: url = `https://player.vidify.top/embed/${type}/${id}${type==='tv'?`?s=${s}&e=${e}`:''}`; break;
+                case 25: url = `https://player.vidplus.to/embed/${type}/${id}${seriesSuffix}`; break;
+                case 26: url = `https://warezcdn.site/${type==='tv'?'serie':'filme'}/${id}${type==='tv'?`/${s}/${e}`:''}`; break;
+                case 27: url = `https://player.cinezo.live/embed/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`; break;
+                case 28: url = `https://mgeb.top/embed/${id}${type==='tv'?`/${s}/${e}`:''}`; break;
+                case 29: url = `https://vidsrc.cc/v2/embed/${type}/${id}${type==='tv'?`?s=${s}&e=${e}`:''}`; break;
+                case 30: url = `https://vidsrc.me/embed/${type}?tmdb=${id}${type==='tv'?`&s=${s}&e=${e}`:''}`; break;
+                case 31: url = `https://moviesmod.club/embed/${type}/${id}${seriesSuffix}`; break;
+                case 99: url = `https://www.dailymotion.com/embed/video/${currentDailymotionId}`; break;     default: url = `https://vidrock.net/embed/${type}/${id}${seriesSuffix}`;
             }
             return url.replace("http://", "https://");
         }
