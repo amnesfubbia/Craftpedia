@@ -1051,17 +1051,37 @@
             position: absolute; bottom: 62px; left: 0; right: 0;
             padding: 0 16px; z-index: 10; pointer-events: none;
         }
+        /* Meta pills row */
+        .reel-meta-pills {
+            display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;
+        }
+        .reel-pill {
+            padding: 5px 14px; border-radius: 20px;
+            font-size: 13px; font-weight: 700;
+            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+        }
+        .reel-pill-type { background: rgba(20,30,60,0.85); color: #fff; }
+        .reel-pill-year { background: rgba(60,50,10,0.85); color: #e8c84a; border: 1px solid rgba(232,200,74,0.3); }
+        .reel-pill-rating { background: rgba(60,50,10,0.85); color: #f5c518; border: 1px solid rgba(245,197,24,0.3); }
+        .reel-pill-runtime { background: rgba(40,40,40,0.85); color: #ccc; }
         .reel-title {
-            font-size: 22px; font-weight: 900; color: #fff;
-            text-shadow: 0 1px 4px rgba(0,0,0,0.6);
-            margin-bottom: 4px; line-height: 1.2; letter-spacing: -0.5px;
+            font-size: 38px; font-weight: 900; color: #fff;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+            margin-bottom: 12px; line-height: 1.05; letter-spacing: -1.5px;
             display: -webkit-box; -webkit-line-clamp: 2;
             -webkit-box-orient: vertical; overflow: hidden;
         }
-        .reel-year {
-            font-size: 11px; color: rgba(255,255,255,0.5);
-            font-weight: 600; margin-bottom: 6px;
+        .reel-genre-pills {
+            display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px;
         }
+        .reel-genre-pill {
+            padding: 6px 16px; border-radius: 20px;
+            background: rgba(40,40,40,0.75); color: #fff;
+            font-size: 13px; font-weight: 600;
+            border: 1px solid rgba(255,255,255,0.15);
+            backdrop-filter: blur(6px);
+        }
+        .reel-year { display: none; }
         .reel-synopsis-overlay {
             font-size: 11px; color: rgba(255,255,255,0.75);
             line-height: 1.5; margin-bottom: 6px;
@@ -1417,17 +1437,72 @@
 
 
         /* ===== EPISODE CARD (horizontal scroll) ===== */
-        .ep-card { flex: 0 0 140px; cursor: pointer; border-radius: 10px; overflow: hidden; background: #111; border: 1.5px solid #1c1c1c; transition: border-color 0.2s, transform 0.15s; -webkit-tap-highlight-color: transparent; }
-        .ep-card:active { transform: scale(0.96); }
-        .ep-card.active-ep { border-color: #fff; background: #1a1a1a; }
-        .ep-thumb { width: 100%; aspect-ratio: 16/9; object-fit: cover; background: #111; display: block; min-height: 78px; }
-        .ep-thumb-placeholder { width: 100%; aspect-ratio: 16/9; background: #0a0a0a; display: flex; align-items: center; justify-content: center; color: #333; font-size: 20px; }
-        .ep-info { padding: 6px 8px 8px; }
-        .ep-num { font-size: 9px; font-weight: 800; color: #555; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 2px; }
-        .ep-title { font-size: 10px; font-weight: 700; color: #ddd; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 2px; }
-        .ep-date { font-size: 9px; color: #555; font-weight: 500; }
-        .ep-card.active-ep .ep-num { color: #fff; }
+        .ep-card {
+            display: flex; align-items: flex-start; gap: 12px;
+            cursor: pointer; padding: 10px 0;
+            border-bottom: 1px solid #1a1a1a;
+            background: transparent;
+            transition: opacity 0.15s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .ep-card:active { opacity: 0.7; }
+        .ep-card.active-ep { background: transparent; }
+        .ep-thumb-wrap {
+            position: relative; flex: 0 0 130px;
+            border-radius: 8px; overflow: hidden; background: #111;
+        }
+        .ep-thumb {
+            width: 130px; aspect-ratio: 16/9;
+            object-fit: cover; background: #111; display: block;
+        }
+        .ep-thumb-placeholder {
+            width: 130px; aspect-ratio: 16/9;
+            background: #0a0a0a; display: flex;
+            align-items: center; justify-content: center;
+            color: #333; font-size: 20px;
+        }
+        .ep-badge {
+            position: absolute; top: 5px; left: 5px;
+            background: rgba(0,0,0,0.75); color: #fff;
+            font-size: 9px; font-weight: 800; padding: 2px 6px;
+            border-radius: 4px;
+        }
+        .ep-duration {
+            position: absolute; bottom: 5px; right: 5px;
+            background: rgba(0,0,0,0.75); color: #fff;
+            font-size: 9px; font-weight: 700; padding: 1px 5px;
+            border-radius: 3px;
+        }
+        .ep-info { flex: 1; min-width: 0; padding: 2px 0; }
+        .ep-num { display: none; }
+        .ep-title {
+            font-size: 14px; font-weight: 700; color: #fff;
+            line-height: 1.3; margin-bottom: 5px;
+            display: -webkit-box; -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical; overflow: hidden;
+        }
+        .ep-synopsis {
+            font-size: 12px; color: #8e8e8e; line-height: 1.4;
+            display: -webkit-box; -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 5px;
+        }
+        .ep-date { font-size: 11px; color: #555; font-weight: 500; display: flex; align-items: center; gap: 4px; }
         .ep-card.active-ep .ep-title { color: #fff; }
+        .ep-card.active-ep .ep-thumb-wrap { outline: 2px solid #fff; }
+        .ep-pagination {
+            display: flex; align-items: center; justify-content: center;
+            gap: 8px; padding: 14px 0 4px;
+        }
+        .ep-page-btn {
+            padding: 8px 18px; border-radius: 10px;
+            background: #111; border: 1px solid #2a2a2a;
+            color: #fff; font-size: 12px; font-weight: 700;
+            cursor: pointer; transition: all 0.2s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .ep-page-btn:active { background: #222; transform: scale(0.95); }
+        .ep-page-btn.disabled { opacity: 0.3; pointer-events: none; }
+        .ep-page-info { font-size: 11px; color: #555; font-weight: 600; min-width: 60px; text-align: center; }
 
         /* ===== BADGE NEW on poster ===== */
         .badge-new {
@@ -2048,7 +2123,20 @@
                         <h4 class="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Episodes</h4>
                         <select id="seasonSel" class="bg-zinc-900 text-white text-[10px] px-2 py-1 rounded border border-zinc-700 appearance-none" onchange="loadEpisodes()"></select>
                     </div>
-                    <div id="episodeGrid" class="flex gap-3 overflow-x-auto pb-2" style="scrollbar-width:none;-webkit-overflow-scrolling:touch;"></div>
+                    <div id="episodeSearchWrap" style="margin-bottom:10px;display:none">
+                        <div style="background:#111;border:1px solid #2a2a2a;border-radius:8px;padding:6px 10px;display:flex;align-items:center;gap:8px">
+                            <i class="fa-solid fa-magnifying-glass" style="font-size:10px;color:#555"></i>
+                            <input id="episodeSearchInp" type="number" min="1" placeholder="Find episode number..."
+                                style="background:transparent;border:none;outline:none;color:#fff;font-size:12px;width:100%"
+                                oninput="filterEpisodes(this.value)">
+                        </div>
+                    </div>
+                    <div id="episodeGrid" class="flex flex-col"></div>
+                    <div id="epPagination" class="ep-pagination" style="display:none">
+                        <button class="ep-page-btn" id="epPrevBtn" onclick="changeEpPage(-1)">← Prev</button>
+                        <span class="ep-page-info" id="epPageInfo"></span>
+                        <button class="ep-page-btn" id="epNextBtn" onclick="changeEpPage(1)">Next →</button>
+                    </div>
                 </div>
 
                 <div id="serverList" class="server-scroll-wrapper mt-4 px-4"></div>
@@ -2349,17 +2437,18 @@
             }, 1200);
 
             // PWA Status Bar Fix
-            (function() {
+            function applyStatusBarFix() {
                 const isPWA = window.matchMedia('(display-mode: standalone)').matches
                     || window.navigator.standalone === true
                     || document.referrer.includes('android-app://');
                 if (isPWA) {
                     document.body.classList.add('pwa-mode');
-                    // Pakai screenY sebagai tinggi status bar di Android
                     const h = window.screenY > 0 ? window.screenY : 28;
                     document.documentElement.style.setProperty('--status-bar-height', h + 'px');
                 }
-            })();
+            }
+            applyStatusBarFix();
+            window.matchMedia('(display-mode: standalone)').addEventListener('change', applyStatusBarFix);
         });
 
         window.onload = () => {
@@ -3105,7 +3194,20 @@
                         <h4 class="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Episodes</h4>
                         <select id="seasonSel" class="bg-zinc-900 text-white text-[10px] px-2 py-1 rounded border border-zinc-700 appearance-none" onchange="loadEpisodes()"></select>
                     </div>
-                    <div id="episodeGrid" class="flex gap-3 overflow-x-auto pb-2" style="scrollbar-width:none;-webkit-overflow-scrolling:touch;"></div>
+                    <div id="episodeSearchWrap" style="margin-bottom:10px;display:none">
+                        <div style="background:#111;border:1px solid #2a2a2a;border-radius:8px;padding:6px 10px;display:flex;align-items:center;gap:8px">
+                            <i class="fa-solid fa-magnifying-glass" style="font-size:10px;color:#555"></i>
+                            <input id="episodeSearchInp" type="number" min="1" placeholder="Find episode number..."
+                                style="background:transparent;border:none;outline:none;color:#fff;font-size:12px;width:100%"
+                                oninput="filterEpisodes(this.value)">
+                        </div>
+                    </div>
+                    <div id="episodeGrid" class="flex flex-col"></div>
+                    <div id="epPagination" class="ep-pagination" style="display:none">
+                        <button class="ep-page-btn" id="epPrevBtn" onclick="changeEpPage(-1)">← Prev</button>
+                        <span class="ep-page-info" id="epPageInfo"></span>
+                        <button class="ep-page-btn" id="epNextBtn" onclick="changeEpPage(1)">Next →</button>
+                    </div>
                 </div>
                 <div id="serverList" class="server-scroll-wrapper mt-4 px-4"></div>
                 <div class="dl-grid">
@@ -3891,7 +3993,12 @@
                         const poster = m.poster_path || '';
                         const synopsis = m.overview || '';
                         const rating = m.vote_average ? m.vote_average.toFixed(1) : '';
-                        return { movieId: m.id, type: mtype, title, year, poster, videoKey: best.key, synopsis, rating };
+                        const runtime = m.runtime || (m.episode_run_time && m.episode_run_time[0]) || null;
+                        const genres = (m.genre_ids || []).slice(0,3).map(id => {
+                            const gMap = {28:'Action',12:'Adventure',16:'Animation',35:'Comedy',80:'Crime',99:'Documentary',18:'Drama',10751:'Family',14:'Fantasy',36:'History',27:'Horror',10402:'Music',9648:'Mystery',10749:'Romance',878:'Sci-Fi',53:'Thriller',10752:'War',37:'Western',10759:'Action & Adventure',10762:'Kids',10763:'News',10764:'Reality',10765:'Sci-Fi & Fantasy',10766:'Soap',10767:'Talk',10768:'War & Politics'};
+                            return gMap[id] || '';
+                        }).filter(Boolean);
+                        return { movieId: m.id, type: mtype, title, year, poster, videoKey: best.key, synopsis, rating, runtime, genres };
                     } catch(e) { return null; }
                 });
 
@@ -3949,7 +4056,14 @@
                         <div class="reel-heart-pop" id="heart-${reel.movieId}"><i class="fa-solid fa-heart"></i></div>
                         <div class="reel-gradient"></div>
                         <div class="reel-info">
+                            <div class="reel-meta-pills">
+                                <span class="reel-pill reel-pill-type">${typeLabel}</span>
+                                ${reel.year ? `<span class="reel-pill reel-pill-year">${reel.year}</span>` : ''}
+                                ${reel.rating ? `<span class="reel-pill reel-pill-rating">★ ${reel.rating}</span>` : ''}
+                                ${reel.runtime ? `<span class="reel-pill reel-pill-runtime">${reel.runtime} min</span>` : ''}
+                            </div>
                             <div class="reel-title">${reel.title}</div>
+                            ${reel.genres && reel.genres.length ? `<div class="reel-genre-pills">${reel.genres.map(g=>`<span class="reel-genre-pill">${g}</span>`).join('')}</div>` : ''}
                             <div class="reel-year">${reel.year || ''} · ${typeLabel} ${ratingStr}</div>
                             ${reel.synopsis ? `
                             <div class="reel-synopsis-overlay" id="${synopsisId}">${reel.synopsis}</div>
@@ -5571,7 +5685,20 @@
                         <h4 class="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Episodes</h4>
                         <select id="seasonSel" class="bg-zinc-900 text-white text-[10px] px-2 py-1 rounded border border-zinc-700 appearance-none" onchange="loadEpisodes()"></select>
                     </div>
-                    <div id="episodeGrid" class="flex gap-3 overflow-x-auto pb-2" style="scrollbar-width:none;-webkit-overflow-scrolling:touch;"></div>
+                    <div id="episodeSearchWrap" style="margin-bottom:10px;display:none">
+                        <div style="background:#111;border:1px solid #2a2a2a;border-radius:8px;padding:6px 10px;display:flex;align-items:center;gap:8px">
+                            <i class="fa-solid fa-magnifying-glass" style="font-size:10px;color:#555"></i>
+                            <input id="episodeSearchInp" type="number" min="1" placeholder="Find episode number..."
+                                style="background:transparent;border:none;outline:none;color:#fff;font-size:12px;width:100%"
+                                oninput="filterEpisodes(this.value)">
+                        </div>
+                    </div>
+                    <div id="episodeGrid" class="flex flex-col"></div>
+                    <div id="epPagination" class="ep-pagination" style="display:none">
+                        <button class="ep-page-btn" id="epPrevBtn" onclick="changeEpPage(-1)">← Prev</button>
+                        <span class="ep-page-info" id="epPageInfo"></span>
+                        <button class="ep-page-btn" id="epNextBtn" onclick="changeEpPage(1)">Next →</button>
+                    </div>
                 </div>
                 <div id="serverList" class="server-scroll-wrapper mt-4 px-4"></div>
                 <div class="dl-grid">
@@ -5740,50 +5867,114 @@
             return url.replace("http://", "https://");
         }
 
+        let _allEpisodes = [];
+        let _epPage = 0;
+        const EP_PER_PAGE = 10;
+
         async function loadEpisodes() { 
             activeSeason = document.getElementById('seasonSel').value;
             activeEpisode = 1;
+            _epPage = 0;
             document.querySelectorAll('.ep-card').forEach(b => b.classList.remove('active-ep'));
             let data = await fetchWithCache(`https://api.themoviedb.org/3/tv/${window.currentMediaId}/season/${activeSeason}?api_key=${API_KEY}&language=en-US`);
-            const episodes = data.episodes || [];
+            _allEpisodes = data.episodes || [];
+            renderEpisodePage();
+        }
+
+        function renderEpisodePage() {
+            const episodes = _allEpisodes;
             const grid = document.getElementById('episodeGrid');
             const seriesPoster = window._currentSeriesPoster || '';
+            const start = _epPage * EP_PER_PAGE;
+            const pageEps = episodes.slice(start, start + EP_PER_PAGE);
+            const totalPages = Math.ceil(episodes.length / EP_PER_PAGE);
 
-            grid.innerHTML = episodes.map((ep) => { 
+            grid.innerHTML = pageEps.map((ep) => { 
                 const epNum = ep.episode_number;
                 const epTitle = ep.name || `Episode ${epNum}`;
-                const epDate = ep.air_date ? new Date(ep.air_date).toLocaleDateString('id-ID', {day:'numeric',month:'long',year:'numeric'}) : '';
-                
+                const epDate = ep.air_date ? new Date(ep.air_date).toLocaleDateString('en-US', {day:'numeric',month:'short',year:'numeric'}) : '';
+                const epOverview = ep.overview || '';
+                const runtime = ep.runtime ? `${ep.runtime}m` : '';
+
                 let thumbHTML;
                 if (ep.still_path) {
                     thumbHTML = `<img class="ep-thumb" src="https://image.tmdb.org/t/p/w300${ep.still_path}" loading="lazy" decoding="async"
-                        onerror="this.src='${seriesPoster ? `https://image.tmdb.org/t/p/w300${seriesPoster}` : ''}'; this.onerror=null; this.style.objectFit='contain'; this.style.background='#111'">`;
+                        onerror="this.src='${seriesPoster ? `https://image.tmdb.org/t/p/w300${seriesPoster}` : ''}'; this.onerror=null;">`;
                 } else if (seriesPoster) {
-                    thumbHTML = `<img class="ep-thumb" src="https://image.tmdb.org/t/p/w300${seriesPoster}" loading="lazy" decoding="async" style="object-fit:contain;background:#111">`;
+                    thumbHTML = `<img class="ep-thumb" src="https://image.tmdb.org/t/p/w300${seriesPoster}" loading="lazy" decoding="async" style="object-fit:contain">`;
                 } else {
                     thumbHTML = `<div class="ep-thumb-placeholder"><i class="fa-solid fa-play"></i></div>`;
                 }
 
                 return `<div class="ep-card" onclick="changeEpisode(${epNum}, this)">
-                    ${thumbHTML}
+                    <div class="ep-thumb-wrap">
+                        ${thumbHTML}
+                        <span class="ep-badge">EP ${epNum}</span>
+                        ${runtime ? `<span class="ep-duration">${runtime}</span>` : ''}
+                    </div>
                     <div class="ep-info">
-                        <div class="ep-num">Episode ${epNum}</div>
                         <div class="ep-title">${epTitle}</div>
-                        ${epDate ? `<div class="ep-date">${epDate}</div>` : ''}
+                        ${epOverview ? `<div class="ep-synopsis">${epOverview}</div>` : ''}
+                        ${epDate ? `<div class="ep-date"><i class="fa-regular fa-calendar" style="font-size:10px"></i>${epDate}</div>` : ''}
                     </div>
                 </div>`;
             }).join('');
 
-            const searchWrap = document.getElementById('episodeSearchWrap');
-            const searchInp = document.getElementById('episodeSearchInp');
-            if (searchWrap) {
-                searchWrap.style.display = episodes.length > 50 ? 'block' : 'none';
-                if (searchInp) searchInp.value = '';
+            // Pagination
+            const pagDiv = document.getElementById('epPagination');
+            const pageInfo = document.getElementById('epPageInfo');
+            const prevBtn = document.getElementById('epPrevBtn');
+            const nextBtn = document.getElementById('epNextBtn');
+            if (pagDiv) {
+                pagDiv.style.display = totalPages > 1 ? 'flex' : 'none';
+                if (pageInfo) pageInfo.innerText = `${_epPage + 1} / ${totalPages}`;
+                if (prevBtn) prevBtn.classList.toggle('disabled', _epPage === 0);
+                if (nextBtn) nextBtn.classList.toggle('disabled', _epPage >= totalPages - 1);
             }
-            const activeCard = grid.querySelector('.ep-card.active-ep');
-            if (activeCard) activeCard.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+
+            // Episode search
+            const searchWrap = document.getElementById('episodeSearchWrap');
+            if (searchWrap) {
+                searchWrap.style.display = episodes.length > 10 ? 'block' : 'none';
+                const si = document.getElementById('episodeSearchInp');
+                if (si) si.value = '';
+            }
+        }
+
+        function changeEpPage(dir) {
+            const totalPages = Math.ceil(_allEpisodes.length / EP_PER_PAGE);
+            _epPage = Math.max(0, Math.min(_epPage + dir, totalPages - 1));
+            renderEpisodePage();
+            // Scroll ke atas episode list
+            document.getElementById('seriesControl')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
         
+        let _epSearchTimer = null;
+        function filterEpisodes(val) {
+            // Debounce: tunggu user selesai mengetik (500ms)
+            clearTimeout(_epSearchTimer);
+            if (!val || val === '') { renderEpisodePage(); return; }
+            _epSearchTimer = setTimeout(() => {
+                const num = parseInt(val);
+                if (isNaN(num)) return;
+                const ep = _allEpisodes.find(e => e.episode_number === num);
+                if (ep) {
+                    const pageIdx = Math.floor(_allEpisodes.indexOf(ep) / EP_PER_PAGE);
+                    _epPage = pageIdx;
+                    renderEpisodePage();
+                    setTimeout(() => {
+                        const cards = document.querySelectorAll('#episodeGrid .ep-card');
+                        cards.forEach(c => {
+                            const badge = c.querySelector('.ep-badge');
+                            if (badge && badge.innerText === `EP ${num}`) {
+                                c.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                            }
+                        });
+                    }, 150);
+                }
+            }, 500);
+        }
+
         function setupSwipe() { 
             const overlay = document.getElementById('swipeOverlay');
             let _swSx = 0;
@@ -6337,6 +6528,8 @@
         }
 
         // ===== SIMILAR FILMS =====
+        function loadSimilarFilms(id,type,genreIds){return loadSimilarMovies(id,type,genreIds);}
+
         async function loadSimilarMovies(id, type, genreIds) {
             const section = document.getElementById('mSimilarSection');
             const scroll = document.getElementById('mSimilarScroll');
