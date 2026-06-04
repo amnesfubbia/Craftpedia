@@ -28,7 +28,7 @@
     <style>
         /* ===== THEME VARIABLES ===== */
         :root {
-            --bg: #000; --bg2: #0a0a0a; --bg3: #111; --bg4: #1a1a1a;
+            --bg: #000; --bg2: #000000; --bg3: #111; --bg4: #1a1a1a;
             --border: #1c1c1c; --border2: #2a2a2a;
             --text: #fff; --text2: #efefef; --text3: #8e8e8e; --text4: #555;
             --card: #111; --card2: #1a1a1a;
@@ -109,7 +109,12 @@
         .tab-item.active { color: #fff; border-bottom: 1px solid #fff; }
 
         .movie-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; padding-bottom: 80px; }
-        .post-card { position: relative; aspect-ratio: 2/3; background: #0a0a0a; overflow: hidden; cursor: pointer; }
+        .post-card { position: relative; aspect-ratio: 2/3; background: #000000; overflow: hidden; cursor: pointer; border-radius: 10px; }
+        .card-title-overlay { position: absolute; bottom: 0; left: 0; right: 0; padding: 28px 7px 7px; background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.5) 60%, transparent 100%); }
+        .card-title-text { font-size: 10px; font-weight: 700; color: #fff; line-height: 1.3; margin-bottom: 3px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .card-meta-row { display: flex; align-items: center; gap: 5px; }
+        .card-star { font-size: 9px; color: #f5c518; font-weight: 700; }
+        .card-year { font-size: 9px; color: rgba(255,255,255,0.6); font-weight: 500; }
         .post-card img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.3s; }
         .badge-rating { position: absolute; top: 6px; left: 6px; padding: 2px 5px; border-radius: 2px; font-size: 7px; font-weight: 900; z-index: 5; background: rgba(0,0,0,0.7); color: #fff; border: 0.5px solid rgba(255,255,255,0.3); }
         .badge-type { position: absolute; top: 6px; right: 6px; padding: 2px 5px; border-radius: 2px; font-size: 7px; font-weight: 900; z-index: 5; background: rgba(0,0,0,0.7); color: #fff; text-transform: uppercase; border: 0.5px solid rgba(255,255,255,0.3); }
@@ -168,7 +173,7 @@
         /* SERVER LIST SCROLL HORIZONTAL - DIPERKECIL */
         .server-scroll-wrapper { display: flex; overflow-x: auto; gap: 8px; padding: 10px 0; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
         .server-scroll-wrapper::-webkit-scrollbar { display: none; }
-        .server-btn { flex: 0 0 auto; min-width: 75px; padding: 7px 12px; border-radius: 8px; font-size: 9px; font-weight: 800; text-transform: uppercase; border: 1px solid #1c1c1c; text-align: center; cursor: pointer; background: #0a0a0a; color: #fff; transition: all 0.2s; }
+        .server-btn { flex: 0 0 auto; min-width: 75px; padding: 7px 12px; border-radius: 8px; font-size: 9px; font-weight: 800; text-transform: uppercase; border: 1px solid #1c1c1c; text-align: center; cursor: pointer; background: #000000; color: #fff; transition: all 0.2s; }
         .server-btn:active { background: #1c1c1c; }
         .server-btn.active-link { border: 1.5px solid #fff !important; background: rgba(255,255,255,0.1); }
         
@@ -192,7 +197,7 @@
         
         .ig-post-content { padding: 0 15px; margin-top: 5px; }
         .ig-likes-count { font-weight: 700; font-size: 13px; margin-bottom: 5px; display: inline-block; padding-right: 5px; }
-        .ig-username { font-weight: 800; font-size: 16px; margin-right: 8px; }
+        .ig-username { font-weight: 900; font-size: 22px; margin-right: 0; display: block; line-height: 1.15; letter-spacing: -0.5px; text-transform: uppercase; }
         .ig-caption { font-size: 13px; line-height: 1.4; color: #efefef; }
         
         .toggle-btn { display: block; color: #a8a8a8; cursor: pointer; font-size: 13px; margin-top: 4px; font-weight: 500; }
@@ -548,7 +553,7 @@
 
         /* Cover / backdrop blur area */
         .actor-cover {
-            position: relative; height: 90px; overflow: hidden; background: #0a0a0a;
+            position: relative; height: 90px; overflow: hidden; background: #000000;
         }
         .actor-cover-blur {
             position: absolute; inset: -20px;
@@ -728,7 +733,7 @@
         }
         .audio-player-mini { width: 100%; height: 32px; margin-top: 10px; outline: none; filter: invert(100%) hue-rotate(180deg) brightness(1.2); }
         .music-card { background: #000; padding: 14px; border-radius: 20px; border: 1px solid #1a1a1a; transition: all 0.2s; }
-        .music-card:active { background: #0a0a0a; transform: scale(0.98); }
+        .music-card:active { background: #000000; transform: scale(0.98); }
 
         /* --- TV MODAL (Professional) --- */
         #tvModal {
@@ -831,7 +836,7 @@
 
         /* Channel info bar (below player) */
         .tv-now-bar {
-            background: #0a0a0a; border-bottom: 1px solid #111;
+            background: #000000; border-bottom: 1px solid #111;
             padding: 12px 15px; display: flex; align-items: center; gap: 12px;
         }
         .tv-now-dot {
@@ -987,7 +992,7 @@
         /* Blur background seperti Instagram Reels */
         .reel-blur-bg {
             position: absolute; inset: 0; z-index: 0;
-            overflow: hidden; background: #111;
+            overflow: hidden; background: #000;
         }
         .reel-blur-bg img {
             position: absolute; top: -10%; left: -10%;
@@ -998,11 +1003,11 @@
         }
         .reel-video-wrap {
             position: absolute;
-            top: 50%; left: 50%;
+            top: 40%; left: 50%;
             transform: translate(-50%, -50%);
             width: 100%;
             aspect-ratio: 9/16;
-            max-height: 100svh;
+            max-height: 72svh;
             background: transparent;
             overflow: hidden;
             z-index: 1;
@@ -1048,7 +1053,7 @@
 
         /* Info teks kiri bawah */
         .reel-info {
-            position: absolute; bottom: 62px; left: 0; right: 0;
+            position: absolute; bottom: 58px; left: 0; right: 0;
             padding: 0 16px; z-index: 10; pointer-events: none;
         }
         /* Meta pills row */
@@ -1082,6 +1087,14 @@
             backdrop-filter: blur(6px);
         }
         .reel-year { display: none; }
+        .reel-meta-inline {
+            display: flex; align-items: center; flex-wrap: wrap; gap: 0;
+            font-size: 16px; font-weight: 500; color: rgba(255,255,255,0.85);
+            margin-bottom: 10px; text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+        }
+        .reel-meta-inline .rmi-rating { color: #f5c518; font-weight: 700; margin-right: 8px; }
+        .reel-meta-inline .rmi-dot { color: rgba(255,255,255,0.4); margin: 0 6px; }
+        .reel-meta-inline .rmi-item { color: rgba(255,255,255,0.85); }
         .reel-synopsis-overlay {
             font-size: 11px; color: rgba(255,255,255,0.75);
             line-height: 1.5; margin-bottom: 6px;
@@ -1116,7 +1129,7 @@
 
         /* Tombol aksi kanan bawah (like, bookmark) */
         .reel-actions {
-            position: absolute; top: 42%; right: 12px;
+            position: absolute; top: 32%; right: 12px;
             transform: translateY(-50%);
             display: flex; flex-direction: column; align-items: center; gap: 18px;
             z-index: 10;
@@ -1298,7 +1311,7 @@
         }
         .rds-btn-watch, .rds-btn-info {
             flex: 0 0 auto; padding: 8px 16px;
-            border-radius: 10px; background: #0a0a0a;
+            border-radius: 10px; background: #000000;
             border: 1px solid #1c1c1c; color: #aaa;
             font-size: 9px; font-weight: 800; text-transform: uppercase;
             letter-spacing: 0.5px; cursor: pointer; text-align: center;
@@ -1457,7 +1470,7 @@
         }
         .ep-thumb-placeholder {
             width: 130px; aspect-ratio: 16/9;
-            background: #0a0a0a; display: flex;
+            background: #000000; display: flex;
             align-items: center; justify-content: center;
             color: #333; font-size: 20px;
         }
@@ -1507,11 +1520,15 @@
         /* ===== BADGE NEW on poster ===== */
         .badge-new {
             position: absolute; bottom: 6px; left: 6px;
-            padding: 2px 5px; border-radius: 2px;
-            font-size: 7px; font-weight: 900; z-index: 5;
-            background: rgba(0,0,0,0.7); color: #ff3b30;
-            text-transform: uppercase; letter-spacing: 0.5px;
-            border: 0.5px solid rgba(255,255,255,0.3);
+            padding: 3px 8px; border-radius: 6px;
+            font-size: 8px; font-weight: 900; z-index: 5; letter-spacing: 0.5px;
+            background: linear-gradient(135deg, #ff416c, #ff4b2b);
+            color: #fff; box-shadow: 0 2px 8px rgba(255,65,108,0.5);
+            animation: pulse-new 2s infinite;
+        }
+        @keyframes pulse-new {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
         }
 
         /* ===== PULL TO REFRESH ===== */
@@ -1569,7 +1586,7 @@
             cursor: pointer; transition: background 0.15s;
             -webkit-tap-highlight-color: transparent;
         }
-        .notif-item:active { background: #0a0a0a; }
+        .notif-item:active { background: #000000; }
         .notif-poster {
             width: 48px; height: 70px; border-radius: 8px;
             object-fit: cover; background: #111; flex-shrink: 0;
@@ -2031,6 +2048,26 @@
                 <div id="popularChips" style="display:flex;flex-wrap:wrap;gap:8px"></div>
             </div>
         </div>
+        <!-- Search filter pills -->
+        <div id="searchFilterBar" style="display:none;padding:6px 16px 0;gap:8px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch" class="flex">
+            <select id="searchYearFilter" onchange="applySearchFilters()" style="flex:0 0 auto;background:#1a1a1a;border:1px solid #2a2a2a;color:#fff;font-size:11px;padding:6px 10px;border-radius:8px;outline:none;cursor:pointer">
+                <option value="">All Years</option>
+            </select>
+            <select id="searchGenreFilter" onchange="applySearchFilters()" style="flex:0 0 auto;background:#1a1a1a;border:1px solid #2a2a2a;color:#fff;font-size:11px;padding:6px 10px;border-radius:8px;outline:none;cursor:pointer">
+                <option value="">All Genres</option>
+                <option value="28">Action</option><option value="12">Adventure</option>
+                <option value="16">Animation</option><option value="35">Comedy</option>
+                <option value="80">Crime</option><option value="18">Drama</option>
+                <option value="14">Fantasy</option><option value="27">Horror</option>
+                <option value="10749">Romance</option><option value="878">Sci-Fi</option>
+                <option value="53">Thriller</option>
+            </select>
+            <select id="searchTypeFilter" onchange="applySearchFilters()" style="flex:0 0 auto;background:#1a1a1a;border:1px solid #2a2a2a;color:#fff;font-size:11px;padding:6px 10px;border-radius:8px;outline:none;cursor:pointer">
+                <option value="">All Types</option>
+                <option value="movie">Movie</option>
+                <option value="tv">Series</option>
+            </select>
+        </div>
         <div id="searchContent" style="display:none; flex-direction:column;">
             <div id="calendarHeader" class="hidden sticky-wrapper"></div>
             <div id="searchGrid" class="movie-grid"></div>
@@ -2118,7 +2155,7 @@
 <div id="mHashtags" style="display:none"></div>
                 <div id="mDateDisplay" style="display:none"></div>
                 
-                <div id="seriesControl" class="hidden mt-4 p-4 bg-zinc-950 rounded-2xl border border-zinc-900">
+                <div id="seriesControl" class="hidden mt-4 p-4 bg-black rounded-2xl border border-zinc-900">
                     <div class="flex justify-between items-center mb-4">
                         <h4 class="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Episodes</h4>
                         <select id="seasonSel" class="bg-zinc-900 text-white text-[10px] px-2 py-1 rounded border border-zinc-700 appearance-none" onchange="loadEpisodes()"></select>
@@ -3189,7 +3226,7 @@
                 </div>
 <div id="mHashtags" style="display:none"></div>
                 <div id="mDateDisplay" style="display:none"></div>
-                <div id="seriesControl" class="hidden mt-4 p-4 bg-zinc-950 rounded-2xl border border-zinc-900">
+                <div id="seriesControl" class="hidden mt-4 p-4 bg-black rounded-2xl border border-zinc-900">
                     <div class="flex justify-between items-center mb-4">
                         <h4 class="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Episodes</h4>
                         <select id="seasonSel" class="bg-zinc-900 text-white text-[10px] px-2 py-1 rounded border border-zinc-700 appearance-none" onchange="loadEpisodes()"></select>
@@ -3696,10 +3733,13 @@
                 if (topWorks.length > 0) {
                     document.getElementById('actorKnownForWrapper').style.display = 'block';
                     document.getElementById('actorKnownFor').innerHTML = topWorks.map(w => `
-                        <div class="actor-hl-item" onclick="openModalFromActor(${w.id}, '${w.media_type}')" style="position:relative;flex:0 0 75px;border-radius:8px;overflow:hidden;background:#111;cursor:pointer">
-                            <img src="https://image.tmdb.org/t/p/w185${w.poster_path}" loading="lazy" style="width:75px;height:110px;object-fit:cover;display:block">
-                            <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(to top,rgba(0,0,0,0.9) 0%,transparent 100%);padding:18px 4px 4px">
-                                <div style="font-size:9px;font-weight:500;color:rgba(255,255,255,0.75);line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${w.title || w.name || ''}</div>
+                        <div class="actor-hl-item" onclick="openModalFromActor(${w.id}, '${w.media_type}')" style="position:relative;flex:0 0 80px;border-radius:8px;overflow:hidden;background:#111;cursor:pointer">
+                            <img src="https://image.tmdb.org/t/p/w185${w.poster_path}" loading="lazy" style="width:80px;height:120px;object-fit:cover;display:block">
+                            <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.75);color:#fff;font-size:7px;font-weight:800;padding:2px 5px;border-radius:3px;text-transform:uppercase">${w.media_type==='tv'?'TV':'MOVIE'}</div>
+                            ${w.vote_average ? `<div style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.75);color:#f5c518;font-size:7px;font-weight:800;padding:2px 5px;border-radius:3px">★${w.vote_average.toFixed(1)}</div>` : ''}
+                            <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(to top,rgba(0,0,0,0.95) 0%,transparent 100%);padding:22px 5px 5px">
+                                <div style="font-size:9px;font-weight:700;color:#fff;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${w.title || w.name || ''}</div>
+                                ${(w.release_date||w.first_air_date) ? `<div style="font-size:8px;color:rgba(255,255,255,0.5);margin-top:2px">${(w.release_date||w.first_air_date).split('-')[0]}</div>` : ''}
                             </div>
                         </div>
                     `).join('');
@@ -4056,14 +4096,13 @@
                         <div class="reel-heart-pop" id="heart-${reel.movieId}"><i class="fa-solid fa-heart"></i></div>
                         <div class="reel-gradient"></div>
                         <div class="reel-info">
-                            <div class="reel-meta-pills">
-                                <span class="reel-pill reel-pill-type">${typeLabel}</span>
-                                ${reel.year ? `<span class="reel-pill reel-pill-year">${reel.year}</span>` : ''}
-                                ${reel.rating ? `<span class="reel-pill reel-pill-rating">★ ${reel.rating}</span>` : ''}
-                                ${reel.runtime ? `<span class="reel-pill reel-pill-runtime">${reel.runtime} min</span>` : ''}
-                            </div>
                             <div class="reel-title">${reel.title}</div>
-                            ${reel.genres && reel.genres.length ? `<div class="reel-genre-pills">${reel.genres.map(g=>`<span class="reel-genre-pill">${g}</span>`).join('')}</div>` : ''}
+                            <div class="reel-meta-inline">
+                                ${reel.rating ? `<span class="rmi-rating">★ ${reel.rating}</span><span class="rmi-dot">·</span>` : ''}
+                                <span class="rmi-item">${typeLabel}</span>
+                                ${reel.year ? `<span class="rmi-dot">·</span><span class="rmi-item">${reel.year}</span>` : ''}
+                                ${reel.genres && reel.genres.length ? reel.genres.map(g=>`<span class="rmi-dot">·</span><span class="rmi-item">${g}</span>`).join('') : ''}
+                            </div>
                             <div class="reel-year">${reel.year || ''} · ${typeLabel} ${ratingStr}</div>
                             ${reel.synopsis ? `
                             <div class="reel-synopsis-overlay" id="${synopsisId}">${reel.synopsis}</div>
@@ -5064,9 +5103,34 @@
                 let items = data.results || data.cast || []; 
                 if(currentCastId) items.sort((a,b) => b.popularity - a.popularity);
                 if(items.length === 0 && isNew) { grid.innerHTML = `<div class="col-span-3 text-center py-20 text-zinc-600 text-xs">Content not found.</div>`; } 
-                else { renderGrid(items, grid); }
+                else {
+                    // Simpan untuk filter jika ini search result
+                    if (window._isSearchMode) {
+                        window._searchResults = items;
+                        // Isi year filter
+                        const years = [...new Set(items.map(m=>(m.release_date||m.first_air_date||'').split('-')[0]).filter(Boolean))].sort().reverse();
+                        const yrSel = document.getElementById('searchYearFilter');
+                        if (yrSel) yrSel.innerHTML = '<option value="">All Years</option>' + years.map(y=>`<option value="${y}">${y}</option>`).join('');
+                        const sfBar = document.getElementById('searchFilterBar');
+                        if (sfBar) sfBar.style.display = 'flex';
+                    }
+                    renderGrid(items, grid);
+                }
             } catch(e) { if(e.name !== 'AbortError') console.error(e); }
             loading = false;
+        }
+
+        function applySearchFilters() {
+            if (!window._searchResults || !window._isSearchMode) return;
+            let filtered = [...window._searchResults];
+            const yr = document.getElementById('searchYearFilter')?.value;
+            const gn = document.getElementById('searchGenreFilter')?.value;
+            const tp = document.getElementById('searchTypeFilter')?.value;
+            if (yr) filtered = filtered.filter(m => (m.release_date||m.first_air_date||'').startsWith(yr));
+            if (gn) filtered = filtered.filter(m => (m.genre_ids||[]).includes(parseInt(gn)));
+            if (tp) filtered = filtered.filter(m => (m.media_type||currentType) === tp);
+            const grid = document.getElementById('feedGrid');
+            if (grid) { grid.innerHTML = ''; renderGrid(filtered, grid); }
         }
 
         function renderGrid(items, grid) { 
@@ -5080,7 +5144,14 @@
                 card.onclick = function() { openModal(m.id, mType); }; 
                 const _rd = m.release_date || m.first_air_date || '';
                 const _nb = isNewRelease(_rd) ? '<div class="badge-new">NEW</div>' : '';
-                card.innerHTML = `<div class="badge-rating">${(m.vote_average||0).toFixed(1)}</div><div class="badge-type">${currentType==='short'?'SHORT':(mType==='tv'?'tv':'movie')}</div>${_nb}<img src="https://image.tmdb.org/t/p/w185${m.poster_path}" loading="lazy" onload="this.style.opacity=1" style="opacity:0">`;
+                let _title = m.title || m.name || '';
+                if (isNonLatin(_title)) {
+                    const origT = m.original_title || m.original_name || '';
+                    if (origT && !isNonLatin(origT)) _title = origT;
+                }
+                const _year = (m.release_date || m.first_air_date || '').split('-')[0];
+                const _rating = m.vote_average ? m.vote_average.toFixed(1) : '';
+                card.innerHTML = `<div class="badge-rating">${_rating}</div><div class="badge-type">${currentType==='short'?'SHORT':(mType==='tv'?'TV':'MOVIE')}</div>${_nb}<img src="https://image.tmdb.org/t/p/w185${m.poster_path}" loading="lazy" onload="this.style.opacity=1" style="opacity:0"><div class="card-title-overlay"><div class="card-title-text">${_title}</div><div class="card-meta-row">${_rating ? `<span class="card-star">★ ${_rating}</span>` : ''}${_year ? `<span class="card-year">${_year}</span>` : ''}</div></div>`;
                 fragment.appendChild(card); 
             });
             grid.appendChild(fragment);
@@ -5139,6 +5210,9 @@
             if(document.getElementById('sideMenu').style.display === 'block') toggleSideMenu();
             document.getElementById('searchGrid').innerHTML = '';
             document.getElementById('searchOverlay').style.display = 'block';
+            window._isSearchMode = false;
+            const sfBar2 = document.getElementById('searchFilterBar');
+            if (sfBar2) sfBar2.style.display = 'none';
             showSearchEmptyState();
             document.getElementById('searchInp').value = '';
             document.getElementById('searchClearBtn').style.display = 'none';
@@ -5680,7 +5754,7 @@
                 </div>
 <div id="mHashtags" style="display:none"></div>
                 <div id="mDateDisplay" style="display:none"></div>
-                <div id="seriesControl" class="hidden mt-4 p-4 bg-zinc-950 rounded-2xl border border-zinc-900">
+                <div id="seriesControl" class="hidden mt-4 p-4 bg-black rounded-2xl border border-zinc-900">
                     <div class="flex justify-between items-center mb-4">
                         <h4 class="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Episodes</h4>
                         <select id="seasonSel" class="bg-zinc-900 text-white text-[10px] px-2 py-1 rounded border border-zinc-700 appearance-none" onchange="loadEpisodes()"></select>
@@ -6496,7 +6570,7 @@
             scroll.innerHTML = items.map((item, idx) => `
                 <div class="recently-item" onclick="openModal(${item.id}, '${item.type}')">
                     <img class="recently-img" src="https://image.tmdb.org/t/p/w185${item.poster || ''}"
-                         onerror="this.style.background='#1a1a1a'" loading="lazy">
+                         onerror="this.style.background='#0d0d0d'" loading="lazy">
                     <div class="recently-del" onclick="event.stopPropagation(); deleteRecentlyViewed(${idx})">
                         <i class="fa-solid fa-xmark"></i>
                     </div>
