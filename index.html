@@ -112,9 +112,10 @@
         .post-card { position: relative; aspect-ratio: 2/3; background: #000000; overflow: hidden; cursor: pointer; border-radius: 10px; }
         .card-title-overlay { position: absolute; bottom: 0; left: 0; right: 0; padding: 28px 7px 7px; background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.5) 60%, transparent 100%); }
         .card-title-text { font-size: 10px; font-weight: 700; color: #fff; line-height: 1.3; margin-bottom: 3px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-        .card-meta-row { display: flex; align-items: center; gap: 5px; }
+        .card-meta-row { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
         .card-star { font-size: 9px; color: #f5c518; font-weight: 700; }
-        .card-year { font-size: 9px; color: rgba(255,255,255,0.6); font-weight: 500; }
+        .card-type-label { font-size: 9px; color: rgba(255,255,255,0.5); font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
+        .card-year { font-size: 9px; color: rgba(255,255,255,0.5); font-weight: 500; }
         .post-card img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.3s; }
         .badge-rating { position: absolute; top: 6px; left: 6px; padding: 2px 5px; border-radius: 2px; font-size: 7px; font-weight: 900; z-index: 5; background: rgba(0,0,0,0.7); color: #fff; border: 0.5px solid rgba(255,255,255,0.3); }
         .badge-type { position: absolute; top: 6px; right: 6px; padding: 2px 5px; border-radius: 2px; font-size: 7px; font-weight: 900; z-index: 5; background: rgba(0,0,0,0.7); color: #fff; text-transform: uppercase; border: 0.5px solid rgba(255,255,255,0.3); }
@@ -197,7 +198,8 @@
         
         .ig-post-content { padding: 0 15px; margin-top: 5px; }
         .ig-likes-count { font-weight: 700; font-size: 13px; margin-bottom: 5px; display: inline-block; padding-right: 5px; }
-        .ig-username { font-weight: 900; font-size: 22px; margin-right: 0; display: block; line-height: 1.15; letter-spacing: -0.5px; text-transform: uppercase; }
+        .ig-username { font-weight: 900; font-size: 22px; margin-right: 0; display: block; line-height: 1.15; letter-spacing: -0.5px; }
+        #mModalTitle { font-size: 22px; font-weight: 900; line-height: 1.15; letter-spacing: -0.5px; color: #fff; display: block; }
         .ig-caption { font-size: 13px; line-height: 1.4; color: #efefef; }
         
         .toggle-btn { display: block; color: #a8a8a8; cursor: pointer; font-size: 13px; margin-top: 4px; font-weight: 500; }
@@ -983,7 +985,7 @@
         .reel-slide {
             width: 100%; height: 100svh;
             scroll-snap-align: start; scroll-snap-stop: always;
-            position: relative; background: transparent;
+            position: relative; background: #000;
             display: flex; align-items: center; justify-content: center;
             overflow: hidden;
         }
@@ -1070,9 +1072,9 @@
         .reel-pill-rating { background: rgba(60,50,10,0.85); color: #f5c518; border: 1px solid rgba(245,197,24,0.3); }
         .reel-pill-runtime { background: rgba(40,40,40,0.85); color: #ccc; }
         .reel-title {
-            font-size: 38px; font-weight: 900; color: #fff;
+            font-size: 28px; font-weight: 900; color: #fff;
             text-shadow: 0 2px 8px rgba(0,0,0,0.8);
-            margin-bottom: 12px; line-height: 1.05; letter-spacing: -1.5px;
+            margin-bottom: 10px; line-height: 1.1; letter-spacing: -0.8px;
             display: -webkit-box; -webkit-line-clamp: 2;
             -webkit-box-orient: vertical; overflow: hidden;
         }
@@ -1089,8 +1091,8 @@
         .reel-year { display: none; }
         .reel-meta-inline {
             display: flex; align-items: center; flex-wrap: wrap; gap: 0;
-            font-size: 16px; font-weight: 500; color: rgba(255,255,255,0.85);
-            margin-bottom: 10px; text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+            font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.85);
+            margin-bottom: 8px; text-shadow: 0 1px 4px rgba(0,0,0,0.8);
         }
         .reel-meta-inline .rmi-rating { color: #f5c518; font-weight: 700; margin-right: 8px; }
         .reel-meta-inline .rmi-dot { color: rgba(255,255,255,0.4); margin: 0 6px; }
@@ -1129,7 +1131,7 @@
 
         /* Tombol aksi kanan bawah (like, bookmark) */
         .reel-actions {
-            position: absolute; top: 32%; right: 12px;
+            position: absolute; top: 44%; right: 12px;
             transform: translateY(-50%);
             display: flex; flex-direction: column; align-items: center; gap: 18px;
             z-index: 10;
@@ -1155,7 +1157,7 @@
         .reels-topbar {
             position: fixed; top: 0; left: 0; right: 0; z-index: 9100;
             display: flex; align-items: center; padding: 14px 16px 10px;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.65) 0%, transparent 100%);
+            background: #000;
             pointer-events: none;
         }
         .reels-topbar-title {
@@ -1519,7 +1521,7 @@
 
         /* ===== BADGE NEW on poster ===== */
         .badge-new {
-            position: absolute; bottom: 6px; left: 6px;
+            position: absolute; top: 6px; right: 6px;
             padding: 3px 8px; border-radius: 6px;
             font-size: 8px; font-weight: 900; z-index: 5; letter-spacing: 0.5px;
             background: linear-gradient(135deg, #ff416c, #ff4b2b);
@@ -2504,7 +2506,7 @@
                 };
                 renderChips(fallbackChips);
                 // Fetch trending untuk chips yang selalu relevan
-                fetch(`https://api.themoviedb.org/3/trending/all/day?api_key=${API_KEY}&language=id-ID`)
+                fetch(`https://api.themoviedb.org/3/trending/all/day?api_key=${API_KEY}&language=en-US`)
                     .then(r => r.json())
                     .then(data => {
                         const trendChips = (data.results || []).slice(0, 8).map(m => m.title || m.name).filter(Boolean);
@@ -3597,9 +3599,20 @@
             } catch { return rawTitle; }
         }
 
-        async function fetchWithCache(url) {
-            const cached = sessionStorage.getItem(url);
-            if (cached) return JSON.parse(cached);
+             // In-memory cache untuk performa maksimal (lebih cepat dari sessionStorage)
+        const _memCache = {};
+        function fetchWithCache(url) {
+            // Cek memory cache dulu (paling cepat)
+            if (_memCache[url]) return Promise.resolve(_memCache[url]);
+            // Cek sessionStorage
+            try {
+                const cached = sessionStorage.getItem(url);
+                if (cached) {
+                    const parsed = JSON.parse(cached);
+                    _memCache[url] = parsed; // Simpan ke memory juga
+                    return Promise.resolve(parsed);
+                }
+            } catch(e) {}
             // Bungkus dalam Promise dengan timeout manual — tidak simpan AbortController di scope global
             return new Promise(async (resolve, reject) => {
                 const timer = setTimeout(() => reject(new Error('fetch timeout')), 8000);
@@ -3607,7 +3620,8 @@
                     const res = await fetch(url);
                     const data = await res.json();
                     clearTimeout(timer);
-                    try { sessionStorage.setItem(url, JSON.stringify(data)); } catch(e) {}
+                    try { _memCache[url] = data; // Memory cache
+                    try { sessionStorage.setItem(url, JSON.stringify(data)); } catch(e) {} } catch(e) {}
                     resolve(data);
                 } catch(e) {
                     clearTimeout(timer);
@@ -3653,16 +3667,23 @@
 
             try {
                 const [details, credits] = await Promise.all([
-                    fetchWithCache(`https://api.themoviedb.org/3/person/${actorId}?api_key=${API_KEY}&language=id-ID`),
-                    fetchWithCache(`https://api.themoviedb.org/3/person/${actorId}/combined_credits?api_key=${API_KEY}&language=id-ID`)
+                    fetchWithCache(`https://api.themoviedb.org/3/person/${actorId}?api_key=${API_KEY}&language=en-US&append_to_response=also_known_as`),
+                    fetchWithCache(`https://api.themoviedb.org/3/person/${actorId}/combined_credits?api_key=${API_KEY}&language=en-US`)
                 ]);
 
                 const imgPath = details.profile_path ? `https://image.tmdb.org/t/p/w500${details.profile_path}` : 'amnesfubbia.png';
                 document.getElementById('actorPic').src = imgPath;
                 document.getElementById('actorCoverBlur').style.backgroundImage = `url('${imgPath}')`;
-                document.getElementById('actorHeaderTitle').innerText = details.name;
-                document.getElementById('actorName').innerText = details.name;
-                document.getElementById('actorNameBio').innerText = details.name;
+                document.getElementById('actorHeaderTitle').innerText = _aLatin;
+                const _aRaw = details.name || '';
+                const _aLatin = (()=>{
+                    if (!/[\u3040-\u30FF\u4E00-\u9FFF\uAC00-\uD7FF\u0400-\u04FF]/.test(_aRaw)) return _aRaw;
+                    const akas = details.also_known_as || [];
+                    const latinAka = akas.find(a => !/[\u3040-\u30FF\u4E00-\u9FFF\uAC00-\uD7FF\u0400-\u04FF]/.test(a) && a.length > 2);
+                    return latinAka || _aRaw;
+                })();
+                document.getElementById('actorName').innerText = _aLatin;
+                document.getElementById('actorNameBio').innerText = _aLatin;
                 document.getElementById('actorDept').innerText = details.known_for_department || 'Pemeran';
 
                 // Age
@@ -3733,13 +3754,14 @@
                 if (topWorks.length > 0) {
                     document.getElementById('actorKnownForWrapper').style.display = 'block';
                     document.getElementById('actorKnownFor').innerHTML = topWorks.map(w => `
-                        <div class="actor-hl-item" onclick="openModalFromActor(${w.id}, '${w.media_type}')" style="position:relative;flex:0 0 80px;border-radius:8px;overflow:hidden;background:#111;cursor:pointer">
-                            <img src="https://image.tmdb.org/t/p/w185${w.poster_path}" loading="lazy" style="width:80px;height:120px;object-fit:cover;display:block">
-                            <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.75);color:#fff;font-size:7px;font-weight:800;padding:2px 5px;border-radius:3px;text-transform:uppercase">${w.media_type==='tv'?'TV':'MOVIE'}</div>
-                            ${w.vote_average ? `<div style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.75);color:#f5c518;font-size:7px;font-weight:800;padding:2px 5px;border-radius:3px">★${w.vote_average.toFixed(1)}</div>` : ''}
-                            <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(to top,rgba(0,0,0,0.95) 0%,transparent 100%);padding:22px 5px 5px">
-                                <div style="font-size:9px;font-weight:700;color:#fff;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${w.title || w.name || ''}</div>
-                                ${(w.release_date||w.first_air_date) ? `<div style="font-size:8px;color:rgba(255,255,255,0.5);margin-top:2px">${(w.release_date||w.first_air_date).split('-')[0]}</div>` : ''}
+                        <div class="actor-hl-item" onclick="openModalFromActor(${w.id}, '${w.media_type}')" style="position:relative;flex:0 0 75px;border-radius:8px;overflow:hidden;background:#111;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.5)">
+                            <img src="https://image.tmdb.org/t/p/w185${w.poster_path}" loading="lazy" style="width:75px;height:110px;object-fit:cover;display:block;opacity:0;transition:opacity 0.3s" onload="this.style.opacity=1">
+                            <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(to top,rgba(0,0,0,0.95) 0%,rgba(0,0,0,0.6) 50%,transparent 100%);padding:20px 5px 5px">
+                                <div style="font-size:9px;font-weight:500;color:rgba(255,255,255,0.75);line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${(()=>{const t=w.title||w.name||'';const o=w.original_title||w.original_name||'';return (t && !/[\u3040-\u30FF\u4E00-\u9FFF\uAC00-\uD7FF\u0400-\u04FF]/.test(t))?t:((o&&!/[\u3040-\u30FF\u4E00-\u9FFF\uAC00-\uD7FF\u0400-\u04FF]/.test(o))?o:t);})()}</div>
+                                <div style="display:flex;align-items:center;gap:3px;margin-top:2px">
+                                    ${w.vote_average ? `<span style="font-size:8px;color:#f5c518;font-weight:700">★${w.vote_average.toFixed(1)}</span>` : ''}
+                                    ${(w.release_date||w.first_air_date) ? `<span style="font-size:8px;color:rgba(255,255,255,0.5)">${(w.release_date||w.first_air_date).split('-')[0]}</span>` : ''}
+                                </div>
                             </div>
                         </div>
                     `).join('');
@@ -3762,7 +3784,10 @@
                         const card = document.createElement('div');
                         card.className = 'post-card';
                         card.onclick = () => openModalFromActor(m.id, 'movie');
-                        card.innerHTML = `<div class="badge-rating">${(m.vote_average||0).toFixed(1)}</div><div class="badge-type">movie</div><img src="https://image.tmdb.org/t/p/w185${m.poster_path}" loading="lazy" onload="this.style.opacity=1" style="opacity:0">`;
+                        const _fTitle = (()=>{const t=m.title||m.name||'';const o=m.original_title||m.original_name||'';return (t&&!/[\u3040-\u30FF\u4E00-\u9FFF\uAC00-\uD7FF\u0400-\u04FF]/.test(t))?t:((o&&!/[\u3040-\u30FF\u4E00-\u9FFF\uAC00-\uD7FF\u0400-\u04FF]/.test(o))?o:t);})();
+                        const _fYear = (m.release_date||'').split('-')[0];
+                        const _fRating = m.vote_average ? m.vote_average.toFixed(1) : '';
+                        card.innerHTML = `<img src="https://image.tmdb.org/t/p/w185${m.poster_path}" loading="lazy" onload="this.style.opacity=1" style="opacity:0"><div class="card-title-overlay"><div class="card-title-text">${_fTitle}</div><div class="card-meta-row"><span class="card-type-label">MOVIE</span>${_fRating?`<span class="card-star">★${_fRating}</span>`:''} ${_fYear?`<span class="card-year">${_fYear}</span>`:''}</div></div>`;
                         filmGrid.appendChild(card);
                     });
                 }
@@ -3783,7 +3808,10 @@
                         const card = document.createElement('div');
                         card.className = 'post-card';
                         card.onclick = () => openModalFromActor(m.id, 'tv');
-                        card.innerHTML = `<div class="badge-rating">${(m.vote_average||0).toFixed(1)}</div><div class="badge-type">tv</div><img src="https://image.tmdb.org/t/p/w185${m.poster_path}" loading="lazy" onload="this.style.opacity=1" style="opacity:0">`;
+                        const _tTitle = (()=>{const t=m.title||m.name||'';const o=m.original_title||m.original_name||'';return (t&&!/[\u3040-\u30FF\u4E00-\u9FFF\uAC00-\uD7FF\u0400-\u04FF]/.test(t))?t:((o&&!/[\u3040-\u30FF\u4E00-\u9FFF\uAC00-\uD7FF\u0400-\u04FF]/.test(o))?o:t);})();
+                        const _tYear = (m.first_air_date||'').split('-')[0];
+                        const _tRating = m.vote_average ? m.vote_average.toFixed(1) : '';
+                        card.innerHTML = `<img src="https://image.tmdb.org/t/p/w185${m.poster_path}" loading="lazy" onload="this.style.opacity=1" style="opacity:0"><div class="card-title-overlay"><div class="card-title-text">${_tTitle}</div><div class="card-meta-row"><span class="card-type-label">TV</span>${_tRating?`<span class="card-star">★${_tRating}</span>`:''} ${_tYear?`<span class="card-year">${_tYear}</span>`:''}</div></div>`;
                         tvGrid.appendChild(card);
                     });
                 }
@@ -4018,16 +4046,10 @@
                         const rawTitle = m.title || m.name || '';
                         let title = rawTitle;
                         if (isNonLatin(rawTitle)) {
-                            try {
-                                const enData = await fetchWithCache(`https://api.themoviedb.org/3/${mtype}/${m.id}?api_key=${API_KEY}&language=en-US`);
-                                // Coba title EN dulu, fallback ke original_title (biasanya latin)
-                                const enTitle = enData.title || enData.name || '';
-                                const origTitle = enData.original_title || enData.original_name || '';
-                                // Pilih yang latin: EN title > original title > rawTitle
-                                if (enTitle && !isNonLatin(enTitle)) title = enTitle;
-                                else if (origTitle && !isNonLatin(origTitle)) title = origTitle;
-                                else title = enTitle || rawTitle;
-                            } catch { title = rawTitle; }
+                            // Gunakan original_title tanpa extra fetch untuk performa
+                            const origTitle = m.original_title || m.original_name || '';
+                            if (origTitle && !isNonLatin(origTitle)) title = origTitle;
+                            // rawTitle tetap jika semua non-latin
                         }
                         const year  = (m.release_date || m.first_air_date || '').split('-')[0];
                         const poster = m.poster_path || '';
@@ -4088,10 +4110,10 @@
                         </div>
                         <div class="reel-video-wrap">
                             <iframe src="${embedUrl}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen loading="lazy"></iframe>
-                            <!-- Tutup header YouTube (atas) - pakai warna blur bg agar seamless -->
-                            <div style="position:absolute;top:0;left:0;right:0;height:52px;z-index:2;pointer-events:none;background:linear-gradient(to bottom,rgba(0,0,0,0.85) 0%,transparent 100%)"></div>
-                            <!-- Tutup UI bawah YouTube (share, thumbnail, logo) -->
-                            <div style="position:absolute;bottom:0;left:0;right:0;height:52px;z-index:2;pointer-events:none;background:linear-gradient(to top,rgba(0,0,0,0.85) 0%,transparent 100%)"></div>
+                            <!-- Tutup header YouTube (atas) solid hitam -->
+                            <div style="position:absolute;top:0;left:0;right:0;height:90px;z-index:2;pointer-events:none;background:#000"></div>
+                            <!-- Tutup UI bawah YouTube solid hitam -->
+                            <div style="position:absolute;bottom:0;left:0;right:0;height:70px;z-index:2;pointer-events:none;background:#000"></div>
                         </div>
                         <div class="reel-heart-pop" id="heart-${reel.movieId}"><i class="fa-solid fa-heart"></i></div>
                         <div class="reel-gradient"></div>
@@ -4346,7 +4368,7 @@
 
             try {
                 const [data, extRatings] = await Promise.allSettled([
-                    fetchWithCache(`https://api.themoviedb.org/3/${type}/${movieId}?api_key=${API_KEY}&language=id-ID&append_to_response=credits`),
+                    fetchWithCache(`https://api.themoviedb.org/3/${type}/${movieId}?api_key=${API_KEY}&language=en-US&append_to_response=credits`),
                     fetchWithCache(`https://api.themoviedb.org/3/${type}/${movieId}/external_ids?api_key=${API_KEY}`)
                 ]);
 
@@ -4836,9 +4858,9 @@
                 const mediaType = calendarMediaType || 'movie';
                 let apiUrl;
                 if (mediaType === 'tv') {
-                    apiUrl = `https://api.themoviedb.org/3/discover/tv?api_key=${API_KEY}&language=id-ID&sort_by=popularity.desc&first_air_date.gte=${dateStr}&first_air_date.lte=${dateStr}&include_adult=false`;
+                    apiUrl = `https://api.themoviedb.org/3/discover/tv?api_key=${API_KEY}&language=en-US&sort_by=popularity.desc&first_air_date.gte=${dateStr}&first_air_date.lte=${dateStr}&include_adult=false`;
                 } else {
-                    apiUrl = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=id-ID&sort_by=popularity.desc&primary_release_date.gte=${dateStr}&primary_release_date.lte=${dateStr}&include_adult=false`;
+                    apiUrl = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=en-US&sort_by=popularity.desc&primary_release_date.gte=${dateStr}&primary_release_date.lte=${dateStr}&include_adult=false`;
                 }
                 const res = await fetch(apiUrl);
                 const data = await res.json();
@@ -5066,7 +5088,7 @@
             const grid = document.getElementById('searchOverlay').style.display === 'block' ? document.getElementById('searchGrid') : document.getElementById('feedGrid');
             if(isNew) { page = 1; grid.innerHTML = ''; }
             let url;
-            if(currentCastId) { url = `https://api.themoviedb.org/3/person/${currentCastId}/combined_credits?api_key=${API_KEY}&language=id-ID`; }
+            if(currentCastId) { url = `https://api.themoviedb.org/3/person/${currentCastId}/combined_credits?api_key=${API_KEY}&language=en-US`; }
             else if(searchQuery) { 
                 if (searchTabType === 'multi' || searchTabType === 'person') {
                     url = `https://api.themoviedb.org/3/search/multi?query=${encodeURIComponent(searchQuery)}&api_key=${API_KEY}&page=${page}&include_adult=false`;
@@ -5074,10 +5096,10 @@
                     url = `https://api.themoviedb.org/3/search/${searchTabType}?query=${encodeURIComponent(searchQuery)}&api_key=${API_KEY}&page=${page}&include_adult=false`;
                 }
             }
-            else if(currentType === 'multi') { url = `https://api.themoviedb.org/3/trending/all/day?api_key=${API_KEY}&language=id-ID&page=${page}`; }
+            else if(currentType === 'multi') { url = `https://api.themoviedb.org/3/trending/all/day?api_key=${API_KEY}&language=en-US&page=${page}`; }
             else {
                 let endpoint = (currentType === 'tv') ? 'discover/tv' : 'discover/movie';
-                url = `https://api.themoviedb.org/3/${endpoint}?api_key=${API_KEY}&language=id-ID&page=${page}&include_adult=false&sort_by=popularity.desc`;
+                url = `https://api.themoviedb.org/3/${endpoint}?api_key=${API_KEY}&language=en-US&page=${page}&include_adult=false&sort_by=popularity.desc`;
                 if(currentCountry) url += `&with_origin_country=${currentCountry}`;
                 if(currentRating) {
                     const rMin = parseFloat(currentRating);
@@ -5135,23 +5157,39 @@
 
         function renderGrid(items, grid) { 
             const fragment = document.createDocumentFragment();
+            // Dedup: cek ID yang sudah ada di grid
+            const existingIds = new Set(
+                [...grid.querySelectorAll('[data-id]')].map(el => el.dataset.id)
+            );
             items.forEach(m => { 
-                if(!m.poster_path || m.media_type === 'person') return; 
+                if(!m.poster_path || m.media_type === 'person') return;
+                if(existingIds.has(String(m.id))) return; existingIds.add(String(m.id)); 
                 let mType = m.media_type;
                 if(!mType) { if(currentType === 'tv') mType = 'tv'; else mType = 'movie'; }
                 const card = document.createElement('div'); 
                 card.className = 'post-card'; 
+                card.dataset.id = String(m.id);
                 card.onclick = function() { openModal(m.id, mType); }; 
                 const _rd = m.release_date || m.first_air_date || '';
                 const _nb = isNewRelease(_rd) ? '<div class="badge-new">NEW</div>' : '';
                 let _title = m.title || m.name || '';
-                if (isNonLatin(_title)) {
+                // Selalu coba resolve ke EN title
+                {
                     const origT = m.original_title || m.original_name || '';
-                    if (origT && !isNonLatin(origT)) _title = origT;
+                    // Jika title non-latin, coba original_title dulu
+                    if (isNonLatin(_title)) {
+                        if (origT && !isNonLatin(origT)) {
+                            _title = origT;
+                        } else {
+                            // Gunakan original_title sebagai fallback tanpa extra fetch
+                            _title = m.original_title || m.original_name || m.title || m.name || '';
+                        }
+                    }
                 }
                 const _year = (m.release_date || m.first_air_date || '').split('-')[0];
                 const _rating = m.vote_average ? m.vote_average.toFixed(1) : '';
-                card.innerHTML = `<div class="badge-rating">${_rating}</div><div class="badge-type">${currentType==='short'?'SHORT':(mType==='tv'?'TV':'MOVIE')}</div>${_nb}<img src="https://image.tmdb.org/t/p/w185${m.poster_path}" loading="lazy" onload="this.style.opacity=1" style="opacity:0"><div class="card-title-overlay"><div class="card-title-text">${_title}</div><div class="card-meta-row">${_rating ? `<span class="card-star">★ ${_rating}</span>` : ''}${_year ? `<span class="card-year">${_year}</span>` : ''}</div></div>`;
+                const _typeLabel = currentType==='short' ? 'SHORT' : (mType==='tv' ? 'TV' : 'MOVIE');
+                card.innerHTML = `${_nb ? _nb.replace('badge-new', 'badge-new" style="position:absolute;top:6px;right:6px;bottom:auto;left:auto') : ''}<img src="https://image.tmdb.org/t/p/w185${m.poster_path}" loading="lazy" onload="this.style.opacity=1" style="opacity:0"><div class="card-title-overlay"><div class="card-title-text">${_title}</div><div class="card-meta-row">${_rating ? `<span class="card-star">★ ${_rating}</span>` : ''}<span class="card-type-label">${_typeLabel}</span>${_year ? `<span class="card-year">${_year}</span>` : ''}</div></div>`;
                 fragment.appendChild(card); 
             });
             grid.appendChild(fragment);
@@ -5475,7 +5513,7 @@
             history.pushState({view: 'modal'}, "");
 
             const [dId, dEn, dCast, dExt] = await Promise.all([
-                fetchWithCache(`https://api.themoviedb.org/3/${type}/${id}?api_key=${API_KEY}&language=id-ID&append_to_response=videos,production_companies&include_video_language=en,id,hi,th,ko,ja,ru,null`),
+                fetchWithCache(`https://api.themoviedb.org/3/${type}/${id}?api_key=${API_KEY}&language=en-US&append_to_response=videos,production_companies&include_video_language=en,id,hi,th,ko,ja,ru,null`),
                 fetchWithCache(`https://api.themoviedb.org/3/${type}/${id}?api_key=${API_KEY}&language=en-US`),
                 fetchWithCache(`https://api.themoviedb.org/3/${type}/${id}/credits?api_key=${API_KEY}`),
                 fetchWithCache(`https://api.themoviedb.org/3/${type}/${id}/external_ids?api_key=${API_KEY}`)
@@ -6116,7 +6154,7 @@
                 return; 
             } 
             const promises = items.map(i => 
-                fetchWithCache(`https://api.themoviedb.org/3/${i.type}/${i.id}?api_key=${API_KEY}&language=id-ID`)
+                fetchWithCache(`https://api.themoviedb.org/3/${i.type}/${i.id}?api_key=${API_KEY}&language=en-US`)
                     .then(r => ({ ...r, _savedType: i.type }))
             ); 
             const results = await Promise.all(promises); 
@@ -6351,8 +6389,8 @@
             try {
                 // Fetch film rilis hari ini (movie + tv)
                 const [movRes, tvRes] = await Promise.allSettled([
-                    fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=id-ID&sort_by=popularity.desc&primary_release_date.gte=${todayStr}&primary_release_date.lte=${todayStr}&include_adult=false`).then(r=>r.json()),
-                    fetch(`https://api.themoviedb.org/3/discover/tv?api_key=${API_KEY}&language=id-ID&sort_by=popularity.desc&first_air_date.gte=${todayStr}&first_air_date.lte=${todayStr}&include_adult=false`).then(r=>r.json()),
+                    fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=en-US&sort_by=popularity.desc&primary_release_date.gte=${todayStr}&primary_release_date.lte=${todayStr}&include_adult=false`).then(r=>r.json()),
+                    fetch(`https://api.themoviedb.org/3/discover/tv?api_key=${API_KEY}&language=en-US&sort_by=popularity.desc&first_air_date.gte=${todayStr}&first_air_date.lte=${todayStr}&include_adult=false`).then(r=>r.json()),
                 ]);
 
                 const movies = (movRes.status==='fulfilled' ? movRes.value.results||[] : []).map(m=>({...m,_mtype:'movie'}));
@@ -6363,8 +6401,8 @@
                 if (allItems.length === 0) {
                     const prev = new Date(Date.now() - 3*24*60*60*1000).toISOString().split('T')[0];
                     const [m2, t2] = await Promise.allSettled([
-                        fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=id-ID&sort_by=popularity.desc&primary_release_date.gte=${prev}&primary_release_date.lte=${todayStr}&include_adult=false`).then(r=>r.json()),
-                        fetch(`https://api.themoviedb.org/3/discover/tv?api_key=${API_KEY}&language=id-ID&sort_by=popularity.desc&first_air_date.gte=${prev}&first_air_date.lte=${todayStr}&include_adult=false`).then(r=>r.json()),
+                        fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=en-US&sort_by=popularity.desc&primary_release_date.gte=${prev}&primary_release_date.lte=${todayStr}&include_adult=false`).then(r=>r.json()),
+                        fetch(`https://api.themoviedb.org/3/discover/tv?api_key=${API_KEY}&language=en-US&sort_by=popularity.desc&first_air_date.gte=${prev}&first_air_date.lte=${todayStr}&include_adult=false`).then(r=>r.json()),
                     ]);
                     allItems = [
                         ...(m2.status==='fulfilled'?m2.value.results||[]:[]).map(m=>({...m,_mtype:'movie'})),
@@ -6384,20 +6422,15 @@
 
                 let html2 = '';
                 // Resolve latin titles async
-                const resolveTitle = async (m) => {
+                // Resolve title tanpa extra fetch - gunakan original_title
+                const allResolved = allItems.map(m => {
                     let title = m.title || m.name || '';
                     if (isNonLatin(title)) {
-                        try {
-                            const en = await fetchWithCache(`https://api.themoviedb.org/3/${m._mtype}/${m.id}?api_key=${API_KEY}&language=en-US`);
-                            const enT = en.title || en.name || '';
-                            const origT = en.original_title || en.original_name || '';
-                            if (enT && !isNonLatin(enT)) title = enT;
-                            else if (origT && !isNonLatin(origT)) title = origT;
-                        } catch {}
+                        const origT = m.original_title || m.original_name || '';
+                        if (origT && !isNonLatin(origT)) title = origT;
                     }
                     return { ...m, _resolvedTitle: title };
-                };
-                const allResolved = await Promise.all(allItems.map(resolveTitle));
+                });
                 const movieResolved = allResolved.filter(m => m._mtype === 'movie');
                 const tvResolved = allResolved.filter(m => m._mtype === 'tv');
 
@@ -6411,8 +6444,7 @@
                                 <div class="notif-title">${m._resolvedTitle}</div>
                                 <div class="notif-meta">Movie · Released today</div>
                             </div>
-                            <span class="notif-rating">${rating}</span>
-                        </div>`;
+                            </div>`;
                     }).join('');
                 }
                 if (tvResolved.length) {
@@ -6425,8 +6457,7 @@
                                 <div class="notif-title">${m._resolvedTitle}</div>
                                 <div class="notif-meta">Series · Airing today</div>
                             </div>
-                            <span class="notif-rating">${rating}</span>
-                        </div>`;
+                            </div>`;
                     }).join('');
                 }
                 content.innerHTML = html2;
