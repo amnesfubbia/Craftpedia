@@ -970,7 +970,7 @@
         /* ===== REELS MODAL ===== */
         #reelsModal {
             display: none; position: fixed; inset: 0; z-index: 8500;
-            background: #000; overflow: hidden;
+            background: #000000; overflow: hidden;
         }
         /* Container scroll vertikal snap */
         .reels-container {
@@ -978,6 +978,7 @@
             overflow-y: scroll; scroll-snap-type: y mandatory;
             scrollbar-width: none; -webkit-overflow-scrolling: touch;
             overscroll-behavior: contain;
+            background: #000000;
         }
         .reels-container::-webkit-scrollbar { display: none; }
 
@@ -985,23 +986,31 @@
         .reel-slide {
             width: 100%; height: 100svh;
             scroll-snap-align: start; scroll-snap-stop: always;
-            position: relative; background: #000;
+            position: relative; background: #000000;
             display: flex; align-items: center; justify-content: center;
             overflow: hidden;
         }
 
         /* Video wrapper 4:5 — posisi agak ke atas agar beri ruang sinopsis */
-        /* Blur background seperti Instagram Reels */
+        /* Background AMOLED hitam pekat, tanpa blur gambar */
         .reel-blur-bg {
             position: absolute; inset: 0; z-index: 0;
-            overflow: hidden; background: #000;
+            overflow: hidden; background: #000000;
         }
+        /* Sembunyikan gambar blur background - AMOLED mode */
         .reel-blur-bg img {
-            position: absolute; top: -10%; left: -10%;
-            width: 120%; height: 120%;
-            object-fit: cover; pointer-events: none;
-            filter: blur(30px) brightness(0.5) saturate(2);
-            transform: scale(1.15);
+            display: none;
+        }
+        /* Overlay hitam atas dan bawah untuk menutup sisa area terang */
+        .reel-blur-bg::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0;
+            height: 35%; background: #000000; z-index: 2; pointer-events: none;
+        }
+        .reel-blur-bg::after {
+            content: '';
+            position: absolute; bottom: 0; left: 0; right: 0;
+            height: 35%; background: #000000; z-index: 2; pointer-events: none;
         }
         .reel-video-wrap {
             position: absolute;
@@ -1010,7 +1019,7 @@
             width: 100%;
             aspect-ratio: 9/16;
             max-height: 72svh;
-            background: transparent;
+            background: #000000;
             overflow: hidden;
             z-index: 1;
         }
@@ -1021,10 +1030,26 @@
             z-index: 3; background: transparent;
             pointer-events: auto;
         }
+        /* Iframe diperbesar + di-crop untuk menyembunyikan tombol bawaan YouTube */
+        /* Scale up + negatif margin memotong area kontrol YT di atas & bawah */
         .reel-video-wrap iframe {
-            width: 100%; height: 100%;
+            width: 100%;
+            height: calc(100% + 100px);
+            margin-top: -50px;
             border: none; pointer-events: none;
             display: block;
+        }
+        /* Strip hitam penutup tombol YouTube atas (judul, tombol back, dll) */
+        .reel-yt-mask-top {
+            position: absolute; top: 0; left: 0; right: 0;
+            height: 52px; background: #000000;
+            z-index: 4; pointer-events: none;
+        }
+        /* Strip hitam penutup tombol YouTube bawah (progress bar, tombol, dll) */
+        .reel-yt-mask-bottom {
+            position: absolute; bottom: 0; left: 0; right: 0;
+            height: 52px; background: #000000;
+            z-index: 4; pointer-events: none;
         }
 
         /* Double-tap heart animation */
@@ -1091,8 +1116,8 @@
         .reel-year { display: none; }
         .reel-meta-inline {
             display: flex; align-items: center; flex-wrap: wrap; gap: 0;
-            font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.85);
-            margin-bottom: 8px; text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+            font-size: 16px; font-weight: 500; color: rgba(255,255,255,0.85);
+            margin-bottom: 10px; text-shadow: 0 1px 4px rgba(0,0,0,0.8);
         }
         .reel-meta-inline .rmi-rating { color: #f5c518; font-weight: 700; margin-right: 8px; }
         .reel-meta-inline .rmi-dot { color: rgba(255,255,255,0.4); margin: 0 6px; }
@@ -1131,7 +1156,7 @@
 
         /* Tombol aksi kanan bawah (like, bookmark) */
         .reel-actions {
-            position: absolute; top: 44%; right: 12px;
+            position: absolute; top: 46%; right: 12px;
             transform: translateY(-50%);
             display: flex; flex-direction: column; align-items: center; gap: 18px;
             z-index: 10;
@@ -1157,7 +1182,7 @@
         .reels-topbar {
             position: fixed; top: 0; left: 0; right: 0; z-index: 9100;
             display: flex; align-items: center; padding: 14px 16px 10px;
-            background: #000;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.65) 0%, transparent 100%);
             pointer-events: none;
         }
         .reels-topbar-title {
@@ -1997,9 +2022,9 @@
 
             <div id="filterBar">
                 <div class="pill-grid grid-cols-4">
-                    <button class="pill" id="btnCountry" onclick="toggleFilter(event, 'countryDropdown')">Negara <i class="fa-solid fa-caret-down"></i></button>
+                    <button class="pill" id="btnCountry" onclick="toggleFilter(event, 'countryDropdown')">Country <i class="fa-solid fa-caret-down"></i></button>
                     <button class="pill" id="btnGenre" onclick="toggleFilter(event, 'genreDropdown')">Genre <i class="fa-solid fa-caret-down"></i></button>
-                    <button class="pill" id="yearBtn" onclick="toggleFilter(event, 'yearDropdown')">Tahun <i class="fa-solid fa-caret-down"></i></button>
+                    <button class="pill" id="yearBtn" onclick="toggleFilter(event, 'yearDropdown')">Year <i class="fa-solid fa-caret-down"></i></button>
                     <button class="pill" id="btnRating" onclick="toggleFilter(event, 'ratingDropdown')">Rating <i class="fa-solid fa-caret-down"></i></button>
                 </div>
             </div>
@@ -3599,20 +3624,9 @@
             } catch { return rawTitle; }
         }
 
-             // In-memory cache untuk performa maksimal (lebih cepat dari sessionStorage)
-        const _memCache = {};
-        function fetchWithCache(url) {
-            // Cek memory cache dulu (paling cepat)
-            if (_memCache[url]) return Promise.resolve(_memCache[url]);
-            // Cek sessionStorage
-            try {
-                const cached = sessionStorage.getItem(url);
-                if (cached) {
-                    const parsed = JSON.parse(cached);
-                    _memCache[url] = parsed; // Simpan ke memory juga
-                    return Promise.resolve(parsed);
-                }
-            } catch(e) {}
+        async function fetchWithCache(url) {
+            const cached = sessionStorage.getItem(url);
+            if (cached) return JSON.parse(cached);
             // Bungkus dalam Promise dengan timeout manual — tidak simpan AbortController di scope global
             return new Promise(async (resolve, reject) => {
                 const timer = setTimeout(() => reject(new Error('fetch timeout')), 8000);
@@ -3620,8 +3634,7 @@
                     const res = await fetch(url);
                     const data = await res.json();
                     clearTimeout(timer);
-                    try { _memCache[url] = data; // Memory cache
-                    try { sessionStorage.setItem(url, JSON.stringify(data)); } catch(e) {} } catch(e) {}
+                    try { sessionStorage.setItem(url, JSON.stringify(data)); } catch(e) {}
                     resolve(data);
                 } catch(e) {
                     clearTimeout(timer);
@@ -3667,23 +3680,16 @@
 
             try {
                 const [details, credits] = await Promise.all([
-                    fetchWithCache(`https://api.themoviedb.org/3/person/${actorId}?api_key=${API_KEY}&language=en-US&append_to_response=also_known_as`),
-                    fetchWithCache(`https://api.themoviedb.org/3/person/${actorId}/combined_credits?api_key=${API_KEY}&language=en-US`)
+                    fetchWithCache(`https://api.themoviedb.org/3/person/${actorId}?api_key=${API_KEY}&language=id-ID`),
+                    fetchWithCache(`https://api.themoviedb.org/3/person/${actorId}/combined_credits?api_key=${API_KEY}&language=id-ID`)
                 ]);
 
                 const imgPath = details.profile_path ? `https://image.tmdb.org/t/p/w500${details.profile_path}` : 'amnesfubbia.png';
                 document.getElementById('actorPic').src = imgPath;
                 document.getElementById('actorCoverBlur').style.backgroundImage = `url('${imgPath}')`;
-                document.getElementById('actorHeaderTitle').innerText = _aLatin;
-                const _aRaw = details.name || '';
-                const _aLatin = (()=>{
-                    if (!/[\u3040-\u30FF\u4E00-\u9FFF\uAC00-\uD7FF\u0400-\u04FF]/.test(_aRaw)) return _aRaw;
-                    const akas = details.also_known_as || [];
-                    const latinAka = akas.find(a => !/[\u3040-\u30FF\u4E00-\u9FFF\uAC00-\uD7FF\u0400-\u04FF]/.test(a) && a.length > 2);
-                    return latinAka || _aRaw;
-                })();
-                document.getElementById('actorName').innerText = _aLatin;
-                document.getElementById('actorNameBio').innerText = _aLatin;
+                document.getElementById('actorHeaderTitle').innerText = details.name;
+                document.getElementById('actorName').innerText = details.name;
+                document.getElementById('actorNameBio').innerText = details.name;
                 document.getElementById('actorDept').innerText = details.known_for_department || 'Pemeran';
 
                 // Age
@@ -3753,18 +3759,35 @@
 
                 if (topWorks.length > 0) {
                     document.getElementById('actorKnownForWrapper').style.display = 'block';
-                    document.getElementById('actorKnownFor').innerHTML = topWorks.map(w => `
+                    document.getElementById('actorKnownFor').innerHTML = topWorks.map(w => {
+                        const rawT = w.title || w.name || '';
+                        const rawO = w.original_title || w.original_name || '';
+                        const displayT = (!isNonLatin(rawT)) ? rawT : ((!isNonLatin(rawO)) ? rawO : rawT);
+                        const titleId = `kf-title-${w.id}-${Math.random().toString(36).slice(2,6)}`;
+                        // Fetch EN async jika masih non-Latin
+                        if (isNonLatin(displayT)) {
+                            const mtype = w.media_type === 'tv' ? 'tv' : 'movie';
+                            fetchWithCache(`https://api.themoviedb.org/3/${mtype}/${w.id}?api_key=${API_KEY}&language=en-US`)
+                                .then(d => {
+                                    const enT = d.title || d.name || '';
+                                    if (enT && !isNonLatin(enT)) {
+                                        const el = document.getElementById(titleId);
+                                        if (el) el.textContent = enT;
+                                    }
+                                }).catch(()=>{});
+                        }
+                        return `
                         <div class="actor-hl-item" onclick="openModalFromActor(${w.id}, '${w.media_type}')" style="position:relative;flex:0 0 75px;border-radius:8px;overflow:hidden;background:#111;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.5)">
                             <img src="https://image.tmdb.org/t/p/w185${w.poster_path}" loading="lazy" style="width:75px;height:110px;object-fit:cover;display:block;opacity:0;transition:opacity 0.3s" onload="this.style.opacity=1">
                             <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(to top,rgba(0,0,0,0.95) 0%,rgba(0,0,0,0.6) 50%,transparent 100%);padding:20px 5px 5px">
-                                <div style="font-size:9px;font-weight:500;color:rgba(255,255,255,0.75);line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${(()=>{const t=w.title||w.name||'';const o=w.original_title||w.original_name||'';return (t && !/[\u3040-\u30FF\u4E00-\u9FFF\uAC00-\uD7FF\u0400-\u04FF]/.test(t))?t:((o&&!/[\u3040-\u30FF\u4E00-\u9FFF\uAC00-\uD7FF\u0400-\u04FF]/.test(o))?o:t);})()}</div>
+                                <div id="${titleId}" style="font-size:9px;font-weight:500;color:rgba(255,255,255,0.75);line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${displayT}</div>
                                 <div style="display:flex;align-items:center;gap:3px;margin-top:2px">
                                     ${w.vote_average ? `<span style="font-size:8px;color:#f5c518;font-weight:700">★${w.vote_average.toFixed(1)}</span>` : ''}
                                     ${(w.release_date||w.first_air_date) ? `<span style="font-size:8px;color:rgba(255,255,255,0.5)">${(w.release_date||w.first_air_date).split('-')[0]}</span>` : ''}
                                 </div>
                             </div>
                         </div>
-                    `).join('');
+                    `;}).join('');
                 }
 
                 // Movie grid (movies)
@@ -3778,16 +3801,29 @@
                 const filmGrid = document.getElementById('actorMovieGrid');
                 filmGrid.innerHTML = '';
                 if (movieMovies.length === 0) {
-                    filmGrid.innerHTML = '<div class="col-span-3 py-16 text-center text-zinc-600 text-xs">Tidak ada data film.</div>';
+                    filmGrid.innerHTML = '<div class="col-span-3 py-16 text-center text-zinc-600 text-xs">No movie data.</div>';
                 } else {
                     movieMovies.forEach(m => {
                         const card = document.createElement('div');
                         card.className = 'post-card';
                         card.onclick = () => openModalFromActor(m.id, 'movie');
-                        const _fTitle = (()=>{const t=m.title||m.name||'';const o=m.original_title||m.original_name||'';return (t&&!/[\u3040-\u30FF\u4E00-\u9FFF\uAC00-\uD7FF\u0400-\u04FF]/.test(t))?t:((o&&!/[\u3040-\u30FF\u4E00-\u9FFF\uAC00-\uD7FF\u0400-\u04FF]/.test(o))?o:t);})();
+                        const rawT = m.title || m.name || '';
+                        const rawO = m.original_title || m.original_name || '';
+                        let _fTitle = (!isNonLatin(rawT)) ? rawT : ((!isNonLatin(rawO)) ? rawO : rawT);
                         const _fYear = (m.release_date||'').split('-')[0];
                         const _fRating = m.vote_average ? m.vote_average.toFixed(1) : '';
                         card.innerHTML = `<img src="https://image.tmdb.org/t/p/w185${m.poster_path}" loading="lazy" onload="this.style.opacity=1" style="opacity:0"><div class="card-title-overlay"><div class="card-title-text">${_fTitle}</div><div class="card-meta-row"><span class="card-type-label">MOVIE</span>${_fRating?`<span class="card-star">★${_fRating}</span>`:''} ${_fYear?`<span class="card-year">${_fYear}</span>`:''}</div></div>`;
+                        // Jika judul masih non-Latin, fetch EN title async
+                        if (isNonLatin(_fTitle)) {
+                            fetchWithCache(`https://api.themoviedb.org/3/movie/${m.id}?api_key=${API_KEY}&language=en-US`)
+                                .then(d => {
+                                    const enT = d.title || d.name || '';
+                                    if (enT && !isNonLatin(enT)) {
+                                        const el = card.querySelector('.card-title-text');
+                                        if (el) el.textContent = enT;
+                                    }
+                                }).catch(()=>{});
+                        }
                         filmGrid.appendChild(card);
                     });
                 }
@@ -3802,16 +3838,29 @@
                 const tvGrid = document.getElementById('actorTvGrid');
                 tvGrid.innerHTML = '';
                 if (tvMovies.length === 0) {
-                    tvGrid.innerHTML = '<div class="col-span-3 py-16 text-center text-zinc-600 text-xs">Tidak ada data serial.</div>';
+                    tvGrid.innerHTML = '<div class="col-span-3 py-16 text-center text-zinc-600 text-xs">No series data.</div>';
                 } else {
                     tvMovies.forEach(m => {
                         const card = document.createElement('div');
                         card.className = 'post-card';
                         card.onclick = () => openModalFromActor(m.id, 'tv');
-                        const _tTitle = (()=>{const t=m.title||m.name||'';const o=m.original_title||m.original_name||'';return (t&&!/[\u3040-\u30FF\u4E00-\u9FFF\uAC00-\uD7FF\u0400-\u04FF]/.test(t))?t:((o&&!/[\u3040-\u30FF\u4E00-\u9FFF\uAC00-\uD7FF\u0400-\u04FF]/.test(o))?o:t);})();
+                        const rawT = m.title || m.name || '';
+                        const rawO = m.original_title || m.original_name || '';
+                        let _tTitle = (!isNonLatin(rawT)) ? rawT : ((!isNonLatin(rawO)) ? rawO : rawT);
                         const _tYear = (m.first_air_date||'').split('-')[0];
                         const _tRating = m.vote_average ? m.vote_average.toFixed(1) : '';
                         card.innerHTML = `<img src="https://image.tmdb.org/t/p/w185${m.poster_path}" loading="lazy" onload="this.style.opacity=1" style="opacity:0"><div class="card-title-overlay"><div class="card-title-text">${_tTitle}</div><div class="card-meta-row"><span class="card-type-label">TV</span>${_tRating?`<span class="card-star">★${_tRating}</span>`:''} ${_tYear?`<span class="card-year">${_tYear}</span>`:''}</div></div>`;
+                        // Jika judul masih non-Latin, fetch EN title async
+                        if (isNonLatin(_tTitle)) {
+                            fetchWithCache(`https://api.themoviedb.org/3/tv/${m.id}?api_key=${API_KEY}&language=en-US`)
+                                .then(d => {
+                                    const enT = d.name || d.title || '';
+                                    if (enT && !isNonLatin(enT)) {
+                                        const el = card.querySelector('.card-title-text');
+                                        if (el) el.textContent = enT;
+                                    }
+                                }).catch(()=>{});
+                        }
                         tvGrid.appendChild(card);
                     });
                 }
@@ -4046,10 +4095,16 @@
                         const rawTitle = m.title || m.name || '';
                         let title = rawTitle;
                         if (isNonLatin(rawTitle)) {
-                            // Gunakan original_title tanpa extra fetch untuk performa
-                            const origTitle = m.original_title || m.original_name || '';
-                            if (origTitle && !isNonLatin(origTitle)) title = origTitle;
-                            // rawTitle tetap jika semua non-latin
+                            try {
+                                const enData = await fetchWithCache(`https://api.themoviedb.org/3/${mtype}/${m.id}?api_key=${API_KEY}&language=en-US`);
+                                // Coba title EN dulu, fallback ke original_title (biasanya latin)
+                                const enTitle = enData.title || enData.name || '';
+                                const origTitle = enData.original_title || enData.original_name || '';
+                                // Pilih yang latin: EN title > original title > rawTitle
+                                if (enTitle && !isNonLatin(enTitle)) title = enTitle;
+                                else if (origTitle && !isNonLatin(origTitle)) title = origTitle;
+                                else title = enTitle || rawTitle;
+                            } catch { title = rawTitle; }
                         }
                         const year  = (m.release_date || m.first_air_date || '').split('-')[0];
                         const poster = m.poster_path || '';
@@ -4104,16 +4159,14 @@
                     const synTransId = `reel-trans-${reel.movieId}`;
 
                     slide.innerHTML = `
-                        <!-- Blurred background - pakai poster TMDb -->
-                        <div class="reel-blur-bg">
-                            ${reel.poster ? `<img src="https://image.tmdb.org/t/p/w500${reel.poster}" alt="" loading="lazy">` : ''}
-                        </div>
+                        <!-- Background AMOLED hitam pekat -->
+                        <div class="reel-blur-bg"></div>
                         <div class="reel-video-wrap">
                             <iframe src="${embedUrl}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen loading="lazy"></iframe>
-                            <!-- Tutup header YouTube (atas) solid hitam -->
-                            <div style="position:absolute;top:0;left:0;right:0;height:90px;z-index:2;pointer-events:none;background:#000"></div>
-                            <!-- Tutup UI bawah YouTube solid hitam -->
-                            <div style="position:absolute;bottom:0;left:0;right:0;height:70px;z-index:2;pointer-events:none;background:#000"></div>
+                            <!-- Masker hitam solid tutup tombol header YouTube (judul, share, dll) -->
+                            <div class="reel-yt-mask-top"></div>
+                            <!-- Masker hitam solid tutup tombol footer YouTube (progress bar, play, volume, dll) -->
+                            <div class="reel-yt-mask-bottom"></div>
                         </div>
                         <div class="reel-heart-pop" id="heart-${reel.movieId}"><i class="fa-solid fa-heart"></i></div>
                         <div class="reel-gradient"></div>
@@ -4368,7 +4421,7 @@
 
             try {
                 const [data, extRatings] = await Promise.allSettled([
-                    fetchWithCache(`https://api.themoviedb.org/3/${type}/${movieId}?api_key=${API_KEY}&language=en-US&append_to_response=credits`),
+                    fetchWithCache(`https://api.themoviedb.org/3/${type}/${movieId}?api_key=${API_KEY}&language=id-ID&append_to_response=credits`),
                     fetchWithCache(`https://api.themoviedb.org/3/${type}/${movieId}/external_ids?api_key=${API_KEY}`)
                 ]);
 
@@ -4751,9 +4804,9 @@
             const btnYear = document.getElementById('yearBtn');
             const btnRatingEl = document.getElementById('btnRating');
             if(btnRatingEl) { btnRatingEl.innerHTML = 'Rating <i class="fa-solid fa-caret-down"></i>'; btnRatingEl.classList.remove('active-pill'); }
-            btnCountry.innerHTML = 'Negara <i class="fa-solid fa-caret-down"></i>';
+            btnCountry.innerHTML = 'Country <i class="fa-solid fa-caret-down"></i>';
             btnGenre.innerHTML = 'Genre <i class="fa-solid fa-caret-down"></i>';
-            btnYear.innerHTML = 'Tahun <i class="fa-solid fa-caret-down"></i>';
+            btnYear.innerHTML = 'Year <i class="fa-solid fa-caret-down"></i>';
             document.querySelectorAll('.pill').forEach(p => p.classList.remove('active-pill'));
             document.querySelectorAll('.btn-ig').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.stat-item').forEach(s => s.classList.remove('active-stat'));
@@ -4956,7 +5009,7 @@
 
         function initFilters() { 
             const yD = document.getElementById('yearDropdown'); 
-            let yearHTML = '<div class="filter-item sticky-reset" onclick="setYear(\'\')">All Tahun</div>'; 
+            let yearHTML = '<div class="filter-item sticky-reset" onclick="setYear(\'\')">All Years</div>'; 
             for(let y=2026; y>=1930; y--) yearHTML += `<div class="filter-item" onclick="setYear(${y})">${y}</div>`; 
             yD.innerHTML = yearHTML; 
 
@@ -5048,14 +5101,14 @@
             countries.slice(1).forEach(c => { if (!countrySeen.has(c[0])) { countrySeen.add(c[0]); countriesUniq.push(c); }});
             const countriesFinal = [countriesUniq[0], ...countriesUniq.slice(1).sort((a,b) => a[1].localeCompare(b[1], 'id'))];
             const cD = document.getElementById('countryDropdown'); 
-            let countryHTML = '<div class="filter-item sticky-reset" onclick="setCountry(\'\',\'Negara\')">All Negara</div>'; 
+            let countryHTML = '<div class="filter-item sticky-reset" onclick="setCountry(\'\',\'Country\')">All Countries</div>'; 
             countriesFinal.forEach(c => countryHTML += `<div class="filter-item" onclick="setCountry('${c[0]}','${c[1]}')">${c[1]}</div>`); 
             cD.innerHTML = countryHTML; 
 
             // Rating dropdown - per angka eksak
             const rD = document.getElementById('ratingDropdown');
             if (rD) {
-                let ratingHTML = '<div class="filter-item sticky-reset" onclick="setRating(\'\',\'Rating\')">All Rating</div>';
+                let ratingHTML = '<div class="filter-item sticky-reset" onclick="setRating(\'\',\'Rating\')">All Ratings</div>';
                 [['9','★ 9'],['8','★ 8'],['7','★ 7'],['6','★ 6'],['5','★ 5'],['4','★ 4']].forEach(r =>
                     ratingHTML += `<div class="filter-item" onclick="setRating('${r[0]}','${r[1]}')">${r[1]}</div>`
                 );
@@ -5073,7 +5126,7 @@
                 [10752,'War'],[37,'Western']
             ].sort((a,b) => a[1].localeCompare(b[1]));
             const gD = document.getElementById('genreDropdown'); 
-            let genreHTML = '<div class="filter-item sticky-reset" onclick="setGenre(\'\',\'Genre\')">All Genre</div>'; 
+            let genreHTML = '<div class="filter-item sticky-reset" onclick="setGenre(\'\',\'Genre\')">All Genres</div>'; 
             genres.forEach(g => genreHTML += `<div class="filter-item" onclick="setGenre('${g[0]}','${g[1]}')">${g[1]}</div>`); 
             gD.innerHTML = genreHTML; 
         }
@@ -5088,7 +5141,7 @@
             const grid = document.getElementById('searchOverlay').style.display === 'block' ? document.getElementById('searchGrid') : document.getElementById('feedGrid');
             if(isNew) { page = 1; grid.innerHTML = ''; }
             let url;
-            if(currentCastId) { url = `https://api.themoviedb.org/3/person/${currentCastId}/combined_credits?api_key=${API_KEY}&language=en-US`; }
+            if(currentCastId) { url = `https://api.themoviedb.org/3/person/${currentCastId}/combined_credits?api_key=${API_KEY}&language=id-ID`; }
             else if(searchQuery) { 
                 if (searchTabType === 'multi' || searchTabType === 'person') {
                     url = `https://api.themoviedb.org/3/search/multi?query=${encodeURIComponent(searchQuery)}&api_key=${API_KEY}&page=${page}&include_adult=false`;
@@ -5099,7 +5152,7 @@
             else if(currentType === 'multi') { url = `https://api.themoviedb.org/3/trending/all/day?api_key=${API_KEY}&language=en-US&page=${page}`; }
             else {
                 let endpoint = (currentType === 'tv') ? 'discover/tv' : 'discover/movie';
-                url = `https://api.themoviedb.org/3/${endpoint}?api_key=${API_KEY}&language=en-US&page=${page}&include_adult=false&sort_by=popularity.desc`;
+                url = `https://api.themoviedb.org/3/${endpoint}?api_key=${API_KEY}&language=id-ID&page=${page}&include_adult=false&sort_by=popularity.desc`;
                 if(currentCountry) url += `&with_origin_country=${currentCountry}`;
                 if(currentRating) {
                     const rMin = parseFloat(currentRating);
@@ -5157,18 +5210,12 @@
 
         function renderGrid(items, grid) { 
             const fragment = document.createDocumentFragment();
-            // Dedup: cek ID yang sudah ada di grid
-            const existingIds = new Set(
-                [...grid.querySelectorAll('[data-id]')].map(el => el.dataset.id)
-            );
             items.forEach(m => { 
-                if(!m.poster_path || m.media_type === 'person') return;
-                if(existingIds.has(String(m.id))) return; existingIds.add(String(m.id)); 
+                if(!m.poster_path || m.media_type === 'person') return; 
                 let mType = m.media_type;
                 if(!mType) { if(currentType === 'tv') mType = 'tv'; else mType = 'movie'; }
                 const card = document.createElement('div'); 
                 card.className = 'post-card'; 
-                card.dataset.id = String(m.id);
                 card.onclick = function() { openModal(m.id, mType); }; 
                 const _rd = m.release_date || m.first_air_date || '';
                 const _nb = isNewRelease(_rd) ? '<div class="badge-new">NEW</div>' : '';
@@ -5181,10 +5228,20 @@
                         if (origT && !isNonLatin(origT)) {
                             _title = origT;
                         } else {
-                            // Gunakan original_title sebagai fallback tanpa extra fetch
-                            _title = m.original_title || m.original_name || m.title || m.name || '';
+                            // Fetch EN dari API async, update card setelah render
+                            fetchWithCache(`https://api.themoviedb.org/3/${mType}/${m.id}?api_key=${API_KEY}&language=en-US`).then(d => {
+                                const enT = d.title || d.name || '';
+                                const origEN = d.original_title || d.original_name || '';
+                                const finalT = (enT && !isNonLatin(enT)) ? enT : (origEN && !isNonLatin(origEN)) ? origEN : '';
+                                if (finalT) {
+                                    const titleEl = card.querySelector('.card-title-text');
+                                    if (titleEl) titleEl.textContent = finalT;
+                                }
+                            }).catch(()=>{});
                         }
                     }
+                    // Juga cek jika title masih dalam bahasa lain (terjemahan Indonesia dll)
+                    // Kita tidak bisa deteksi bahasa secara pasti, tapi original_title lebih aman
                 }
                 const _year = (m.release_date || m.first_air_date || '').split('-')[0];
                 const _rating = m.vote_average ? m.vote_average.toFixed(1) : '';
@@ -5313,7 +5370,7 @@
         function setYear(y) { 
             currentYear = y; 
             const btn = document.getElementById('yearBtn');
-            btn.innerHTML = (y || 'Tahun') + ' <i class="fa-solid fa-caret-down"></i>'; 
+            btn.innerHTML = (y || 'Year') + ' <i class="fa-solid fa-caret-down"></i>'; 
             y ? btn.classList.add('active-pill') : btn.classList.remove('active-pill');
             if(currentType === 'multi') currentType = 'movie';
             closeD(); loadFeed(true); 
@@ -5513,7 +5570,7 @@
             history.pushState({view: 'modal'}, "");
 
             const [dId, dEn, dCast, dExt] = await Promise.all([
-                fetchWithCache(`https://api.themoviedb.org/3/${type}/${id}?api_key=${API_KEY}&language=en-US&append_to_response=videos,production_companies&include_video_language=en,id,hi,th,ko,ja,ru,null`),
+                fetchWithCache(`https://api.themoviedb.org/3/${type}/${id}?api_key=${API_KEY}&language=id-ID&append_to_response=videos,production_companies&include_video_language=en,id,hi,th,ko,ja,ru,null`),
                 fetchWithCache(`https://api.themoviedb.org/3/${type}/${id}?api_key=${API_KEY}&language=en-US`),
                 fetchWithCache(`https://api.themoviedb.org/3/${type}/${id}/credits?api_key=${API_KEY}`),
                 fetchWithCache(`https://api.themoviedb.org/3/${type}/${id}/external_ids?api_key=${API_KEY}`)
@@ -5655,11 +5712,29 @@
                 } catch(e) { currentDailymotionId = ""; }
             })();
 
-            document.getElementById('castContainer').innerHTML = (dCast.cast || []).slice(0, 10).map(c => {
+            // Render cast dengan nama Latin (fetch also_known_as jika nama non-Latin)
+            const castRaw = (dCast.cast || []).slice(0, 10);
+            const castItems = await Promise.all(castRaw.map(async c => {
                 const profileImg = c.profile_path ? `<img src="https://image.tmdb.org/t/p/w185${c.profile_path}" loading="lazy" class="rounded-full">` : `<div style="width:100%; height:100%; background:#222; display:flex; align-items:center; justify-content:center; color:#555;"><i class="fa-solid fa-user"></i></div>`;
                 const charName = c.character ? c.character.replace(/\s*\(.*?\)/g,'').trim() : '';
-                return `<div class="cast-item" onclick="openActorProfile(${c.id})"><div class="cast-img-border"><div class="inner-border">${profileImg}</div></div><span class="cast-name">${c.name}</span>${charName ? `<span style="font-size:8px;color:#555;display:block;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:65px">${charName}</span>` : ''}</div>`;
-            }).join('');
+                let displayName = c.name || '';
+                // Jika nama non-Latin, cari nama Latin dari also_known_as
+                if (isNonLatin(displayName)) {
+                    try {
+                        const personData = await fetchWithCache(`https://api.themoviedb.org/3/person/${c.id}?api_key=${API_KEY}&language=en-US`);
+                        const latinName = personData.name || '';
+                        if (!isNonLatin(latinName)) {
+                            displayName = latinName;
+                        } else {
+                            // Coba also_known_as untuk nama Latin
+                            const aka = (personData.also_known_as || []).find(n => n && !isNonLatin(n));
+                            if (aka) displayName = aka;
+                        }
+                    } catch {}
+                }
+                return `<div class="cast-item" onclick="openActorProfile(${c.id})"><div class="cast-img-border"><div class="inner-border">${profileImg}</div></div><span class="cast-name">${displayName}</span>${charName ? `<span style="font-size:8px;color:#555;display:block;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:65px">${charName}</span>` : ''}</div>`;
+            }));
+            document.getElementById('castContainer').innerHTML = castItems.join('');
             document.getElementById('mLikeDisplay').innerText = `${Math.floor((dId.vote_average || 0) * 1234).toLocaleString('id-ID')} suka`;
             // Prioritaskan judul en-US agar selalu Latin
             // Jika dEn kosong atau masih non-Latin, coba ambil lagi
@@ -6154,7 +6229,7 @@
                 return; 
             } 
             const promises = items.map(i => 
-                fetchWithCache(`https://api.themoviedb.org/3/${i.type}/${i.id}?api_key=${API_KEY}&language=en-US`)
+                fetchWithCache(`https://api.themoviedb.org/3/${i.type}/${i.id}?api_key=${API_KEY}&language=id-ID`)
                     .then(r => ({ ...r, _savedType: i.type }))
             ); 
             const results = await Promise.all(promises); 
@@ -6422,15 +6497,20 @@
 
                 let html2 = '';
                 // Resolve latin titles async
-                // Resolve title tanpa extra fetch - gunakan original_title
-                const allResolved = allItems.map(m => {
+                const resolveTitle = async (m) => {
                     let title = m.title || m.name || '';
                     if (isNonLatin(title)) {
-                        const origT = m.original_title || m.original_name || '';
-                        if (origT && !isNonLatin(origT)) title = origT;
+                        try {
+                            const en = await fetchWithCache(`https://api.themoviedb.org/3/${m._mtype}/${m.id}?api_key=${API_KEY}&language=en-US`);
+                            const enT = en.title || en.name || '';
+                            const origT = en.original_title || en.original_name || '';
+                            if (enT && !isNonLatin(enT)) title = enT;
+                            else if (origT && !isNonLatin(origT)) title = origT;
+                        } catch {}
                     }
                     return { ...m, _resolvedTitle: title };
-                });
+                };
+                const allResolved = await Promise.all(allItems.map(resolveTitle));
                 const movieResolved = allResolved.filter(m => m._mtype === 'movie');
                 const tvResolved = allResolved.filter(m => m._mtype === 'tv');
 
