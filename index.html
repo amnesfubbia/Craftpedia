@@ -52,7 +52,56 @@
         @keyframes splashScale { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         @keyframes fadeIn { to { opacity: 1; } }
 
-        .profile-header { padding: 15px 15px 0 15px; background: #000; }
+        /* ===== LIGHT THEME OVERRIDES ===== */
+        body.light-theme {
+            --bg: #f0f0f0; --bg2: #f5f5f5; --bg3: #e8e8e8; --bg4: #ddd;
+            --border: #d4d4d4; --border2: #c0c0c0;
+            --text: #0a0a0a; --text2: #1a1a1a; --text3: #555; --text4: #888;
+            --card: #fff; --card2: #f0f0f0;
+            background-color: #f0f0f0 !important; color: #0a0a0a !important;
+        }
+        body.light-theme .profile-header,
+        body.light-theme #mainFeed,
+        body.light-theme #searchOverlay,
+        body.light-theme .bottom-nav,
+        body.light-theme #movieModal,
+        body.light-theme #actorModal,
+        body.light-theme #aboutPage { background: var(--bg) !important; }
+        body.light-theme .bottom-nav { border-top-color: #ddd !important; }
+        body.light-theme .bottom-nav-item { color: #888 !important; }
+        body.light-theme .bottom-nav-item.active-nav { color: #0a0a0a !important; }
+        body.light-theme .pill { background: #e0e0e0 !important; color: #0a0a0a !important; border-color: #ccc !important; }
+        body.light-theme .pill.active-pill { background: #0a0a0a !important; color: #fff !important; }
+        body.light-theme .movie-card { background: #fff !important; }
+        body.light-theme .card-title { color: #0a0a0a !important; }
+        body.light-theme .filter-dropdown { background: #fff !important; border-color: #ddd !important; }
+        body.light-theme .filter-item { color: #0a0a0a !important; border-bottom-color: #f0f0f0 !important; }
+        body.light-theme .filter-item:hover { background: #f5f5f5 !important; }
+        body.light-theme .tab-item { color: #888 !important; border-bottom-color: transparent !important; }
+        body.light-theme .tab-item.active { color: #0a0a0a !important; border-bottom-color: #0a0a0a !important; }
+        body.light-theme .search-tab { color: #888 !important; }
+        body.light-theme .search-tab.active { color: #0a0a0a !important; border-bottom-color: #0a0a0a !important; }
+        body.light-theme #searchInp { background: #e8e8e8 !important; color: #0a0a0a !important; }
+        body.light-theme .ep-card { background: #fff !important; border-bottom-color: #eee !important; }
+        body.light-theme .ep-title { color: #0a0a0a !important; }
+        body.light-theme .ep-synopsis { color: #555 !important; }
+        body.light-theme .about-feature-row { background: #fff !important; border-bottom-color: #f0f0f0 !important; }
+        body.light-theme .about-feat-title { color: #0a0a0a !important; }
+        body.light-theme .about-feat-desc { color: #555 !important; }
+        body.light-theme .about-info-list { background: #fff !important; }
+        body.light-theme .about-info-label { color: #0a0a0a !important; }
+        body.light-theme .about-info-value { color: #555 !important; }
+        body.light-theme .about-link-row { background: #fff !important; border-bottom-color: #f0f0f0 !important; }
+        body.light-theme .about-section-label { color: #888 !important; }
+        body.light-theme .minfo-cell { background: #fff !important; }
+        body.light-theme .minfo-key { color: #888 !important; }
+        body.light-theme .minfo-val { color: #0a0a0a !important; }
+        body.light-theme #movieModal .modal-content-area { background: var(--bg) !important; }
+        body.light-theme .cast-name { color: #0a0a0a !important; }
+        body.light-theme .ig-logo { color: #0a0a0a !important; }
+        body.light-theme .stat-val { color: #0a0a0a !important; }
+
+
         /* PWA Status Bar Fix */
         body.pwa-mode { padding-top: var(--status-bar-height); }
         .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
@@ -1514,15 +1563,27 @@
         .ep-num { display: none; }
         .ep-title {
             font-size: 14px; font-weight: 700; color: #fff;
-            line-height: 1.3; margin-bottom: 5px;
+            line-height: 1.3; margin-bottom: 4px;
             display: -webkit-box; -webkit-line-clamp: 2;
             -webkit-box-orient: vertical; overflow: hidden;
         }
+        .ep-meta-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; flex-wrap: wrap; }
+        .ep-rating { display: flex; align-items: center; gap: 3px; font-size: 11px; font-weight: 700; color: #f5c518; }
+        .ep-rating-count { font-size: 10px; color: #555; font-weight: 400; }
         .ep-synopsis {
-            font-size: 12px; color: #8e8e8e; line-height: 1.4;
-            display: -webkit-box; -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 5px;
+            font-size: 11px; color: #8e8e8e; line-height: 1.45;
+            display: -webkit-box; -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 6px;
         }
+        .ep-synopsis.expanded { -webkit-line-clamp: unset; display: block; }
+        .ep-translate-btn {
+            display: inline-block; margin-top: 2px;
+            font-size: 10px; font-weight: 600; color: #aaa;
+            background: #1a1a1a; border: 1px solid #2a2a2a;
+            border-radius: 5px; padding: 3px 8px; cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .ep-translate-btn:active { background: #222; }
         .ep-date { font-size: 11px; color: #555; font-weight: 500; display: flex; align-items: center; gap: 4px; }
         .ep-card.active-ep .ep-title { color: #fff; }
         .ep-card.active-ep .ep-thumb-wrap { outline: 2px solid #fff; }
@@ -1880,8 +1941,17 @@
                     <i class="ph ph-magnifying-glass" style="color:#4caf7d"></i>
                 </div>
                 <div class="about-feat-text">
-                    <div class="about-feat-title">Smart Search</div>
-                    <div class="about-feat-desc">Cari judul, aktor, atau studio dengan saran otomatis real-time.</div>
+                    <div class="about-feat-title">Smart Search + Filter</div>
+                    <div class="about-feat-desc">Cari judul, aktor, atau studio. Filter by genre, tahun, rating, negara. Saran otomatis real-time.</div>
+                </div>
+            </div>
+            <div class="about-feature-row">
+                <div class="about-feat-icon-wrap" style="background:#1a1a2e">
+                    <i class="ph ph-users-three" style="color:#60a5fa"></i>
+                </div>
+                <div class="about-feat-text">
+                    <div class="about-feat-title">Top Actors & Awards</div>
+                    <div class="about-feat-desc">Jelajahi aktor terpopuler dan nominasi penghargaan Oscar, Emmy, Golden Globe.</div>
                 </div>
             </div>
             <div class="about-feature-row">
@@ -1890,7 +1960,7 @@
                 </div>
                 <div class="about-feat-text">
                     <div class="about-feat-title">Personal Archive</div>
-                    <div class="about-feat-desc">Simpan film favorit ke Bookmark dan daftar Suka kapan saja.</div>
+                    <div class="about-feat-desc">Simpan film favorit ke Bookmark dan Suka. Riwayat tontonan otomatis tersimpan lokal.</div>
                 </div>
             </div>
             <div class="about-feature-row">
@@ -1899,7 +1969,7 @@
                 </div>
                 <div class="about-feat-text">
                     <div class="about-feat-title">Multi-Server Streaming</div>
-                    <div class="about-feat-desc">20+ server pilihan untuk streaming lancar tanpa gangguan.</div>
+                    <div class="about-feat-desc">20+ server pilihan. Trailer embedded langsung di modal tanpa keluar aplikasi.</div>
                 </div>
             </div>
             <div class="about-feature-row">
@@ -1908,10 +1978,46 @@
                 </div>
                 <div class="about-feat-text">
                     <div class="about-feat-title">Live TV Indonesia</div>
-                    <div class="about-feat-desc">Tonton siaran langsung channel TV nasional Indonesia.</div>
+                    <div class="about-feat-desc">Tonton siaran langsung channel TV nasional Indonesia kapan saja.</div>
+                </div>
+            </div>
+            <div class="about-feature-row">
+                <div class="about-feat-icon-wrap" style="background:#1a2020">
+                    <i class="ph ph-video" style="color:#34d399"></i>
+                </div>
+                <div class="about-feat-text">
+                    <div class="about-feat-title">Reels Trailer Mode</div>
+                    <div class="about-feat-desc">Jelajahi trailer film & serial bergaya TikTok/Instagram — scroll vertikal, suka & simpan.</div>
+                </div>
+            </div>
+            <div class="about-feature-row">
+                <div class="about-feat-icon-wrap" style="background:#201a20">
+                    <i class="ph ph-info" style="color:#f472b6"></i>
+                </div>
+                <div class="about-feat-text">
+                    <div class="about-feat-title">Detail Lengkap</div>
+                    <div class="about-feat-desc">Director, Writer, Budget, Revenue, Cast Latin, Sinopsis EN/ID, Rating & terjemahan per episode, More Like This.</div>
                 </div>
             </div>
         </div>
+
+        <!-- Pengaturan -->
+        <div class="about-section-label">Pengaturan</div>
+        <div class="about-info-list">
+            <div class="about-info-row" style="cursor:pointer" onclick="toggleTheme()">
+                <div style="display:flex;align-items:center;gap:10px">
+                    <i id="themeIcon" class="fa-solid fa-moon" style="font-size:15px;color:#aaa;width:18px;text-align:center"></i>
+                    <span class="about-info-label">Tampilan</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px">
+                    <span class="about-info-value" id="themeLabel">Gelap</span>
+                    <div id="themeToggleSwitch" style="width:44px;height:26px;border-radius:13px;background:#1a1a1a;border:1px solid #333;position:relative;transition:background 0.25s;flex-shrink:0">
+                        <div id="themeToggleThumb" style="position:absolute;top:4px;left:4px;width:16px;height:16px;border-radius:50%;background:#555;transition:all 0.25s"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
 
         <!-- Data source -->
         <div class="about-section-label">Sumber Data</div>
@@ -6147,6 +6253,9 @@
                 const epDate = ep.air_date ? new Date(ep.air_date).toLocaleDateString('en-US', {day:'numeric',month:'short',year:'numeric'}) : '';
                 const epOverview = ep.overview || '';
                 const runtime = ep.runtime ? `${ep.runtime}m` : '';
+                const epRating = ep.vote_average && ep.vote_average > 0 ? ep.vote_average.toFixed(1) : '';
+                const epVotes = ep.vote_count ? (ep.vote_count >= 1000 ? (ep.vote_count/1000).toFixed(1)+'k' : ep.vote_count) : '';
+                const epId = `ep-${epNum}-${ep.season_number || 0}`;
 
                 let thumbHTML;
                 if (ep.still_path) {
@@ -6158,6 +6267,12 @@
                     thumbHTML = `<div class="ep-thumb-placeholder"><i class="fa-solid fa-play"></i></div>`;
                 }
 
+                // Tombol terjemahkan hanya tampil jika ada sinopsis
+                const synopsisHTML = epOverview
+                    ? `<div class="ep-synopsis" id="syn-${epId}">${epOverview}</div>
+                       <span class="ep-translate-btn" id="transbtn-${epId}" onclick="translateEpSynopsis('${epId}', this, event)">Translate to Indonesian</span>`
+                    : `<div class="ep-synopsis" style="color:#333;font-style:italic">No synopsis available.</div>`;
+
                 return `<div class="ep-card" onclick="changeEpisode(${epNum}, this)">
                     <div class="ep-thumb-wrap">
                         ${thumbHTML}
@@ -6166,8 +6281,11 @@
                     </div>
                     <div class="ep-info">
                         <div class="ep-title">${epTitle}</div>
-                        ${epOverview ? `<div class="ep-synopsis">${epOverview}</div>` : ''}
-                        ${epDate ? `<div class="ep-date"><i class="fa-regular fa-calendar" style="font-size:10px"></i>${epDate}</div>` : ''}
+                        <div class="ep-meta-row">
+                            ${epRating ? `<span class="ep-rating">★ ${epRating}<span class="ep-rating-count">${epVotes ? ` (${epVotes})` : ''}</span></span>` : ''}
+                            ${epDate ? `<span class="ep-date"><i class="fa-regular fa-calendar" style="font-size:9px"></i>${epDate}</span>` : ''}
+                        </div>
+                        ${synopsisHTML}
                     </div>
                 </div>`;
             }).join('');
@@ -6190,6 +6308,43 @@
                 searchWrap.style.display = episodes.length > 10 ? 'block' : 'none';
                 const si = document.getElementById('episodeSearchInp');
                 if (si) si.value = '';
+            }
+        }
+
+        // Cache terjemahan episode per ID agar tidak fetch ulang
+        const _epTranslateCache = {};
+        async function translateEpSynopsis(epId, btn, event) {
+            event.stopPropagation(); // Jangan trigger changeEpisode
+            const synEl = document.getElementById(`syn-${epId}`);
+            if (!synEl) return;
+            const originalText = synEl.getAttribute('data-original') || synEl.textContent;
+            // Toggle: jika sudah diterjemahkan, balik ke EN
+            if (btn.getAttribute('data-translated') === '1') {
+                synEl.textContent = originalText;
+                btn.textContent = 'Translate to Indonesian';
+                btn.setAttribute('data-translated', '0');
+                return;
+            }
+            // Simpan original jika belum
+            if (!synEl.getAttribute('data-original')) synEl.setAttribute('data-original', originalText);
+            // Cek cache
+            if (_epTranslateCache[epId]) {
+                synEl.textContent = _epTranslateCache[epId];
+                btn.textContent = 'View in English';
+                btn.setAttribute('data-translated', '1');
+                return;
+            }
+            btn.textContent = 'Translating...';
+            try {
+                const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=id&dt=t&q=${encodeURIComponent(originalText)}`);
+                const data = await res.json();
+                const translated = data[0].map(x => x[0]).join('');
+                _epTranslateCache[epId] = translated;
+                synEl.textContent = translated;
+                btn.textContent = 'View in English';
+                btn.setAttribute('data-translated', '1');
+            } catch(e) {
+                btn.textContent = 'Translate to Indonesian';
             }
         }
 
@@ -6710,16 +6865,29 @@
         function toggleTheme() {
             const isLight = document.body.classList.toggle('light-theme');
             localStorage.setItem('amnesTheme', isLight ? 'light' : 'dark');
+            _applyThemeUI(isLight);
+        }
+
+        function _applyThemeUI(isLight) {
             const lbl = document.getElementById('themeLabel');
+            const thumb = document.getElementById('themeToggleThumb');
+            const sw = document.getElementById('themeToggleSwitch');
+            const icon = document.getElementById('themeIcon');
             if (lbl) lbl.innerText = isLight ? 'Terang' : 'Gelap';
+            if (thumb) { thumb.style.left = isLight ? '22px' : '4px'; thumb.style.background = isLight ? '#fff' : '#555'; }
+            if (sw) sw.style.background = isLight ? '#4caf7d' : '#1a1a1a';
+            if (icon) { icon.className = isLight ? 'fa-solid fa-sun' : 'fa-solid fa-moon'; icon.style.color = isLight ? '#ffca28' : '#aaa'; }
+            // Update meta theme-color
+            const metaTheme = document.querySelector('meta[name="theme-color"]');
+            if (metaTheme) metaTheme.content = isLight ? '#f0f0f0' : '#000000';
         }
 
         // Apply saved theme on load
         (function() {
             const saved = localStorage.getItem('amnesTheme');
-            if (saved === 'light') {
-                document.body.classList.add('light-theme');
-            }
+            const isLight = saved === 'light';
+            if (isLight) document.body.classList.add('light-theme');
+            _applyThemeUI(isLight);
         })();
 
 
@@ -6784,47 +6952,58 @@
             const section = document.getElementById('mSimilarSection');
             const scroll = document.getElementById('mSimilarScroll');
             if (!section || !scroll) return;
-            section.style.display = 'none';
-            scroll.innerHTML = '';
+            section.style.display = 'none'; scroll.innerHTML = '';
             try {
                 let items = [];
-                // Coba recommendations dulu
+                const existIds = new Set([parseInt(id)]);
+
+                // 1. TMDb recommendations (paling relevan)
                 try {
-                    const recData = await fetchWithCache(
-                        `https://api.themoviedb.org/3/${type}/${id}/recommendations?api_key=${API_KEY}&language=en-US&page=1`
-                    );
-                    items = (recData.results || []).filter(m => m.poster_path && m.id != id);
+                    const recData = await fetchWithCache(`https://api.themoviedb.org/3/${type}/${id}/recommendations?api_key=${API_KEY}&language=en-US&page=1`);
+                    (recData.results || []).filter(m => m.poster_path && !existIds.has(m.id))
+                        .forEach(m => { existIds.add(m.id); items.push({...m, _src:'rec'}); });
                 } catch(e) {}
 
-                // Jika recommendations < 6, fallback ke discover dengan genre yang sama
-                if (items.length < 6 && genreIds && genreIds.length > 0) {
-                    const endpoint = type === 'tv' ? 'discover/tv' : 'discover/movie';
-                    const discData = await fetchWithCache(
-                        `https://api.themoviedb.org/3/${endpoint}?api_key=${API_KEY}&language=en-US&with_genres=${genreIds.join(',')}&sort_by=popularity.desc&vote_count.gte=50&page=1`
-                    );
-                    const discItems = (discData.results || []).filter(m => m.poster_path && m.id != id);
-                    // Merge, hindari duplikat
-                    const existIds = new Set(items.map(m => m.id));
-                    discItems.forEach(m => { if (!existIds.has(m.id)) items.push(m); });
+                // 2. Film dari director yang sama
+                try {
+                    const crewData = await fetchWithCache(`https://api.themoviedb.org/3/${type}/${id}/credits?api_key=${API_KEY}`);
+                    const director = (crewData.crew || []).find(c => c.job === 'Director');
+                    if (director) {
+                        const endpoint = type === 'tv' ? 'tv_credits' : 'movie_credits';
+                        const dirFilms = await fetchWithCache(`https://api.themoviedb.org/3/person/${director.id}/${endpoint}?api_key=${API_KEY}&language=en-US`);
+                        const dirList = type === 'tv' ? (dirFilms.crew || []) : (dirFilms.crew || []);
+                        dirList.filter(m => m.poster_path && !existIds.has(m.id) && (m.vote_average || 0) > 5)
+                            .sort((a,b) => (b.vote_average||0) - (a.vote_average||0)).slice(0,5)
+                            .forEach(m => { existIds.add(m.id); items.push({...m, _src:'director', _dirName: director.name}); });
+                    }
+                } catch(e) {}
+
+                // 3. Fallback discover by genre jika masih kurang
+                if (items.length < 8 && genreIds && genreIds.length > 0) {
+                    const ep = type === 'tv' ? 'discover/tv' : 'discover/movie';
+                    const disc = await fetchWithCache(`https://api.themoviedb.org/3/${ep}?api_key=${API_KEY}&language=en-US&with_genres=${genreIds[0]}&sort_by=vote_average.desc&vote_count.gte=200&page=1`);
+                    (disc.results || []).filter(m => m.poster_path && !existIds.has(m.id)).slice(0,8)
+                        .forEach(m => { existIds.add(m.id); items.push({...m, _src:'genre'}); });
                 }
 
-                // Filter: hanya tampilkan yang punya genre overlap dengan film ini
-                if (genreIds && genreIds.length > 0) {
-                    const genreSet = new Set(genreIds);
-                    const withOverlap = items.filter(m => (m.genre_ids || []).some(g => genreSet.has(g)));
-                    if (withOverlap.length >= 4) items = withOverlap;
-                }
-
-                items = items.slice(0, 15);
+                items = items.slice(0, 18);
                 if (!items.length) return;
+
+                const labelEl = section.querySelector('.similar-label');
+                if (labelEl) labelEl.textContent = 'More Like This';
+
                 section.style.display = 'block';
                 scroll.innerHTML = items.map(m => {
                     const r = m.vote_average ? m.vote_average.toFixed(1) : '';
-                    const title = m.title || m.name || '';
+                    const rawT = m.title || m.name || '';
+                    const rawO = m.original_title || m.original_name || '';
+                    const title = (!isNonLatin(rawT)) ? rawT : ((!isNonLatin(rawO)) ? rawO : rawT);
                     const year = (m.release_date || m.first_air_date || '').split('-')[0];
+                    const badge = m._src === 'director'
+                        ? `<div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.85);color:#ccc;font-size:7px;font-weight:700;padding:2px 5px;border-radius:3px;line-height:1.3;max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">By ${m._dirName}</div>` : '';
                     return `<div class="similar-card" onclick="openModal(${m.id}, '${type}')">
-                        <img class="similar-poster" src="https://image.tmdb.org/t/p/w342${m.poster_path}"
-                             loading="lazy" onload="this.classList.add('loaded')">
+                        <img class="similar-poster" src="https://image.tmdb.org/t/p/w342${m.poster_path}" loading="lazy" onload="this.classList.add('loaded')">
+                        ${badge}
                         <div class="similar-card-overlay">
                             <div class="similar-card-title">${title}</div>
                             <div class="similar-card-meta">
