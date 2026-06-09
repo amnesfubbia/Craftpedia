@@ -553,19 +553,16 @@
         }
         .actor-topbar-icon { font-size: 20px; color: #fff; cursor: pointer; padding: 6px; }
 
-        /* Cover / backdrop blur area */
+        /* Cover / backdrop AMOLED hitam — tidak ada blur */
         .actor-cover {
             position: relative; height: 90px; overflow: hidden; background: #000000;
         }
         .actor-cover-blur {
-            position: absolute; inset: -20px;
-            background-size: cover; background-position: center top;
-            filter: blur(22px) brightness(0.35) saturate(1.4);
-            transform: scale(1.1);
+            display: none; /* Sembunyikan elemen blur - AMOLED mode */
         }
         .actor-cover-overlay {
             position: absolute; inset: 0;
-            background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.85) 100%);
+            background: #000000;
         }
 
         /* Profile row on top of cover */
@@ -1156,7 +1153,7 @@
 
         /* Tombol aksi kanan bawah (like, bookmark) */
         .reel-actions {
-            position: absolute; top: 46%; right: 12px;
+            position: absolute; top: 40%; right: 12px;
             transform: translateY(-50%);
             display: flex; flex-direction: column; align-items: center; gap: 18px;
             z-index: 10;
@@ -3427,6 +3424,17 @@
             // Movie modal biasa
             if (document.getElementById('movieModal').style.display === 'block') {
                 _closeModalSilent();
+                // Jika film dibuka dari actor modal, kembalikan ke actor modal
+                if (window._actorModalPendingReopen) {
+                    const aid = window._actorModalPendingReopen;
+                    window._actorModalPendingReopen = null;
+                    document.getElementById('actorModal').style.display = 'block';
+                    document.getElementById('actorModal').scrollTop = 0;
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    // Periksa apakah ada actor modal history di stack
+                    window._actorModalPendingReopen = null;
+                }
                 return;
             }
 
@@ -3645,6 +3653,7 @@
 
         async function openActorProfile(actorId) {
             window._currentActorId = actorId;
+            window._currentOpenActorId = actorId; // Simpan untuk back navigation dari film
             lastTrailerSources = [];
             const frames = document.querySelectorAll('#carouselTrack iframe');
             frames.forEach(f => { 
@@ -3931,12 +3940,14 @@
         // Buka modal film dari dalam actorModal (poster diklik)
         // Tutup actorModal dulu agar tidak tertutup z-index, lalu buka modal film
         function openModalFromActor(id, type) {
-            // Tutup actorModal tanpa mengubah history (replaceState ke modal)
+            // Simpan actorId yang sedang dibuka agar bisa kembali saat back
+            const currentActorId = window._currentOpenActorId || null;
+            // Sembunyikan actorModal (TANPA pop history — history actor tetap ada)
             document.getElementById('actorModal').style.display = 'none';
-            // Bersihkan lastTrailerSources karena kita buka film baru
             lastTrailerSources = [];
-            // Push state baru untuk film yang akan dibuka
-            // (openModal akan push state sendiri)
+            // Push state modal film — saat back nanti popstate akan:
+            //   1. Tutup movie modal → state actor masih ada → tampilkan kembali actor modal
+            window._actorModalPendingReopen = currentActorId;
             openModal(id, type);
         }
 
@@ -5117,11 +5128,11 @@
 
             // Genre — lengkap, urut abjad (ID TMDb)
             const genres = [
-                [28,'Action'],[12,'Adventure'],[16,'Animasi'],
-                [35,'Komedi'],[80,'Crime'],
-                [99,'Dokumenter'],[18,'Drama'],[10751,'Family'],
+                [28,'Action'],[12,'Adventure'],[16,'Animation'],
+                [35,'Comedy'],[80,'Crime'],
+                [99,'Documentary'],[18,'Drama'],[10751,'Family'],
                 [14,'Fantasy'],[36,'History'],[27,'Horror'],
-                [10402,'Musik'],[9648,'Misteri'],[10749,'Romance'],
+                [10402,'Music'],[9648,'Mystery'],[10749,'Romance'],
                 [878,'Sci-Fi'],[10770,'TV Movie'],[53,'Thriller'],
                 [10752,'War'],[37,'Western']
             ].sort((a,b) => a[1].localeCompare(b[1]));
@@ -5578,8 +5589,32 @@
             currentImdbId = dExt.imdb_id || ""; 
             originalIndoDesc = dId.overview || "";
             globalEnDesc = dEn.overview || "";
-            const translateBtn = document.getElementById('mTranslateBtn');
-            if (originalIndoDesc.trim() !== "") { globalFullDesc = originalIndoDesc; translateBtn.innerText = "View original"; translateBtn.classList.remove('hidden'); } else { globalFullDesc = globalEnDesc || "Synopsis belum tersedia."; translateBtn.innerText = "See translation"; if(globalEnDesc) translateBtn.classList.remove('hidden'); }
+            // Default: tampilkan synopsis bahasa Inggris
+            if (globalEnDesc.trim() !== "") {
+                globalFullDesc = globalEnDesc;
+            } else if (originalIndoDesc.trim() !== "") {
+                globalFullDesc = originalIndoDesc;
+            } else {
+                globalFullDesc = "No synopsis available.";
+            }
+            // Setup tombol terjemahkan — lakukan setelah renderSynopsis selesai
+            const _setupTranslateBtn = () => {
+                const translateBtn = document.getElementById('mTranslateBtn');
+                if (!translateBtn) return;
+                if (globalEnDesc.trim() !== "" && originalIndoDesc.trim() !== "" && originalIndoDesc !== globalEnDesc) {
+                    translateBtn.innerText = "Translate to Indonesian";
+                    translateBtn.style.display = 'inline-block';
+                    translateBtn.classList.remove('hidden');
+                } else if (globalEnDesc.trim() !== "") {
+                    // Hanya EN tersedia — tawarkan terjemahkan via Google
+                    translateBtn.innerText = "Translate to Indonesian";
+                    translateBtn.style.display = 'inline-block';
+                    translateBtn.classList.remove('hidden');
+                } else {
+                    translateBtn.style.display = 'none';
+                    translateBtn.classList.add('hidden');
+                }
+            };
             
             const dots = document.getElementById('carouselDots');
             track.innerHTML = ''; dots.innerHTML = ''; track.style.transform = 'translateX(0)';
@@ -5712,26 +5747,26 @@
                 } catch(e) { currentDailymotionId = ""; }
             })();
 
-            // Render cast dengan nama Latin (fetch also_known_as jika nama non-Latin)
+            // Render cast dengan nama Latin (fetch person detail jika nama non-Latin)
             const castRaw = (dCast.cast || []).slice(0, 10);
             const castItems = await Promise.all(castRaw.map(async c => {
                 const profileImg = c.profile_path ? `<img src="https://image.tmdb.org/t/p/w185${c.profile_path}" loading="lazy" class="rounded-full">` : `<div style="width:100%; height:100%; background:#222; display:flex; align-items:center; justify-content:center; color:#555;"><i class="fa-solid fa-user"></i></div>`;
                 const charName = c.character ? c.character.replace(/\s*\(.*?\)/g,'').trim() : '';
                 let displayName = c.name || '';
-                // Jika nama non-Latin, cari nama Latin dari also_known_as
-                if (isNonLatin(displayName)) {
-                    try {
-                        const personData = await fetchWithCache(`https://api.themoviedb.org/3/person/${c.id}?api_key=${API_KEY}&language=en-US`);
-                        const latinName = personData.name || '';
-                        if (!isNonLatin(latinName)) {
-                            displayName = latinName;
-                        } else {
-                            // Coba also_known_as untuk nama Latin
-                            const aka = (personData.also_known_as || []).find(n => n && !isNonLatin(n));
-                            if (aka) displayName = aka;
-                        }
-                    } catch {}
-                }
+                // Selalu fetch person detail untuk pastikan nama Latin (en-US)
+                // Ini juga handle nama Korea seperti Kim Moo-yul yang mungkin masih dalam hangul
+                try {
+                    const personData = await fetchWithCache(`https://api.themoviedb.org/3/person/${c.id}?api_key=${API_KEY}&language=en-US`);
+                    const enName = personData.name || '';
+                    if (enName && !isNonLatin(enName)) {
+                        displayName = enName;
+                    } else {
+                        // Coba also_known_as: prioritas yang ada huruf Latin (A-Z) dan ada spasi/tanda hubung
+                        const akaList = personData.also_known_as || [];
+                        const latinAka = akaList.find(n => n && !isNonLatin(n) && /[a-zA-Z]/.test(n));
+                        if (latinAka) displayName = latinAka;
+                    }
+                } catch {}
                 return `<div class="cast-item" onclick="openActorProfile(${c.id})"><div class="cast-img-border"><div class="inner-border">${profileImg}</div></div><span class="cast-name">${displayName}</span>${charName ? `<span style="font-size:8px;color:#555;display:block;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:65px">${charName}</span>` : ''}</div>`;
             }));
             document.getElementById('castContainer').innerHTML = castItems.join('');
@@ -5753,7 +5788,7 @@
             window.currentMediaTitle = displayTitle;
             window.currentMediaYear = (dId.release_date || dId.first_air_date || '').split('-')[0] || '';
             window.currentMediaTitleOriginal = dId.title || dId.name || '';
-            isExpanded = false; renderSynopsis();
+            isExpanded = false; renderSynopsis(); _setupTranslateBtn();
             const relYear = (dId.release_date || dId.first_air_date || "2026").split('-')[0];
             const contentKind = (type === 'tv') ? 'tv' : 'movie';
             const genresArr = (dId.genres || []).map(g => `#${g.name.replace(/[^a-zA-Z0-9]/g, '')}`).slice(0, 3).join(' ');
@@ -5769,16 +5804,25 @@
             const miReleaseStr = rel2 ? new Date(rel2).toLocaleDateString('id-ID', {day:'numeric',month:'long',year:'numeric'}) : '—';
             const infoGridEl = document.getElementById('mInfoGrid');
             if (infoGridEl) {
-                // Director
+                // Director & Writer
                 const miCrew = (dCast.crew || []);
                 const miDir = miCrew.find(c => c.job === 'Director');
                 const miDirName = miDir ? miDir.name : (type === 'tv' ? ((dId.created_by && dId.created_by[0]) ? dId.created_by[0].name : '—') : '—');
+                // Writer: cari dari crew (Screenplay, Story, Writer)
+                const miWriters = miCrew.filter(c => ['Writer','Screenplay','Story','Script','Creator'].includes(c.job));
+                const miWriterNames = miWriters.length ? [...new Set(miWriters.map(w => w.name))].slice(0,2).join(', ') : (type === 'tv' && dId.created_by && dId.created_by.length ? dId.created_by.map(c=>c.name).join(', ') : '—');
+                // Budget & Revenue (hanya untuk movie)
+                const miBudget = (type === 'movie' && dId.budget && dId.budget > 0) ? '$' + dId.budget.toLocaleString('en-US') : (type === 'tv' ? '—' : '—');
+                const miRevenue = (type === 'movie' && dId.revenue && dId.revenue > 0) ? '$' + dId.revenue.toLocaleString('en-US') : (type === 'tv' ? '—' : '—');
                 infoGridEl.innerHTML = `
-                <div class="minfo-cell full-width"><span class="minfo-key">Director</span><span class="minfo-val">${miDirName}</span></div>
+                <div class="minfo-cell"><span class="minfo-key">Director</span><span class="minfo-val">${miDirName}</span></div>
+                <div class="minfo-cell"><span class="minfo-key">Writer</span><span class="minfo-val">${miWriterNames}</span></div>
                 <div class="minfo-cell"><span class="minfo-key">Release</span><span class="minfo-val">${miReleaseStr}</span></div>
                 <div class="minfo-cell"><span class="minfo-key">Runtime</span><span class="minfo-val">${runTime}</span></div>
                 <div class="minfo-cell"><span class="minfo-key">Country</span><span class="minfo-val">${miCountries}</span></div>
                 <div class="minfo-cell"><span class="minfo-key">Language</span><span class="minfo-val">${miLanguage}</span></div>
+                <div class="minfo-cell"><span class="minfo-key">Budget</span><span class="minfo-val">${miBudget}</span></div>
+                <div class="minfo-cell"><span class="minfo-key">Revenue</span><span class="minfo-val">${miRevenue}</span></div>
                 <div class="minfo-cell full-width"><span class="minfo-key">Studio</span><span class="minfo-val">${miStudios}</span></div>
                 <div class="minfo-cell full-width"><span class="minfo-key">Genre</span><span class="minfo-val">${miGenres}</span></div>`;
                 infoGridEl.style.display = 'grid';
@@ -5811,13 +5855,34 @@
 
         async function handleTranslate() {
             const btn = document.getElementById('mTranslateBtn');
-            if (originalIndoDesc && globalEnDesc) { if (globalFullDesc === originalIndoDesc) { globalFullDesc = globalEnDesc; btn.innerText = "View original"; } else { globalFullDesc = originalIndoDesc; btn.innerText = "View original"; } } 
-            else if (!originalIndoDesc && globalEnDesc) {
-                if(!isTranslated) {
+            // Mode: EN default, toggle ke ID dan balik ke EN
+            if (globalEnDesc && originalIndoDesc && originalIndoDesc !== globalEnDesc) {
+                // Toggle antara EN dan ID (keduanya tersedia)
+                if (globalFullDesc === globalEnDesc) {
+                    globalFullDesc = originalIndoDesc;
+                    btn.innerText = "View in English";
+                } else {
+                    globalFullDesc = globalEnDesc;
+                    btn.innerText = "Translate to Indonesian";
+                }
+            } else if (globalEnDesc && !originalIndoDesc) {
+                // Hanya ada EN, terjemahkan ke ID via Google
+                if (!isTranslated) {
                     const oldText = btn.innerText; btn.innerText = "Translating...";
-                    try { const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=id&dt=t&q=${encodeURIComponent(globalEnDesc)}`); const data = await res.json(); globalFullDesc = data[0].map(x => x[0]).join(''); isTranslated = true; btn.innerText = "View original"; } 
-                    catch(e) { btn.innerText = "Translation failed"; setTimeout(()=>btn.innerText=oldText, 2000); }
-                } else { globalFullDesc = globalEnDesc; isTranslated = false; btn.innerText = "See translation"; }
+                    try {
+                        const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=id&dt=t&q=${encodeURIComponent(globalEnDesc)}`);
+                        const data = await res.json();
+                        const translated = data[0].map(x => x[0]).join('');
+                        originalIndoDesc = translated;
+                        globalFullDesc = translated;
+                        isTranslated = true;
+                        btn.innerText = "View in English";
+                    } catch(e) { btn.innerText = "Translation failed"; setTimeout(()=>btn.innerText=oldText, 2000); }
+                } else {
+                    globalFullDesc = globalEnDesc;
+                    isTranslated = false;
+                    btn.innerText = "Translate to Indonesian";
+                }
             }
             renderSynopsis();
         }
