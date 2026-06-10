@@ -181,6 +181,26 @@
             transition: color 0.2s, border-color 0.2s;
         }
         .search-tab.active { color: #fff; border-bottom-color: #fff; }
+        .genre-explore-chip {
+            padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 600;
+            background: #1a1a1a; border: 1px solid #2a2a2a; color: #666;
+            cursor: pointer; white-space: nowrap; transition: all 0.15s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .genre-explore-chip.active { background: #fff; color: #000; border-color: #fff; }
+        .decade-tab-chip {
+            padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700;
+            background: #1a1a1a; border: 1px solid #2a2a2a; color: #666;
+            cursor: pointer; white-space: nowrap; flex-shrink: 0;
+            -webkit-tap-highlight-color: transparent; transition: all 0.15s;
+        }
+        .decade-tab-chip.active { background: #fff; color: #000; border-color: #fff; }
+        .decade-type-btn {
+            padding: 6px 16px; border-radius: 20px; font-size: 12px; font-weight: 700;
+            background: #1a1a1a; border: 1px solid #2a2a2a; color: #666;
+            cursor: pointer; -webkit-tap-highlight-color: transparent; transition: all 0.15s;
+        }
+        .decade-type-btn.active { background: #fff; color: #000; border-color: #fff; }
         
         #smartSearchDropdown { position: absolute; top: 100%; left: 0; right: 0; background: #1a1a1a; border-radius: 0 0 10px 10px; border: 1px solid #333; border-top: none; display: none; z-index: 500; max-height: 300px; overflow-y: auto; }
         .smart-item { display: flex; align-items: center; padding: 10px; gap: 12px; border-bottom: 1px solid #262626; cursor: pointer; }
@@ -1535,7 +1555,14 @@
         .ep-card.active-ep { background: transparent; }
         .ep-thumb-wrap {
             position: relative; flex: 0 0 130px;
-            border-radius: 8px; overflow: hidden; background: #111;
+            border-radius: 8px; background: #111;
+            display: flex; flex-direction: column;
+            overflow: visible;
+        }
+        .ep-thumb-wrap > img,
+        .ep-thumb-wrap > .ep-thumb-placeholder {
+            border-radius: 8px;
+            overflow: hidden;
         }
         .ep-thumb {
             width: 130px; aspect-ratio: 16/9;
@@ -1576,14 +1603,25 @@
             -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 6px;
         }
         .ep-synopsis.expanded { -webkit-line-clamp: unset; display: block; }
-        .ep-translate-btn {
-            display: inline-block; margin-top: 2px;
-            font-size: 10px; font-weight: 600; color: #aaa;
-            background: #1a1a1a; border: 1px solid #2a2a2a;
-            border-radius: 5px; padding: 3px 8px; cursor: pointer;
-            -webkit-tap-highlight-color: transparent;
+        .ep-action-row {
+            display: flex; gap: 6px;
+            padding: 0 0 10px 0;
+            margin-top: -2px;
+            width: 100%;
         }
-        .ep-translate-btn:active { background: #222; }
+        .ep-action-btn {
+            flex: 1; padding: 8px 4px;
+            border-radius: 8px; font-size: 10px; font-weight: 700;
+            text-align: center; cursor: pointer; border: 1px solid #2a2a2a;
+            background: #1a1a1a; color: #fff;
+            -webkit-tap-highlight-color: transparent;
+            transition: background 0.15s;
+            display: flex; align-items: center; justify-content: center; gap: 4px;
+        }
+        .ep-action-btn:active { background: #2a2a2a; }
+        .ep-btn-watch { background: #1a1a1a; border-color: #3a3a3a; }
+        .ep-btn-download { background: #1a1a1a; border-color: #3a3a3a; }
+        .ep-btn-translate { background: #1a1a1a; border-color: #3a3a3a; font-size: 9px; }
         .ep-date { font-size: 11px; color: #555; font-weight: 500; display: flex; align-items: center; gap: 4px; }
         .ep-card.active-ep .ep-title { color: #fff; }
         .ep-card.active-ep .ep-thumb-wrap { outline: 2px solid #fff; }
@@ -2001,22 +2039,7 @@
             </div>
         </div>
 
-        <!-- Pengaturan -->
-        <div class="about-section-label">Pengaturan</div>
-        <div class="about-info-list">
-            <div class="about-info-row" style="cursor:pointer" onclick="toggleTheme()">
-                <div style="display:flex;align-items:center;gap:10px">
-                    <i id="themeIcon" class="fa-solid fa-moon" style="font-size:15px;color:#aaa;width:18px;text-align:center"></i>
-                    <span class="about-info-label">Tampilan</span>
-                </div>
-                <div style="display:flex;align-items:center;gap:8px">
-                    <span class="about-info-value" id="themeLabel">Gelap</span>
-                    <div id="themeToggleSwitch" style="width:44px;height:26px;border-radius:13px;background:#1a1a1a;border:1px solid #333;position:relative;transition:background 0.25s;flex-shrink:0">
-                        <div id="themeToggleThumb" style="position:absolute;top:4px;left:4px;width:16px;height:16px;border-radius:50%;background:#555;transition:all 0.25s"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
+
 
 
         <!-- Data source -->
@@ -2161,6 +2184,14 @@
                 <i class="fa-solid fa-xmark text-zinc-500 text-xs cursor-pointer" id="searchClearBtn" style="display:none;padding-left:6px" onclick="clearSearch()"></i>
                 <div id="smartSearchDropdown" class="no-scrollbar"></div>
             </div>
+            <div id="searchFilterToggleBtn" onclick="handleSearchFilterBtn()" style="
+                width:36px;height:36px;border-radius:10px;background:#1a1a1a;
+                border:1px solid #2a2a2a;display:flex;align-items:center;justify-content:center;
+                cursor:pointer;flex-shrink:0;transition:all 0.2s;position:relative;
+                -webkit-tap-highlight-color:transparent;">
+                <i class="fa-solid fa-sliders" style="font-size:14px;color:#aaa"></i>
+                <div id="searchFilterDot" style="display:none;position:absolute;top:5px;right:5px;width:7px;height:7px;background:#fff;border-radius:50%;border:1.5px solid #000"></div>
+            </div>
         </div>
         <!-- Search type tabs (tampil saat ada hasil) -->
         <div id="searchTypeTabs" style="display:none; border-bottom:1px solid #1c1c1c; background:#000; position:sticky; top:54px; z-index:90; flex-direction:row;">
@@ -2169,17 +2200,39 @@
             <div class="search-tab" id="stab-tv" onclick="setSearchTab('tv',this)">Series</div>
         </div>
         <!-- Empty/idle state -->
-        <div id="searchEmptyState" style="padding:40px 20px; text-align:center;">
-            <i class="fa-solid fa-magnifying-glass" style="font-size:40px;color:#222;margin-bottom:16px;display:block"></i>
-            <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:6px">Search Movies & Shows</div>
-            <div style="font-size:13px;color:#555;line-height:1.5">Type a title, series name,<br>actor name, or studio</div>
-            <div style="margin-top:28px;text-align:left">
-                <div style="font-size:10px;font-weight:800;color:#333;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;padding:0 4px">Popular Searches</div>
-                <div id="popularChips" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+        <div id="searchEmptyState" style="padding:0 0 40px;">
+            <!-- Explore tabs — sticky di bawah search bar -->
+            <div style="position:sticky;top:54px;z-index:88;background:#000;border-bottom:1px solid #1c1c1c;">
+                <div style="display:flex">
+                    <div id="exploreTab-trending" class="search-tab active" style="flex:1;font-size:13px;font-weight:700" onclick="switchExploreTab('trending',this)">Trending</div>
+                    <div id="exploreTab-genres" class="search-tab" style="flex:1;font-size:13px;font-weight:700" onclick="switchExploreTab('genres',this)">Genres</div>
+                    <div id="exploreTab-new" class="search-tab" style="flex:1;font-size:13px;font-weight:700" onclick="switchExploreTab('new',this)">New</div>
+                </div>
+            </div>
+            <!-- Genre chips row (shown only on Genres tab) -->
+            <div id="genreChipsRow" style="display:none;flex-wrap:wrap;gap:8px;padding:14px 16px 10px"></div>
+            <!-- Landscape grid: 2 columns -->
+            <div id="exploreGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px 16px"></div>
+        </div>
+
+        <!-- Decade modal (triggered by filter btn when idle) -->
+        <div id="decadeModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.92);overflow-y:auto">
+            <div style="max-width:520px;margin:0 auto;padding:20px 16px 60px">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+                    <div style="font-size:17px;font-weight:800;color:#fff">Top Rated by Decade</div>
+                    <i class="fa-solid fa-xmark" style="font-size:20px;color:#888;cursor:pointer;padding:6px" onclick="closeDecadeModal()"></i>
+                </div>
+                <!-- Decade + type selector -->
+                <div style="display:flex;gap:8px;margin-bottom:16px;overflow-x:auto;scrollbar-width:none" class="no-scrollbar" id="decadeTabRow"></div>
+                <div style="display:flex;gap:6px;margin-bottom:16px">
+                    <div id="dcTypeMovie" class="decade-type-btn active" onclick="selectDecadeType('movie',this)">Movies</div>
+                    <div id="dcTypeTV" class="decade-type-btn" onclick="selectDecadeType('tv',this)">Series</div>
+                </div>
+                <div id="decadeGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px"></div>
             </div>
         </div>
         <!-- Search filter pills -->
-        <div id="searchFilterBar" style="display:none;padding:6px 16px 0;gap:8px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch" class="flex">
+        <div id="searchFilterBar" style="display:none;padding:10px 16px;gap:8px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;background:#000;border-bottom:1px solid #1c1c1c;position:sticky;top:54px;z-index:89;" class="flex no-scrollbar">
             <select id="searchYearFilter" onchange="applySearchFilters()" style="flex:0 0 auto;background:#1a1a1a;border:1px solid #2a2a2a;color:#fff;font-size:11px;padding:6px 10px;border-radius:8px;outline:none;cursor:pointer">
                 <option value="">All Years</option>
             </select>
@@ -3041,6 +3094,11 @@
             // Tutup semua overlay yang mungkin aktif
             if (document.getElementById('reelsModal').style.display === 'block') {
                 _closeReelsSilent();
+            }
+            // Tutup actorModal jika sedang terbuka
+            const actorModal = document.getElementById('actorModal');
+            if (actorModal && actorModal.style.display === 'block') {
+                actorModal.style.display = 'none';
             }
             // Simpan state tvModal agar back bisa kembali ke sana
             const wasTvOpen = document.getElementById('tvModal').style.display === 'block';
@@ -5312,7 +5370,26 @@
             loading = false;
         }
 
+        function toggleSearchFilterBar() {
+            const bar = document.getElementById('searchFilterBar');
+            const btn = document.getElementById('searchFilterToggleBtn');
+            const icon = btn ? btn.querySelector('i') : null;
+            const isVisible = bar && bar.style.display !== 'none';
+            if (bar) bar.style.display = isVisible ? 'none' : 'flex';
+            if (icon) { icon.style.color = isVisible ? '#aaa' : '#fff'; }
+            if (btn) { btn.style.background = isVisible ? '#1a1a1a' : '#2a2a2a'; btn.style.borderColor = isVisible ? '#2a2a2a' : '#555'; }
+        }
+
+        function updateSearchFilterDot() {
+            const yr = document.getElementById('searchYearFilter')?.value;
+            const gn = document.getElementById('searchGenreFilter')?.value;
+            const tp = document.getElementById('searchTypeFilter')?.value;
+            const dot = document.getElementById('searchFilterDot');
+            if (dot) dot.style.display = (yr || gn || tp) ? 'block' : 'none';
+        }
+
         function applySearchFilters() {
+            updateSearchFilterDot();
             if (!window._searchResults || !window._isSearchMode) return;
             let filtered = [...window._searchResults];
             const yr = document.getElementById('searchYearFilter')?.value;
@@ -5426,6 +5503,7 @@
             const sfBar2 = document.getElementById('searchFilterBar');
             if (sfBar2) sfBar2.style.display = 'none';
             showSearchEmptyState();
+            initExploreSection();
             document.getElementById('searchInp').value = '';
             document.getElementById('searchClearBtn').style.display = 'none';
             document.getElementById('searchInp').focus();
@@ -5442,6 +5520,13 @@
             document.getElementById('searchInp').value = '';
             document.getElementById('searchClearBtn').style.display = 'none';
             document.getElementById('smartSearchDropdown').style.display = 'none';
+            // Reset filter bar
+            const filterBar = document.getElementById('searchFilterBar');
+            if (filterBar) filterBar.style.display = 'none';
+            const filterBtn = document.getElementById('searchFilterToggleBtn');
+            if (filterBtn) { filterBtn.style.background = '#1a1a1a'; filterBtn.style.borderColor = '#2a2a2a'; const ic = filterBtn.querySelector('i'); if(ic) ic.style.color = '#aaa'; }
+            const dot = document.getElementById('searchFilterDot');
+            if (dot) dot.style.display = 'none';
             updateActiveNav(document.getElementById('homeBtnNav'));
             history.replaceState({view: 'home'}, '');
         }
@@ -5708,12 +5793,12 @@
                 const translateBtn = document.getElementById('mTranslateBtn');
                 if (!translateBtn) return;
                 if (globalEnDesc.trim() !== "" && originalIndoDesc.trim() !== "" && originalIndoDesc !== globalEnDesc) {
-                    translateBtn.innerText = "Translate to Indonesian";
+                    translateBtn.innerText = "See Translation";
                     translateBtn.style.display = 'inline-block';
                     translateBtn.classList.remove('hidden');
                 } else if (globalEnDesc.trim() !== "") {
                     // Hanya EN tersedia — tawarkan terjemahkan via Google
-                    translateBtn.innerText = "Translate to Indonesian";
+                    translateBtn.innerText = "See Translation";
                     translateBtn.style.display = 'inline-block';
                     translateBtn.classList.remove('hidden');
                 } else {
@@ -5966,10 +6051,10 @@
                 // Toggle antara EN dan ID (keduanya tersedia)
                 if (globalFullDesc === globalEnDesc) {
                     globalFullDesc = originalIndoDesc;
-                    btn.innerText = "View in English";
+                    btn.innerText = "See Original";
                 } else {
                     globalFullDesc = globalEnDesc;
-                    btn.innerText = "Translate to Indonesian";
+                    btn.innerText = "See Translation";
                 }
             } else if (globalEnDesc && !originalIndoDesc) {
                 // Hanya ada EN, terjemahkan ke ID via Google
@@ -5982,12 +6067,12 @@
                         originalIndoDesc = translated;
                         globalFullDesc = translated;
                         isTranslated = true;
-                        btn.innerText = "View in English";
+                        btn.innerText = "See Original";
                     } catch(e) { btn.innerText = "Translation failed"; setTimeout(()=>btn.innerText=oldText, 2000); }
                 } else {
                     globalFullDesc = globalEnDesc;
                     isTranslated = false;
-                    btn.innerText = "Translate to Indonesian";
+                    btn.innerText = "See Translation";
                 }
             }
             renderSynopsis();
@@ -6269,23 +6354,35 @@
 
                 // Tombol terjemahkan hanya tampil jika ada sinopsis
                 const synopsisHTML = epOverview
-                    ? `<div class="ep-synopsis" id="syn-${epId}">${epOverview}</div>
-                       <span class="ep-translate-btn" id="transbtn-${epId}" onclick="translateEpSynopsis('${epId}', this, event)">Translate to Indonesian</span>`
+                    ? `<div class="ep-synopsis" id="syn-${epId}">${epOverview}</div>`
                     : `<div class="ep-synopsis" style="color:#333;font-style:italic">No synopsis available.</div>`;
 
-                return `<div class="ep-card" onclick="changeEpisode(${epNum}, this)">
-                    <div class="ep-thumb-wrap">
-                        ${thumbHTML}
-                        <span class="ep-badge">EP ${epNum}</span>
-                        ${runtime ? `<span class="ep-duration">${runtime}</span>` : ''}
-                    </div>
-                    <div class="ep-info">
-                        <div class="ep-title">${epTitle}</div>
-                        <div class="ep-meta-row">
-                            ${epRating ? `<span class="ep-rating">★ ${epRating}<span class="ep-rating-count">${epVotes ? ` (${epVotes})` : ''}</span></span>` : ''}
-                            ${epDate ? `<span class="ep-date"><i class="fa-regular fa-calendar" style="font-size:9px"></i>${epDate}</span>` : ''}
+                const actionRowHTML = '';
+
+                return `<div class="ep-card" style="flex-direction:column;padding-bottom:0" onclick="changeEpisode(${epNum}, this)">
+                    <div style="display:flex;align-items:flex-start;gap:12px;padding:10px 0 4px">
+                        <div class="ep-thumb-wrap">
+                            ${thumbHTML}
+                            <span class="ep-badge">EP ${epNum}</span>
+                            ${runtime ? `<span class="ep-duration">${runtime}</span>` : ''}
                         </div>
-                        ${synopsisHTML}
+                        <div class="ep-info" style="padding:2px 0">
+                            <div class="ep-title">${epTitle}</div>
+                            <div class="ep-meta-row">
+                                ${epRating ? `<span class="ep-rating">★ ${epRating}<span class="ep-rating-count">${epVotes ? ` (${epVotes})` : ''}</span></span>` : ''}
+                                ${epDate ? `<span class="ep-date"><i class="fa-regular fa-calendar" style="font-size:9px"></i>${epDate}</span>` : ''}
+                            </div>
+                            ${synopsisHTML}
+                        </div>
+                    </div>
+                    <div class="ep-action-row" onclick="event.stopPropagation()">
+                        <button class="ep-action-btn ep-btn-watch" onclick="changeEpisode(${epNum}, this.closest('.ep-card')); document.getElementById('movieModal').scrollTo({top:0,behavior:'smooth'})">
+                            <i class="fa-solid fa-play" style="font-size:8px"></i> Watch
+                        </button>
+                        <button class="ep-action-btn ep-btn-download" onclick="(function(){const id=window.currentMediaId,s=document.getElementById('seasonSel').value||1;window.open('https://vidvault.ru/tv/'+id+'/'+s+'/${epNum}','_blank')})()">
+                            <i class="fa-solid fa-download" style="font-size:8px"></i> Download
+                        </button>
+                        ${epOverview ? `<button class="ep-action-btn ep-btn-translate" id="transbtn-${epId}" onclick="translateEpSynopsis('${epId}', this, event)">See Translation</button>` : ''}
                     </div>
                 </div>`;
             }).join('');
@@ -6321,7 +6418,7 @@
             // Toggle: jika sudah diterjemahkan, balik ke EN
             if (btn.getAttribute('data-translated') === '1') {
                 synEl.textContent = originalText;
-                btn.textContent = 'Translate to Indonesian';
+                btn.textContent = 'See Translation';
                 btn.setAttribute('data-translated', '0');
                 return;
             }
@@ -6330,7 +6427,7 @@
             // Cek cache
             if (_epTranslateCache[epId]) {
                 synEl.textContent = _epTranslateCache[epId];
-                btn.textContent = 'View in English';
+                btn.textContent = 'See Original';
                 btn.setAttribute('data-translated', '1');
                 return;
             }
@@ -6341,10 +6438,10 @@
                 const translated = data[0].map(x => x[0]).join('');
                 _epTranslateCache[epId] = translated;
                 synEl.textContent = translated;
-                btn.textContent = 'View in English';
+                btn.textContent = 'See Original';
                 btn.setAttribute('data-translated', '1');
             } catch(e) {
-                btn.textContent = 'Translate to Indonesian';
+                btn.textContent = 'See Translation';
             }
         }
 
@@ -7072,6 +7169,253 @@
                 </span>`;
             bar.style.display = 'flex';
         }
+
+        // ===== EXPLORE SECTION (Search Empty State) =====
+        let _currentExploreTab = 'trending';
+        let _currentGenreId = null;
+        let _exploreLoading = false;
+
+        const EXPLORE_GENRES_MOVIE = [
+            {id:28,name:'Action'},{id:35,name:'Comedy'},{id:18,name:'Drama'},
+            {id:27,name:'Horror'},{id:10749,name:'Romance'},{id:878,name:'Sci-Fi'},
+            {id:53,name:'Thriller'},{id:16,name:'Animation'},{id:12,name:'Adventure'},
+            {id:80,name:'Crime'},{id:14,name:'Fantasy'},{id:99,name:'Documentary'}
+        ];
+
+        function initExploreSection() {
+            _currentExploreTab = 'trending';
+            _currentGenreId = null;
+            document.querySelectorAll('[id^="exploreTab-"]').forEach(t => t.classList.remove('active'));
+            const tt = document.getElementById('exploreTab-trending');
+            if (tt) tt.classList.add('active');
+            const gr = document.getElementById('genreChipsRow');
+            if (gr) gr.style.display = 'none';
+            loadExploreTrending();
+        }
+
+        function switchExploreTab(tab, el) {
+            _currentExploreTab = tab;
+            document.querySelectorAll('[id^="exploreTab-"]').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+            const gr = document.getElementById('genreChipsRow');
+            if (tab === 'trending') {
+                if (gr) gr.style.display = 'none';
+                loadExploreTrending();
+            } else if (tab === 'genres') {
+                buildGenreChips();
+                if (gr) gr.style.display = 'flex';
+                if (!_currentGenreId) _currentGenreId = EXPLORE_GENRES_MOVIE[0].id;
+                loadExploreGenre(_currentGenreId);
+            } else if (tab === 'new') {
+                if (gr) gr.style.display = 'none';
+                loadExploreNew();
+            }
+        }
+
+        function buildGenreChips() {
+            const row = document.getElementById('genreChipsRow');
+            if (!row || row.dataset.built) return;
+            row.dataset.built = '1';
+            row.innerHTML = EXPLORE_GENRES_MOVIE.map(g =>
+                `<div class="genre-explore-chip ${g.id === (_currentGenreId || EXPLORE_GENRES_MOVIE[0].id) ? 'active' : ''}"
+                      id="gc-${g.id}" onclick="selectExploreGenre(${g.id}, this)">${g.name}</div>`
+            ).join('');
+        }
+
+        function selectExploreGenre(gid, el) {
+            _currentGenreId = gid;
+            document.querySelectorAll('.genre-explore-chip').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+            loadExploreGenre(gid);
+        }
+
+        async function loadExploreTrending() {
+            if (_exploreLoading) return;
+            _exploreLoading = true;
+            const grid = document.getElementById('exploreGrid');
+            if (!grid) { _exploreLoading = false; return; }
+            grid.innerHTML = `<div style="grid-column:1/-1;padding:20px;text-align:center;color:#333;font-size:11px">Loading...</div>`;
+            try {
+                const data = await fetchWithCache(`https://api.themoviedb.org/3/trending/all/week?api_key=${API_KEY}&language=en-US`);
+                const items = (data.results || []).filter(m => m.backdrop_path && (m.media_type === 'movie' || m.media_type === 'tv'));
+                renderExploreGrid(grid, items.slice(0, 12));
+            } catch(e) {
+                grid.innerHTML = `<div style="grid-column:1/-1;padding:20px;text-align:center;color:#333;font-size:11px">Failed to load.</div>`;
+            }
+            _exploreLoading = false;
+        }
+
+        async function loadExploreGenre(gid) {
+            if (_exploreLoading) return;
+            _exploreLoading = true;
+            const grid = document.getElementById('exploreGrid');
+            if (!grid) { _exploreLoading = false; return; }
+            grid.innerHTML = `<div style="grid-column:1/-1;padding:20px;text-align:center;color:#333;font-size:11px">Loading...</div>`;
+            try {
+                const data = await fetchWithCache(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=en-US&sort_by=popularity.desc&with_genres=${gid}&page=1`);
+                const items = (data.results || []).filter(m => m.backdrop_path);
+                renderExploreGrid(grid, items.slice(0, 12), 'movie');
+            } catch(e) {
+                grid.innerHTML = `<div style="grid-column:1/-1;padding:20px;text-align:center;color:#333;font-size:11px">Failed to load.</div>`;
+            }
+            _exploreLoading = false;
+        }
+
+        async function loadExploreNew() {
+            if (_exploreLoading) return;
+            _exploreLoading = true;
+            const grid = document.getElementById('exploreGrid');
+            if (!grid) { _exploreLoading = false; return; }
+            grid.innerHTML = `<div style="grid-column:1/-1;padding:20px;text-align:center;color:#333;font-size:11px">Loading...</div>`;
+            try {
+                const today = new Date();
+                const y = today.getFullYear();
+                const m = String(today.getMonth() + 1).padStart(2, '0');
+                const firstDay = `${y}-${m}-01`;
+                const todayStr = today.toISOString().split('T')[0];
+                const [movies, shows] = await Promise.all([
+                    fetchWithCache(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=en-US&sort_by=popularity.desc&primary_release_date.gte=${firstDay}&primary_release_date.lte=${todayStr}&page=1`),
+                    fetchWithCache(`https://api.themoviedb.org/3/discover/tv?api_key=${API_KEY}&language=en-US&sort_by=popularity.desc&first_air_date.gte=${firstDay}&first_air_date.lte=${todayStr}&page=1`)
+                ]);
+                const combined = [
+                    ...(movies.results||[]).filter(m=>m.backdrop_path).map(m=>({...m,media_type:'movie'})),
+                    ...(shows.results||[]).filter(m=>m.backdrop_path).map(m=>({...m,media_type:'tv'}))
+                ].sort((a,b) => b.popularity - a.popularity).slice(0, 12);
+                renderExploreGrid(grid, combined);
+            } catch(e) {
+                grid.innerHTML = `<div style="grid-column:1/-1;padding:20px;text-align:center;color:#333;font-size:11px">Failed to load.</div>`;
+            }
+            _exploreLoading = false;
+        }
+
+        function renderExploreGrid(grid, items, forceType) {
+            if (!items.length) {
+                grid.innerHTML = `<div style="grid-column:1/-1;padding:20px;text-align:center;color:#333;font-size:11px">No results.</div>`;
+                return;
+            }
+            grid.innerHTML = items.map(m => {
+                const type = forceType || m.media_type || 'movie';
+                const title = m.title || m.name || '';
+                const rating = m.vote_average ? m.vote_average.toFixed(1) : '';
+                return `<div onclick="openModal(${m.id},'${type}');closeSearch()" style="position:relative;border-radius:10px;overflow:hidden;cursor:pointer;background:#111;aspect-ratio:16/9">
+                    <img src="https://image.tmdb.org/t/p/w300${m.backdrop_path}" loading="lazy"
+                         onload="this.style.opacity=1"
+                         style="opacity:0;width:100%;height:100%;object-fit:cover;transition:opacity 0.3s">
+                    <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.88) 0%,rgba(0,0,0,0.1) 55%,transparent 100%)"></div>
+                    <div style="position:absolute;bottom:0;left:0;right:0;padding:7px 8px">
+                        <div style="font-size:10px;font-weight:700;color:#fff;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${title}</div>
+                        ${rating ? `<div style="font-size:9px;color:#f5c518;font-weight:700;margin-top:2px">★ ${rating}</div>` : ''}
+                    </div>
+                    ${type === 'tv' ? `<div style="position:absolute;top:5px;right:5px;background:rgba(0,0,0,0.55);border-radius:4px;font-size:8px;font-weight:700;color:#aaa;padding:2px 5px;backdrop-filter:blur(4px)">TV</div>` : ''}
+                </div>`;
+            }).join('');
+        }
+
+        // ===== DECADE MODAL =====
+        let _decadeType = 'movie';
+        let _decadeSelected = '2020s';
+
+        const DECADES = [
+            {label:'2020s', gte:'2020-01-01', lte:'2029-12-31'},
+            {label:'2010s', gte:'2010-01-01', lte:'2019-12-31'},
+            {label:'2000s', gte:'2000-01-01', lte:'2009-12-31'},
+            {label:'90s',   gte:'1990-01-01', lte:'1999-12-31'},
+            {label:'80s',   gte:'1980-01-01', lte:'1989-12-31'},
+            {label:'70s',   gte:'1970-01-01', lte:'1979-12-31'},
+        ];
+
+        function handleSearchFilterBtn() {
+            // Jika sedang mode search hasil → toggle filter bar biasa
+            if (window._isSearchMode) {
+                toggleSearchFilterBar();
+                return;
+            }
+            // Jika idle → buka decade modal
+            openDecadeModal();
+        }
+
+        function openDecadeModal() {
+            document.getElementById('decadeModal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            buildDecadeTabRow();
+            loadDecadeGrid();
+        }
+
+        function closeDecadeModal() {
+            document.getElementById('decadeModal').style.display = 'none';
+            document.body.style.overflow = 'hidden'; // search overlay masih butuh hidden
+        }
+
+        function buildDecadeTabRow() {
+            const row = document.getElementById('decadeTabRow');
+            if (!row) return;
+            row.innerHTML = DECADES.map(d =>
+                `<div class="decade-tab-chip ${d.label === _decadeSelected ? 'active' : ''}"
+                      onclick="selectDecade('${d.label}', this)">${d.label}</div>`
+            ).join('');
+        }
+
+        function selectDecade(label, el) {
+            _decadeSelected = label;
+            document.querySelectorAll('.decade-tab-chip').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+            loadDecadeGrid();
+        }
+
+        function selectDecadeType(type, el) {
+            _decadeType = type;
+            document.querySelectorAll('.decade-type-btn').forEach(b => b.classList.remove('active'));
+            el.classList.add('active');
+            loadDecadeGrid();
+        }
+
+        async function loadDecadeGrid() {
+            const grid = document.getElementById('decadeGrid');
+            if (!grid) return;
+            grid.innerHTML = `<div style="grid-column:1/-1;padding:20px;text-align:center;color:#333;font-size:11px">Loading...</div>`;
+            const decade = DECADES.find(d => d.label === _decadeSelected);
+            if (!decade) return;
+            const dateParam = _decadeType === 'movie'
+                ? `primary_release_date.gte=${decade.gte}&primary_release_date.lte=${decade.lte}`
+                : `first_air_date.gte=${decade.gte}&first_air_date.lte=${decade.lte}`;
+            try {
+                const data = await fetchWithCache(
+                    `https://api.themoviedb.org/3/discover/${_decadeType}?api_key=${API_KEY}&language=en-US&sort_by=vote_average.desc&vote_count.gte=500&${dateParam}&page=1`
+                );
+                const items = (data.results || []).filter(m => m.backdrop_path).slice(0, 12);
+                if (!items.length) {
+                    grid.innerHTML = `<div style="grid-column:1/-1;padding:20px;text-align:center;color:#333;font-size:11px">No results.</div>`;
+                    return;
+                }
+                grid.innerHTML = items.map(m => {
+                    const title = m.title || m.name || '';
+                    const rating = m.vote_average ? m.vote_average.toFixed(1) : '';
+                    const year = (m.release_date || m.first_air_date || '').split('-')[0];
+                    return `<div onclick="closeDecadeModal(); openModal(${m.id},'${_decadeType}'); closeSearch()" style="position:relative;border-radius:10px;overflow:hidden;cursor:pointer;background:#111;aspect-ratio:16/9">
+                        <img src="https://image.tmdb.org/t/p/w300${m.backdrop_path}" loading="lazy"
+                             onload="this.style.opacity=1"
+                             style="opacity:0;width:100%;height:100%;object-fit:cover;transition:opacity 0.3s">
+                        <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.88) 0%,rgba(0,0,0,0.1) 55%,transparent 100%)"></div>
+                        <div style="position:absolute;bottom:0;left:0;right:0;padding:7px 8px">
+                            <div style="font-size:10px;font-weight:700;color:#fff;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${title}</div>
+                            <div style="display:flex;align-items:center;gap:5px;margin-top:2px">
+                                ${rating ? `<span style="font-size:9px;color:#f5c518;font-weight:700">★ ${rating}</span>` : ''}
+                                ${year ? `<span style="font-size:9px;color:#888">${year}</span>` : ''}
+                            </div>
+                        </div>
+                    </div>`;
+                }).join('');
+            } catch(e) {
+                grid.innerHTML = `<div style="grid-column:1/-1;padding:20px;text-align:center;color:#333;font-size:11px">Failed to load.</div>`;
+            }
+        }
+
+        // ===== DUMMY stubs — keep for safety =====
+        function initAwardFilters() {}
+        function loadAwardNominees() {}
+        function switchAwardTab() {}
+
+        const AWARD_CONFIG = {};
 
         // ===== PULL TO REFRESH =====
         (function initPullToRefresh() {
