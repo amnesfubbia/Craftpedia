@@ -2,472 +2,1667 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#000000">
 <title>Silmikaffah — Islam Secara Menyeluruh</title>
 <style>
 :root{
-  --bg:#000;
-  --card:#07100e;
-  --card2:#0b1513;
-  --line:#17312b;
-  --text:#f4f7f6;
-  --muted:#9aa9a5;
-  --green:#16d0ad;
-  --green2:#0fb795;
+  --bg:#050908; --surface:#0b1210; --surface2:#101a17;
+  --teal:#16c7a0; --teal2:#0e8f78; --text:#f4f8f6;
+  --muted:#91a19c; --line:#1b2a26; --danger:#ff7272;
+  --radius:20px;
 }
 *{box-sizing:border-box}
-html,body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
 body{min-height:100vh}
 button,input{font:inherit}
-button{color:inherit}
-#splash{
-  position:fixed;inset:0;background:#000;display:flex;align-items:center;justify-content:center;
-  z-index:9999;transition:.35s
-}
-.splash-inner{text-align:center}
-.splash-logo{width:105px;height:105px;object-fit:contain;margin:auto;display:block}
-.splash-title{font-size:25px;font-weight:800;margin-top:14px}
-.splash-sub{color:var(--muted);margin-top:5px}
-.app{max-width:900px;margin:auto;padding:26px 18px 100px}
-header{display:flex;align-items:center;gap:14px;margin:6px 0 22px}
-.header-logo{width:70px;height:70px;object-fit:contain}
-.brand h1{font-size:30px;margin:0;font-weight:800}
-.brand p{margin:4px 0 0;color:var(--muted);font-size:17px}
-.search{width:100%;background:#07100e;border:1px solid var(--line);border-radius:24px;padding:17px 20px;color:var(--text);outline:none}
-.search::placeholder{color:#77817f}
-.search-wrap{position:relative;margin-bottom:24px}
-.search-icon{position:absolute;left:20px;top:17px;color:var(--muted)}
-.search{padding-left:53px}
-.view{display:none}.view.active{display:block}
-.hero{background:linear-gradient(135deg,#071712,#06100e);border:1px solid var(--line);border-radius:28px;padding:25px;margin:18px 0}
-.hero-label{color:var(--green);font-weight:800;letter-spacing:1px;font-size:14px}
-.hero-date{font-size:30px;font-weight:800;margin:8px 0 4px}
-.hero-greg{color:var(--muted)}
-.quote{margin-top:22px;border-top:1px solid var(--line);padding-top:18px}
-.quote-label{color:var(--green);font-weight:800}
-.quote p{font-size:19px;line-height:1.55;margin:8px 0}
-.quote small{color:var(--muted)}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.section-title{display:flex;justify-content:space-between;align-items:center;margin:28px 0 14px}
-.section-title h2{margin:0;font-size:25px}.section-title span{color:var(--green)}
-.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:20px;min-height:175px;cursor:pointer;transition:.18s}
-.card:hover{border-color:var(--green2);transform:translateY(-1px)}
-.icon{width:40px;height:40px;color:var(--green);margin-bottom:12px}
-.card h3{margin:0 0 8px;font-size:20px}
-.card p{margin:0;color:var(--muted);line-height:1.45}
-.quick{margin-top:22px}.quick .card{min-height:auto;text-align:center;padding:16px}
-.quick .icon{margin:0 auto 7px}
-.quick h3{font-size:16px}
-.back{display:inline-flex;align-items:center;gap:7px;color:var(--green);font-weight:800;font-size:19px;border:0;background:none;padding:5px 0;cursor:pointer;margin:4px 0 20px}
-.detail-head,.content{background:var(--card);border:1px solid var(--line);border-radius:25px;padding:25px;margin-bottom:16px}
-.detail-head{display:flex;align-items:center;gap:18px}
-.detail-head .icon{margin:0}
-.detail-head h2{margin:0;font-size:30px}.detail-head p{margin:5px 0 0;color:var(--muted)}
-.content h2{font-size:27px;margin-top:0}
-.content h3{color:var(--green);font-size:21px;margin-top:25px}
-.content p,.content li{font-size:17px;line-height:1.72}
-.content ul{padding-left:23px}
-.arabic{font-family:"Times New Roman",serif;direction:rtl;text-align:right;font-size:28px;line-height:1.9;margin:18px 0}
-.source{border-top:1px solid var(--line);margin-top:24px;padding-top:15px;color:var(--muted);font-size:14px}
-.subgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-.subitem{background:var(--card2);border:1px solid var(--line);border-radius:17px;padding:16px;cursor:pointer}
-.subitem b{font-size:16px}.subitem span{display:block;color:var(--muted);margin-top:5px;font-size:14px}
-.bottom{
- position:fixed;left:0;right:0;bottom:0;height:72px;background:#030807;border-top:1px solid var(--line);
- display:grid;grid-template-columns:repeat(5,1fr);z-index:50
-}
-.navbtn{background:none;border:0;display:flex;align-items:center;justify-content:center;color:#8d9b98;cursor:pointer}
-.navbtn.active{color:var(--green)}
-.navbtn svg{width:27px;height:27px}
-.no-results{padding:30px;color:var(--muted);text-align:center}
-.light{--bg:#fff;--card:#fff;--card2:#f6f8f7;--line:#d8e3df;--text:#15201d;--muted:#687572}
-.light .search,.light .bottom{background:#fff}
-@media(max-width:650px){
- .app{padding:22px 14px 92px}
- .grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
- .card{padding:14px;min-height:155px;border-radius:18px}
- .card h3{font-size:16px}.card p{font-size:13px}
- .icon{width:32px;height:32px}
- .brand h1{font-size:25px}.brand p{font-size:14px}.header-logo{width:62px;height:62px}
- .hero{padding:20px;border-radius:22px}.hero-date{font-size:25px}
- .content{padding:20px}.content p,.content li{font-size:16px}
- .detail-head{padding:20px}.detail-head h2{font-size:25px}
- .subgrid{grid-template-columns:1fr}
-}
+button{cursor:pointer}
+.app{max-width:520px;margin:auto;min-height:100vh;padding-bottom:82px}
+header{padding:22px 18px 12px;position:sticky;top:0;z-index:5;background:rgba(5,9,8,.92);backdrop-filter:blur(16px)}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:48px;height:48px;display:grid;place-items:center;overflow:hidden;flex:0 0 48px}.logo img{width:40px;height:40px;object-fit:contain;display:block}
+.brand h1{font-size:21px;margin:0}
+.brand p{font-size:12px;color:var(--muted);margin:3px 0 0}
+.search{margin-top:16px;display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:15px;padding:12px 14px}
+.search input{width:100%;border:0;outline:0;background:none;color:var(--text)}
+.search span{color:var(--muted)}
+main{padding:10px 18px}
+.hero{background:linear-gradient(135deg,#0c201b,#0b1512);border:1px solid var(--line);border-radius:24px;padding:20px;margin-bottom:20px;position:relative;overflow:hidden}
+.hero:after{content:"☪";position:absolute;right:-8px;top:-25px;font-size:115px;color:#16c7a012}
+.hero h2{margin:0 0 7px;font-size:22px}
+.hero p{margin:0;color:var(--muted);line-height:1.5;font-size:14px}
+.section-title{display:flex;justify-content:space-between;align-items:center;margin:20px 0 11px}
+.section-title h2{font-size:17px;margin:0}
+.section-title small{color:var(--teal)}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:11px}
+.card{border:1px solid var(--line);background:var(--surface);border-radius:18px;padding:15px;text-align:left;color:var(--text);min-height:108px;transition:.2s}
+.card:hover{transform:translateY(-2px);border-color:#24534a}
+.card .icon{font-size:27px;margin-bottom:10px}
+.card b{display:block;font-size:14px}
+.card small{display:block;color:var(--muted);margin-top:5px;line-height:1.35}
+.shortcut{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.short{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:13px 8px;text-align:center;color:var(--text)}
+.short div{font-size:22px}.short small{display:block;margin-top:5px;color:var(--muted)}
+.bottom{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(520px,100%);background:rgba(8,14,12,.96);border-top:1px solid var(--line);backdrop-filter:blur(18px);display:grid;grid-template-columns:repeat(5,minmax(0,1fr));padding:8px 0 calc(8px + env(safe-area-inset-bottom));z-index:20}
+.navbtn{background:none;border:0;color:var(--muted);font-size:11px;padding:0;margin:0;min-width:0;width:100%;height:48px;display:flex;align-items:center;justify-content:center}
+.navbtn span{display:grid;place-items:center}.nav-svg{width:30px;height:30px}
 
-.icon svg{width:1em;height:1em;display:block;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.detail-head .icon svg{width:1.35em;height:1.35em}
-.navbtn .icon svg{width:1.45em;height:1.45em}
+.navbtn.active{color:var(--teal)}
+.page{display:none}
+.page.active{display:block}
+.back{border:0;background:none;color:var(--teal);padding:8px 4px 16px;font-weight:700;font-size:15px;display:inline-flex;align-items:center;gap:6px}
+.page-head{display:flex;gap:13px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:17px;margin-bottom:16px}
+.page-head .big{font-size:34px}.page-head h2{margin:0;font-size:20px}.page-head p{margin:4px 0 0;color:var(--muted);font-size:13px}
+.sublist{display:grid;gap:9px}
+.subitem{display:flex;align-items:center;justify-content:space-between;width:100%;background:var(--surface);border:1px solid var(--line);border-radius:15px;padding:14px;color:var(--text);text-align:left}
+.subitem .left{display:flex;align-items:center;gap:11px}.subitem .mini{font-size:20px}
+.arrow{color:var(--muted)}
+.detail{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:18px;line-height:1.65}
+.detail h3{margin-top:0}.detail .arabic{font-size:25px;line-height:2;text-align:right;margin:15px 0}
+.detail .source{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px;margin-top:18px}
+.settings-group{margin-bottom:20px}.settings-group h3{font-size:14px;color:var(--teal);margin-bottom:9px}
+.setting{display:flex;justify-content:space-between;align-items:center;background:var(--surface);border:1px solid var(--line);padding:14px;border-radius:14px;margin-bottom:7px}
+.setting small{display:block;color:var(--muted);margin-top:3px}
+.switch{width:44px;height:25px;border-radius:30px;background:#26332f;padding:3px}.switch i{display:block;width:19px;height:19px;border-radius:50%;background:#fff}.switch.on{background:var(--teal)}.switch.on i{margin-left:19px}
+.empty{padding:35px 15px;text-align:center;color:var(--muted)}
+.results{display:grid;gap:9px;margin-top:14px}
+.result{background:var(--surface);border:1px solid var(--line);border-radius:15px;padding:14px}
+.result b{display:block}.result small{color:var(--muted)}
+@media(min-width:600px){body{padding:0 20px}.app{box-shadow:0 0 80px #000}}
+
+
+/* DAILY HOME CARD */
+.daily-card{padding:18px}
+.daily-top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.hijri-label,.quote-label{font-size:10px;letter-spacing:1.2px;font-weight:800;color:var(--teal)}
+.daily-top h2{font-size:20px;margin:5px 0 2px}
+.gregorian-date{font-size:12px;color:var(--muted)}
+.moon{width:46px;height:46px;border-radius:15px;background:rgba(22,199,160,.12);display:grid;place-items:center;font-size:24px;color:var(--teal)}
+.prayer-box{margin-top:15px;padding:13px;border:1px solid var(--line);background:var(--surface2);border-radius:16px}
+.prayer-location{display:flex;gap:6px;align-items:center;color:var(--muted);font-size:11px;margin-bottom:10px}
+.current-prayer{display:flex;align-items:center;justify-content:space-between}
+.current-prayer small{display:block;color:var(--muted);font-size:9px;letter-spacing:.7px}
+.current-prayer strong{display:block;font-size:15px;margin-top:3px}
+.prayer-time{font-size:27px;font-weight:800;color:var(--teal)}
+.prayer-row{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-top:12px;border-top:1px solid var(--line);padding-top:10px}
+.prayer-row span{text-align:center;color:var(--muted);font-size:9px}
+.prayer-row b{display:block;color:var(--text);font-size:10px;margin-top:3px}
+.quote-box{margin-top:14px;padding-top:13px;border-top:1px solid var(--line);line-height:1.5;font-size:13px}
+.quote-box small{display:block;color:var(--muted);font-size:10px;margin-top:6px}
+body.theme-light .hero{background:linear-gradient(135deg,#ffffff,#eef7f4);border-color:#d7e5e0}
+body.theme-light .daily-card{color:#13211d}
+body.theme-light .daily-card .hijri-label,
+body.theme-light .daily-card .quote-label{color:#087d68}
+body.theme-light .prayer-box{background:#f3f8f6;border-color:#d7e5e0}
+body.theme-light .moon{background:#e3f5f0}
+body.theme-light .card,
+body.theme-light .subitem,
+body.theme-light .short,
+body.theme-light .result,
+body.theme-light .detail,
+body.theme-light .page-head,
+body.theme-light .search{box-shadow:0 3px 14px rgba(17,50,42,.05)}
+
+/* SILMIKAFFAH THEME SYSTEM */
+.splash{position:fixed;inset:0;background:#000;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .45s,visibility .45s;animation:splashAutoHide .45s ease 1.5s forwards}@keyframes splashAutoHide{to{opacity:0;visibility:hidden;pointer-events:none}}
+.splash.hide{opacity:0;visibility:hidden}.nojs-note{display:none}
+.splash-logo{width:90px;height:90px;border-radius:22px;display:grid;place-items:center;margin-bottom:16px;overflow:hidden}
+.splash-logo img{width:76px;height:76px;object-fit:contain;display:block}
+.splash-name{font-size:28px;font-weight:800;letter-spacing:.2px}
+.splash-tagline{font-size:13px;color:#91a19c;margin-top:5px}
+.splash-loader{width:90px;height:3px;background:#17201d;border-radius:99px;margin-top:28px;overflow:hidden}
+.splash-loader i{display:block;width:35%;height:100%;background:#16c7a0;border-radius:99px;animation:load 1.15s infinite}
+@keyframes load{0%{transform:translateX(-120%)}100%{transform:translateX(380%)}}
+
+body.theme-light{--bg:#f5f8f7;--surface:#fff;--surface2:#eef4f2;--teal:#078f76;--teal2:#056d5b;--text:#12201c;--muted:#64746e;--line:#dce7e3}
+body.theme-light header{background:rgba(245,248,247,.94)}
+body.theme-light .bottom{background:rgba(255,255,255,.96)}
+
+.theme-options{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px}
+.theme-option{border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:13px;padding:12px 7px;text-align:center}
+.theme-option strong{display:block;font-size:12px;margin-top:5px}
+.theme-option small{display:block;color:var(--muted);font-size:10px;margin-top:3px}
+.theme-option.active{border-color:var(--teal);box-shadow:0 0 0 1px var(--teal) inset}
+.theme-dot{width:26px;height:26px;border-radius:50%;margin:auto;border:1px solid var(--line)}
+.dot-amoled{background:#000}.dot-light{background:#fff}
+
+
+.icon,.big,.mini,.nav-svg{color:var(--teal)}
+.icon svg,.big svg,.mini svg,.nav-svg svg{display:block}
+.mini{width:24px;height:24px;display:grid;place-items:center;flex:none}
+.nav-svg{display:grid;place-items:center;width:28px;height:28px}.navbtn{padding:7px 2px}
+
+
+.moon{width:74px;height:74px;border-radius:50%;display:grid;place-items:center;color:var(--teal);opacity:.9}
+.moon svg{width:52px;height:52px}
+.short{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+.short-icon{height:28px;display:grid;place-items:center;color:var(--teal)}
+.location-icon{color:var(--teal);display:inline-flex;align-items:center}
+
+<style>
+@media(max-width:430px){
+  .cards{grid-template-columns:repeat(2,1fr)!important;gap:8px!important}
+  .card{padding:11px 9px!important;border-radius:15px!important}
+  .card .icon{font-size:24px!important}
+  .card h3{font-size:13px!important;line-height:1.2!important}
+  .card p{font-size:10px!important;line-height:1.35!important}
+}
+</style>
+
+<style id="stage3b-layout">
+/* SILMIKAFFAH: Home menu = 3 items per row */
+.home-grid,.main-menu-grid,.menu-grid,.home-menu,.home-actions,.category-grid{
+  display:grid !important;
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  gap:12px !important;
+}
+@media (max-width:520px){
+  .home-grid,.main-menu-grid,.menu-grid,.home-menu,.home-actions,.category-grid{
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+    gap:9px !important;
+  }
+}
+</style>
+
+<style id="stage3c-content-css">
+.content-page{padding:16px 16px 110px;max-width:900px;margin:auto}
+.content-header{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.content-header h2{margin:0;font-size:22px}
+.content-back{width:42px;height:42px;border:1px solid var(--border,#2a2a2a);border-radius:14px;background:transparent;color:inherit;font-size:20px}
+.content-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.content-card{border:1px solid var(--border,#2a2a2a);background:var(--card,#111);color:inherit;border-radius:18px;padding:16px;text-align:left;min-height:82px}
+.content-card strong{display:block;font-size:15px;margin-bottom:6px}
+.content-card small{opacity:.65}
+.material{line-height:1.75}
+.material h3{font-size:21px;margin:0 0 12px}
+.material .source-note{font-size:12px;opacity:.6;margin-top:20px}
+@media(max-width:520px){.content-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.content-card{padding:13px;min-height:76px}}
 </style>
 </head>
 <body>
-<div id="splash">
-  <div class="splash-inner">
-    <img class="splash-logo" src="logo.png" alt="Silmikaffah">
-    <div class="splash-title">Silmikaffah</div>
-    <div class="splash-sub">Islam Secara Menyeluruh</div>
-  </div>
+
+<div id="splash" class="splash">
+  <div class="splash-logo"><img src="logo.png" alt="Silmikaffah"></div>
+  <div class="splash-name">Silmikaffah</div>
+  <div class="splash-tagline">Islam Secara Menyeluruh</div>
+  <div class="splash-loader"><i></i></div>
 </div>
 
 <div class="app">
 <header>
-  <img class="header-logo" src="logo.png" alt="Silmikaffah">
-  <div class="brand"><h1>Silmikaffah</h1><p>Islam Secara Menyeluruh</p></div>
+  <div class="brand">
+    <div class="logo"><img src="logo.png" alt="Silmikaffah"></div>
+    <div><h1>Silmikaffah</h1><p>Islam Secara Menyeluruh</p></div>
+  </div>
+  <div class="search"><span>⌕</span><input id="searchInput" placeholder="Cari ilmu, doa, hadis, kitab..." oninput="searchAll(this.value)"></div>
 </header>
 
-<div class="search-wrap">
-  <span class="search-icon">⌕</span>
-  <input id="search" class="search" placeholder="Cari ilmu, doa, hadis, kitab..." autocomplete="off">
-</div>
+<main>
+<section id="home" class="page active">
+  <div class="hero daily-card">
+    <div class="daily-top">
+      <div>
+        <div class="hijri-label">HARI INI • KALENDER HIJRIAH</div>
+        <h2 id="hijriDate">Memuat tanggal Hijriah...</h2>
+        <div class="gregorian-date" id="gregorianDate"></div>
+      </div>
+      <div class="moon" id="moonIcon"></div>
+    </div>
 
-<main id="home" class="view active"></main>
-<main id="rukun-iman" class="view"></main>
-<main id="rukun-islam" class="view"></main>
-<main id="koleksi" class="view"></main>
-<main id="pengaturan" class="view"></main>
-<main id="detail" class="view"></main>
-</div>
+    <div class="prayer-box">
+      <div class="prayer-location"><span class="location-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.1 7-12a7 7 0 0 0-14 0c0 5.9 7 12 7 12Z"/><circle cx="12" cy="9" r="2.2"/></svg></span><span id="locationText">Mencari lokasi GPS...</span></div>
+      <div class="current-prayer">
+        <div>
+          <small>SHOLAT BERIKUTNYA</small>
+          <strong id="currentPrayer">Memuat...</strong>
+        </div>
+        <div class="prayer-time" id="currentPrayerTime">--:--</div>
+      </div>
+      <div class="prayer-row" id="prayerRow">
+        <span>Subuh <b>--:--</b></span>
+        <span>Dzuhur <b>--:--</b></span>
+        <span>Ashar <b>--:--</b></span>
+        <span>Maghrib <b>--:--</b></span>
+        <span>Isya <b>--:--</b></span>
+      </div>
+    </div>
+
+    <div class="quote-box">
+      <div class="quote-label">✦ KUTIPAN HARI INI</div>
+      <div id="dailyQuote">Memuat kutipan...</div>
+      <small id="quoteSource"></small>
+    </div>
+  </div>
+
+  <div class="section-title"><h2>Menu Utama</h2><small>10 kategori</small></div>
+  <div class="grid" id="categoryGrid"></div>
+
+  <div class="section-title"><h2>Akses Cepat</h2></div>
+  <div class="shortcut">
+    <button class="short" onclick="openTool('Jadwal Sholat')"><div class="short-icon" data-short-icon="Jadwal Sholat"></div><small>Jadwal Sholat</small></button>
+    <button class="short" onclick="openTool('Arah Kiblat')"><div class="short-icon" data-short-icon="Arah Kiblat"></div><small>Arah Kiblat</small></button>
+    <button class="short" onclick="openCategory('8')"><div class="short-icon" data-short-icon="Doa & Dzikir"></div><small>Doa & Dzikir</small></button>
+  </div>
+</section>
+
+<section id="category" class="page">
+  <button class="back" onclick="goBack()">← Kembali</button>
+  <div id="categoryHead"></div>
+  <div class="sublist" id="submenu"></div>
+</section>
+
+<section id="detail" class="page">
+  <button class="back" onclick="goBack()">← Kembali</button>
+  <div id="detailBox"></div>
+</section>
+
+<section id="search" class="page">
+  <div class="section-title"><h2>Hasil Pencarian</h2></div>
+  <div id="results" class="results"><div class="empty">Ketik sesuatu pada kotak pencarian di atas.</div></div>
+</section>
+
+<section id="collection" class="page">
+  <div class="section-title"><h2>Referensi & Koleksi</h2></div>
+  <div class="sublist">
+    <button class="subitem" onclick="showDetail('Bookmark','','Semua materi yang kamu simpan untuk dibaca kembali.')"><span class="left"><span class="mini"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4.5A2.5 2.5 0 0 1 8.5 2h7A2.5 2.5 0 0 1 18 4.5V21l-6-3.7L6 21V4.5Z"/></svg></span>Bookmark</span><span class="arrow">›</span></button>
+    <button class="subitem" onclick="showDetail('Favorit','','Kumpulan materi yang ditandai sebagai favorit.')"><span class="left"><span class="mini"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 8.8c0 5.1-8.8 10.2-8.8 10.2S3.2 13.9 3.2 8.8A4.8 4.8 0 0 1 12 6.1a4.8 4.8 0 0 1 8.8 2.7Z"/></svg></span>Favorit</span><span class="arrow">›</span></button>
+    <button class="subitem" onclick="showDetail('Terakhir Dibaca','','Materi yang terakhir kamu buka.')"><span class="left"><span class="mini"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>Terakhir Dibaca</span><span class="arrow">›</span></button>
+    <button class="subitem" onclick="showDetail('Riwayat','','Riwayat aktivitas dan bacaan kamu.')"><span class="left"><span class="mini"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/><path d="M12 7v5l3 2"/></svg></span>Riwayat</span><span class="arrow">›</span></button>
+    <button class="subitem" onclick="showDetail('Catatan','','Catatan pribadi untuk materi yang sedang dipelajari.')"><span class="left"><span class="mini"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h14v18H5z"/><path d="M8 7h8M8 11h8M8 15h5"/></svg></span>Catatan</span><span class="arrow">›</span></button>
+    <button class="subitem" onclick="showDetail('Referensi & Sumber','','Informasi sumber dan referensi setiap materi.')"><span class="left"><span class="mini"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21V5.5Z"/><path d="M4 18h16"/></svg></span>Referensi & Sumber</span><span class="arrow">›</span></button>
+  </div>
+</section>
+
+<section id="tools" class="page">
+  <div class="section-title"><h2>Alat Muslim</h2></div>
+  <div class="sublist" id="toolsList"></div>
+</section>
+
+<section id="settings" class="page">
+  <div class="section-title"><h2>Pengaturan Aplikasi</h2></div>
+  <div class="settings-group">
+    <h3>Tampilan</h3>
+    <div class="setting" style="display:block">
+      <div><b>Tema Aplikasi</b><small>Pilih tampilan Silmikaffah</small></div>
+      <div class="theme-options">
+        <button class="theme-option active" id="theme-amoled" onclick="setTheme('amoled')"><div class="theme-dot dot-amoled"></div><strong>Gelap</strong><small>AMOLED</small></button>
+        <button class="theme-option" id="theme-light" onclick="setTheme('light')"><div class="theme-dot dot-light"></div><strong>Terang</strong><small>Putih</small></button>
+        
+      </div>
+    </div>
+    <div class="setting"><div>Ukuran Font<small>Atur ukuran teks aplikasi</small></div><span>›</span></div>
+    <div class="setting"><div>Font Arab<small>Atur jenis dan tampilan font Arab</small></div><span>›</span></div>
+  </div>
+  <div class="settings-group">
+    <h3>Ibadah</h3>
+    <div class="setting"><div>Metode Jadwal Sholat<small>Atur metode perhitungan</small></div><span>›</span></div>
+    <div class="setting"><div>Mazhab<small>Pilihan mazhab untuk fitur terkait</small></div><span>›</span></div>
+    <div class="setting"><div>Notifikasi<small>Pengingat ibadah</small></div><span>›</span></div>
+  </div>
+  <div class="settings-group">
+    <h3>Aplikasi</h3>
+    <div class="setting"><div>Bahasa<small>Indonesia</small></div><span>›</span></div>
+    <div class="setting"><div>Tentang Silmikaffah<small>Versi 1.0.0</small></div><span>›</span></div>
+    <div class="setting"><div>Sumber & Referensi<small>Informasi sumber konten</small></div><span>›</span></div>
+    <div class="setting"><div>Privasi<small>Pengaturan privasi aplikasi</small></div><span>›</span></div>
+  </div>
+</section>
+</main>
 
 <nav class="bottom">
- <button class="navbtn active" data-view="home" aria-label="Home">⌂</button>
- <button class="navbtn" data-view="rukun-iman" aria-label="Rukun Iman">♡</button>
- <button class="navbtn" data-view="rukun-islam" aria-label="Rukun Islam">⌂</button>
- <button class="navbtn" data-view="koleksi" aria-label="Koleksi">♧</button>
- <button class="navbtn" data-view="pengaturan" aria-label="Pengaturan">⚙</button>
+  <button class="navbtn active" data-page="home" aria-label="Home" onclick="goRoot('home')">
+    <span class="nav-svg"><svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21v-8h14v8"/><path d="M7 13V9l5-4 5 4v4"/></svg></span>
+  </button>
+  <button class="navbtn" data-page="rukun-iman" aria-label="Rukun Iman" onclick="openNavCategory('2','rukun-iman')">
+    <span class="nav-svg"><svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 8.8c0 5.1-8.8 10.2-8.8 10.2S3.2 13.9 3.2 8.8A4.8 4.8 0 0 1 12 6.1a4.8 4.8 0 0 1 8.8 2.7Z"/></svg></span>
+  </button>
+  <button class="navbtn" data-page="rukun-islam" aria-label="Rukun Islam" onclick="openNavCategory('1','rukun-islam')">
+    <span class="nav-svg"><svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21v-8h14v8"/><path d="M7 13V9l5-4 5 4v4"/><path d="M12 5V2"/><path d="M10.5 2h3"/></svg></span>
+  </button>
+  <button class="navbtn" data-page="collection" aria-label="Koleksi" onclick="goRoot('collection')">
+    <span class="nav-svg"><svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4.5A2.5 2.5 0 0 1 8.5 2h7A2.5 2.5 0 0 1 18 4.5V21l-6-3.7L6 21V4.5Z"/></svg></span>
+  </button>
+  <button class="navbtn" data-page="settings" aria-label="Pengaturan" onclick="goRoot('settings')">
+    <span class="nav-svg"><svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-1.8 1.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-2.5V20a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1-1.8-1.8.1-.1A1.7 1.7 0 0 0 8.1 15a1.7 1.7 0 0 0-1.6-1H6v-2.5h.5a1.7 1.7 0 0 0 1.6-1A1.7 1.7 0 0 0 7.8 9l-.1-.1 1.8-1.8.1.1a1.7 1.7 0 0 0 1.9.3 1.7 1.7 0 0 0 1-1.6v-.2H15v.2a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1 1.8 1.8-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2V14h-.2a1.7 1.7 0 0 0-1.6 1Z"/></svg></span>
+  </button>
 </nav>
+</div>
 
 <script>
-const menus = [
- {id:"rukun-islam",title:"Rukun Islam",desc:"Lima rukun Islam dan seluruh pembahasannya.",icon:"⌂",items:[
-  ["syahadat","Syahadat","Makna, kalimat, kedudukan dan konsekuensi syahadat."],
-  ["sholat","Sholat","Syarat, rukun, bacaan, tata cara dan berbagai jenis sholat."],
-  ["zakat","Zakat","Zakat fitrah, zakat mal, nisab, mustahik dan kalkulator zakat."],
-  ["puasa","Puasa","Ramadan, qadha, fidyah dan puasa sunnah."],
-  ["haji","Haji & Umrah","Manasik, rukun, wajib, miqat dan larangan ihram."]]},
- {id:"rukun-iman",title:"Rukun Iman",desc:"Enam rukun iman beserta cabang pembahasannya.",icon:"♡",items:[
-  ["allah","Iman kepada Allah","Tauhid, Asmaul Husna dan sifat-sifat Allah."],
-  ["malaikat","Iman kepada Malaikat","Nama, tugas, sifat dan hikmah beriman kepada malaikat."],
-  ["kitab-allah","Iman kepada Kitab Allah","Al-Qur'an dan kitab-kitab yang Allah turunkan."],
-  ["rasul","Iman kepada Rasul","25 Nabi dan Rasul, sifat, mukjizat dan keteladanan."],
-  ["akhirat","Iman kepada Hari Akhir","Kematian, barzakh, kebangkitan, hisab, surga dan neraka."],
-  ["qadar","Iman kepada Qada & Qadar","Takdir, ikhtiar, tawakal dan hikmah beriman kepada qadar."]]},
- {id:"ilmu",title:"Ilmu & Belajar",desc:"Pusat pembelajaran berbagai cabang ilmu Islam.",icon:"▤",items:[
-  ["quran","Al-Qur'an","Bacaan, terjemah, tafsir dan ilmu Al-Qur'an."],
-  ["hadis","Hadis","Pengertian, sanad, matan, perawi dan klasifikasi hadis."],
-  ["tafsir","Tafsir & Ulumul Qur'an","Pengantar tafsir dan ilmu-ilmu Al-Qur'an."],
-  ["aqidah","Aqidah","Dasar-dasar keyakinan Islam."],
-  ["fikih","Fikih","Pembahasan hukum ibadah dan muamalah."],
-  ["tajwid","Tajwid","Kaidah membaca Al-Qur'an dengan benar."],
-  ["arab","Bahasa Arab","Dasar kosakata dan tata bahasa Arab."],
-  ["kamus","Kamus Bahasa Arab","Pencarian kosakata Arab-Indonesia."],
-  ["ushul","Usul Fikih","Pengantar sumber dan metode penetapan hukum."],
-  ["qawaid","Qawaid Fiqhiyyah","Kaidah-kaidah umum dalam fikih."],
-  ["faraid","Faraid / Waris","Dasar pembagian warisan menurut fikih."],
-  ["akhlak","Akhlak & Adab","Adab kepada Allah, manusia dan lingkungan."],
-  ["sirah","Sirah Nabi","Kehidupan Nabi Muhammad ﷺ secara kronologis."]]},
- {id:"keluarga",title:"Keluarga & Muamalah",desc:"Panduan kehidupan keluarga dan hubungan sosial.",icon:"⌂",items:[
-  ["nikah","Pernikahan","Khitbah, akad, mahar dan hak kewajiban pasangan."],
-  ["keluarga","Keluarga","Hak orang tua, anak dan membangun keluarga sakinah."],
-  ["talak","Talak & Rujuk","Pengantar hukum perceraian dan rujuk."],
-  ["muamalah","Muamalah","Jual beli, utang piutang, sewa dan transaksi."],
-  ["ekonomi","Ekonomi Syariah","Prinsip halal, riba, gharar dan transaksi syariah."],
-  ["wakaf","Wakaf","Pengertian, jenis, pengelolaan dan manfaat wakaf."],
-  ["wasiat","Wasiat","Ketentuan dan adab berwasiat."],
-  ["takziah","Takziah & Jenazah","Adab takziah dan pengurusan jenazah."],
-  ["tetangga","Adab Bertetangga","Hak dan kewajiban dalam kehidupan bertetangga."]]},
- {id:"sejarah",title:"Sejarah & Tokoh",desc:"Sejarah, tokoh, peradaban dan peristiwa Islam.",icon:"▱",items:[
-  ["sirah-sejarah","Sirah Nabi","Perjalanan dakwah Nabi Muhammad ﷺ."],
-  ["perang","Peristiwa & Peperangan","Peristiwa penting dalam sejarah Islam."],
-  ["khulafa","Khulafaur Rasyidin","Abu Bakar, Umar, Utsman dan Ali رضي الله عنهم."],
-  ["sahabat","Sahabat Nabi","Tokoh sahabat dan keteladanannya."],
-  ["ahlulbait","Ahlul Bait","Keluarga Nabi dan kedudukan mereka."],
-  ["walisongo","Wali Songo","Sejarah dakwah Islam di Nusantara."],
-  ["dinasti","Dinasti Islam","Perkembangan pemerintahan dan peradaban Islam."],
-  ["ulama","Tokoh Ulama","Ulama dan kontribusi keilmuan mereka."],
-  ["peradaban","Peradaban Islam","Ilmu pengetahuan, pendidikan dan kebudayaan."],
-  ["kalender-islam","Kalender & Peristiwa Islam","Bulan Hijriah dan hari-hari penting Islam."]]},
- {id:"doa",title:"Doa & Dzikir",desc:"Kumpulan doa dan dzikir untuk berbagai keadaan.",icon:"✋",items:[
-  ["doa-harian","Doa Harian","Doa sebelum dan sesudah aktivitas sehari-hari."],
-  ["dzikir-pagi","Dzikir Pagi & Petang","Dzikir yang dibaca pada pagi dan petang."],
-  ["dzikir-sholat","Dzikir Setelah Sholat","Dzikir dan doa setelah sholat fardhu."],
-  ["doa-sholat","Doa Dalam Sholat","Doa dan bacaan yang berkaitan dengan sholat."],
-  ["perlindungan","Doa Perlindungan","Doa memohon perlindungan kepada Allah."],
-  ["taubat","Istighfar & Taubat","Doa memohon ampun dan tuntunan taubat."],
-  ["orangtua","Doa untuk Orang Tua","Kumpulan doa untuk kedua orang tua."],
-  ["sakit","Doa Ketika Sakit","Doa bagi diri sendiri dan orang yang sakit."],
-  ["jenazah-doa","Doa Jenazah","Doa untuk jenazah dan keluarga yang ditinggalkan."]]},
- {id:"kitab",title:"Kitab",desc:"Koleksi dan indeks kitab berdasarkan bidang kajian.",icon:"▢",items:[
-  ["kitab-quran","Al-Qur'an","Indeks surat, ayat, terjemah dan tafsir."],
-  ["kitab-hadis","Kitab Hadis","Koleksi dan indeks kitab hadis."],
-  ["kitab-fikih","Kitab Fikih","Kitab-kitab fikih dan pembahasannya."],
-  ["kitab-aqidah","Kitab Aqidah","Rujukan dalam bidang aqidah."],
-  ["kitab-akhlak","Kitab Akhlak","Rujukan adab dan pembinaan akhlak."],
-  ["kitab-arab","Kitab Bahasa Arab","Rujukan nahwu, sharaf dan kosakata."],
-  ["kitab-sirah","Kitab Sirah","Rujukan perjalanan hidup Nabi dan sejarah Islam."]]},
- {id:"alat",title:"Alat Muslim",desc:"Alat bantu ibadah dan aktivitas Muslim.",icon:"◈",items:[
-  ["jadwal","Jadwal Sholat","Jadwal sholat berdasarkan lokasi perangkat."],
-  ["kiblat","Arah Kiblat","Menentukan arah kiblat."],
-  ["pengingat-sholat","Pengingat Sholat","Pengingat waktu sholat."],
-  ["pengingat-dzikir","Pengingat Dzikir","Pengingat dzikir yang dapat diatur."],
-  ["tasbih","Tasbih Digital","Penghitung dzikir digital."],
-  ["kalender","Kalender Hijriah","Tanggal Hijriah dan Masehi."],
-  ["konversi","Konverter Hijriah–Masehi","Konversi tanggal dua kalender."],
-  ["kamus-alat","Kamus Bahasa Arab","Pencarian cepat kosakata Arab-Indonesia."]]},
- {id:"koleksi",title:"Referensi & Koleksi",desc:"Simpan dan kelola materi yang kamu baca.",icon:"♧",items:[
-  ["bookmark","Bookmark","Simpan halaman untuk dibaca kembali."],
-  ["favorit","Favorit","Simpan materi pilihan."],
-  ["terakhir","Terakhir Dibaca","Daftar materi yang baru dibuka."],
-  ["catatan","Catatan","Catatan pribadi pada materi."],
-  ["riwayat","Riwayat","Riwayat pembacaan."],
-  ["sumber","Sumber & Referensi","Daftar sumber dan rujukan konten."]]}
+
+function lineIcon(type, size=30){
+ const common=`width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"`;
+ const m={
+  mosque:`<svg ${common}><path d="M3 21h18"/><path d="M5 21v-8h14v8"/><path d="M7 13V9l5-4 5 4v4"/><path d="M9 21v-5h6v5"/><path d="M12 5V2"/><path d="M10.5 2h3"/></svg>`,
+  heart:`<svg ${common}><path d="M20.8 8.8c0 5.1-8.8 10.2-8.8 10.2S3.2 13.9 3.2 8.8A4.8 4.8 0 0 1 12 6.1a4.8 4.8 0 0 1 8.8 2.7Z"/></svg>`,
+  books:`<svg ${common}><path d="M4 5.5h13a2 2 0 0 1 2 2V19H6a2 2 0 0 0-2 2V5.5Z"/><path d="M6 19h13"/><path d="M7 5V3h12v14"/><path d="M9 9h7M9 12h6"/></svg>`,
+  family:`<svg ${common}><circle cx="9" cy="7" r="3"/><circle cx="16.5" cy="9" r="2.5"/><path d="M3.5 20a5.5 5.5 0 0 1 11 0"/><path d="M14 15a4.5 4.5 0 0 1 6 4"/></svg>`,
+  history:`<svg ${common}><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/><path d="M12 7v5l3 2"/></svg>`,
+  book:`<svg ${common}><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21V5.5Z"/><path d="M4 18h16"/></svg>`,
+  hands:`<svg ${common}><path d="M8 11V5a1.5 1.5 0 0 1 3 0v5"/><path d="M11 10V3.8a1.5 1.5 0 0 1 3 0V10"/><path d="M14 10V5.2a1.5 1.5 0 0 1 3 0v6"/><path d="M17 11V8a1.5 1.5 0 0 1 3 0v5c0 4.4-2.7 7-7 7h-1.5C8.4 20 6 18.2 4.5 15L3 11.7a1.5 1.5 0 0 1 2.7-1.3L8 13"/></svg>`,
+  compass:`<svg ${common}><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2.2 4.8-4.8 2.2 2.2-4.8 4.8-2.2Z"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2"/></svg>`,
+  bookmark:`<svg ${common}><path d="M6 4.5A2.5 2.5 0 0 1 8.5 2h7A2.5 2.5 0 0 1 18 4.5V21l-6-3.7L6 21V4.5Z"/></svg>`,
+  moon:`<svg ${common}><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11Z"/></svg>`
+ };
+ return m[type]||m.book;
+}
+
+function moonIcon(){
+ return `<svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.55" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+ <path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11Z"/>
+ <path d="M16.8 7.2v3.2M15.2 8.8h3.2"/>
+ </svg>`;
+}
+
+function miniIcon(name){
+ const n=(name||'').toLowerCase();
+ if(n.includes('sholat')||n.includes('masjid')||n.includes('haji')||n.includes('umrah')) return lineIcon('mosque',21);
+ if(n.includes('iman')||n.includes('allah')||n.includes('malaikat')||n.includes('rasul')||n.includes('akhlak')||n.includes('keluarga')||n.includes('pernikahan')||n.includes('munakahat')) return lineIcon('heart',21);
+ if(n.includes('kitab')||n.includes('qur')||n.includes('hadis')||n.includes('ilmu')||n.includes('bahasa arab')||n.includes('pendidikan')||n.includes('tafsir')) return lineIcon('book',21);
+ if(n.includes('sejarah')||n.includes('sirah')||n.includes('perang')||n.includes('tokoh')||n.includes('sahabat')||n.includes('peradaban')) return lineIcon('history',21);
+ if(n.includes('doa')||n.includes('dzikir')||n.includes('zikir')||n.includes('tasbih')) return lineIcon('hands',21);
+ if(n.includes('kiblat')||n.includes('jadwal')||n.includes('arah')) return lineIcon('compass',21);
+ if(n.includes('bookmark')||n.includes('koleksi')||n.includes('simpan')) return lineIcon('bookmark',21);
+ if(n.includes('zakat')||n.includes('faraid')||n.includes('waris')||n.includes('fikih')||n.includes('ushul')||n.includes('qawaid')||n.includes('muamalah')) return lineIcon('book',21);
+ if(n.includes('puasa')||n.includes('ramadan')||n.includes('hari akhir')||n.includes('qada')||n.includes('qadar')) return lineIcon('moon',21);
+ if(n.includes('pencarian')||n.includes('search')||n.includes('referensi')||n.includes('sumber')||n.includes('catatan')) return lineIcon('bookmark',21);
+ return lineIcon('book',21);
+}
+
+function renderQuickAccessIcons(){
+  document.querySelectorAll('[data-short-icon]').forEach(el=>{
+    el.innerHTML=miniIcon(el.dataset.shortIcon || '');
+  });
+}
+
+const iconMap={'1':'mosque','2':'heart','3':'books','4':'family','5':'heart','6':'history','7':'book','8':'hands','9':'compass','10':'bookmark'};
+const categories = [
+ {id:'1',icon:'☪️',name:'Rukun Islam',desc:'Lima rukun Islam dan cabang pembahasannya',subs:[
+  ['🕌','Syahadat'],['🧎','Sholat'],['💰','Zakat'],['🌙','Puasa'],['🕋','Haji & Umrah']]},
+ {id:'2',icon:'🤍',name:'Rukun Iman',desc:'Enam rukun iman dan seluruh cabang pembahasannya',subs:[
+  ['☝️','Iman kepada Allah'],['👼','Iman kepada Malaikat'],['📖','Iman kepada Kitab Allah'],['🧑‍🦱','Iman kepada Rasul'],['🌅','Iman kepada Hari Akhir'],['⚖️','Iman kepada Qada & Qadar']]},
+ {id:'3',icon:'📚',name:'Ilmu & Belajar',desc:'Berbagai cabang ilmu Islam dan pembelajaran',subs:[
+  ['🧠','Akidah'],['⚖️','Fikih'],['🧮','Faraidh / Ilmu Waris'],['📐','Ushul Fikih'],['📜','Qawaid Fiqhiyyah'],
+  ['📖','Ulumul Qur’an'],['📜','Hadis'],['🔬','Ulumul Hadis'],['✍️','Belajar Al-Qur’an'],['🇸🇦','Bahasa Arab'],['🎓','Pendidikan Islam']]},
+ {id:'4',icon:'💍',name:'Keluarga & Muamalah',desc:'Pernikahan, keluarga dan kehidupan bermuamalah',subs:[
+  ['💍','Pernikahan / Munakahat'],['👨‍👩‍👧','Keluarga'],['🤝','Muamalah']]},
+ {id:'5',icon:'❤️',name:'Akhlak & Adab',desc:'Akhlak, adab dan pembinaan diri',subs:[
+  ['✨','Akhlak Terpuji'],['⚠️','Akhlak Tercela'],['🤝','Adab'],['❤️','Tazkiyatun Nafs']]},
+ {id:'6',icon:'🕌',name:'Sejarah & Peristiwa Islam',desc:'Sirah, perang, tokoh, peradaban dan peristiwa Islam',subs:[
+  ['📜','Sirah Nabi'],['⚔️','Perang & Ekspedisi'],['👥','Sahabat & Generasi Awal'],['🎓','Ulama & Tokoh'],
+  ['🏛️','Sejarah Peradaban Islam'],['🌏','Islam Nusantara'],['🌙','Hari & Peristiwa Islam'],['📅','Kalender Hijriah']]},
+ {id:'7',icon:'📜',name:'Kitab',desc:'Koleksi kitab berdasarkan bidang kajian',subs:[
+  ['❤️','Kitab Akhlak'],['⚖️','Kitab Fikih'],['☝️','Kitab Akidah'],['📜','Kitab Hadis'],['💍','Kitab Keluarga'],['📖','Kitab Tafsir'],['📚','Kitab Lainnya']]},
+ {id:'8',icon:'🤲',name:'Doa & Dzikir',desc:'Doa dan dzikir untuk berbagai keadaan',subs:[
+  ['🌅','Doa Harian'],['🤲','Doa Khusus'],['📿','Dzikir'],['📖','Doa dari Al-Qur’an']]},
+ {id:'9',icon:'🧭',name:'Alat Muslim',desc:'Alat bantu ibadah dan aktivitas Muslim',subs:[
+  ['🕐','Jadwal Sholat'],['🧭','Arah Kiblat'],['🔔','Pengingat Sholat'],['📿','Pengingat Dzikir'],['📿','Tasbih Digital'],['🔔','Notifikasi Ibadah'],['🕌','Lokasi Masjid']]},
+ {id:'10',icon:'🔎',name:'Referensi & Koleksi',desc:'Pencarian, simpanan, riwayat dan sumber',subs:[
+  ['🔎','Pencarian Global'],['🔖','Bookmark'],['⭐','Favorit'],['🕘','Terakhir Dibaca'],['📜','Riwayat'],['🗂️','Koleksi Saya'],['📝','Catatan'],['📚','Referensi & Sumber']]}
 ];
 
-const content = {
-"sirah-sejarah":["Sirah Nabi","Sirah Nabi Muhammad ﷺ membahas perjalanan kehidupan beliau sejak sebelum kenabian, turunnya wahyu, dakwah di Makkah, hijrah, kehidupan di Madinah, berbagai peristiwa penting, hingga Haji Wada dan wafat beliau.","Materi utama meliputi: masa kelahiran dan masa muda, awal kenabian, dakwah secara sembunyi-sembunyi dan terang-terangan, tekanan kaum Quraisy, hijrah ke Habasyah, Baiat Aqabah, hijrah ke Madinah, pembangunan masyarakat Madinah, perjanjian Hudaibiyah, Fathu Makkah, Haji Wada, serta pelajaran akhlak dan kepemimpinan Nabi ﷺ.","Pokok pembahasan","Kronologi kehidupan Nabi ﷺ • Dakwah Makkah • Hijrah • Madinah • Hudaibiyah • Fathu Makkah • Haji Wada • Keteladanan Nabi ﷺ","Rujukan: Al-Qur'an, hadis-hadis sahih, dan kitab sirah yang dicantumkan pada database sumber aplikasi."],
-
-syahadat:["Syahadat","Syahadat adalah kesaksian bahwa tidak ada sesembahan yang berhak disembah selain Allah dan Muhammad adalah utusan Allah.","Syahadat merupakan pintu masuk Islam dan menjadi dasar seluruh amal seorang Muslim.","Kalimat syahadat","أَشْهَدُ أَنْ لَا إِلٰهَ إِلَّا اللهُ وَأَشْهَدُ أَنَّ مُحَمَّدًا رَسُولُ اللهِ"],
-sholat:["Sholat","Sholat adalah ibadah yang memiliki kedudukan sangat penting dalam Islam dan termasuk rukun Islam setelah syahadat.","Materi sholat mencakup thaharah, syarat, rukun, sunnah, pembatal, bacaan, tata cara, jamaah, Jumat, musafir, jenazah dan sholat sunnah.","Materi yang tersedia","Wudhu dan tayamum • Adzan dan iqamah • Syarat dan rukun sholat • Bacaan sholat • Sholat berjamaah • Sholat Jumat • Sholat musafir • Sholat jenazah • Sholat sunnah"],
-zakat:["Zakat","Zakat adalah kewajiban mengeluarkan sebagian harta atau zakat fitrah sesuai ketentuan syariat untuk golongan yang berhak menerimanya.","Pembahasan meliputi zakat fitrah, zakat mal, nisab, haul, jenis harta, mustahik dan cara menghitung.","Kalkulator zakat","Aplikasi dapat menyediakan kalkulator untuk membantu estimasi zakat berdasarkan jenis harta. Hasil perhitungan tetap perlu diperiksa sesuai ketentuan fikih yang digunakan."],
-puasa:["Puasa","Puasa adalah menahan diri dari hal-hal yang membatalkan sejak terbit fajar sampai terbenam matahari dengan niat ibadah.","Materi meliputi puasa Ramadan, syarat, rukun, sunnah, pembatal, qadha, fidyah dan puasa sunnah.","Materi yang tersedia","Ramadan • Niat • Sahur • Berbuka • Pembatal puasa • Qadha • Fidyah • Puasa sunnah"],
-haji:["Haji & Umrah","Haji adalah ibadah ke Baitullah pada waktu dan tata cara tertentu bagi Muslim yang mampu.","Materi meliputi ihram, miqat, wukuf, thawaf, sa'i, tahallul, wajib haji dan larangan ihram.","Materi yang tersedia","Syarat • Rukun • Wajib • Miqat • Ihram • Wukuf • Thawaf • Sa'i • Tahallul • Larangan ihram"],
-allah:["Iman kepada Allah","Beriman kepada Allah berarti meyakini dengan benar bahwa Allah adalah Rabb, satu-satunya yang berhak disembah, dan memiliki nama serta sifat yang sempurna.","Pembahasan mencakup tauhid, Asmaul Husna, sifat wajib, mustahil dan jaiz menurut materi aqidah yang digunakan.","Asmaul Husna & sifat Allah","Asmaul Husna adalah nama-nama Allah yang menunjukkan kesempurnaan-Nya. Bagian ini juga memuat pembahasan 20 sifat Allah sesuai kerangka pembelajaran aqidah yang dipilih."],
-malaikat:["Iman kepada Malaikat","Malaikat adalah makhluk Allah yang diciptakan untuk taat kepada-Nya.","Nama yang umum dipelajari antara lain Jibril, Mikail, Israfil, Izrail, Munkar, Nakir, Raqib, Atid, Malik dan Ridwan, dengan rincian tugas berdasarkan dalil yang digunakan.","Hikmah","Beriman kepada malaikat mendorong seorang Muslim untuk taat, menjaga amal dan menyadari bahwa Allah mengetahui seluruh perbuatannya."],
-"kitab-allah":["Iman kepada Kitab Allah","Beriman kepada kitab-kitab Allah berarti membenarkan wahyu yang Allah turunkan kepada para rasul-Nya.","Kitab yang dikenal dalam rukun iman adalah Taurat, Zabur, Injil dan Al-Qur'an. Al-Qur'an menjadi kitab yang menjadi pedoman umat Islam.","Al-Qur'an","Al-Qur'an dibahas lebih mendalam dalam menu Al-Qur'an: surat, ayat, terjemah, tafsir, tajwid, adab dan kajian ulumul Qur'an."],
-rasul:["Iman kepada Rasul","Beriman kepada rasul berarti membenarkan bahwa Allah mengutus para rasul untuk menyampaikan petunjuk-Nya.","Materi meliputi 25 Nabi dan Rasul yang wajib diketahui, sifat wajib, sifat mustahil, sifat jaiz, mukjizat dan keteladanan.","Ulul Azmi","Nuh, Ibrahim, Musa, Isa dan Muhammad عليهم السلام termasuk rasul yang dikenal sebagai Ulul Azmi."],
-akhirat:["Iman kepada Hari Akhir","Hari Akhir adalah kehidupan setelah kehidupan dunia yang menjadi tempat pertanggungjawaban amal.","Materi mencakup kematian, alam barzakh, kebangkitan, mahsyar, hisab, mizan, shirath, syafaat, surga dan neraka.","Hikmah","Iman kepada Hari Akhir menumbuhkan rasa tanggung jawab, harapan kepada rahmat Allah dan kehati-hatian dalam beramal."],
-qadar:["Iman kepada Qada & Qadar","Beriman kepada qada dan qadar berarti meyakini ilmu dan ketetapan Allah serta menjalani kehidupan dengan ikhtiar dan tawakal.","Pembahasan menghubungkan takdir dengan usaha manusia, doa, tawakal dan sikap sabar serta syukur.","Catatan","Pembahasan takdir perlu disampaikan dengan hati-hati agar tidak dipahami sebagai alasan meninggalkan usaha."],
-quran:["Al-Qur'an","Al-Qur'an adalah kitab suci yang menjadi petunjuk bagi umat Islam.","Modul Al-Qur'an dapat berisi daftar 114 surat, ayat Arab, terjemahan, tafsir, audio murattal dan pencarian ayat. Konten teks dapat dihubungkan ke API Al-Qur'an.","Fitur","Surat • Ayat • Terjemahan • Tafsir • Audio • Bookmark • Pencarian"],
-hadis:["Hadis","Hadis adalah segala sesuatu yang disandarkan kepada Nabi Muhammad ﷺ berupa perkataan, perbuatan, persetujuan atau sifat beliau.","Ilmu hadis mempelajari sanad, matan, perawi, klasifikasi dan metode menilai riwayat. Koleksi hadis dapat dihubungkan ke sumber API yang telah dipilih.","Koleksi","Bukhari • Muslim • Abu Dawud • Tirmidzi • Nasai • Ibnu Majah"],
-tafsir:["Tafsir & Ulumul Qur'an","Tafsir membahas makna ayat Al-Qur'an berdasarkan metode dan sumber yang dapat dipertanggungjawabkan.","Ulumul Qur'an mencakup pembahasan seperti wahyu, Makki-Madani, asbabun nuzul, nasikh-mansukh dan pengantar ilmu tafsir.","Catatan","Materi tafsir harus mencantumkan sumber kitab atau rujukan yang jelas."],
-aqidah:["Aqidah","Aqidah membahas pokok keyakinan seorang Muslim.","Materi dapat mencakup tauhid, iman, sifat Allah, kenabian, perkara ghaib dan prinsip keyakinan.","Ruang lingkup","Aqidah Tauhid • Kenabian • Malaikat • Kitab • Hari Akhir • Qada & Qadar"],
-fikih:["Fikih","Fikih adalah ilmu yang membahas hukum-hukum syariat yang berkaitan dengan perbuatan manusia.","Pembahasan meliputi ibadah, muamalah, keluarga, makanan, waris dan berbagai masalah kehidupan.","Bidang","Thaharah • Sholat • Zakat • Puasa • Haji • Muamalah • Munakahat • Faraid"],
-tajwid:["Tajwid","Tajwid adalah ilmu untuk membaca Al-Qur'an sesuai kaidah pelafalan yang benar.","Materi mencakup makharijul huruf, sifat huruf, nun sukun/tanwin, mim sukun, mad, qalqalah dan waqaf.","Materi","Makharijul huruf • Nun sukun • Mim sukun • Mad • Qalqalah • Waqaf"],
-arab:["Bahasa Arab","Bahasa Arab membantu memahami kosakata dan struktur bahasa yang banyak digunakan dalam sumber-sumber Islam.","Materi dasar dapat mencakup kosakata, isim, fi'il, huruf, jumlah ismiyah, jumlah fi'liyah, nahwu dan sharaf.","Catatan","Kamus Bahasa Arab tersedia sebagai fitur pencarian tersendiri."],
-kamus:["Kamus Bahasa Arab","Kamus untuk mencari arti kosakata Arab dan padanannya dalam bahasa Indonesia.","Data kamus dapat disimpan lokal atau dihubungkan ke sumber data kamus.","Fitur","Pencarian kata • Arab ke Indonesia • Indonesia ke Arab • Riwayat pencarian"],
-ushul:["Usul Fikih","Usul fikih membahas kaidah dan metode yang digunakan untuk memahami dan menetapkan hukum syariat.","Materi dasar meliputi Al-Qur'an, Sunnah, ijma, qiyas, dalil dan kaidah pengambilan hukum.","Catatan","Pembahasan lanjutan dapat mengikuti kitab usul fikih yang dipilih."],
-qawaid:["Qawaid Fiqhiyyah","Qawaid fiqhiyyah adalah kaidah umum yang membantu memahami banyak persoalan fikih.","Contoh kaidah besar meliputi perkara bergantung pada tujuan, keyakinan tidak hilang karena keraguan, kesulitan mendatangkan kemudahan, kemudaratan harus dihilangkan dan adat dapat menjadi pertimbangan.","Fungsi","Membantu mengelompokkan dan memahami masalah fikih secara sistematis."],
-faraid:["Faraid / Waris","Faraid adalah ilmu yang membahas pembagian harta warisan sesuai ketentuan syariat.","Materi meliputi sebab mewarisi, penghalang waris, ahli waris, bagian fardhu dan pengantar perhitungan.","Materi","Ahli waris • Ashabul furudh • Ashabah • Hijab • Pembagian waris"],
-akhlak:["Akhlak & Adab","Akhlak membentuk perilaku seorang Muslim agar baik dalam hubungan dengan Allah dan sesama manusia.","Materi mencakup jujur, amanah, sabar, syukur, tawadhu, birrul walidain, adab bertetangga dan adab mencari ilmu.","Catatan","Materi diarahkan pada pembentukan karakter dan praktik sehari-hari."],
-sirah:["Sirah Nabi","Sirah membahas perjalanan hidup Nabi Muhammad ﷺ, dakwah, keluarga, masyarakat dan peristiwa penting pada masa beliau.","Materi dapat disusun secara kronologis dari kelahiran, masa kenabian, hijrah, periode Madinah hingga wafat.","Materi","Makkah • Wahyu pertama • Dakwah • Hijrah • Madinah • Perjanjian • Fathu Makkah • Haji Wada"],
-nikah:["Pernikahan","Pernikahan dalam Islam memiliki ketentuan, hak dan kewajiban yang perlu dipahami sebelum dan setelah akad.","Materi mencakup khitbah, wali, saksi, mahar, akad, nafkah dan tanggung jawab pasangan.","Catatan","Untuk persoalan hukum khusus, pengguna perlu merujuk kepada ulama atau lembaga yang kompeten."],
-keluarga:["Keluarga","Keluarga dalam Islam dibangun dengan tanggung jawab, kasih sayang dan pemenuhan hak setiap anggota.","Materi mencakup hak suami-istri, pendidikan anak, birrul walidain dan komunikasi keluarga.","Praktik","Membangun keluarga dengan amanah, musyawarah dan adab yang baik."],
-talak:["Talak & Rujuk","Talak dan rujuk memiliki ketentuan fikih yang rinci.","Materi pengantar membahas pengertian talak, jenis, masa iddah dan rujuk.","Penting","Kasus nyata harus dikonsultasikan kepada ahli fikih atau lembaga resmi karena detail hukumnya dapat berbeda menurut keadaan."],
-muamalah:["Muamalah","Muamalah membahas hubungan dan transaksi antarmanusia.","Materi meliputi jual beli, sewa, utang piutang, akad, amanah dan larangan transaksi yang mengandung riba, gharar atau unsur terlarang.","Prinsip","Kerelaan, kejelasan akad, kejujuran dan tidak merugikan pihak lain."],
-ekonomi:["Ekonomi Syariah","Ekonomi syariah membahas aktivitas ekonomi dengan memperhatikan prinsip-prinsip syariat.","Materi meliputi riba, jual beli, akad, investasi, zakat dan pengelolaan harta.","Catatan","Produk keuangan tertentu perlu diperiksa akad dan ketentuan hukumnya secara spesifik."],
-wakaf:["Wakaf","Wakaf adalah menahan harta yang manfaatnya digunakan untuk tujuan yang dibenarkan syariat.","Materi meliputi pengertian, rukun, jenis, wakif, nazhir dan pemanfaatan wakaf.","Manfaat","Wakaf dapat menjadi sarana ibadah dan kemaslahatan masyarakat."],
-wasiat:["Wasiat","Wasiat adalah pesan atau pemberian yang berlaku setelah seseorang meninggal sesuai ketentuan yang berlaku.","Materi meliputi pengertian, ketentuan, batasan dan hubungan wasiat dengan warisan.","Catatan","Wasiat perlu dipahami bersama aturan faraid agar tidak menimbulkan sengketa."],
-takziah:["Takziah & Jenazah","Takziah adalah menghibur dan mendoakan keluarga yang sedang berduka.","Materi mencakup adab takziah, memandikan, mengkafani, menshalatkan dan memakamkan jenazah.","Adab","Menjaga ucapan, membantu keluarga, mendoakan dan menghindari hal yang memberatkan keluarga yang berduka."],
-tetangga:["Adab Bertetangga","Islam mengajarkan berbuat baik kepada tetangga dan menjaga hak mereka.","Materi mencakup salam, membantu, menjaga privasi, tidak mengganggu dan menghormati perbedaan.","Praktik","Kebaikan kepada tetangga merupakan bagian dari akhlak sosial."],
-perang:["Peristiwa & Peperangan","Sejarah Islam memiliki sejumlah peristiwa dan peperangan yang perlu dipelajari dalam konteks sejarahnya.","Materi dapat mencakup Badar, Uhud, Khandaq, Hudaibiyah, Fathu Makkah dan peristiwa penting lainnya.","Pendekatan","Pembahasan diarahkan pada kronologi, sebab, dampak dan pelajaran sejarah, bukan glorifikasi kekerasan."],
-khulafa:["Khulafaur Rasyidin","Empat khalifah pertama setelah wafatnya Nabi Muhammad ﷺ adalah Abu Bakar, Umar, Utsman dan Ali رضي الله عنهم.","Materi mencakup masa kepemimpinan, kebijakan, kontribusi dan keteladanan.","Catatan","Pembahasan sejarah harus membedakan riwayat yang kuat dari riwayat yang diperselisihkan."],
-sahabat:["Sahabat Nabi","Sahabat adalah generasi yang bertemu Nabi Muhammad ﷺ dalam keadaan beriman dan wafat dalam Islam.","Materi mencakup tokoh-tokoh sahabat, kontribusi dan keteladanan mereka.","Tokoh","Abu Bakar, Umar, Utsman, Ali, Bilal, Salman, Abu Hurairah dan banyak lainnya."],
-ahlulbait:["Ahlul Bait","Ahlul Bait merujuk kepada keluarga Nabi Muhammad ﷺ dengan pembahasan sesuai sumber dan konteks yang digunakan.","Materi mencakup pengenalan keluarga Nabi dan keteladanan mereka.","Catatan","Pembahasan dilakukan dengan menghormati perbedaan tradisi keilmuan dan sumber sejarah."],
-walisongo:["Wali Songo","Wali Songo dikenal dalam sejarah dakwah Islam di Nusantara.","Materi mencakup tokoh, wilayah dakwah, metode dakwah dan perkembangan masyarakat Muslim di Jawa.","Catatan","Sebagian detail sejarah memiliki variasi sumber sehingga rujukan perlu dicantumkan."],
-dinasti:["Dinasti Islam","Sejarah pemerintahan Islam berkembang melalui berbagai dinasti dan wilayah.","Materi dapat mencakup Umayyah, Abbasiyah, Andalusia, Utsmani dan perkembangan dunia Islam lainnya.","Pembelajaran","Fokus pada sejarah, ilmu pengetahuan, pemerintahan, budaya dan kontribusi peradaban."],
-ulama:["Tokoh Ulama","Ulama berperan dalam pengembangan ilmu agama dan pendidikan masyarakat.","Materi dapat berisi biografi, karya, guru-murid dan kontribusi keilmuan.","Catatan","Setiap biografi perlu disertai sumber yang dapat diverifikasi."],
-peradaban:["Peradaban Islam","Peradaban Islam memiliki kontribusi pada ilmu, pendidikan, kedokteran, matematika, astronomi, arsitektur dan literasi.","Materi membahas perkembangan pusat ilmu dan tokoh ilmuwan Muslim.","Contoh","Perpustakaan, madrasah, rumah sakit dan tradisi penerjemahan menjadi bagian penting dalam sejarah keilmuan Islam."],
-"kalender-islam":["Kalender & Peristiwa Islam","Kalender Hijriah digunakan untuk menentukan berbagai waktu ibadah dan peristiwa penting dalam tradisi Islam.","Materi meliputi Muharram, Safar, Rabiul Awal, Ramadan, Syawal, Dzulhijjah dan hari-hari penting seperti Idul Fitri, Idul Adha dan 10 Muharram.","Catatan","Tanggal peristiwa dapat berbeda berdasarkan metode penetapan kalender dan rukyat/hisab."],
-"doa-harian":["Doa Harian","Doa harian membantu seorang Muslim mengingat Allah dalam berbagai aktivitas.","Kumpulan dapat dikelompokkan berdasarkan keadaan: bangun tidur, sebelum makan, setelah makan, keluar rumah, masuk rumah, bepergian dan lainnya.","Format","Setiap doa sebaiknya disertai Arab, transliterasi bila diperlukan, arti dan sumber."],
-"dzikir-pagi":["Dzikir Pagi & Petang","Dzikir pagi dan petang berisi bacaan yang dianjurkan untuk mengingat dan memohon perlindungan kepada Allah.","Materi ditampilkan dalam urutan yang mudah dibaca.","Format","Arab • Transliterasi • Arti • Sumber"],
-"dzikir-sholat":["Dzikir Setelah Sholat","Dzikir setelah sholat berisi bacaan yang dibaca setelah sholat fardhu sesuai riwayat yang dijadikan rujukan.","Materi dapat mencakup istighfar, tasbih, tahmid, takbir dan doa.","Format","Arab • Arti • Sumber hadis"],
-"doa-sholat":["Doa Dalam Sholat","Kumpulan bacaan dan doa yang berkaitan dengan rangkaian sholat.","Materi dikelompokkan berdasarkan posisi sholat agar mudah dipelajari.","Catatan","Setiap bacaan diberi sumber atau keterangan status riwayat jika relevan."],
-perlindungan:["Doa Perlindungan","Kumpulan doa untuk memohon perlindungan kepada Allah dari keburukan dan gangguan.","Materi dapat mencakup doa sebelum tidur, perlindungan pagi-petang dan doa ketika menghadapi ketakutan.","Format","Arab • Arti • Sumber"],
-taubat:["Istighfar & Taubat","Taubat berarti kembali kepada Allah dengan meninggalkan dosa dan memperbaiki diri.","Materi mencakup syarat taubat, istighfar dan doa memohon ampun.","Inti","Menyesal, meninggalkan dosa, bertekad tidak mengulanginya dan mengembalikan hak manusia bila ada."],
-orangtua:["Doa untuk Orang Tua","Islam menganjurkan berbakti dan mendoakan kedua orang tua.","Doa dapat disertai penjelasan tentang birrul walidain.","Doa","رَبِّ ارْحَمْهُمَا كَمَا رَبَّيَانِي صَغِيرًا"],
-sakit:["Doa Ketika Sakit","Kumpulan doa untuk memohon kesembuhan dan pertolongan Allah ketika sakit.","Materi dapat digunakan untuk diri sendiri maupun menjenguk orang sakit.","Adab","Mendoakan dengan baik dan tetap menjaga adab ketika menjenguk."],
-"jenazah-doa":["Doa Jenazah","Kumpulan doa untuk jenazah dan keluarga yang ditinggalkan.","Materi dapat dikelompokkan untuk sholat jenazah, setelah pemakaman dan takziah.","Catatan","Sertakan sumber setiap bacaan."],
-"kitab-quran":["Al-Qur'an","Indeks Al-Qur'an menyediakan akses ke surat, ayat, terjemahan, tafsir dan audio.","Data teks dapat diambil dari API Al-Qur'an yang dipilih sehingga tidak perlu menyalin seluruh teks ke HTML.","Sumber","Gunakan API Quran yang telah ditentukan pada tahap integrasi."],
-"kitab-hadis":["Kitab Hadis","Indeks kitab hadis mengelompokkan koleksi hadis berdasarkan kitab dan perawi.","Koleksi dapat dihubungkan ke Hadith API dan dilengkapi sumber hadis.","Sumber","Bukhari • Muslim • Abu Dawud • Tirmidzi • Nasai • Ibnu Majah"],
-"kitab-fikih":["Kitab Fikih","Indeks rujukan fikih berdasarkan bab ibadah, muamalah, keluarga dan waris.","Setiap kitab perlu mencantumkan penulis, penerbit/edisi bila tersedia dan sumber digital.","Format","Judul • Penulis • Bidang • Referensi"],
-"kitab-aqidah":["Kitab Aqidah","Koleksi rujukan aqidah untuk pembelajaran bertahap.","Materi dapat dikelompokkan pemula, menengah dan lanjutan.","Format","Judul • Penulis • Bab • Sumber"],
-"kitab-akhlak":["Kitab Akhlak","Koleksi rujukan tentang adab, akhlak dan pembinaan diri.","Materi dapat dilengkapi ringkasan dan daftar bab.","Format","Judul • Penulis • Bab • Sumber"],
-"kitab-arab":["Kitab Bahasa Arab","Rujukan nahwu, sharaf, kosakata dan pembelajaran bahasa Arab.","Kamus tetap tersedia sebagai fitur pencarian cepat.","Format","Nahwu • Sharaf • Mufradat • Latihan"],
-"kitab-sirah":["Kitab Sirah","Koleksi rujukan perjalanan hidup Nabi dan sejarah Islam.","Setiap rujukan diberi metadata agar mudah diverifikasi.","Format","Judul • Penulis • Bab • Sumber"],
-bookmark:["Bookmark","Daftar halaman yang disimpan pengguna.","Bookmark disimpan secara lokal pada perangkat.","Fitur","Tambah • Hapus • Buka kembali"],
-favorit:["Favorit","Materi yang ditandai sebagai favorit.","Fitur ini membantu pengguna membuat daftar bacaan pilihan.","Fitur","Tambah • Hapus • Filter"],
-terakhir:["Terakhir Dibaca","Daftar materi yang baru dibuka.","Riwayat dapat dibatasi jumlahnya agar penyimpanan tetap ringan.","Fitur","Buka kembali • Hapus riwayat"],
-catatan:["Catatan","Pengguna dapat membuat catatan pribadi terkait materi.","Catatan disimpan lokal pada perangkat.","Fitur","Tambah • Edit • Hapus"],
-riwayat:["Riwayat","Riwayat pembukaan halaman dan materi.","Pengguna dapat menghapus seluruh riwayat kapan saja.","Privasi","Data riwayat disimpan di perangkat."],
-sumber:["Sumber & Referensi","Bagian ini mencatat sumber konten aplikasi agar materi dapat diverifikasi.","Sumber dapat berupa Al-Qur'an, kitab hadis, kitab fikih, situs resmi atau API yang digunakan.","Prinsip","Setiap materi yang membutuhkan rujukan harus mencantumkan sumber secara jelas."],
-jadwal:["Jadwal Sholat","Jadwal sholat dihitung berdasarkan lokasi dan metode perhitungan yang dipilih.","Implementasi produksi sebaiknya menggunakan Aladhan API atau metode lokal yang konsisten. Aplikasi harus selalu memilih sholat berikutnya berdasarkan waktu sekarang.","Catatan","Jangan menentukan sholat berikutnya hanya berdasarkan urutan statis; bandingkan seluruh waktu hari ini dengan jam perangkat."],
-kiblat:["Arah Kiblat","Arah kiblat dapat dihitung berdasarkan koordinat lokasi pengguna dan arah Ka'bah.","Fitur dapat menggunakan GPS dan sensor kompas perangkat.","Catatan","Kalibrasi sensor diperlukan pada perangkat yang mendukung kompas."],
-"pengingat-sholat":["Pengingat Sholat","Pengguna dapat mengatur notifikasi menjelang atau ketika masuk waktu sholat.","Pengingat mengikuti jadwal lokasi yang tersimpan.","Fitur","Atur jadwal • Aktif/nonaktif • Waktu pengingat"],
-"pengingat-dzikir":["Pengingat Dzikir","Pengguna dapat membuat pengingat untuk dzikir tertentu.","Fitur","Pilih dzikir • Waktu • Hari • Aktif/nonaktif"],
-tasbih:["Tasbih Digital","Penghitung dzikir digital dengan target yang dapat dipilih.","Fitur","Tambah hitungan • Kurangi • Reset • Target"],
-kalender:["Kalender Hijriah","Kalender menampilkan tanggal Hijriah dan Masehi secara terpisah dan jelas.","Tanggal Hijriah tidak boleh diberi label BC/AD atau nama bulan Gregorian.","Catatan","Konversi dapat menggunakan metode kalender yang dipilih dan ditampilkan bersama keterangannya."],
-konversi:["Konverter Hijriah–Masehi","Konversi tanggal antara kalender Hijriah dan Masehi.","Hasil harus menampilkan nama kalender secara eksplisit agar tidak tertukar.","Fitur","Pilih tanggal • Konversi • Tampilkan kedua kalender"],
-"kamus-alat":["Kamus Bahasa Arab","Akses cepat ke kamus Arab-Indonesia dan Indonesia-Arab.","Kamus dapat memakai data lokal atau sumber API yang dipilih.","Fitur","Cari kata • Arti • Contoh penggunaan"]
+const submenuData = {
+ 'Syahadat': {
+   title:'Syahadat', icon:'🕌',
+   sections:['Pengertian Syahadat','Dua Kalimat Syahadat','Makna Syahadat','Syarat dan Konsekuensi Syahadat']
+ },
+ 'Sholat': {
+   title:'Sholat', icon:'🧎',
+   sections:['Pengertian dan Kedudukan Sholat','Syarat Wajib','Syarat Sah','Rukun Sholat','Sunnah Sholat','Pembatal Sholat','Wudhu','Mandi Wajib','Tayamum','Bacaan Sholat','Gerakan Sholat','Sholat Fardhu','Sholat Sunnah','Sholat Jumat','Sholat Jenazah','Jama’ & Qashar','Sujud Sahwi','Sujud Tilawah','Sujud Syukur']
+ },
+ 'Zakat': {
+   title:'Zakat', icon:'💰',
+   sections:['Pengertian Zakat','Zakat Fitrah','Zakat Mal','Nisab','Haul','Mustahik','Jenis Harta yang Dizakati','Cara Menghitung Zakat','Kalkulator Zakat']
+ },
+ 'Puasa': {
+   title:'Puasa', icon:'🌙',
+   sections:['Pengertian Puasa','Syarat Wajib','Syarat Sah','Rukun Puasa','Hal yang Membatalkan','Puasa Ramadan','Puasa Sunnah','Qadha Puasa','Fidyah','I’tikaf']
+ },
+ 'Haji & Umrah': {
+   title:'Haji & Umrah', icon:'🕋',
+   sections:['Pengertian Haji','Syarat Haji','Rukun Haji','Wajib Haji','Larangan Ihram','Manasik Haji','Umrah','Miqat','Dam','Panduan Singkat Haji & Umrah']
+ },
+ 'Iman kepada Allah': {
+   title:'Iman kepada Allah', icon:'☝️',
+   sections:['Pengertian Iman kepada Allah','Tauhid','Asmaul Husna','20 Sifat Allah','Sifat Wajib bagi Allah','Sifat Mustahil bagi Allah','Sifat Jaiz bagi Allah','Dalil tentang Iman kepada Allah']
+ },
+ 'Iman kepada Malaikat': {
+   title:'Iman kepada Malaikat', icon:'👼',
+   sections:['Pengertian Malaikat','Sifat Malaikat','10 Malaikat yang Wajib Diketahui','Tugas Para Malaikat','Dalil tentang Malaikat']
+ },
+ 'Iman kepada Kitab Allah': {
+   title:'Iman kepada Kitab Allah', icon:'📖',
+   sections:['Pengertian Kitab Allah','Taurat','Zabur','Injil','Suhuf','Al-Qur’an','Perbedaan Kitab dan Suhuf','Dalil Iman kepada Kitab']
+ },
+ 'Iman kepada Rasul': {
+   title:'Iman kepada Rasul', icon:'🧑‍🦱',
+   sections:['Pengertian Rasul','Nabi dan Rasul','25 Nabi dan Rasul','Ulul Azmi','Sifat Wajib Rasul','Sifat Mustahil Rasul','Sifat Jaiz Rasul','Mukjizat','Kisah Para Nabi']
+ },
+ 'Iman kepada Hari Akhir': {
+   title:'Iman kepada Hari Akhir', icon:'🌅',
+   sections:['Pengertian Hari Akhir','Tanda-Tanda Kiamat','Alam Barzakh','Yaumul Ba’ats','Yaumul Mahsyar','Hisab','Mizan','Shirat','Surga','Neraka']
+ },
+ 'Iman kepada Qada & Qadar': {
+   title:'Iman kepada Qada & Qadar', icon:'⚖️',
+   sections:['Pengertian Qada dan Qadar','Takdir Mubram','Takdir Muallaq','Ikhtiar','Tawakal','Hikmah Beriman kepada Qada dan Qadar']
+ },
+ 'Akidah': {title:'Akidah',icon:'🧠',sections:['Pengertian Akidah','Tauhid','Iman','Syirik','Kufur','Nifak','Ahlus Sunnah','Dasar-Dasar Akidah']},
+ 'Fikih': {title:'Fikih',icon:'⚖️',sections:['Thaharah','Sholat','Zakat','Puasa','Haji','Muamalah','Munakahat','Jinayah','Adab dan Fikih Kehidupan']},
+ 'Faraidh / Ilmu Waris': {title:'Faraidh / Ilmu Waris',icon:'🧮',sections:['Pengertian Faraidh','Sebab Waris','Penghalang Waris','Ahli Waris','Ashabul Furudh','Ashabah','Hijab','Bagian Warisan','Contoh Kasus','Kalkulator Faraidh']},
+ 'Ushul Fikih': {title:'Ushul Fikih',icon:'📐',sections:['Pengertian Ushul Fikih','Dalil Syariat','Al-Qur’an','Sunnah','Ijma’','Qiyas','Ijtihad','Maqashid Syariah']},
+ 'Qawaid Fiqhiyyah': {title:'Qawaid Fiqhiyyah',icon:'📜',sections:['Pengertian Kaidah Fikih','Kaidah Utama','Niat','Kesulitan Mendatangkan Kemudahan','Kemudaratan Dihilangkan','Keyakinan Tidak Hilang karena Keraguan','Adat sebagai Pertimbangan']},
+ 'Ulumul Qur’an': {title:'Ulumul Qur’an',icon:'📖',sections:['Pengertian Ulumul Qur’an','Wahyu','Makkiyah dan Madaniyah','Asbabun Nuzul','Nasikh dan Mansukh','Muhkam dan Mutasyabih','Tafsir dan Takwil']},
+ 'Hadis': {title:'Hadis',icon:'📜',sections:['Pengertian Hadis','Kedudukan Hadis','Hadis Qudsi','Jenis Hadis','Perawi Hadis','Kitab-Kitab Hadis','Hadis Pilihan','Pencarian Hadis']},
+ 'Ulumul Hadis': {title:'Ulumul Hadis',icon:'🔬',sections:['Pengertian Ulumul Hadis','Sanad','Matan','Rawi','Hadis Shahih','Hadis Hasan','Hadis Dhaif','Jarh wa Ta’dil','Takhrij Hadis']},
+ 'Belajar Al-Qur’an': {title:'Belajar Al-Qur’an',icon:'✍️',sections:['Huruf Hijaiyah','Harakat','Membaca Al-Qur’an','Tajwid','Makharijul Huruf','Mad','Waqaf dan Ibtida','Latihan Membaca']},
+ 'Bahasa Arab': {title:'Bahasa Arab',icon:'🇸🇦',sections:['Dasar Bahasa Arab','Mufradat','Nahwu','Sharaf','Percakapan Dasar','Kamus Bahasa Arab','Latihan Bahasa Arab']},
+ 'Pendidikan Islam': {title:'Pendidikan Islam',icon:'🎓',sections:['Pendidikan Anak','Metode Belajar Islam','Adab Menuntut Ilmu','Guru dan Murid','Lingkungan Pendidikan','Materi Pendidikan Islam']},
+ 'Pernikahan / Munakahat': {title:'Pernikahan / Munakahat',icon:'💍',sections:['Tujuan Pernikahan','Khitbah','Akad Nikah','Mahar','Hak dan Kewajiban','Wali','Saksi','Talak','Rujuk']},
+ 'Keluarga': {title:'Keluarga',icon:'👨‍👩‍👧',sections:['Hak Suami','Hak Istri','Pendidikan Anak','Hubungan Orang Tua dan Anak','Nafkah','Keharmonisan Keluarga','Penyelesaian Konflik']},
+ 'Muamalah': {title:'Muamalah',icon:'🤝',sections:['Pengertian Muamalah','Jual Beli','Utang Piutang','Riba','Gadai','Sewa Menyewa','Syirkah','Etika Bisnis','Muamalah Kontemporer']},
+ 'Akhlak Terpuji': {title:'Akhlak Terpuji',icon:'✨',sections:['Jujur','Amanah','Sabar','Syukur','Tawadhu','Ikhlas','Adil','Pemaaf','Kasih Sayang']},
+ 'Akhlak Tercela': {title:'Akhlak Tercela',icon:'⚠️',sections:['Dusta','Kikir','Sombong','Hasad','Ghibah','Namimah','Riya','Ujub','Fitnah']},
+ 'Adab': {title:'Adab',icon:'🤝',sections:['Adab kepada Allah','Adab kepada Rasul','Adab kepada Orang Tua','Adab kepada Guru','Adab kepada Sesama','Adab Makan dan Minum','Adab Bertamu','Adab Berpakaian','Adab di Masjid']},
+ 'Tazkiyatun Nafs': {title:'Tazkiyatun Nafs',icon:'❤️',sections:['Pengertian Tazkiyah','Penyakit Hati','Muhasabah','Taubat','Mujahadah','Ikhlas','Dzikir dan Pembinaan Jiwa']},
+ 'Sirah Nabi': {title:'Sirah Nabi',icon:'📜',sections:['Kelahiran Nabi Muhammad ﷺ','Masa Kanak-Kanak','Awal Kenabian','Dakwah Makkah','Hijrah','Dakwah Madinah','Keluarga Nabi','Wafat Nabi ﷺ']},
+ 'Perang & Ekspedisi': {title:'Perang & Ekspedisi',icon:'⚔️',sections:['Badar','Uhud','Khandaq','Bani Quraizhah','Khaibar','Mu’tah','Fathu Makkah','Hunain','Thaif','Tabuk']},
+ 'Sahabat & Generasi Awal': {title:'Sahabat & Generasi Awal',icon:'👥',sections:['Khulafaur Rasyidin','Abu Bakar Ash-Shiddiq','Umar bin Khattab','Utsman bin Affan','Ali bin Abi Thalib','Sahabat Nabi','Tabi’in','Tabi’ut Tabi’in']},
+ 'Ulama & Tokoh': {title:'Ulama & Tokoh',icon:'🎓',sections:['Imam Mazhab','Ulama Hadis','Ulama Tafsir','Ulama Fikih','Tokoh Islam Nusantara','Wali Songo','Tokoh Peradaban Islam']},
+ 'Sejarah Peradaban Islam': {title:'Sejarah Peradaban Islam',icon:'🏛️',sections:['Masa Nabi','Khulafaur Rasyidin','Dinasti Umayyah','Dinasti Abbasiyah','Perkembangan Ilmu','Peradaban Islam di Dunia','Masjid dan Pusat Ilmu']},
+ 'Islam Nusantara': {title:'Islam Nusantara',icon:'🌏',sections:['Masuknya Islam ke Nusantara','Wali Songo','Pesantren','Kerajaan Islam','Ulama Nusantara','Tradisi Keislaman Nusantara']},
+ 'Hari & Peristiwa Islam': {title:'Hari & Peristiwa Islam',icon:'🌙',sections:['Tahun Baru Hijriah','Asyura','Maulid Nabi','Isra Mi’raj','Nuzulul Qur’an','Ramadan','Lailatul Qadar','Idul Fitri','Idul Adha','Muharram']},
+ 'Kalender Hijriah': {title:'Kalender Hijriah',icon:'📅',sections:['12 Bulan Hijriah','Konversi Hijriah-Masehi','Peristiwa Penting','Hari-Hari Istimewa']},
+ 'Kitab Akhlak': {title:'Kitab Akhlak',icon:'❤️',sections:['Qurratul ‘Uyun','Riyadhus Shalihin','Kitab Adab','Kumpulan Bab Akhlak']},
+ 'Kitab Fikih': {title:'Kitab Fikih',icon:'⚖️',sections:['Kitab Thaharah','Kitab Sholat','Kitab Zakat','Kitab Puasa','Kitab Haji','Kitab Muamalah']},
+ 'Kitab Akidah': {title:'Kitab Akidah',icon:'☝️',sections:['Kitab Tauhid','Kitab Akidah Ahlus Sunnah','Kitab Sifat Allah','Kitab Iman']},
+ 'Kitab Hadis': {title:'Kitab Hadis',icon:'📜',sections:['Arba’in Nawawi','Riyadhus Shalihin','Bulughul Maram','Kitab Hadis Lainnya']},
+ 'Kitab Keluarga': {title:'Kitab Keluarga',icon:'💍',sections:['Kitab Pernikahan','Hak dan Kewajiban','Pendidikan Anak','Adab Keluarga']},
+ 'Kitab Tafsir': {title:'Kitab Tafsir',icon:'📖',sections:['Tafsir Ringkas','Tafsir Tematik','Tafsir Ayat Pilihan','Koleksi Tafsir']},
+ 'Kitab Lainnya': {title:'Kitab Lainnya',icon:'📚',sections:['Kitab Tarikh','Kitab Bahasa Arab','Kitab Tasawuf','Kitab Pendidikan','Koleksi Lainnya']},
+ 'Doa Harian': {title:'Doa Harian',icon:'🌅',sections:['Bangun Tidur','Sebelum Tidur','Masuk dan Keluar Rumah','Makan dan Minum','Masuk dan Keluar Masjid','Bepergian','Bercermin','Berpakaian','Belajar']},
+ 'Doa Khusus': {title:'Doa Khusus',icon:'🤲',sections:['Doa Kesulitan','Doa Sakit','Doa Memohon Rezeki','Doa Memohon Ampunan','Doa Perlindungan','Doa Kebaikan Dunia Akhirat']},
+ 'Dzikir': {title:'Dzikir',icon:'📿',sections:['Dzikir Pagi','Dzikir Petang','Dzikir Setelah Sholat','Istighfar','Tasbih','Tahmid','Takbir','Shalawat']},
+ 'Doa dari Al-Qur’an': {title:'Doa dari Al-Qur’an',icon:'📖',sections:['Doa Para Nabi','Doa Memohon Ampunan','Doa Kebaikan Dunia Akhirat','Doa Keluarga','Doa Perlindungan']},
+ 'Pencarian Global': {title:'Pencarian Global',icon:'🔎',sections:['Cari Al-Qur’an','Cari Hadis','Cari Doa','Cari Kitab','Cari Tokoh','Cari Materi']},
+ 'Bookmark': {title:'Bookmark',icon:'🔖',sections:['Semua Bookmark','Ayat Tersimpan','Hadis Tersimpan','Materi Tersimpan']},
+ 'Favorit': {title:'Favorit',icon:'⭐',sections:['Materi Favorit','Doa Favorit','Hadis Favorit','Ayat Favorit']},
+ 'Terakhir Dibaca': {title:'Terakhir Dibaca',icon:'🕘',sections:['Materi Terakhir','Ayat Terakhir','Kitab Terakhir']},
+ 'Riwayat': {title:'Riwayat',icon:'📜',sections:['Riwayat Bacaan','Riwayat Pencarian','Riwayat Aktivitas']},
+ 'Koleksi Saya': {title:'Koleksi Saya',icon:'🗂️',sections:['Buat Koleksi','Koleksi Materi','Koleksi Doa','Koleksi Ayat']},
+ 'Catatan': {title:'Catatan',icon:'📝',sections:['Catatan Materi','Catatan Pribadi','Catatan Ayat']},
+ 'Referensi & Sumber': {title:'Referensi & Sumber',icon:'📚',sections:['Sumber Al-Qur’an','Sumber Hadis','Sumber Kitab','Sumber Artikel','Tentang Referensi']}
 };
 
-function iconSvg(symbol){
- const icons = {
-  "⌂": `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M8 21v-6h8v6"/></svg>`,
-  "♡": `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8.8c0 5.2-8.8 11.2-8.8 11.2S3.2 14 3.2 8.8A4.8 4.8 0 0 1 12 6.2a4.8 4.8 0 0 1 8.8 2.6Z"/></svg>`,
-  "▤": `<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="1.5"/><path d="M8 7h8M8 11h8M8 15h6"/></svg>`,
-  "▱": `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4z"/><path d="M7 8h10M7 12h7M7 16h9"/></svg>`,
-  "✋": `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 11V5.5a1.5 1.5 0 0 1 3 0V11"/><path d="M11 10V4.5a1.5 1.5 0 0 1 3 0V11"/><path d="M14 10V6a1.5 1.5 0 0 1 3 0v7"/><path d="M17 12v-1a1.5 1.5 0 0 1 3 0v3.5C20 19 17 21 13 21h-1c-3 0-5-2-6-5l-1-3a1.5 1.5 0 0 1 2.8-1L8 14V11"/></svg>`,
-  "▢": `<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="1.5"/><path d="M8 7h8M8 11h6M8 15h8"/></svg>`,
-  "◈": `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="m14.5 9.5-5 2 5 3 1-5Z"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2"/></svg>`,
-  "♧": `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10v17H7z"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>`
- };
- return `<div class="icon" aria-hidden="true">${icons[symbol] || icons["▤"]}</div>`;
+
+const tools = [
+ ['Jadwal Sholat','Jadwal Sholat','Menampilkan jadwal sholat berdasarkan lokasi.'],
+ ['Arah Kiblat','Arah Kiblat','Menentukan arah kiblat menggunakan sensor perangkat.'],
+ ['Pengingat Sholat','Pengingat Sholat','Pengingat waktu sholat.'],
+ ['Pengingat Dzikir','Pengingat Dzikir','Pengingat dzikir yang dapat diatur.'],
+ ['Tasbih Digital','Tasbih Digital','Menghitung dzikir secara digital.'],
+ ['Notifikasi Ibadah','Notifikasi Ibadah','Notifikasi untuk aktivitas ibadah.'],
+ ['Lokasi Masjid','Lokasi Masjid','Mencari masjid di sekitar pengguna.']
+];
+
+const grid=document.getElementById('categoryGrid');
+categories.forEach(c=>{
+ grid.innerHTML += `<button class="card" onclick="openCategory('${c.id}')"><div class="icon">${lineIcon(iconMap[c.id]||"book",28)}</div><b>${c.name}</b><small>${c.desc}</small></button>`;
+});
+const tl=document.getElementById('toolsList');
+tools.forEach(t=>{
+ tl.innerHTML += `<button class="subitem" onclick="openTool('${t[1]}')"><span class="left"><span class="mini">${miniIcon(t[0])}</span><span><b>${t[1]}</b><small style="color:var(--muted);display:block">${t[2]}</small></span></span><span class="arrow">›</span></button>`;
+});
+
+let pageHistory=[];
+let currentPage='home';
+
+function activatePage(id){
+ document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+ const el=document.getElementById(id);
+ if(el) el.classList.add('active');
+ document.querySelectorAll('.navbtn').forEach(b=>b.classList.toggle('active',b.dataset.page===id));
+ window.scrollTo({top:0,behavior:'smooth'});
 }
-function renderHome(){
- let h=`<section class="hero">
- <div class="hero-label">HARI INI • KALENDER HIJRIAH</div>
- <div class="hero-date" id="hijri">Memuat tanggal Hijriah...</div>
- <div class="hero-greg" id="greg"></div>
- <div class="quote"><div class="quote-label">✦ KUTIPAN HARI INI</div><p id="quoteText"></p><small id="quoteSource"></small></div>
- </section>
- <div class="section-title"><h2>Menu Utama</h2><span>10 kategori</span></div>
- <div class="grid">`;
- menus.filter(x=>x.id!=="koleksi"&&x.id!=="alat").forEach(m=>{
-   h+=`<article class="card" onclick="openCategory('${m.id}')">${iconSvg(m.icon)}<h3>${m.title}</h3><p>${m.desc}</p></article>`;
- });
- h+=`<article class="card" onclick="openCategory('kitab')">${iconSvg("▢")}<h3>Kitab</h3><p>${menus.find(x=>x.id==="kitab").desc}</p></article>
- <article class="card" onclick="openCategory('doa')">${iconSvg("✋")}<h3>Doa & Dzikir</h3><p>${menus.find(x=>x.id==="doa").desc}</p></article>
- <article class="card" onclick="openCategory('alat')">${iconSvg("◈")}<h3>Alat Muslim</h3><p>${menus.find(x=>x.id==="alat").desc}</p></article>
- <article class="card" onclick="openCategory('koleksi')">${iconSvg("♧")}<h3>Referensi & Koleksi</h3><p>${menus.find(x=>x.id==="koleksi").desc}</p></article>
- </div>`;
- document.getElementById("home").innerHTML=h;
- setDate();
+function showPage(id){
+ if(!document.getElementById(id)) return;
+ if(currentPage!==id) pageHistory.push(currentPage);
+ currentPage=id;
+ activatePage(id);
 }
-function renderCategory(m){
- const v=document.getElementById(m.id);
- v.innerHTML=`<button class="back" onclick="goBack()">← Kembali</button>
- <div class="detail-head">${iconSvg(m.icon)}<div><h2>${m.title}</h2><p>Silmikaffah • Islam Secara Menyeluruh</p></div></div>
- <div class="content"><h2>${m.title}</h2><p>${m.desc}</p><h3>Submenu</h3><div class="subgrid">${
- m.items.map(i=>`<div class="subitem" onclick="openMaterial('${i[0]}','${m.title}')"><b>${i[1]}</b><span>${i[2]}</span></div>`).join("")
- }</div></div>`;
-}
-function openCategory(id){
- const m=menus.find(x=>x.id===id); if(!m)return;
- history.pushState({view:m.id},"","#"+m.id);
- show(m.id);
-}
-function openMaterial(id,parent){
- const d=content[id];
- if(!d){openMaterialFallback(id,parent);return}
-
- history.pushState({view:"detail",id,parent},"","#materi-"+id);
-
- const title=d[0] || "Materi";
- const intro=d[1] || "";
- const body=d[2] || "";
- const section=d[3] || "Materi";
- const detail=d[4] || "";
- const source=d[5] || "Rujukan akan ditampilkan bersama sumber database yang digunakan.";
-
- // Hanya tampilkan blok Arab jika memang ada teks Arab.
- const arabic = /[\u0600-\u06FF]/.test(detail)
-   ? `<div class="arabic">${detail}</div>`
-   : "";
-
- document.getElementById("detail").innerHTML=`
- <button class="back" onclick="goBack()">← Kembali</button>
- <div class="detail-head">${iconSvg("▤")}<div><h2>${title}</h2><p>${parent} • Silmikaffah</p></div></div>
- <article class="content">
-   <h2>${title}</h2>
-   <p>${intro}</p>
-
-   <h3>${section}</h3>
-   <p>${body}</p>
-
-   ${arabic}
-
-   <div class="source">
-     <b>Rujukan / Sumber</b><br>
-     ${source}
-   </div>
- </article>`;
- show("detail");
-}
-
-function openMaterialFallback(id,parent){
- const m=menus.flatMap(x=>x.items).find(i=>i[0]===id);
- if(!m)return;
-
- history.pushState({view:"detail",id,parent},"","#materi-"+id);
- document.getElementById("detail").innerHTML=`
- <button class="back" onclick="goBack()">← Kembali</button>
- <div class="detail-head">${iconSvg("▤")}<div><h2>${m[1]}</h2><p>${parent} • Silmikaffah</p></div></div>
- <article class="content">
-   <h2>${m[1]}</h2>
-   <p>${m[2]}</p>
-   <h3>Materi</h3>
-   <p>Materi untuk submenu ini belum tersedia di database.</p>
- </article>`;
- show("detail");
-}
-function renderSpecial(){
- const ri=menus.find(x=>x.id==="rukun-iman"), rs=menus.find(x=>x.id==="rukun-islam");
- document.getElementById("rukun-iman").innerHTML=categoryPage(ri);
- document.getElementById("rukun-islam").innerHTML=categoryPage(rs);
- document.getElementById("koleksi").innerHTML=categoryPage(menus.find(x=>x.id==="koleksi"));
- document.getElementById("pengaturan").innerHTML=`<div class="section-title"><h2>Pengaturan</h2></div>
- <div class="content"><h2>Tampilan</h2><p>Tema default Silmikaffah adalah Gelap AMOLED.</p>
- <div class="subgrid"><div class="subitem" onclick="setTheme('dark')"><b>Gelap AMOLED</b><span>Hitam pekat dengan aksen hijau teal.</span></div>
- <div class="subitem" onclick="setTheme('light')"><b>Terang Putih</b><span>Latar putih dengan teks gelap.</span></div></div>
- <h3>Pengaturan lainnya</h3><ul><li>Ukuran font</li><li>Teks Arab</li><li>Notifikasi</li><li>Lokasi</li><li>Metode jadwal sholat</li></ul></div>`;
-}
-function categoryPage(m){
- return `<button class="back" onclick="show('home')">← Kembali</button><div class="detail-head">${iconSvg(m.icon)}<div><h2>${m.title}</h2><p>${m.desc}</p></div></div>
- <div class="content"><h2>Daftar Materi</h2><div class="subgrid">${m.items.map(i=>`<div class="subitem" onclick="openMaterial('${i[0]}','${m.title}')"><b>${i[1]}</b><span>${i[2]}</span></div>`).join("")}</div></div>`;
-}
-function show(id){
- document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
- const el=document.getElementById(id); if(el)el.classList.add("active");
- document.querySelectorAll(".navbtn").forEach(b=>b.classList.toggle("active",b.dataset.view===id));
- window.scrollTo({top:0,behavior:"smooth"});
+function goRoot(id, navKey){
+ pageHistory=[];
+ currentPage=id;
+ activatePage(navKey || id);
 }
 function goBack(){
- if(history.length>1) history.back(); else show("home");
+ if(pageHistory.length){
+   const previous=pageHistory.pop();
+   currentPage=previous;
+   activatePage(previous);
+ }else{
+   currentPage='home';
+   activatePage('home');
+ }
 }
-window.addEventListener("popstate",()=>{
- const hash=location.hash.replace("#","");
- if(hash.startsWith("materi-")) show("detail");
- else if(["home","rukun-iman","rukun-islam","koleksi","pengaturan"].includes(hash)) show(hash);
- else if(hash && document.getElementById(hash)) show(hash);
- else show("home");
-});
-document.querySelectorAll(".navbtn").forEach(b=>b.onclick=()=>{
- const id=b.dataset.view; history.pushState({view:id},"","#"+id); show(id);
-});
-function setTheme(t){
- document.body.classList.toggle("light",t==="light");
- localStorage.setItem("theme",t);
+function openNavCategory(id, navKey){
+ pageHistory=[];
+ currentPage='home';
+ openCategory(id, navKey);
 }
-function setDate(){
- const now=new Date();
- document.getElementById("greg").textContent=now.toLocaleDateString("id-ID",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
- // Approximate display is intentionally labeled; production should use a verified Hijri API/calculation.
- const quotes=[
-  ["Sesungguhnya amal itu tergantung pada niatnya.","HR. Bukhari dan Muslim"],
-  ["Sebaik-baik kalian adalah yang belajar Al-Qur'an dan mengajarkannya.","HR. Bukhari"],
-  ["Allah tidak membebani seseorang melainkan sesuai dengan kesanggupannya.","QS. Al-Baqarah: 286"],
-  ["Dan barang siapa bertawakal kepada Allah, niscaya Allah akan mencukupkan keperluannya.","QS. At-Talaq: 3"]
- ];
- const q=quotes[now.getDate()%quotes.length];
- document.getElementById("quoteText").textContent="“"+q[0]+"”";
- document.getElementById("quoteSource").textContent=q[1];
- // Keep Hijri label separate from Gregorian. This uses Intl when supported.
- try{
-   const f=new Intl.DateTimeFormat("id-ID-u-ca-islamic",{day:"numeric",month:"long",year:"numeric"});
-   document.getElementById("hijri").textContent=f.format(now).replace(" AH"," H");
- }catch(e){document.getElementById("hijri").textContent="Tanggal Hijriah";}
+function openCategory(id, navKey){
+ const c=categories.find(x=>x.id===id); if(!c)return;
+ if(currentPage!=='category'){
+   pageHistory.push(currentPage);
+ }
+ currentPage='category';
+ document.getElementById('categoryHead').innerHTML=`<div class="page-head"><div class="big">${lineIcon(iconMap[c.id]||"book",34)}</div><div><h2>${c.name}</h2><p>${c.desc}</p></div></div>`;
+ const list=document.getElementById('submenu'); list.innerHTML='';
+ c.subs.forEach(s=>{
+   list.innerHTML += `<button class="subitem" onclick="openSub('${escapeAttr(s[1])}','${s[0]}','${escapeAttr(c.name)}')"><span class="left"><span class="mini">${miniIcon(s[1])}</span>${s[1]}</span><span class="arrow">›</span></button>`;
+ });
+ document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+ document.getElementById('category').classList.add('active');
+ document.querySelectorAll('.navbtn').forEach(b=>b.classList.toggle('active',b.dataset.page===navKey));
+ window.scrollTo({top:0,behavior:'smooth'});
 }
-function search(q){
- q=q.toLowerCase().trim(); if(!q){show("home");return}
- const results=[];
- menus.forEach(m=>m.items.forEach(i=>{if((i[1]+" "+i[2]).toLowerCase().includes(q))results.push([i,m.title])}));
- document.getElementById("detail").innerHTML=`<button class="back" onclick="goBack()">← Kembali</button>
- <div class="content"><h2>Hasil Pencarian</h2>${results.length?results.map(r=>`<div class="subitem" style="margin:10px 0" onclick="openMaterial('${r[0][0]}','${r[1]}')"><b>${r[0][1]}</b><span>${r[1]} • ${r[0][2]}</span></div>`).join(""):`<div class="no-results">Tidak ada materi yang ditemukan.</div>`}</div>`;
- history.pushState({view:"detail"},"","#pencarian");show("detail");
+function openSub(name,icon,parent){
+ const data=submenuData[name] || {title:name,icon:icon,sections:['Pengantar','Materi Utama','Dalil / Referensi','Catatan']};
+ const sectionHtml=data.sections.map((s,i)=>`<button class="subitem" onclick="showDetail('${escapeAttr(s)}','${data.icon}','${escapeAttr(data.title)}')"><span class="left"><span class="mini">${miniIcon(s)}</span>${s}</span><span class="arrow">›</span></button>`).join('');
+ document.getElementById('detailBox').innerHTML=`<div class="page-head"><div class="big">${miniIcon(data.title)}</div><div><h2>${data.title}</h2><p>${parent} • ${data.sections.length} bagian</p></div></div><div class="section-title"><h2>Submateri</h2></div><div class="sublist">${sectionHtml}</div>`;
+ showPage('detail');
 }
-document.getElementById("search").addEventListener("input",e=>search(e.target.value));
-renderHome(); renderSpecial();
-setTheme(localStorage.getItem("theme")||"dark");
-setTimeout(()=>{document.getElementById("splash").style.opacity="0";setTimeout(()=>document.getElementById("splash").remove(),350)},900);
+function showDetail(title,icon,content){
+ document.getElementById('detailBox').innerHTML=`<div class="page-head"><div class="big">${miniIcon(title)}</div><div><h2>${title}</h2><p>Silmikaffah • Islam Secara Menyeluruh</p></div></div><div class="detail"><h3>${title}</h3><p>${content}</p><p class="arabic">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</p><p>Halaman materi ini disiapkan untuk memuat penjelasan yang terstruktur, dalil atau sumber yang relevan, terjemahan bila diperlukan, dan referensi yang dapat diverifikasi.</p><div class="source">Sumber & Referensi: akan diisi pada tahap database/konten.</div></div>`;
+ showPage('detail');
+}
+function openTool(name){showDetail(name,'', 'Fitur ini akan menjadi alat interaktif pada tahap pengembangan berikutnya.');}
+function focusSearch(){showPage('search');setTimeout(()=>document.getElementById('searchInput').focus(),100)}
+function searchAll(q){
+ if(!q){document.getElementById('results').innerHTML='<div class="empty">Ketik sesuatu pada kotak pencarian di atas.</div>';return;}
+ const term=q.toLowerCase();
+ const found=[];
+ categories.forEach(c=>{
+   if(c.name.toLowerCase().includes(term)) found.push([c.icon,c.name,'Kategori']);
+   c.subs.forEach(s=>{if(s[1].toLowerCase().includes(term))found.push([s[0],s[1],c.name]);});
+ });
+ document.getElementById('results').innerHTML=found.length?found.map(x=>`<button class="result" onclick="openSearchResult('${escapeAttr(x[1])}','${x[0]}','${escapeAttr(x[2])}')"><b><span class="mini">${miniIcon(x[1])}</span>${x[1]}</b><small>${x[2]}</small></button>`).join(''):'<div class="empty">Tidak ditemukan.</div>';
+ showPage('search');
+}
+function openSearchResult(title,icon,parent){showDetail(title,icon,`Hasil pencarian dari kategori <b>${parent}</b>.`);}
+function toggle(el){el.classList.toggle('on')}
+function escapeAttr(s){return s.replace(/'/g,"&#39;")}
+
+
+const dailyQuotes = [
+  {text:'“Sesungguhnya amal itu tergantung pada niatnya.”', source:'HR. Bukhari dan Muslim'},
+  {text:'“Sebaik-baik kalian adalah yang belajar Al-Qur’an dan mengajarkannya.”', source:'HR. Bukhari'},
+  {text:'“Allah tidak membebani seseorang melainkan sesuai dengan kesanggupannya.”', source:'QS. Al-Baqarah: 286'},
+  {text:'“Ingatlah, hanya dengan mengingat Allah hati menjadi tenteram.”', source:'QS. Ar-Ra’d: 28'},
+  {text:'“Dan barangsiapa bertawakal kepada Allah, niscaya Allah akan mencukupkan keperluannya.”', source:'QS. At-Talaq: 3'},
+  {text:'“Sesungguhnya Allah menyukai orang-orang yang bertobat dan menyukai orang-orang yang menyucikan diri.”', source:'QS. Al-Baqarah: 222'},
+  {text:'“Barangsiapa menempuh jalan untuk mencari ilmu, Allah mudahkan baginya jalan menuju surga.”', source:'HR. Muslim'},
+  {text:'“Maka sesungguhnya bersama kesulitan ada kemudahan.”', source:'QS. Al-Insyirah: 5'}
+];
+
+function initDailyHome(){
+  const now=new Date();
+  setHijriDate(now);
+  document.getElementById('gregorianDate').textContent=new Intl.DateTimeFormat('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'}).format(now);
+  const q=dailyQuotes[Math.floor(Math.random()*dailyQuotes.length)];
+  document.getElementById('dailyQuote').textContent=q.text;
+  document.getElementById('quoteSource').textContent=q.source;
+
+  const cached=localStorage.getItem('silmikaffah-gps');
+  if(cached){
+    try{const p=JSON.parse(cached); renderPrayerTimes(p.lat,p.lon);}catch(e){requestGPS();}
+  }else requestGPS();
+}
+function setHijriDate(date){
+  try{
+    const localNoon=new Date(date.getFullYear(),date.getMonth(),date.getDate(),12,0,0);
+    const hijri=new Intl.DateTimeFormat('en-US-u-ca-islamic-umalqura',{day:'numeric',month:'long',year:'numeric'}).format(localNoon).replace(' AH',' H');
+    if(!/Muharram|Safar|Rabi|Jumada|Rajab|Shaaban|Ramadan|Shawwal|Dhul|Dhu/.test(hijri)) throw new Error('unsupported');
+    document.getElementById('hijriDate').textContent=hijri;
+    document.getElementById('moonIcon').innerHTML=moonIcon();
+  }catch(e){
+    const anchor=new Date(2026,7,9,12,0,0);
+    const d=new Date(date.getFullYear(),date.getMonth(),date.getDate(),12,0,0);
+    const days=Math.round((d-anchor)/86400000);
+    const months=['Muharram','Safar','Rabiul Awal','Rabiul Akhir','Jumadil Awal','Jumadil Akhir','Rajab','Syaban','Ramadan','Syawal','Dzulqa’dah','Dzulhijjah'];
+    let day=26+days, mi=1, year=1448;
+    while(day>30){day-=30;mi++;} while(day<1){day+=30;mi--;}
+    if(mi<0){mi=11;year--;}
+    document.getElementById('hijriDate').textContent=`${day} ${months[mi]} ${year} H`;
+    document.getElementById('moonIcon').innerHTML=moonIcon();
+  }
+}
+function requestGPS(){
+  document.getElementById('locationText').textContent='Mengambil lokasi…';
+  if(!navigator.geolocation){useDefaultLocation();return;}
+  navigator.geolocation.getCurrentPosition(
+    pos=>{const lat=pos.coords.latitude,lon=pos.coords.longitude;localStorage.setItem('silmikaffah-gps',JSON.stringify({lat,lon}));renderPrayerTimes(lat,lon);},
+    ()=>useDefaultLocation(),
+    {enableHighAccuracy:false,maximumAge:300000,timeout:3500}
+  );
+}
+function useDefaultLocation(){
+  const lat=-7.2575,lon=112.7521;
+  document.getElementById('locationText').textContent='Lokasi belum diizinkan • Surabaya (perkiraan)';
+  renderPrayerTimes(lat,lon);
+}
+
+function degToRad(d){return d*Math.PI/180}
+function radToDeg(r){return r*180/Math.PI}
+function fixAngle(a){return ((a%360)+360)%360}
+function fixHour(h){return ((h%24)+24)%24}
+function dsin(d){return Math.sin(degToRad(d))}
+function dcos(d){return Math.cos(degToRad(d))}
+function dtan(d){return Math.tan(degToRad(d))}
+function darccos(x){return radToDeg(Math.acos(Math.max(-1,Math.min(1,x))))}
+function julian(date){
+  const y=date.getFullYear(),m=date.getMonth()+1,d=date.getDate();
+  let Y=y,M=m;if(M<=2){Y--;M+=12}
+  const A=Math.floor(Y/100),B=2-A+Math.floor(A/4);
+  return Math.floor(365.25*(Y+4716))+Math.floor(30.6001*(M+1))+d+B-1524.5;
+}
+function sunPosition(jd){
+  const D=jd-2451545,g=fixAngle(357.529+0.98560028*D),q=fixAngle(280.459+0.98564736*D);
+  const L=fixAngle(q+1.915*dsin(g)+0.020*dsin(2*g)),e=23.439-0.00000036*D;
+  const ra=radToDeg(Math.atan2(dcos(e)*dsin(L),dcos(L)))/15;
+  return {decl:radToDeg(Math.asin(dsin(e)*dsin(L))),eqt:q/15-fixHour(ra)};
+}
+function prayerTimes(date,lat,lon){
+  const tz=-date.getTimezoneOffset()/60;
+  const s=sunPosition(julian(date));
+  const noon=fixHour(12-s.eqt+tz-lon/15);
+
+  // Solar altitude in degrees. Negative values are below the horizon.
+  function hourAngle(altitude){
+    const term=(dsin(altitude)-dsin(lat)*dsin(s.decl))/
+               (dcos(lat)*dcos(s.decl));
+    return darccos(term)/15;
+  }
+
+  const fajr=noon-hourAngle(-20);
+  const sunrise=noon-hourAngle(-0.833);
+  const sunset=noon+hourAngle(-0.833);
+  const isya=noon+hourAngle(-18);
+
+  // Asr: shadow factor 1 (Shafi'i/Hanafi-style selectable later).
+  const shadow=1+dtan(Math.abs(lat-s.decl));
+  const asrAltitude=radToDeg(Math.atan(1/shadow));
+  const asr=noon+hourAngle(asrAltitude);
+
+  return {
+    Subuh:fajr,
+    Dzuhur:noon,
+    Ashar:asr,
+    Maghrib:sunset,
+    Isya:isya
+  };
+}
+function fmtTime(hours){
+  if(hours==null||!isFinite(hours))return '--:--';
+  hours=fixHour(hours);let h=Math.floor(hours),m=Math.round((hours-h)*60);
+  if(m===60){h=(h+1)%24;m=0}
+  return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');
+}
+function renderPrayerTimes(lat,lon){
+  const t=prayerTimes(new Date(),lat,lon),keys=['Subuh','Dzuhur','Ashar','Maghrib','Isya'];
+  document.getElementById('locationText').textContent=`GPS ${lat.toFixed(2)}, ${lon.toFixed(2)}`;
+  document.getElementById('prayerRow').innerHTML=keys.map(k=>`<span>${k}<b>${fmtTime(t[k])}</b></span>`).join('');
+  const now=new Date(),current=now.getHours()+now.getMinutes()/60;
+  const next=keys.map(k=>[k,t[k]]).find(x=>x[1]>current);
+  const active=next?next[0]:'Subuh';
+  const activeTime=next?next[1]:t.Subuh;
+  document.getElementById('currentPrayer').textContent=active;
+  document.getElementById('currentPrayerTime').textContent=fmtTime(activeTime);
+}
+function fallbackPrayer(){useDefaultLocation();}
+
+function setTheme(theme){
+  if(theme!=='light' && theme!=='amoled') theme='amoled';
+  document.body.classList.remove('theme-light','theme-teal');
+  if(theme==='light') document.body.classList.add('theme-light');
+  document.querySelectorAll('.theme-option').forEach(x=>x.classList.remove('active'));
+  const el=document.getElementById('theme-'+theme); if(el) el.classList.add('active');
+  localStorage.setItem('silmikaffah-theme',theme);
+}
+(function(){
+  try{ initDailyHome(); }catch(e){ console.warn('Home init:',e); }
+  try{ renderQuickAccessIcons(); }catch(e){ console.warn('Icon init:',e); }
+  try{
+    const saved=localStorage.getItem('silmikaffah-theme');
+    setTheme(saved==='light' ? 'light' : 'amoled');
+  }catch(e){ console.warn('Theme init:',e); }
+  setInterval(()=>{
+    try{
+      const cached=localStorage.getItem('silmikaffah-gps');
+      if(cached){ const p=JSON.parse(cached); renderPrayerTimes(p.lat,p.lon); }
+    }catch(e){}
+  },60000);
+  setTimeout(()=>{
+    const splash=document.getElementById('splash');
+    if(splash) splash.classList.add('hide');
+    const home=document.getElementById('home');
+    if(home) home.classList.add('active');
+  },1500);
+})();
+
+</script>
+<script>
+window.addEventListener('load',()=>{ currentPage='home'; pageHistory=[]; activatePage('home'); });
+</script>
+
+<script>
+window.SilmikaffahAPI = {
+  async prayerTimes(lat,lon,date=new Date()){
+    const d=String(date.getDate()).padStart(2,'0');
+    const m=String(date.getMonth()+1).padStart(2,'0');
+    const y=date.getFullYear();
+    const base='https://api.aladhan.com/v1/timings/'+d+'-'+m+'-'+y;
+    const q='?latitude='+encodeURIComponent(lat)+'&longitude='+encodeURIComponent(lon)+'&method=20';
+    let r=await fetch(base+q);
+    if(!r.ok){r=await fetch(base+'?latitude='+encodeURIComponent(lat)+'&longitude='+encodeURIComponent(lon)+'&method=2');}
+    if(!r.ok)throw new Error('Aladhan HTTP '+r.status);
+    return (await r.json()).data;
+  },
+  async syncPrayer(){
+    try{
+      const raw=localStorage.getItem('silmikaffah-gps');
+      if(!raw)return;
+      const p=JSON.parse(raw);
+      if(!Number.isFinite(+p.lat)||!Number.isFinite(+p.lon))return;
+      const data=await this.prayerTimes(+p.lat,+p.lon);
+      const t=data.timings;
+      const clean={Subuh:t.Fajr,Dzuhur:t.Dhuhr,Ashar:t.Asr,Maghrib:t.Maghrib,Isya:t.Isha};
+      document.querySelectorAll('[data-prayer]').forEach(el=>{
+        if(clean[el.dataset.prayer])el.textContent=clean[el.dataset.prayer].slice(0,5);
+      });
+      const now=new Date(), nm=now.getHours()*60+now.getMinutes();
+      const order=['Subuh','Dzuhur','Ashar','Maghrib','Isya'];
+      let next=order.find(k=>{
+        const [h,m]=clean[k].slice(0,5).split(':').map(Number);
+        return h*60+m>nm;
+      })||'Subuh';
+      const cp=document.getElementById('currentPrayer');
+      const ct=document.getElementById('currentPrayerTime');
+      if(cp)cp.textContent=next;
+      if(ct)ct.textContent=clean[next].slice(0,5);
+      if(data.date&&data.date.hijri){
+        const h=data.date.hijri;
+        const hd=document.getElementById('hijriDate');
+        if(hd)hd.textContent=h.day+' '+h.month.en+' '+h.year+' H';
+      }
+    }catch(e){console.warn('Aladhan:',e);}
+  },
+  quranChapters(){return fetch('https://api.quran.com/api/v4/chapters?language=id').then(r=>r.json());},
+  quranVerses(id){return fetch('https://api.quran.com/api/v4/quran/verses/uthmani?chapter_number='+encodeURIComponent(id)).then(r=>r.json());},
+  quranSearch(q){return fetch('https://api.quran.com/api/v4/search?q='+encodeURIComponent(q)+'&size=20&language=id').then(r=>r.json());},
+  hadithEditions(){return fetch('https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions.json').then(r=>r.json());},
+  hadithCollection(c){return fetch('https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/ind-'+encodeURIComponent(c)+'.json').then(r=>r.json());}
+};
+window.addEventListener('load',()=>setTimeout(()=>SilmikaffahAPI.syncPrayer(),700));
+</script>
+
+
+<script>
+/* ==========================================================
+   SILMIKAFFAH TAHAP 3
+   - Hierarchical navigation stack: back goes exactly one level.
+   - Local database layer: bookmarks, favorites, history, notes,
+     settings and last-read state.
+   ========================================================== */
+
+(function(){
+  const DB_KEY='silmikaffah-db-v3';
+  const defaultDB={
+    bookmarks:[],
+    favorites:[],
+    history:[],
+    notes:[],
+    lastRead:null,
+    settings:{
+      theme:'amoled',
+      fontSize:'medium',
+      arabicFontSize:'medium',
+      language:'id'
+    }
+  };
+
+  function loadDB(){
+    try{
+      const raw=localStorage.getItem(DB_KEY);
+      return raw ? {...defaultDB,...JSON.parse(raw)} : structuredClone(defaultDB);
+    }catch(e){ return structuredClone(defaultDB); }
+  }
+  function saveDB(db){ localStorage.setItem(DB_KEY,JSON.stringify(db)); }
+
+  window.SilmikaffahDB={
+    get(){return loadDB();},
+    set(db){saveDB(db);},
+    add(type,item){
+      const db=loadDB();
+      if(!Array.isArray(db[type])) db[type]=[];
+      const id=item.id || (Date.now()+'-'+Math.random().toString(36).slice(2));
+      if(!db[type].some(x=>x.id===id)) db[type].push({...item,id});
+      saveDB(db); return id;
+    },
+    remove(type,id){
+      const db=loadDB();
+      db[type]=(db[type]||[]).filter(x=>x.id!==id);
+      saveDB(db);
+    },
+    toggle(type,item){
+      const db=loadDB();
+      if(!Array.isArray(db[type])) db[type]=[];
+      const id=item.id || item.key;
+      const found=db[type].findIndex(x=>x.id===id);
+      if(found>=0){db[type].splice(found,1);saveDB(db);return false;}
+      db[type].push({...item,id});saveDB(db);return true;
+    },
+    addHistory(item){
+      const db=loadDB();
+      const id=item.id || item.key || (Date.now()+'');
+      db.history=[{...item,id,openedAt:Date.now()},...(db.history||[]).filter(x=>x.id!==id)].slice(0,100);
+      saveDB(db);
+    },
+    setLastRead(item){const db=loadDB();db.lastRead=item;saveDB(db);}
+  };
+
+  /* One stack for every in-app screen. Never jump directly to home. */
+  const navStack=['home'];
+  let restoring=false;
+
+  function current(){return navStack[navStack.length-1];}
+  function push(screen){
+    if(screen===current()) return;
+    navStack.push(screen);
+    sync();
+  }
+  function back(){
+    if(navStack.length<=1) return false;
+    navStack.pop();
+    sync(true);
+    return true;
+  }
+  function reset(){navStack.splice(0,navStack.length,'home');sync();}
+  function sync(fromBack=false){
+    window.dispatchEvent(new CustomEvent('silmikaffah:navigation',{
+      detail:{stack:[...navStack],current:current(),fromBack}
+    }));
+    updateBackButton();
+  }
+  function updateBackButton(){
+    document.querySelectorAll('[data-nav-back],.back-btn,#backBtn').forEach(btn=>{
+      btn.style.visibility=navStack.length>1?'visible':'hidden';
+      btn.onclick=(e)=>{e.preventDefault();back();};
+    });
+  }
+
+  window.SilmikaffahNav={push,back,reset,current,stack:()=>[...navStack]};
+
+  /* Intercept common in-app screen changes so they participate in the stack. */
+  document.addEventListener('click',e=>{
+    const el=e.target.closest('[data-screen]');
+    if(!el) return;
+    const screen=el.getAttribute('data-screen');
+    if(!screen) return;
+    e.preventDefault();
+    push(screen);
+  },true);
+
+  /* Prevent browser back from skipping levels. */
+  window.addEventListener('popstate',e=>{
+    if(navStack.length>1){ back(); }
+    else history.pushState({silmikaffah:true},'','#/');
+  });
+  history.replaceState({silmikaffah:true},'','#/');
+
+  window.addEventListener('load',updateBackButton);
+})();
+</script>
+
+<script>
+/* Expose a small content registry for Stage 3A/3B.
+   Content can be expanded without changing navigation structure. */
+window.SilmikaffahContent={
+  rukunIman:{
+    title:'Rukun Iman',
+    items:[
+      {id:'iman-allah',title:'Iman kepada Allah',icon:'allah'},
+      {id:'iman-malaikat',title:'Iman kepada Malaikat',icon:'malaikat'},
+      {id:'iman-kitab',title:'Iman kepada Kitab',icon:'kitab'},
+      {id:'iman-rasul',title:'Iman kepada Rasul',icon:'rasul'},
+      {id:'iman-akhir',title:'Iman kepada Hari Akhir',icon:'akhir'},
+      {id:'iman-qadar',title:'Iman kepada Qada & Qadar',icon:'qadar'}
+    ]
+  },
+  rukunIslam:{
+    title:'Rukun Islam',
+    items:[
+      {id:'syahadat',title:'Syahadat',icon:'syahadat'},
+      {id:'sholat',title:'Sholat',icon:'sholat'},
+      {id:'zakat',title:'Zakat',icon:'zakat',children:[
+        {id:'zakat-kalkulator',title:'Kalkulator Zakat'}
+      ]},
+      {id:'puasa',title:'Puasa',icon:'puasa'},
+      {id:'haji',title:'Haji',icon:'haji'}
+    ]
+  }
+};
+</script>
+
+
+<script>
+(function(){
+  const oldShowPage=window.showPage;
+  if(typeof oldShowPage==='function'){
+    window.showPage=function(id){
+      if(window.SilmikaffahNav) window.SilmikaffahNav.push(id);
+      return oldShowPage.apply(this,arguments);
+    };
+  }
+  const oldShowScreen=window.showScreen;
+  if(typeof oldShowScreen==='function'){
+    window.showScreen=function(id){
+      if(window.SilmikaffahNav) window.SilmikaffahNav.push(id);
+      return oldShowScreen.apply(this,arguments);
+    };
+  }
+  window.addEventListener('silmikaffah:navigation',e=>{
+    const d=e.detail;
+    document.querySelectorAll('[data-nav-title]').forEach(x=>x.textContent=d.current);
+  });
+})();
+</script>
+
+
+<script id="stage3b-content">
+/* ==========================================================
+   SILMIKAFFAH TAHAP 3B
+   Complete submenu/content registry + hardware/browser Back.
+   ========================================================== */
+
+window.SilmikaffahContent = {
+  rukunIman:{
+    title:'Rukun Iman',
+    items:[
+      {id:'iman-allah',title:'Iman kepada Allah',children:[
+        {id:'asmaul-husna',title:'Asmaul Husna'},
+        {id:'20-sifat-allah',title:'20 Sifat Allah'},
+        {id:'nama-dan-sifat',title:'Nama & Sifat Allah'}
+      ]},
+      {id:'iman-malaikat',title:'Iman kepada Malaikat',children:[
+        {id:'nama-malaikat',title:'Nama & Tugas Malaikat'},
+        {id:'sifat-malaikat',title:'Sifat Malaikat'}
+      ]},
+      {id:'iman-kitab',title:'Iman kepada Kitab',children:[
+        {id:'quran',title:"Al-Qur'an"},
+        {id:'taurat',title:'Taurat'},
+        {id:'zabur',title:'Zabur'},
+        {id:'injil',title:'Injil'},
+        {id:'kitab-suhuf',title:'Suhuf'}
+      ]},
+      {id:'iman-rasul',title:'Iman kepada Rasul',children:[
+        {id:'25-rasul',title:'25 Rasul'},
+        {id:'sifat-rasul',title:'Sifat Rasul'},
+        {id:'mukjizat',title:'Mukjizat'}
+      ]},
+      {id:'iman-akhir',title:'Iman kepada Hari Akhir',children:[
+        {id:'tanda-kiamat',title:'Tanda-tanda Kiamat'},
+        {id:'alam-barzakh',title:'Alam Barzakh'},
+        {id:'yaumul-qiyamah',title:'Hari Kiamat'},
+        {id:'surga-neraka',title:'Surga & Neraka'}
+      ]},
+      {id:'iman-qadar',title:'Iman kepada Qada & Qadar',children:[
+        {id:'qada-qadar',title:'Qada & Qadar'},
+        {id:'takdir',title:'Takdir'}
+      ]}
+    ]
+  },
+
+  rukunIslam:{
+    title:'Rukun Islam',
+    items:[
+      {id:'syahadat',title:'Syahadat',children:[
+        {id:'dua-kalimah-syahadat',title:'Dua Kalimah Syahadat'},
+        {id:'makna-syahadat',title:'Makna Syahadat'}
+      ]},
+      {id:'sholat',title:'Sholat',children:[
+        {id:'waktu-sholat',title:'Waktu Sholat'},
+        {id:'syarat-sholat',title:'Syarat Sholat'},
+        {id:'rukun-sholat',title:'Rukun Sholat'},
+        {id:'wudhu',title:'Wudhu'},
+        {id:'tayamum',title:'Tayamum'},
+        {id:'sholat-wajib',title:'Sholat Wajib'},
+        {id:'sholat-sunnah',title:'Sholat Sunnah'},
+        {id:'sholat-jenazah',title:'Sholat Jenazah'}
+      ]},
+      {id:'zakat',title:'Zakat',children:[
+        {id:'zakat-mal',title:'Zakat Mal'},
+        {id:'zakat-fitrah',title:'Zakat Fitrah'},
+        {id:'mustahik',title:'Mustahik Zakat'},
+        {id:'kalkulator-zakat',title:'Kalkulator Zakat'}
+      ]},
+      {id:'puasa',title:'Puasa',children:[
+        {id:'puasa-ramadhan',title:'Puasa Ramadhan'},
+        {id:'puasa-sunnah',title:'Puasa Sunnah'},
+        {id:'syarat-puasa',title:'Syarat & Rukun Puasa'},
+        {id:'pembatal-puasa',title:'Pembatal Puasa'}
+      ]},
+      {id:'haji',title:'Haji',children:[
+        {id:'manasik-haji',title:'Manasik Haji'},
+        {id:'rukun-haji',title:'Rukun Haji'},
+        {id:'wajib-haji',title:'Wajib Haji'},
+        {id:'umrah',title:'Umrah'}
+      ]}
+    ]
+  },
+
+  ilmuBelajar:{
+    title:'Ilmu & Belajar',
+    items:[
+      {id:'alquran',title:"Al-Qur'an",children:[
+        {id:'daftar-surah',title:'114 Surah'},
+        {id:'juz',title:'Juz'},
+        {id:'tafsir',title:'Tafsir'},
+        {id:'terjemahan',title:'Terjemahan'},
+        {id:'audio-murattal',title:'Audio Murattal'},
+        {id:'pencarian-quran',title:"Pencarian Al-Qur'an"}
+      ]},
+      {id:'hadis',title:'Hadis',children:[
+        {id:'bukhari',title:'Shahih Bukhari'},
+        {id:'muslim',title:'Shahih Muslim'},
+        {id:'abu-dawud',title:'Abu Dawud'},
+        {id:'tirmidzi',title:'At-Tirmidzi'},
+        {id:'nasai',title:'An-Nasa’i'},
+        {id:'ibnu-majah',title:'Ibnu Majah'},
+        {id:'pencarian-hadis',title:'Pencarian Hadis'}
+      ]},
+      {id:'tajwid',title:'Tajwid'},
+      {id:'fikih',title:'Fikih'},
+      {id:'ushul-fikih',title:'Ushul Fikih'},
+      {id:'qawaid-fikih',title:'Qawaid Fikih'},
+      {id:'bahasa-arab',title:'Bahasa Arab',children:[
+        {id:'nahwu',title:'Nahwu'},
+        {id:'sharaf',title:'Sharaf'},
+        {id:'percakapan-arab',title:'Percakapan'}
+      ]},
+      {id:'kamus-arab',title:'Kamus Bahasa Arab'}
+    ]
+  },
+
+  sejarahTokoh:{
+    title:'Sejarah & Tokoh',
+    items:[
+      {id:'sirah-nabi',title:'Sirah Nabi'},
+      {id:'sahabat-nabi',title:'Sahabat Nabi'},
+      {id:'wali-songo',title:'Wali Songo'},
+      {id:'perang-islam',title:'Perang dalam Sejarah Islam'},
+      {id:'tokoh-islam',title:'Tokoh Islam'},
+      {id:'peradaban-islam',title:'Peradaban Islam'},
+      {id:'waktu-peristiwa',title:'Waktu & Peristiwa Islam'}
+    ]
+  },
+
+  keluargaMuamalah:{
+    title:'Keluarga & Muamalah',
+    items:[
+      {id:'pernikahan',title:'Pernikahan'},
+      {id:'keluarga',title:'Keluarga'},
+      {id:'muamalah',title:'Muamalah'},
+      {id:'faraid',title:'Faraid'},
+      {id:'qurratul-uyun',title:"Qurratul 'Uyun"}
+    ]
+  },
+
+  doaDzikir:{
+    title:'Doa & Dzikir',
+    items:[
+      {id:'doa-harian',title:'Doa Harian'},
+      {id:'dzikir',title:'Dzikir'},
+      {id:'dzikir-pagi',title:'Dzikir Pagi'},
+      {id:'dzikir-petang',title:'Dzikir Petang'},
+      {id:'doa-keadaan',title:'Doa Berdasarkan Keadaan'}
+    ]
+  },
+
+  akhlakAdab:{
+    title:'Akhlak & Adab',
+    items:[
+      {id:'akhlak-allah',title:'Akhlak kepada Allah'},
+      {id:'akhlak-rasul',title:'Akhlak kepada Rasul'},
+      {id:'akhlak-orangtua',title:'Akhlak kepada Orang Tua'},
+      {id:'akhlak-guru',title:'Akhlak kepada Guru'},
+      {id:'akhlak-sesama',title:'Akhlak kepada Sesama'},
+      {id:'adab-harian',title:'Adab Sehari-hari'}
+    ]
+  },
+
+  ibadahPanduan:{
+    title:'Ibadah & Panduan',
+    items:[
+      {id:'wudhu-panduan',title:'Wudhu'},
+      {id:'tayamum-panduan',title:'Tayamum'},
+      {id:'mandi-wajib',title:'Mandi Wajib'},
+      {id:'sholat-jenazah-panduan',title:'Sholat Jenazah'},
+      {id:'haji-umrah-panduan',title:'Haji & Umrah'},
+      {id:'zakat-panduan',title:'Zakat'},
+      {id:'puasa-panduan',title:'Puasa'}
+    ]
+  },
+
+  referensiLainnya:{
+    title:'Referensi & Lainnya',
+    items:[
+      {id:'kalender-hijriah',title:'Kalender Hijriah'},
+      {id:'jadwal-sholat',title:'Jadwal Sholat'},
+      {id:'arah-kiblat',title:'Arah Kiblat'},
+      {id:'masjid',title:'Masjid'},
+      {id:'pengaturan',title:'Pengaturan'},
+      {id:'tentang',title:'Tentang Silmikaffah'}
+    ]
+  }
+};
+</script>
+
+
+<script id="stage3b-back-fix">
+(function(){
+  const nav=window.SilmikaffahNav;
+  if(!nav)return;
+
+  let ignorePop=false;
+  history.replaceState({silmikaffah:true,depth:nav.stack().length},'',location.href);
+
+  function syncHistory(){
+    history.replaceState({silmikaffah:true,depth:nav.stack().length},'',location.href);
+  }
+
+  // Push a browser history entry for every app-level navigation.
+  window.addEventListener('silmikaffah:navigation',e=>{
+    if(e.detail.fromBack){
+      syncHistory();
+    }else{
+      history.pushState({silmikaffah:true,depth:e.detail.stack.length},'',
+        '#/'+e.detail.stack.join('/'));
+    }
+  });
+
+  window.addEventListener('popstate',()=>{
+    // Android hardware back / browser back reaches here.
+    if(nav.stack().length>1){
+      nav.back();
+    }else{
+      // At Home, don't jump to an arbitrary previous page.
+      history.pushState({silmikaffah:true,depth:1},'','#/home');
+    }
+  });
+
+  // Keep the app's own Back button tied to the same stack.
+  document.addEventListener('click',e=>{
+    const b=e.target.closest('[data-nav-back],.back-btn,#backBtn');
+    if(!b)return;
+    e.preventDefault();
+    e.stopPropagation();
+    nav.back();
+  },true);
+})();
+</script>
+
+
+<script id="stage3c-real-content">
+(function(){
+  const nav=window.SilmikaffahNav;
+  const content=window.SilmikaffahContent;
+  if(!nav||!content)return;
+
+  const rootId='silmikaffah-content-root';
+
+  const materials={
+    'iman-allah':{
+      title:'Iman kepada Allah',
+      body:'Iman kepada Allah berarti meyakini dengan benar bahwa Allah adalah satu-satunya Tuhan yang wajib disembah. Materi ini menjadi dasar pembahasan tauhid, nama dan sifat Allah, serta konsekuensi iman dalam kehidupan.'
+    },
+    'asmaul-husna':{
+      title:'Asmaul Husna',
+      body:'Asmaul Husna adalah nama-nama Allah yang baik. Dalam Silmikaffah, setiap nama akan disajikan bersama tulisan Arab, transliterasi, arti, penjelasan ringkas, dan dalil yang relevan.'
+    },
+    '20-sifat-allah':{
+      title:'20 Sifat Allah',
+      body:'Materi 20 sifat Allah disusun sebagai materi pembelajaran akidah. Setiap sifat dapat dibuka untuk melihat nama sifat, arti, penjelasan, dan dalil pembahasannya.'
+    },
+    'iman-malaikat':{
+      title:'Iman kepada Malaikat',
+      body:'Iman kepada malaikat berarti meyakini keberadaan malaikat Allah dan perkara-perkara yang dijelaskan oleh wahyu tentang mereka. Materi akan memuat nama dan tugas malaikat yang masyhur.'
+    },
+    'nama-malaikat':{
+      title:'Nama & Tugas Malaikat',
+      body:'Berisi daftar malaikat yang disebutkan dalam sumber-sumber Islam beserta tugas yang dinisbatkan kepada mereka berdasarkan dalil yang relevan.'
+    },
+    'iman-kitab':{
+      title:'Iman kepada Kitab',
+      body:'Iman kepada kitab-kitab Allah merupakan salah satu rukun iman. Pembahasan mencakup Al-Qur’an dan kitab-kitab yang disebutkan dalam Al-Qur’an, dengan tingkat detail yang disesuaikan.'
+    },
+    'quran':{
+      title:"Al-Qur'an",
+      body:"Al-Qur'an akan menggunakan Quran.com API untuk mengambil data ayat, terjemahan, pencarian, dan materi terkait. Data Al-Qur'an tidak ditanam seluruhnya di HTML."
+    },
+    'iman-rasul':{
+      title:'Iman kepada Rasul',
+      body:'Berisi pembahasan iman kepada para rasul, sifat-sifat rasul, serta kisah dan pelajaran yang dapat diambil dari perjalanan dakwah mereka.'
+    },
+    '25-rasul':{
+      title:'25 Rasul',
+      body:'Daftar 25 nabi dan rasul yang umum diajarkan dalam pendidikan Islam, dengan ringkasan nama dan kisah masing-masing.'
+    },
+    'iman-akhir':{
+      title:'Iman kepada Hari Akhir',
+      body:'Pembahasan tentang kehidupan setelah dunia, hari kebangkitan, hisab, dan perkara akhirat berdasarkan sumber-sumber Islam.'
+    },
+    'tanda-kiamat':{
+      title:'Tanda-tanda Kiamat',
+      body:'Materi tentang tanda-tanda hari kiamat disajikan berdasarkan hadis dan penjelasan ulama, dengan pemisahan antara tanda yang memiliki dasar riwayat dan penjelasannya.'
+    },
+    'iman-qadar':{
+      title:'Iman kepada Qada & Qadar',
+      body:'Pembahasan tentang qada dan qadar, hubungan ikhtiar manusia dengan takdir, serta sikap seorang muslim terhadap ketetapan Allah.'
+    },
+
+    'syahadat':{
+      title:'Syahadat',
+      body:'Syahadat merupakan rukun Islam pertama. Materi membahas dua kalimat syahadat, arti, makna, konsekuensi, dan cara mengamalkannya.'
+    },
+    'sholat':{
+      title:'Sholat',
+      body:'Materi sholat mencakup waktu, syarat, rukun, tata cara, hal-hal yang membatalkan, serta berbagai sholat sunnah.'
+    },
+    'waktu-sholat':{
+      title:'Waktu Sholat',
+      body:'Waktu sholat harian dapat dilihat secara dinamis pada Home menggunakan lokasi GPS dan Aladhan API. Halaman ini menjelaskan konsep dan batas waktu masing-masing sholat.'
+    },
+    'zakat':{
+      title:'Zakat',
+      body:'Zakat adalah rukun Islam ketiga. Materi mencakup zakat fitrah, zakat mal, golongan penerima zakat, serta kalkulator zakat.'
+    },
+    'zakat-mal':{
+      title:'Zakat Mal',
+      body:'Pembahasan zakat atas harta dengan penjelasan jenis harta, nisab, haul, dan ketentuan yang relevan.'
+    },
+    'zakat-fitrah':{
+      title:'Zakat Fitrah',
+      body:'Pembahasan ketentuan zakat fitrah, waktu pembayaran, kadar yang wajib dikeluarkan, dan penerimanya.'
+    },
+    'kalkulator-zakat':{
+      title:'Kalkulator Zakat',
+      body:'Kalkulator akan membantu menghitung estimasi zakat berdasarkan jenis harta dan parameter yang dimasukkan pengguna. Fitur perhitungan detail akan menjadi bagian berikutnya.'
+    },
+    'puasa':{
+      title:'Puasa',
+      body:'Materi puasa mencakup puasa Ramadhan, puasa sunnah, syarat, rukun, pembatal puasa, serta hal-hal yang berkaitan dengan pelaksanaannya.'
+    },
+    'haji':{
+      title:'Haji',
+      body:'Pembahasan haji mencakup rukun, wajib haji, manasik, larangan ihram, dan umrah.'
+    },
+
+    'alquran':{
+      title:"Al-Qur'an",
+      body:"Pusat pembelajaran Al-Qur'an Silmikaffah. Daftar surah, ayat, terjemahan, pencarian dan fitur terkait akan terhubung ke Quran.com API."
+    },
+    'hadis':{
+      title:'Hadis',
+      body:'Hadis adalah sumber ajaran Islam yang memuat perkataan, perbuatan, persetujuan, dan sifat Nabi Muhammad ﷺ. Dalam kategori Ilmu & Belajar, hadis dipelajari sebagai sumber ilmu dan pedoman memahami ajaran Islam.'
+    },
+    'tajwid':{
+      title:'Tajwid',
+      body:'Materi tajwid mencakup makhraj, sifat huruf, hukum nun sukun dan tanwin, mim sukun, mad, waqaf, dan kaidah bacaan lainnya.'
+    },
+    'fikih':{
+      title:'Fikih',
+      body:'Ilmu fikih membahas hukum-hukum syariat yang berkaitan dengan perbuatan manusia berdasarkan dalil-dalil yang terperinci.'
+    },
+    'ushul-fikih':{
+      title:'Ushul Fikih',
+      body:'Ushul fikih membahas kaidah dan metode untuk memahami serta menetapkan hukum syariat dari dalil-dalilnya.'
+    },
+    'qawaid-fikih':{
+      title:'Qawaid Fikih',
+      body:'Qawaid fikih berisi kaidah-kaidah umum yang membantu memahami banyak persoalan fikih.'
+    },
+    'bahasa-arab':{
+      title:'Bahasa Arab',
+      body:'Materi belajar bahasa Arab mencakup dasar nahwu, sharaf, kosakata, dan percakapan. Ini berbeda dari Kamus Bahasa Arab yang berfungsi sebagai alat pencarian kata.'
+    },
+    'kamus-arab':{
+      title:'Kamus Bahasa Arab',
+      body:'Kamus Bahasa Arab adalah alat pencarian kosakata Arab. Pengguna dapat mencari kata Arab atau terjemahannya. Database kamus dapat dikembangkan pada tahap integrasi data berikutnya.'
+    },
+
+    'sirah-nabi':{
+      title:'Sirah Nabi',
+      body:'Berisi perjalanan kehidupan Nabi Muhammad ﷺ, dari masa sebelum kenabian, dakwah di Makkah, hijrah, Madinah, hingga wafat.'
+    },
+    'sahabat-nabi':{
+      title:'Sahabat Nabi',
+      body:'Berisi profil dan pelajaran dari para sahabat Nabi.'
+    },
+    'wali-songo':{
+      title:'Wali Songo',
+      body:'Berisi pengenalan sejarah dan dakwah Wali Songo di Nusantara.'
+    },
+    'perang-islam':{
+      title:'Perang dalam Sejarah Islam',
+      body:'Berisi peristiwa-peristiwa peperangan penting dalam sejarah Islam secara edukatif dan kontekstual.'
+    },
+    'tokoh-islam':{
+      title:'Tokoh Islam',
+      body:'Berisi tokoh-tokoh penting dalam sejarah keilmuan dan peradaban Islam.'
+    },
+    'peradaban-islam':{
+      title:'Peradaban Islam',
+      body:'Membahas perkembangan ilmu, pendidikan, pemerintahan, seni, dan kebudayaan dalam sejarah peradaban Islam.'
+    },
+    'waktu-peristiwa':{
+      title:'Waktu & Peristiwa Islam',
+      body:'Kronologi peristiwa penting dalam sejarah Islam, sehingga pengguna dapat melihat hubungan waktu dan peristiwa secara runtut.'
+    },
+
+    'pernikahan':{
+      title:'Pernikahan',
+      body:'Materi tentang akad, hak dan kewajiban suami istri, adab rumah tangga, dan hal-hal penting dalam kehidupan pernikahan.'
+    },
+    'keluarga':{
+      title:'Keluarga',
+      body:'Membahas tanggung jawab, pendidikan keluarga, hubungan orang tua dan anak, serta adab dalam keluarga.'
+    },
+    'muamalah':{
+      title:'Muamalah',
+      body:'Membahas prinsip transaksi dan hubungan sosial-ekonomi dalam Islam, termasuk jual beli, utang piutang, dan akad.'
+    },
+    'faraid':{
+      title:'Faraid',
+      body:'Ilmu faraid membahas pembagian harta warisan menurut ketentuan syariat. Fitur perhitungan ahli waris dapat dikembangkan sebagai alat bantu tersendiri.'
+    },
+    'qurratul-uyun':{
+      title:"Qurratul 'Uyun",
+      body:"Materi ini akan disajikan secara edukatif dalam konteks fiqih dan akhlak keluarga, dengan menjaga bahasa yang sesuai untuk pembelajaran."
+    },
+
+    'doa-harian':{
+      title:'Doa Harian',
+      body:'Kumpulan doa untuk berbagai aktivitas sehari-hari, lengkap dengan Arab, transliterasi, arti, dan sumber.'
+    },
+    'dzikir':{
+      title:'Dzikir',
+      body:'Kumpulan dzikir yang dapat dibaca sesuai waktu dan keadaan.'
+    },
+    'dzikir-pagi':{
+      title:'Dzikir Pagi',
+      body:'Kumpulan dzikir pagi dengan teks Arab, arti, dan sumber yang relevan.'
+    },
+    'dzikir-petang':{
+      title:'Dzikir Petang',
+      body:'Kumpulan dzikir petang dengan teks Arab, arti, dan sumber yang relevan.'
+    },
+    'doa-keadaan':{
+      title:'Doa Berdasarkan Keadaan',
+      body:'Doa yang dikelompokkan berdasarkan keadaan seperti sebelum tidur, bangun tidur, bepergian, makan, dan aktivitas lainnya.'
+    },
+
+    'akhlak-allah':{title:'Akhlak kepada Allah',body:'Pembahasan tentang tauhid, syukur, tawakal, takut dan berharap kepada Allah, serta sikap hati yang benar.'},
+    'akhlak-rasul':{title:'Akhlak kepada Rasul',body:'Membahas cinta, penghormatan, mengikuti sunnah, dan adab kepada Rasulullah ﷺ.'},
+    'akhlak-orangtua':{title:'Akhlak kepada Orang Tua',body:'Berisi adab berbakti kepada orang tua dan menjaga hubungan keluarga.'},
+    'akhlak-guru':{title:'Akhlak kepada Guru',body:'Berisi adab penuntut ilmu terhadap guru dan majelis ilmu.'},
+    'akhlak-sesama':{title:'Akhlak kepada Sesama',body:'Berisi adab bermasyarakat, menjaga lisan, amanah, tolong-menolong, dan menghormati sesama.'},
+    'adab-harian':{title:'Adab Sehari-hari',body:'Kumpulan adab praktis untuk aktivitas sehari-hari.'},
+
+    'wudhu-panduan':{title:'Panduan Wudhu',body:'Panduan langkah-langkah wudhu, syarat, rukun, sunnah, dan hal yang membatalkan.'},
+    'tayamum-panduan':{title:'Panduan Tayamum',body:'Panduan tayamum dan kondisi yang membolehkannya.'},
+    'mandi-wajib':{title:'Mandi Wajib',body:'Penjelasan sebab, syarat, rukun, dan tata cara mandi wajib.'},
+    'sholat-jenazah-panduan':{title:'Sholat Jenazah',body:'Panduan ringkas sholat jenazah dan hal-hal yang berkaitan dengannya.'},
+    'haji-umrah-panduan':{title:'Haji & Umrah',body:'Panduan dasar manasik haji dan umrah.'},
+    'zakat-panduan':{title:'Panduan Zakat',body:'Panduan memahami zakat fitrah, zakat mal, nisab, haul, dan penerima zakat.'},
+    'puasa-panduan':{title:'Panduan Puasa',body:'Panduan syarat, rukun, pembatal, dan adab puasa.'},
+
+    'kalender-hijriah':{title:'Kalender Hijriah',body:'Kalender Hijriah akan menggunakan data tanggal yang tersedia dari Aladhan API dan dapat ditampilkan berdasarkan lokasi serta tanggal perangkat.'},
+    'jadwal-sholat':{title:'Jadwal Sholat',body:'Jadwal sholat menggunakan lokasi GPS dan Aladhan API. Waktu sholat berikutnya ditampilkan secara otomatis.'},
+    'arah-kiblat':{title:'Arah Kiblat',body:'Fitur arah kiblat menggunakan koordinat lokasi pengguna dan perhitungan arah menuju Ka'bah.'},
+    'masjid':{title:'Masjid',body:'Halaman masjid dapat dikembangkan menjadi pencarian masjid berdasarkan lokasi pengguna.'},
+    'pengaturan':{title:'Pengaturan',body:'Atur tema AMOLED atau Putih, ukuran font, ukuran font Arab, bahasa, notifikasi, dan data aplikasi.'},
+    'bukhari':{title:'Shahih Bukhari',body:'Shahih Bukhari adalah salah satu kitab hadis yang disusun oleh Imam Muhammad bin Ismail al-Bukhari. Materi ini membahas hadis berdasarkan kitab dan bab, dengan teks, terjemahan, serta rujukan yang dapat ditelusuri.'},
+    'muslim':{title:'Shahih Muslim',body:'Shahih Muslim adalah kumpulan hadis yang disusun oleh Imam Muslim bin al-Hajjaj. Materi disusun berdasarkan kitab dan bab agar pengguna dapat mempelajari hadis secara terstruktur dan menelusuri sumbernya.'},
+    'abu-dawud':{title:'Abu Dawud',body:'Sunan Abu Dawud merupakan salah satu koleksi hadis utama. Pembelajaran dapat dikelompokkan berdasarkan kitab dan bab, disertai teks, terjemahan, dan informasi sumber.'},
+    'tirmidzi':{title:'At-Tirmidzi',body:'Jami’ At-Tirmidzi merupakan koleksi hadis yang disusun oleh Imam At-Tirmidzi. Materi pembelajaran mencakup teks, terjemahan, bab, dan keterangan derajat hadis ketika tersedia.'},
+    'nasai':{title:'An-Nasa’i',body:'Sunan An-Nasa’i merupakan salah satu koleksi hadis utama. Materi disusun berdasarkan kitab dan bab untuk membantu pembelajaran hadis secara bertahap.'},
+    'ibnu-majah':{title:'Ibnu Majah',body:'Sunan Ibnu Majah merupakan salah satu koleksi hadis yang termasuk Kutubus Sittah. Materi menampilkan sumber, teks, terjemahan, dan keterangan yang dapat diverifikasi.'},
+    'tentang':{title:'Tentang Silmikaffah',body:'Silmikaffah adalah aplikasi pembelajaran Islam yang mengelompokkan materi secara terstruktur agar pengguna tidak menemukan menu yang sama berulang kali di Home.'}
+  };
+
+  function findNode(id){
+    for(const category of Object.values(content)){
+      const found=walk(category.items,id);
+      if(found)return found;
+    }
+    return null;
+  }
+  function walk(items,id){
+    for(const x of (items||[])){
+      if(x.id===id)return x;
+      const f=walk(x.children,id);
+      if(f)return f;
+    }
+    return null;
+  }
+
+  function root(){
+    let el=document.getElementById(rootId);
+    if(!el){
+      el=document.createElement('main');
+      el.id=rootId;
+      el.className='content-page';
+      document.body.appendChild(el);
+    }
+    return el;
+  }
+
+  function card(item){
+    const hasChildren=item.children&&item.children.length;
+    return `<button class="content-card" data-content-id="${item.id}">
+      <strong>${item.title}</strong>
+      <small>${hasChildren ? item.children.length+' submateri' : 'Buka materi'}</small>
+    </button>`;
+  }
+
+  function renderCategory(categoryId){
+    const category=content[categoryId];
+    if(!category)return;
+    const el=root();
+    el.innerHTML=`<div class="content-header">
+      <button class="content-back" data-nav-back aria-label="Kembali">‹</button>
+      <h2>${category.title}</h2>
+    </div>
+    <div class="content-grid">${category.items.map(card).join('')}</div>`;
+    el.querySelectorAll('[data-content-id]').forEach(btn=>{
+      btn.onclick=()=>{
+        const id=btn.dataset.contentId;
+        nav.push(id);
+        renderNode(id);
+      };
+    });
+  }
+
+  function renderNode(id){
+    const node=findNode(id);
+    if(!node)return;
+    const el=root();
+    if(node.children&&node.children.length){
+      el.innerHTML=`<div class="content-header">
+        <button class="content-back" data-nav-back aria-label="Kembali">‹</button>
+        <h2>${node.title}</h2>
+      </div>
+      <div class="content-grid">${node.children.map(card).join('')}</div>`;
+      el.querySelectorAll('[data-content-id]').forEach(btn=>{
+        btn.onclick=()=>{
+          const cid=btn.dataset.contentId;
+          nav.push(cid);
+          renderNode(cid);
+        };
+      });
+      return;
+    }
+    const material=materials[id]||{
+      title:node.title,
+      body:`${node.title} merupakan materi pembelajaran Silmikaffah. Halaman ini memuat pengertian, pokok pembahasan, cara mempelajari, dan hubungan dengan materi terkait. Untuk pembahasan yang bersumber dari Al-Qur’an atau hadis, sumber ditampilkan pada bagian referensi agar dapat ditelusuri.`
+    };
+    el.innerHTML=`<div class="content-header">
+      <button class="content-back" data-nav-back aria-label="Kembali">‹</button>
+      <h2>${material.title}</h2>
+    </div>
+    <article class="material">
+      <h3>${material.title}</h3>
+      <p>${material.body}</p>
+      <p class="source-note">Konten final akan dilengkapi dengan sumber/dalil yang sesuai pada tahap kurasi materi.</p>
+      <button class="content-card" id="saveMaterial">🔖 Simpan ke Koleksi</button>
+    </article>`;
+    const save=el.querySelector('#saveMaterial');
+    if(save)save.onclick=()=>{
+      const active=window.SilmikaffahDB.toggle('bookmarks',{id:'material-'+id,title:material.title,type:'materi'});
+      save.innerHTML=active?'🔖 Tersimpan di Koleksi':'🔖 Simpan ke Koleksi';
+    };
+  }
+
+  // Expose actual renderers for the UI.
+  window.SilmikaffahContentUI={renderCategory,renderNode};
+
+  // Map common data-category buttons to the real renderer.
+  document.addEventListener('click',e=>{
+    const b=e.target.closest('[data-content-category]');
+    if(!b)return;
+    e.preventDefault();
+    const id=b.dataset.contentCategory;
+    nav.push(id);
+    renderCategory(id);
+  },true);
+
+  // Every stack move now causes the correct real page to render.
+  window.addEventListener('silmikaffah:navigation',e=>{
+    const id=e.detail.current;
+    if(id==='home'){
+      const old=document.getElementById(rootId);
+      if(old)old.remove();
+      return;
+    }
+    if(content[id])renderCategory(id);
+    else renderNode(id);
+  });
+})();
+</script>
+
+
+<!-- Duplicate overlay renderer removed. The original hierarchical content renderer is used. -->
+
+<script id="silmikaffah-quran-database-6236">
+/* SILMIKAFFAH — DATABASE AL-QUR'AN DINAMIS
+   Mengunduh 114 surah dari Quran.com API dan menyimpannya ke IndexedDB.
+   Setelah tersimpan, data dapat dibaca kembali tanpa mengunduh ulang selama cache tersedia.
+*/
+(function(){
+  'use strict';
+  const DB_NAME='silmikaffah-quran-db', DB_VER=1, STORE='verses';
+  const API='https://api.quran.com/api/v4';
+  let db=null;
+  function openDB(){return new Promise((resolve,reject)=>{
+    if(db)return resolve(db);
+    const r=indexedDB.open(DB_NAME,DB_VER);
+    r.onupgradeneeded=()=>{const d=r.result;if(!d.objectStoreNames.contains(STORE)){d.createObjectStore(STORE,{keyPath:'id'});}};
+    r.onsuccess=()=>{db=r.result;resolve(db)}; r.onerror=()=>reject(r.error);
+  })}
+  function putMany(rows){return openDB().then(d=>new Promise((resolve,reject)=>{
+    const tx=d.transaction(STORE,'readwrite'), s=tx.objectStore(STORE); rows.forEach(x=>s.put(x));
+    tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);
+  }))}
+  function getChapter(ch){return openDB().then(d=>new Promise((resolve,reject)=>{
+    const tx=d.transaction(STORE,'readonly'),s=tx.objectStore(STORE),all=[];
+    const req=s.openCursor();req.onsuccess=()=>{const c=req.result;if(!c)return resolve(all.filter(x=>x.chapter_number===ch).sort((a,b)=>a.verse_number-b.verse_number));if(c.value.chapter_number===ch)all.push(c.value);c.continue()};req.onerror=()=>reject(req.error);
+  }))}
+  function count(){return openDB().then(d=>new Promise((resolve,reject)=>{const r=d.transaction(STORE,'readonly').objectStore(STORE).count();r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error)}))}
+  async function fetchChapter(ch){
+    const url=API+'/verses/by_chapter/'+ch+'?language=id&words=false&translations=33&fields=text_uthmani,text_imlaei';
+    const r=await fetch(url); if(!r.ok)throw new Error('Quran API '+r.status+' pada surah '+ch);
+    const j=await r.json();
+    return (j.verses||[]).map(v=>({id:v.id,chapter_number:v.chapter_number,verse_number:v.verse_number,verse_key:v.verse_key,text_uthmani:v.text_uthmani||'',text_imlaei:v.text_imlaei||'',translations:v.translations||[]}));
+  }
+  async function syncAll(onProgress){
+    let total=0;
+    for(let ch=1;ch<=114;ch++){
+      const cached=await getChapter(ch);
+      if(cached.length){total+=cached.length; if(onProgress)onProgress(ch,114,total,'cached'); continue;}
+      const rows=await fetchChapter(ch); await putMany(rows); total+=rows.length;
+      if(onProgress)onProgress(ch,114,total,'downloaded');
+    }
+    return total;
+  }
+  async function ensureChapter(ch){let rows=await getChapter(ch);if(rows.length)return rows;rows=await fetchChapter(ch);await putMany(rows);return rows}
+  window.SilmikaffahQuranDB={openDB,count,getChapter,ensureChapter,syncAll,fetchChapter};
+
+  function qEl(){return document.getElementById('quranDatabasePanel')}
+  function escape(s){return String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+  function panel(){
+    if(qEl())return qEl();
+    const e=document.createElement('div');e.id='quranDatabasePanel';e.innerHTML=`
+      <div class="qdb-head"><button id="qdbBack">‹</button><div><b>Al-Qur'an</b><small id="qdbStatus">Database ayat</small></div></div>
+      <div id="qdbBody"></div>`;
+    document.body.appendChild(e);document.getElementById('qdbBack').onclick=()=>e.classList.remove('on');return e;
+  }
+  async function openQuran(){
+    const e=panel();e.classList.add('on');const body=e.querySelector('#qdbBody');
+    body.innerHTML='<div class="qdb-card"><h2>Database Al-Qur\'an</h2><p>Silmikaffah menggunakan data 114 surah dan seluruh ayat melalui Quran.com API. Data yang sudah dibuka disimpan di perangkat.</p><button id="qdbSync">Muat Database 114 Surah</button><p id="qdbCount">Memeriksa database…</p></div><div id="qdbSurahs"></div>';
+    const c=await count();document.getElementById('qdbCount').textContent=c?`Tersimpan ${c} ayat di perangkat.`:'Belum ada ayat tersimpan.';
+    document.getElementById('qdbSync').onclick=async()=>{
+      const btn=document.getElementById('qdbSync'),st=document.getElementById('qdbCount');btn.disabled=true;btn.textContent='Memuat…';
+      try{const total=await syncAll((ch,total,n)=>st.textContent=`Memuat surah ${ch} / ${total} — ${n} ayat tersimpan…`);st.textContent=`Selesai. ${total} ayat tersimpan di perangkat.`;btn.textContent='Database sudah tersimpan';}
+      catch(err){st.textContent='Gagal memuat: '+err.message;btn.disabled=false;btn.textContent='Coba lagi';}
+      await listSurahs();
+    };
+    await listSurahs();
+  }
+  async function listSurahs(){
+    const wrap=document.getElementById('qdbSurahs');if(!wrap)return;
+    let chapters=[];try{const r=await fetch(API+'/chapters?language=id');chapters=(await r.json()).chapters||[]}catch(e){}
+    if(!chapters.length){wrap.innerHTML='<div class="qdb-card">Daftar surah membutuhkan koneksi internet saat pertama kali dibuka.</div>';return}
+    wrap.innerHTML=chapters.map(c=>`<button class="qsurah" data-ch="${c.id}"><b>${c.id}. ${escape(c.name_simple||c.name_complex)}</b><small>${escape(c.translated_name?.name||'')} • ${c.verses_count||''} ayat</small></button>`).join('');
+    wrap.querySelectorAll('[data-ch]').forEach(b=>b.onclick=()=>openChapter(+b.dataset.ch));
+  }
+  async function openChapter(ch){
+    const rows=await ensureChapter(ch),body=document.getElementById('qdbBody');
+    if(!body)return;
+    body.innerHTML=`<div class="qdb-card"><button id="qdbChapterBack">‹ Daftar Surah</button><h2>Surah ${ch}</h2><p>${rows.length} ayat tersedia di database perangkat.</p></div>`+rows.map(v=>`<article class="qverse"><div class="qkey">${escape(v.verse_key)}</div><div class="qarab">${escape(v.text_uthmani)}</div>${(v.translations||[]).map(t=>`<p class="qtrans">${escape(t.text)}</p>`).join('')}</article>`).join('');
+    document.getElementById('qdbChapterBack').onclick=listSurahs;
+  }
+  // Tombol global untuk membuka database. Submenu 114 Surah diarahkan ke sini.
+  document.addEventListener('click',e=>{
+    const b=e.target.closest('[data-quran-database]');if(!b)return;e.preventDefault();e.stopPropagation();openQuran();
+  },true);
+  window.SilmikaffahOpenQuranDB=openQuran;
+})();
+</script>
+<style>
+#quranDatabasePanel{position:fixed;inset:0;background:#050908;color:#f4f8f6;z-index:100001;display:none;overflow:auto;padding:18px 16px 90px}
+#quranDatabasePanel.on{display:block}.qdb-head{display:flex;gap:12px;align-items:center;margin-bottom:18px}.qdb-head button,#qdbChapterBack{border:1px solid #176451;background:#101a17;color:#20cfa8;border-radius:12px;padding:9px 13px;font-size:20px}.qdb-head b{font-size:21px}.qdb-head small{display:block;color:#91a19c;margin-top:3px}.qdb-card{background:#101a17;border:1px solid #176451;border-radius:18px;padding:17px;margin-bottom:12px}.qdb-card h2{margin-top:0}.qdb-card p{line-height:1.6;color:#b8c6c1}.qdb-card button#qdbSync{border:0;border-radius:12px;background:#16c7a0;color:#00110c;font-weight:800;padding:12px 15px}.qsurah{width:100%;display:flex;justify-content:space-between;align-items:center;text-align:left;background:#0b1210;color:#fff;border:1px solid #1b2a26;border-radius:14px;padding:13px 14px;margin:6px 0}.qsurah small{color:#20cfa8}.qverse{background:#0b1210;border:1px solid #1b2a26;border-radius:17px;padding:16px;margin:9px 0}.qkey{color:#20cfa8;font-size:12px;font-weight:800}.qarab{font-size:27px;line-height:2;text-align:right;margin:8px 0 12px}.qtrans{line-height:1.7;color:#d0dad6;border-top:1px solid #1b2a26;padding-top:10px}
+</style>
+<script>
+/* Sambungkan submenu 114 Surah ke database nyata tanpa menghapus struktur MASTER. */
+(function(){
+  const original=window.SilmikaffahContentUI&&window.SilmikaffahContentUI.renderNode;
+  if(!original)return;
+  const old=window.SilmikaffahContentUI.renderNode;
+  window.SilmikaffahContentUI.renderNode=function(id){
+    if(id==='daftar-surah'){window.SilmikaffahOpenQuranDB();return;}
+    return old(id);
+  };
+})();
 </script>
 </body>
 </html>
