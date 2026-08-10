@@ -775,5 +775,177 @@ window.SilmikaffahAPI = {
 window.addEventListener('load',()=>setTimeout(()=>SilmikaffahAPI.syncPrayer(),700));
 </script>
 
+
+<script>
+/* ==========================================================
+   SILMIKAFFAH TAHAP 3
+   - Hierarchical navigation stack: back goes exactly one level.
+   - Local database layer: bookmarks, favorites, history, notes,
+     settings and last-read state.
+   ========================================================== */
+
+(function(){
+  const DB_KEY='silmikaffah-db-v3';
+  const defaultDB={
+    bookmarks:[],
+    favorites:[],
+    history:[],
+    notes:[],
+    lastRead:null,
+    settings:{
+      theme:'amoled',
+      fontSize:'medium',
+      arabicFontSize:'medium',
+      language:'id'
+    }
+  };
+
+  function loadDB(){
+    try{
+      const raw=localStorage.getItem(DB_KEY);
+      return raw ? {...defaultDB,...JSON.parse(raw)} : structuredClone(defaultDB);
+    }catch(e){ return structuredClone(defaultDB); }
+  }
+  function saveDB(db){ localStorage.setItem(DB_KEY,JSON.stringify(db)); }
+
+  window.SilmikaffahDB={
+    get(){return loadDB();},
+    set(db){saveDB(db);},
+    add(type,item){
+      const db=loadDB();
+      if(!Array.isArray(db[type])) db[type]=[];
+      const id=item.id || (Date.now()+'-'+Math.random().toString(36).slice(2));
+      if(!db[type].some(x=>x.id===id)) db[type].push({...item,id});
+      saveDB(db); return id;
+    },
+    remove(type,id){
+      const db=loadDB();
+      db[type]=(db[type]||[]).filter(x=>x.id!==id);
+      saveDB(db);
+    },
+    toggle(type,item){
+      const db=loadDB();
+      if(!Array.isArray(db[type])) db[type]=[];
+      const id=item.id || item.key;
+      const found=db[type].findIndex(x=>x.id===id);
+      if(found>=0){db[type].splice(found,1);saveDB(db);return false;}
+      db[type].push({...item,id});saveDB(db);return true;
+    },
+    addHistory(item){
+      const db=loadDB();
+      const id=item.id || item.key || (Date.now()+'');
+      db.history=[{...item,id,openedAt:Date.now()},...(db.history||[]).filter(x=>x.id!==id)].slice(0,100);
+      saveDB(db);
+    },
+    setLastRead(item){const db=loadDB();db.lastRead=item;saveDB(db);}
+  };
+
+  /* One stack for every in-app screen. Never jump directly to home. */
+  const navStack=['home'];
+  let restoring=false;
+
+  function current(){return navStack[navStack.length-1];}
+  function push(screen){
+    if(screen===current()) return;
+    navStack.push(screen);
+    sync();
+  }
+  function back(){
+    if(navStack.length<=1) return false;
+    navStack.pop();
+    sync(true);
+    return true;
+  }
+  function reset(){navStack.splice(0,navStack.length,'home');sync();}
+  function sync(fromBack=false){
+    window.dispatchEvent(new CustomEvent('silmikaffah:navigation',{
+      detail:{stack:[...navStack],current:current(),fromBack}
+    }));
+    updateBackButton();
+  }
+  function updateBackButton(){
+    document.querySelectorAll('[data-nav-back],.back-btn,#backBtn').forEach(btn=>{
+      btn.style.visibility=navStack.length>1?'visible':'hidden';
+      btn.onclick=(e)=>{e.preventDefault();back();};
+    });
+  }
+
+  window.SilmikaffahNav={push,back,reset,current,stack:()=>[...navStack]};
+
+  /* Intercept common in-app screen changes so they participate in the stack. */
+  document.addEventListener('click',e=>{
+    const el=e.target.closest('[data-screen]');
+    if(!el) return;
+    const screen=el.getAttribute('data-screen');
+    if(!screen) return;
+    e.preventDefault();
+    push(screen);
+  },true);
+
+  /* Prevent browser back from skipping levels. */
+  window.addEventListener('popstate',e=>{
+    if(navStack.length>1){ back(); }
+    else history.pushState({silmikaffah:true},'','#/');
+  });
+  history.replaceState({silmikaffah:true},'','#/');
+
+  window.addEventListener('load',updateBackButton);
+})();
+</script>
+
+<script>
+/* Expose a small content registry for Stage 3A/3B.
+   Content can be expanded without changing navigation structure. */
+window.SilmikaffahContent={
+  rukunIman:{
+    title:'Rukun Iman',
+    items:[
+      {id:'iman-allah',title:'Iman kepada Allah',icon:'allah'},
+      {id:'iman-malaikat',title:'Iman kepada Malaikat',icon:'malaikat'},
+      {id:'iman-kitab',title:'Iman kepada Kitab',icon:'kitab'},
+      {id:'iman-rasul',title:'Iman kepada Rasul',icon:'rasul'},
+      {id:'iman-akhir',title:'Iman kepada Hari Akhir',icon:'akhir'},
+      {id:'iman-qadar',title:'Iman kepada Qada & Qadar',icon:'qadar'}
+    ]
+  },
+  rukunIslam:{
+    title:'Rukun Islam',
+    items:[
+      {id:'syahadat',title:'Syahadat',icon:'syahadat'},
+      {id:'sholat',title:'Sholat',icon:'sholat'},
+      {id:'zakat',title:'Zakat',icon:'zakat',children:[
+        {id:'zakat-kalkulator',title:'Kalkulator Zakat'}
+      ]},
+      {id:'puasa',title:'Puasa',icon:'puasa'},
+      {id:'haji',title:'Haji',icon:'haji'}
+    ]
+  }
+};
+</script>
+
+
+<script>
+(function(){
+  const oldShowPage=window.showPage;
+  if(typeof oldShowPage==='function'){
+    window.showPage=function(id){
+      if(window.SilmikaffahNav) window.SilmikaffahNav.push(id);
+      return oldShowPage.apply(this,arguments);
+    };
+  }
+  const oldShowScreen=window.showScreen;
+  if(typeof oldShowScreen==='function'){
+    window.showScreen=function(id){
+      if(window.SilmikaffahNav) window.SilmikaffahNav.push(id);
+      return oldShowScreen.apply(this,arguments);
+    };
+  }
+  window.addEventListener('silmikaffah:navigation',e=>{
+    const d=e.detail;
+    document.querySelectorAll('[data-nav-title]').forEach(x=>x.textContent=d.current);
+  });
+})();
+</script>
+
 </body>
 </html>
