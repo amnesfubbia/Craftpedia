@@ -148,6 +148,21 @@ body.theme-light .bottom{background:rgba(255,255,255,.96)}
   .card p{font-size:10px!important;line-height:1.35!important}
 }
 </style>
+
+<style id="stage3b-layout">
+/* SILMIKAFFAH: Home menu = 3 items per row */
+.home-grid,.main-menu-grid,.menu-grid,.home-menu,.home-actions,.category-grid{
+  display:grid !important;
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  gap:12px !important;
+}
+@media (max-width:520px){
+  .home-grid,.main-menu-grid,.menu-grid,.home-menu,.home-actions,.category-grid{
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+    gap:9px !important;
+  }
+}
+</style>
 </head>
 <body>
 
@@ -944,6 +959,240 @@ window.SilmikaffahContent={
     const d=e.detail;
     document.querySelectorAll('[data-nav-title]').forEach(x=>x.textContent=d.current);
   });
+})();
+</script>
+
+
+<script id="stage3b-content">
+/* ==========================================================
+   SILMIKAFFAH TAHAP 3B
+   Complete submenu/content registry + hardware/browser Back.
+   ========================================================== */
+
+window.SilmikaffahContent = {
+  rukunIman:{
+    title:'Rukun Iman',
+    items:[
+      {id:'iman-allah',title:'Iman kepada Allah',children:[
+        {id:'asmaul-husna',title:'Asmaul Husna'},
+        {id:'20-sifat-allah',title:'20 Sifat Allah'},
+        {id:'nama-dan-sifat',title:'Nama & Sifat Allah'}
+      ]},
+      {id:'iman-malaikat',title:'Iman kepada Malaikat',children:[
+        {id:'nama-malaikat',title:'Nama & Tugas Malaikat'},
+        {id:'sifat-malaikat',title:'Sifat Malaikat'}
+      ]},
+      {id:'iman-kitab',title:'Iman kepada Kitab',children:[
+        {id:'quran',title:"Al-Qur'an"},
+        {id:'taurat',title:'Taurat'},
+        {id:'zabur',title:'Zabur'},
+        {id:'injil',title:'Injil'},
+        {id:'kitab-suhuf',title:'Suhuf'}
+      ]},
+      {id:'iman-rasul',title:'Iman kepada Rasul',children:[
+        {id:'25-rasul',title:'25 Rasul'},
+        {id:'sifat-rasul',title:'Sifat Rasul'},
+        {id:'mukjizat',title:'Mukjizat'}
+      ]},
+      {id:'iman-akhir',title:'Iman kepada Hari Akhir',children:[
+        {id:'tanda-kiamat',title:'Tanda-tanda Kiamat'},
+        {id:'alam-barzakh',title:'Alam Barzakh'},
+        {id:'yaumul-qiyamah',title:'Hari Kiamat'},
+        {id:'surga-neraka',title:'Surga & Neraka'}
+      ]},
+      {id:'iman-qadar',title:'Iman kepada Qada & Qadar',children:[
+        {id:'qada-qadar',title:'Qada & Qadar'},
+        {id:'takdir',title:'Takdir'}
+      ]}
+    ]
+  },
+
+  rukunIslam:{
+    title:'Rukun Islam',
+    items:[
+      {id:'syahadat',title:'Syahadat',children:[
+        {id:'dua-kalimah-syahadat',title:'Dua Kalimah Syahadat'},
+        {id:'makna-syahadat',title:'Makna Syahadat'}
+      ]},
+      {id:'sholat',title:'Sholat',children:[
+        {id:'waktu-sholat',title:'Waktu Sholat'},
+        {id:'syarat-sholat',title:'Syarat Sholat'},
+        {id:'rukun-sholat',title:'Rukun Sholat'},
+        {id:'wudhu',title:'Wudhu'},
+        {id:'tayamum',title:'Tayamum'},
+        {id:'sholat-wajib',title:'Sholat Wajib'},
+        {id:'sholat-sunnah',title:'Sholat Sunnah'},
+        {id:'sholat-jenazah',title:'Sholat Jenazah'}
+      ]},
+      {id:'zakat',title:'Zakat',children:[
+        {id:'zakat-mal',title:'Zakat Mal'},
+        {id:'zakat-fitrah',title:'Zakat Fitrah'},
+        {id:'mustahik',title:'Mustahik Zakat'},
+        {id:'kalkulator-zakat',title:'Kalkulator Zakat'}
+      ]},
+      {id:'puasa',title:'Puasa',children:[
+        {id:'puasa-ramadhan',title:'Puasa Ramadhan'},
+        {id:'puasa-sunnah',title:'Puasa Sunnah'},
+        {id:'syarat-puasa',title:'Syarat & Rukun Puasa'},
+        {id:'pembatal-puasa',title:'Pembatal Puasa'}
+      ]},
+      {id:'haji',title:'Haji',children:[
+        {id:'manasik-haji',title:'Manasik Haji'},
+        {id:'rukun-haji',title:'Rukun Haji'},
+        {id:'wajib-haji',title:'Wajib Haji'},
+        {id:'umrah',title:'Umrah'}
+      ]}
+    ]
+  },
+
+  ilmuBelajar:{
+    title:'Ilmu & Belajar',
+    items:[
+      {id:'alquran',title:"Al-Qur'an",children:[
+        {id:'daftar-surah',title:'114 Surah'},
+        {id:'juz',title:'Juz'},
+        {id:'tafsir',title:'Tafsir'},
+        {id:'terjemahan',title:'Terjemahan'},
+        {id:'audio-murattal',title:'Audio Murattal'},
+        {id:'pencarian-quran',title:"Pencarian Al-Qur'an"}
+      ]},
+      {id:'hadis',title:'Hadis',children:[
+        {id:'bukhari',title:'Shahih Bukhari'},
+        {id:'muslim',title:'Shahih Muslim'},
+        {id:'abu-dawud',title:'Abu Dawud'},
+        {id:'tirmidzi',title:'At-Tirmidzi'},
+        {id:'nasai',title:'An-Nasa’i'},
+        {id:'ibnu-majah',title:'Ibnu Majah'},
+        {id:'pencarian-hadis',title:'Pencarian Hadis'}
+      ]},
+      {id:'tajwid',title:'Tajwid'},
+      {id:'fikih',title:'Fikih'},
+      {id:'ushul-fikih',title:'Ushul Fikih'},
+      {id:'qawaid-fikih',title:'Qawaid Fikih'},
+      {id:'bahasa-arab',title:'Bahasa Arab',children:[
+        {id:'nahwu',title:'Nahwu'},
+        {id:'sharaf',title:'Sharaf'},
+        {id:'percakapan-arab',title:'Percakapan'}
+      ]},
+      {id:'kamus-arab',title:'Kamus Bahasa Arab'}
+    ]
+  },
+
+  sejarahTokoh:{
+    title:'Sejarah & Tokoh',
+    items:[
+      {id:'sirah-nabi',title:'Sirah Nabi'},
+      {id:'sahabat-nabi',title:'Sahabat Nabi'},
+      {id:'wali-songo',title:'Wali Songo'},
+      {id:'perang-islam',title:'Perang dalam Sejarah Islam'},
+      {id:'tokoh-islam',title:'Tokoh Islam'},
+      {id:'peradaban-islam',title:'Peradaban Islam'},
+      {id:'waktu-peristiwa',title:'Waktu & Peristiwa Islam'}
+    ]
+  },
+
+  keluargaMuamalah:{
+    title:'Keluarga & Muamalah',
+    items:[
+      {id:'pernikahan',title:'Pernikahan'},
+      {id:'keluarga',title:'Keluarga'},
+      {id:'muamalah',title:'Muamalah'},
+      {id:'faraid',title:'Faraid'},
+      {id:'qurratul-uyun',title:"Qurratul 'Uyun"}
+    ]
+  },
+
+  doaDzikir:{
+    title:'Doa & Dzikir',
+    items:[
+      {id:'doa-harian',title:'Doa Harian'},
+      {id:'dzikir',title:'Dzikir'},
+      {id:'dzikir-pagi',title:'Dzikir Pagi'},
+      {id:'dzikir-petang',title:'Dzikir Petang'},
+      {id:'doa-keadaan',title:'Doa Berdasarkan Keadaan'}
+    ]
+  },
+
+  akhlakAdab:{
+    title:'Akhlak & Adab',
+    items:[
+      {id:'akhlak-allah',title:'Akhlak kepada Allah'},
+      {id:'akhlak-rasul',title:'Akhlak kepada Rasul'},
+      {id:'akhlak-orangtua',title:'Akhlak kepada Orang Tua'},
+      {id:'akhlak-guru',title:'Akhlak kepada Guru'},
+      {id:'akhlak-sesama',title:'Akhlak kepada Sesama'},
+      {id:'adab-harian',title:'Adab Sehari-hari'}
+    ]
+  },
+
+  ibadahPanduan:{
+    title:'Ibadah & Panduan',
+    items:[
+      {id:'wudhu-panduan',title:'Wudhu'},
+      {id:'tayamum-panduan',title:'Tayamum'},
+      {id:'mandi-wajib',title:'Mandi Wajib'},
+      {id:'sholat-jenazah-panduan',title:'Sholat Jenazah'},
+      {id:'haji-umrah-panduan',title:'Haji & Umrah'},
+      {id:'zakat-panduan',title:'Zakat'},
+      {id:'puasa-panduan',title:'Puasa'}
+    ]
+  },
+
+  referensiLainnya:{
+    title:'Referensi & Lainnya',
+    items:[
+      {id:'kalender-hijriah',title:'Kalender Hijriah'},
+      {id:'jadwal-sholat',title:'Jadwal Sholat'},
+      {id:'arah-kiblat',title:'Arah Kiblat'},
+      {id:'masjid',title:'Masjid'},
+      {id:'pengaturan',title:'Pengaturan'},
+      {id:'tentang',title:'Tentang Silmikaffah'}
+    ]
+  }
+};
+</script>
+
+
+<script id="stage3b-back-fix">
+(function(){
+  const nav=window.SilmikaffahNav;
+  if(!nav)return;
+
+  let ignorePop=false;
+  history.replaceState({silmikaffah:true,depth:nav.stack().length},'',location.href);
+
+  function syncHistory(){
+    history.replaceState({silmikaffah:true,depth:nav.stack().length},'',location.href);
+  }
+
+  // Push a browser history entry for every app-level navigation.
+  window.addEventListener('silmikaffah:navigation',e=>{
+    if(e.detail.fromBack){
+      syncHistory();
+    }else{
+      history.pushState({silmikaffah:true,depth:e.detail.stack.length},'',
+        '#/'+e.detail.stack.join('/'));
+    }
+  });
+
+  window.addEventListener('popstate',()=>{
+    // Android hardware back / browser back reaches here.
+    if(nav.stack().length>1){
+      nav.back();
+    }else{
+      // At Home, don't jump to an arbitrary previous page.
+      history.pushState({silmikaffah:true,depth:1},'','#/home');
+    }
+  });
+
+  // Keep the app's own Back button tied to the same stack.
+  document.addEventListener('click',e=>{
+    const b=e.target.closest('[data-nav-back],.back-btn,#backBtn');
+    if(!b)return;
+    e.preventDefault();
+    e.stopPropagation();
+    nav.back();
+  },true);
 })();
 </script>
 
