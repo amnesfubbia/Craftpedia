@@ -163,6 +163,21 @@ body.theme-light .bottom{background:rgba(255,255,255,.96)}
   }
 }
 </style>
+
+<style id="stage3c-content-css">
+.content-page{padding:16px 16px 110px;max-width:900px;margin:auto}
+.content-header{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.content-header h2{margin:0;font-size:22px}
+.content-back{width:42px;height:42px;border:1px solid var(--border,#2a2a2a);border-radius:14px;background:transparent;color:inherit;font-size:20px}
+.content-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.content-card{border:1px solid var(--border,#2a2a2a);background:var(--card,#111);color:inherit;border-radius:18px;padding:16px;text-align:left;min-height:82px}
+.content-card strong{display:block;font-size:15px;margin-bottom:6px}
+.content-card small{opacity:.65}
+.material{line-height:1.75}
+.material h3{font-size:21px;margin:0 0 12px}
+.material .source-note{font-size:12px;opacity:.6;margin-top:20px}
+@media(max-width:520px){.content-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.content-card{padding:13px;min-height:76px}}
+</style>
 </head>
 <body>
 
@@ -1193,6 +1208,349 @@ window.SilmikaffahContent = {
     e.stopPropagation();
     nav.back();
   },true);
+})();
+</script>
+
+
+<script id="stage3c-real-content">
+(function(){
+  const nav=window.SilmikaffahNav;
+  const content=window.SilmikaffahContent;
+  if(!nav||!content)return;
+
+  const rootId='silmikaffah-content-root';
+
+  const materials={
+    'iman-allah':{
+      title:'Iman kepada Allah',
+      body:'Iman kepada Allah berarti meyakini dengan benar bahwa Allah adalah satu-satunya Tuhan yang wajib disembah. Materi ini menjadi dasar pembahasan tauhid, nama dan sifat Allah, serta konsekuensi iman dalam kehidupan.'
+    },
+    'asmaul-husna':{
+      title:'Asmaul Husna',
+      body:'Asmaul Husna adalah nama-nama Allah yang baik. Dalam Silmikaffah, setiap nama akan disajikan bersama tulisan Arab, transliterasi, arti, penjelasan ringkas, dan dalil yang relevan.'
+    },
+    '20-sifat-allah':{
+      title:'20 Sifat Allah',
+      body:'Materi 20 sifat Allah disusun sebagai materi pembelajaran akidah. Setiap sifat dapat dibuka untuk melihat nama sifat, arti, penjelasan, dan dalil pembahasannya.'
+    },
+    'iman-malaikat':{
+      title:'Iman kepada Malaikat',
+      body:'Iman kepada malaikat berarti meyakini keberadaan malaikat Allah dan perkara-perkara yang dijelaskan oleh wahyu tentang mereka. Materi akan memuat nama dan tugas malaikat yang masyhur.'
+    },
+    'nama-malaikat':{
+      title:'Nama & Tugas Malaikat',
+      body:'Berisi daftar malaikat yang disebutkan dalam sumber-sumber Islam beserta tugas yang dinisbatkan kepada mereka berdasarkan dalil yang relevan.'
+    },
+    'iman-kitab':{
+      title:'Iman kepada Kitab',
+      body:'Iman kepada kitab-kitab Allah merupakan salah satu rukun iman. Pembahasan mencakup Al-Qur’an dan kitab-kitab yang disebutkan dalam Al-Qur’an, dengan tingkat detail yang disesuaikan.'
+    },
+    'quran':{
+      title:"Al-Qur'an",
+      body:"Al-Qur'an akan menggunakan Quran.com API untuk mengambil data ayat, terjemahan, pencarian, dan materi terkait. Data Al-Qur'an tidak ditanam seluruhnya di HTML."
+    },
+    'iman-rasul':{
+      title:'Iman kepada Rasul',
+      body:'Berisi pembahasan iman kepada para rasul, sifat-sifat rasul, serta kisah dan pelajaran yang dapat diambil dari perjalanan dakwah mereka.'
+    },
+    '25-rasul':{
+      title:'25 Rasul',
+      body:'Daftar 25 nabi dan rasul yang umum diajarkan dalam pendidikan Islam, dengan ringkasan nama dan kisah masing-masing.'
+    },
+    'iman-akhir':{
+      title:'Iman kepada Hari Akhir',
+      body:'Pembahasan tentang kehidupan setelah dunia, hari kebangkitan, hisab, dan perkara akhirat berdasarkan sumber-sumber Islam.'
+    },
+    'tanda-kiamat':{
+      title:'Tanda-tanda Kiamat',
+      body:'Materi tentang tanda-tanda hari kiamat disajikan berdasarkan hadis dan penjelasan ulama, dengan pemisahan antara tanda yang memiliki dasar riwayat dan penjelasannya.'
+    },
+    'iman-qadar':{
+      title:'Iman kepada Qada & Qadar',
+      body:'Pembahasan tentang qada dan qadar, hubungan ikhtiar manusia dengan takdir, serta sikap seorang muslim terhadap ketetapan Allah.'
+    },
+
+    'syahadat':{
+      title:'Syahadat',
+      body:'Syahadat merupakan rukun Islam pertama. Materi membahas dua kalimat syahadat, arti, makna, konsekuensi, dan cara mengamalkannya.'
+    },
+    'sholat':{
+      title:'Sholat',
+      body:'Materi sholat mencakup waktu, syarat, rukun, tata cara, hal-hal yang membatalkan, serta berbagai sholat sunnah.'
+    },
+    'waktu-sholat':{
+      title:'Waktu Sholat',
+      body:'Waktu sholat harian dapat dilihat secara dinamis pada Home menggunakan lokasi GPS dan Aladhan API. Halaman ini menjelaskan konsep dan batas waktu masing-masing sholat.'
+    },
+    'zakat':{
+      title:'Zakat',
+      body:'Zakat adalah rukun Islam ketiga. Materi mencakup zakat fitrah, zakat mal, golongan penerima zakat, serta kalkulator zakat.'
+    },
+    'zakat-mal':{
+      title:'Zakat Mal',
+      body:'Pembahasan zakat atas harta dengan penjelasan jenis harta, nisab, haul, dan ketentuan yang relevan.'
+    },
+    'zakat-fitrah':{
+      title:'Zakat Fitrah',
+      body:'Pembahasan ketentuan zakat fitrah, waktu pembayaran, kadar yang wajib dikeluarkan, dan penerimanya.'
+    },
+    'kalkulator-zakat':{
+      title:'Kalkulator Zakat',
+      body:'Kalkulator akan membantu menghitung estimasi zakat berdasarkan jenis harta dan parameter yang dimasukkan pengguna. Fitur perhitungan detail akan menjadi bagian berikutnya.'
+    },
+    'puasa':{
+      title:'Puasa',
+      body:'Materi puasa mencakup puasa Ramadhan, puasa sunnah, syarat, rukun, pembatal puasa, serta hal-hal yang berkaitan dengan pelaksanaannya.'
+    },
+    'haji':{
+      title:'Haji',
+      body:'Pembahasan haji mencakup rukun, wajib haji, manasik, larangan ihram, dan umrah.'
+    },
+
+    'alquran':{
+      title:"Al-Qur'an",
+      body:"Pusat pembelajaran Al-Qur'an Silmikaffah. Daftar surah, ayat, terjemahan, pencarian dan fitur terkait akan terhubung ke Quran.com API."
+    },
+    'hadis':{
+      title:'Hadis',
+      body:'Hadis adalah sumber ajaran Islam yang memuat perkataan, perbuatan, persetujuan, dan sifat Nabi Muhammad ﷺ. Dalam kategori Ilmu & Belajar, hadis dipelajari sebagai sumber ilmu dan pedoman memahami ajaran Islam.'
+    },
+    'tajwid':{
+      title:'Tajwid',
+      body:'Materi tajwid mencakup makhraj, sifat huruf, hukum nun sukun dan tanwin, mim sukun, mad, waqaf, dan kaidah bacaan lainnya.'
+    },
+    'fikih':{
+      title:'Fikih',
+      body:'Ilmu fikih membahas hukum-hukum syariat yang berkaitan dengan perbuatan manusia berdasarkan dalil-dalil yang terperinci.'
+    },
+    'ushul-fikih':{
+      title:'Ushul Fikih',
+      body:'Ushul fikih membahas kaidah dan metode untuk memahami serta menetapkan hukum syariat dari dalil-dalilnya.'
+    },
+    'qawaid-fikih':{
+      title:'Qawaid Fikih',
+      body:'Qawaid fikih berisi kaidah-kaidah umum yang membantu memahami banyak persoalan fikih.'
+    },
+    'bahasa-arab':{
+      title:'Bahasa Arab',
+      body:'Materi belajar bahasa Arab mencakup dasar nahwu, sharaf, kosakata, dan percakapan. Ini berbeda dari Kamus Bahasa Arab yang berfungsi sebagai alat pencarian kata.'
+    },
+    'kamus-arab':{
+      title:'Kamus Bahasa Arab',
+      body:'Kamus Bahasa Arab adalah alat pencarian kosakata Arab. Pengguna dapat mencari kata Arab atau terjemahannya. Database kamus dapat dikembangkan pada tahap integrasi data berikutnya.'
+    },
+
+    'sirah-nabi':{
+      title:'Sirah Nabi',
+      body:'Berisi perjalanan kehidupan Nabi Muhammad ﷺ, dari masa sebelum kenabian, dakwah di Makkah, hijrah, Madinah, hingga wafat.'
+    },
+    'sahabat-nabi':{
+      title:'Sahabat Nabi',
+      body:'Berisi profil dan pelajaran dari para sahabat Nabi.'
+    },
+    'wali-songo':{
+      title:'Wali Songo',
+      body:'Berisi pengenalan sejarah dan dakwah Wali Songo di Nusantara.'
+    },
+    'perang-islam':{
+      title:'Perang dalam Sejarah Islam',
+      body:'Berisi peristiwa-peristiwa peperangan penting dalam sejarah Islam secara edukatif dan kontekstual.'
+    },
+    'tokoh-islam':{
+      title:'Tokoh Islam',
+      body:'Berisi tokoh-tokoh penting dalam sejarah keilmuan dan peradaban Islam.'
+    },
+    'peradaban-islam':{
+      title:'Peradaban Islam',
+      body:'Membahas perkembangan ilmu, pendidikan, pemerintahan, seni, dan kebudayaan dalam sejarah peradaban Islam.'
+    },
+    'waktu-peristiwa':{
+      title:'Waktu & Peristiwa Islam',
+      body:'Kronologi peristiwa penting dalam sejarah Islam, sehingga pengguna dapat melihat hubungan waktu dan peristiwa secara runtut.'
+    },
+
+    'pernikahan':{
+      title:'Pernikahan',
+      body:'Materi tentang akad, hak dan kewajiban suami istri, adab rumah tangga, dan hal-hal penting dalam kehidupan pernikahan.'
+    },
+    'keluarga':{
+      title:'Keluarga',
+      body:'Membahas tanggung jawab, pendidikan keluarga, hubungan orang tua dan anak, serta adab dalam keluarga.'
+    },
+    'muamalah':{
+      title:'Muamalah',
+      body:'Membahas prinsip transaksi dan hubungan sosial-ekonomi dalam Islam, termasuk jual beli, utang piutang, dan akad.'
+    },
+    'faraid':{
+      title:'Faraid',
+      body:'Ilmu faraid membahas pembagian harta warisan menurut ketentuan syariat. Fitur perhitungan ahli waris dapat dikembangkan sebagai alat bantu tersendiri.'
+    },
+    'qurratul-uyun':{
+      title:"Qurratul 'Uyun",
+      body:"Materi ini akan disajikan secara edukatif dalam konteks fiqih dan akhlak keluarga, dengan menjaga bahasa yang sesuai untuk pembelajaran."
+    },
+
+    'doa-harian':{
+      title:'Doa Harian',
+      body:'Kumpulan doa untuk berbagai aktivitas sehari-hari, lengkap dengan Arab, transliterasi, arti, dan sumber.'
+    },
+    'dzikir':{
+      title:'Dzikir',
+      body:'Kumpulan dzikir yang dapat dibaca sesuai waktu dan keadaan.'
+    },
+    'dzikir-pagi':{
+      title:'Dzikir Pagi',
+      body:'Kumpulan dzikir pagi dengan teks Arab, arti, dan sumber yang relevan.'
+    },
+    'dzikir-petang':{
+      title:'Dzikir Petang',
+      body:'Kumpulan dzikir petang dengan teks Arab, arti, dan sumber yang relevan.'
+    },
+    'doa-keadaan':{
+      title:'Doa Berdasarkan Keadaan',
+      body:'Doa yang dikelompokkan berdasarkan keadaan seperti sebelum tidur, bangun tidur, bepergian, makan, dan aktivitas lainnya.'
+    },
+
+    'akhlak-allah':{title:'Akhlak kepada Allah',body:'Pembahasan tentang tauhid, syukur, tawakal, takut dan berharap kepada Allah, serta sikap hati yang benar.'},
+    'akhlak-rasul':{title:'Akhlak kepada Rasul',body:'Membahas cinta, penghormatan, mengikuti sunnah, dan adab kepada Rasulullah ﷺ.'},
+    'akhlak-orangtua':{title:'Akhlak kepada Orang Tua',body:'Berisi adab berbakti kepada orang tua dan menjaga hubungan keluarga.'},
+    'akhlak-guru':{title:'Akhlak kepada Guru',body:'Berisi adab penuntut ilmu terhadap guru dan majelis ilmu.'},
+    'akhlak-sesama':{title:'Akhlak kepada Sesama',body:'Berisi adab bermasyarakat, menjaga lisan, amanah, tolong-menolong, dan menghormati sesama.'},
+    'adab-harian':{title:'Adab Sehari-hari',body:'Kumpulan adab praktis untuk aktivitas sehari-hari.'},
+
+    'wudhu-panduan':{title:'Panduan Wudhu',body:'Panduan langkah-langkah wudhu, syarat, rukun, sunnah, dan hal yang membatalkan.'},
+    'tayamum-panduan':{title:'Panduan Tayamum',body:'Panduan tayamum dan kondisi yang membolehkannya.'},
+    'mandi-wajib':{title:'Mandi Wajib',body:'Penjelasan sebab, syarat, rukun, dan tata cara mandi wajib.'},
+    'sholat-jenazah-panduan':{title:'Sholat Jenazah',body:'Panduan ringkas sholat jenazah dan hal-hal yang berkaitan dengannya.'},
+    'haji-umrah-panduan':{title:'Haji & Umrah',body:'Panduan dasar manasik haji dan umrah.'},
+    'zakat-panduan':{title:'Panduan Zakat',body:'Panduan memahami zakat fitrah, zakat mal, nisab, haul, dan penerima zakat.'},
+    'puasa-panduan':{title:'Panduan Puasa',body:'Panduan syarat, rukun, pembatal, dan adab puasa.'},
+
+    'kalender-hijriah':{title:'Kalender Hijriah',body:'Kalender Hijriah akan menggunakan data tanggal yang tersedia dari Aladhan API dan dapat ditampilkan berdasarkan lokasi serta tanggal perangkat.'},
+    'jadwal-sholat':{title:'Jadwal Sholat',body:'Jadwal sholat menggunakan lokasi GPS dan Aladhan API. Waktu sholat berikutnya ditampilkan secara otomatis.'},
+    'arah-kiblat':{title:'Arah Kiblat',body:'Fitur arah kiblat menggunakan koordinat lokasi pengguna dan perhitungan arah menuju Ka'bah.'},
+    'masjid':{title:'Masjid',body:'Halaman masjid dapat dikembangkan menjadi pencarian masjid berdasarkan lokasi pengguna.'},
+    'pengaturan':{title:'Pengaturan',body:'Atur tema AMOLED atau Putih, ukuran font, ukuran font Arab, bahasa, notifikasi, dan data aplikasi.'},
+    'tentang':{title:'Tentang Silmikaffah',body:'Silmikaffah adalah aplikasi pembelajaran Islam yang mengelompokkan materi secara terstruktur agar pengguna tidak menemukan menu yang sama berulang kali di Home.'}
+  };
+
+  function findNode(id){
+    for(const category of Object.values(content)){
+      const found=walk(category.items,id);
+      if(found)return found;
+    }
+    return null;
+  }
+  function walk(items,id){
+    for(const x of (items||[])){
+      if(x.id===id)return x;
+      const f=walk(x.children,id);
+      if(f)return f;
+    }
+    return null;
+  }
+
+  function root(){
+    let el=document.getElementById(rootId);
+    if(!el){
+      el=document.createElement('main');
+      el.id=rootId;
+      el.className='content-page';
+      document.body.appendChild(el);
+    }
+    return el;
+  }
+
+  function card(item){
+    const hasChildren=item.children&&item.children.length;
+    return `<button class="content-card" data-content-id="${item.id}">
+      <strong>${item.title}</strong>
+      <small>${hasChildren ? item.children.length+' submateri' : 'Buka materi'}</small>
+    </button>`;
+  }
+
+  function renderCategory(categoryId){
+    const category=content[categoryId];
+    if(!category)return;
+    const el=root();
+    el.innerHTML=`<div class="content-header">
+      <button class="content-back" data-nav-back aria-label="Kembali">‹</button>
+      <h2>${category.title}</h2>
+    </div>
+    <div class="content-grid">${category.items.map(card).join('')}</div>`;
+    el.querySelectorAll('[data-content-id]').forEach(btn=>{
+      btn.onclick=()=>{
+        const id=btn.dataset.contentId;
+        nav.push(id);
+        renderNode(id);
+      };
+    });
+  }
+
+  function renderNode(id){
+    const node=findNode(id);
+    if(!node)return;
+    const el=root();
+    if(node.children&&node.children.length){
+      el.innerHTML=`<div class="content-header">
+        <button class="content-back" data-nav-back aria-label="Kembali">‹</button>
+        <h2>${node.title}</h2>
+      </div>
+      <div class="content-grid">${node.children.map(card).join('')}</div>`;
+      el.querySelectorAll('[data-content-id]').forEach(btn=>{
+        btn.onclick=()=>{
+          const cid=btn.dataset.contentId;
+          nav.push(cid);
+          renderNode(cid);
+        };
+      });
+      return;
+    }
+    const material=materials[id]||{
+      title:node.title,
+      body:'Materi ini sudah terdaftar dalam struktur Silmikaffah dan siap diisi dengan konten lengkap pada tahap pengisian materi.'
+    };
+    el.innerHTML=`<div class="content-header">
+      <button class="content-back" data-nav-back aria-label="Kembali">‹</button>
+      <h2>${material.title}</h2>
+    </div>
+    <article class="material">
+      <h3>${material.title}</h3>
+      <p>${material.body}</p>
+      <p class="source-note">Konten final akan dilengkapi dengan sumber/dalil yang sesuai pada tahap kurasi materi.</p>
+      <button class="content-card" id="saveMaterial">🔖 Simpan ke Koleksi</button>
+    </article>`;
+    const save=el.querySelector('#saveMaterial');
+    if(save)save.onclick=()=>{
+      const active=window.SilmikaffahDB.toggle('bookmarks',{id:'material-'+id,title:material.title,type:'materi'});
+      save.innerHTML=active?'🔖 Tersimpan di Koleksi':'🔖 Simpan ke Koleksi';
+    };
+  }
+
+  // Expose actual renderers for the UI.
+  window.SilmikaffahContentUI={renderCategory,renderNode};
+
+  // Map common data-category buttons to the real renderer.
+  document.addEventListener('click',e=>{
+    const b=e.target.closest('[data-content-category]');
+    if(!b)return;
+    e.preventDefault();
+    const id=b.dataset.contentCategory;
+    nav.push(id);
+    renderCategory(id);
+  },true);
+
+  // Every stack move now causes the correct real page to render.
+  window.addEventListener('silmikaffah:navigation',e=>{
+    const id=e.detail.current;
+    if(id==='home'){
+      const old=document.getElementById(rootId);
+      if(old)old.remove();
+      return;
+    }
+    if(content[id])renderCategory(id);
+    else renderNode(id);
+  });
 })();
 </script>
 
