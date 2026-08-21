@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>KHATULISTARA — Tahap 2 Peta Nusantara</title>
+<title>KHATULISTARA — Tahap 3 Lorong Waktu</title>
 <style>
 :root{
   --bg:#f7f7f4;
@@ -197,6 +197,9 @@ main{padding:0 18px 98px}
 .section-note{font-size:10px;color:var(--muted);line-height:1.45;margin:-5px 2px 10px}
 .stage-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 9px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-size:9px;font-weight:800}
 
+
+/* TAHAP 3 - LORONG WAKTU */
+.history-head h1{font-family:Georgia,serif;font-size:28px;line-height:1.12;margin:6px 0}.history-head p{font-size:11px;color:var(--muted);line-height:1.5}.era-strip{display:flex;gap:7px;overflow:auto;margin:12px 0;scrollbar-width:none}.era-strip::-webkit-scrollbar{display:none}.era-chip{white-space:nowrap;border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 11px;font-size:9px;font-weight:700}.era-chip.active{background:var(--accent);color:#fff}.history-search{display:flex;gap:7px;background:#fff;border:1px solid var(--line);border-radius:15px;padding:9px;margin:12px 0}.history-search input{flex:1;border:0;outline:0;font-size:11px}.history-search button{background:var(--accent);color:#fff;border-radius:10px;padding:8px 12px;font-size:9px;font-weight:800}.timeline{position:relative;padding-left:22px;margin:15px 0}.timeline:before{content:"";position:absolute;left:6px;top:4px;bottom:4px;width:2px;background:#ddd}.timeline-item{position:relative;text-align:left;padding:0 0 17px;background:none;border:0;width:100%;cursor:pointer}.timeline-item:before{content:"";position:absolute;left:-20px;top:4px;width:9px;height:9px;border-radius:50%;background:var(--accent);border:3px solid #f8f8f5;box-shadow:0 0 0 1px #d6d8d2}.timeline-year{font-size:8px;font-weight:900;color:var(--accent);letter-spacing:.4px}.timeline-item strong{display:block;font-size:12px;margin:3px 0}.timeline-item span{display:block;font-size:9px;color:var(--muted);line-height:1.45}.history-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.history-card{background:#fff;border:1px solid var(--line);border-radius:15px;padding:12px;text-align:left}.history-card strong{font-size:10px;display:block;margin-bottom:4px}.history-card span{font-size:8.5px;color:var(--muted);line-height:1.4}.history-stat{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.history-stat div{background:#fff;border:1px solid var(--line);border-radius:13px;padding:10px}.history-stat b{display:block;font-family:Georgia,serif;font-size:18px}.history-stat span{font-size:8px;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -256,6 +259,47 @@ main{padding:0 18px 98px}
   </div>
 </section>
 
+<section id="history" class="page">
+  <div class="history-head">
+    <div class="stage-badge">TAHAP 3 · LORONG WAKTU</div>
+    <h1>Menelusuri Jejak Nusantara</h1>
+    <p>Ensiklopedia sejarah Indonesia dari masa prasejarah hingga Indonesia modern, lengkap dengan kerajaan, perlawanan, tokoh, prasasti, manuskrip, kabinet dan sejarah agama.</p>
+  </div>
+  <div class="history-search"><svg width="17" height="17" fill="none" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" stroke="currentColor"/><path d="m20 20-4-4" stroke="currentColor"/></svg><input id="historySearch" placeholder="Cari kerajaan, tokoh, peristiwa..." oninput="filterHistory(this.value)"><button onclick="filterHistory(document.getElementById('historySearch').value)">Cari</button></div>
+  <div class="era-strip">
+    <button class="era-chip active" onclick="historyEra(this,'Semua')">Semua</button><button class="era-chip" onclick="historyEra(this,'Prasejarah')">Prasejarah</button><button class="era-chip" onclick="historyEra(this,'Kerajaan')">Kerajaan</button><button class="era-chip" onclick="historyEra(this,'Kolonial')">Kolonial</button><button class="era-chip" onclick="historyEra(this,'Nasional')">Pergerakan</button><button class="era-chip" onclick="historyEra(this,'Kemerdekaan')">Kemerdekaan</button><button class="era-chip" onclick="historyEra(this,'Modern')">Pascakemerdekaan</button>
+  </div>
+  <div class="history-stat"><div><b>7</b><span>Era utama</span></div><div><b>∞</b><span>Lintasan sejarah</span></div><div><b>↔</b><span>Data terhubung</span></div></div>
+  <div class="section-head"><h2>Garis Waktu Nusantara</h2><button onclick="showToast('Timeline aktif')">Timeline</button></div>
+  <div id="historyTimeline" class="timeline">
+    <button class="timeline-item" data-era="Prasejarah" data-key="prasejarah zaman batu paleolitikum mesolitikum neolitikum megalitikum perundagian fosil manusia purba situs lukisan gua"><div class="timeline-year">MASA PRASEJARAH</div><strong>Jejak awal manusia di Nusantara</strong><span>Zaman batu, perundagian, fosil, manusia purba, situs prasejarah, peralatan kuno dan lukisan gua.</span></button>
+    <button class="timeline-item" data-era="Kerajaan" data-key="kutai tarumanegara kalingga sriwijaya mataram kuno kediri singhasari majapahit hindu buddha"><div class="timeline-year">ERA HINDU–BUDDHA</div><strong>Tumbuhnya kerajaan dan pusat kebudayaan</strong><span>Kutai, Tarumanegara, Kalingga, Sriwijaya, Mataram Kuno, Kediri, Singhasari, Majapahit dan kerajaan lainnya.</span></button>
+    <button class="timeline-item" data-era="Kerajaan" data-key="samudra pasai demak aceh mataram islam banten cirebon ternate tidore gowa tallo"><div class="timeline-year">ERA KESULTANAN</div><strong>Perkembangan kerajaan Islam Nusantara</strong><span>Samudra Pasai, Demak, Aceh, Mataram Islam, Banten, Cirebon, Ternate, Tidore, Gowa-Tallo dan lainnya.</span></button>
+    <button class="timeline-item" data-era="Kolonial" data-key="portugis spanyol voc kolonialisme tanam paksa politik kolonial"><div class="timeline-year">ERA KOLONIAL</div><strong>Kedatangan bangsa Eropa dan kolonialisme</strong><span>Portugis, Spanyol, VOC, pemerintahan kolonial, tanam paksa, politik kolonial, perubahan sosial dan perlawanan rakyat.</span></button>
+    <button class="timeline-item" data-era="Nasional" data-key="budi utomo sarekat islam indische partij perhimpunan indonesia sumpah pemuda"><div class="timeline-year">PERGERAKAN NASIONAL</div><strong>Lahirnya kesadaran kebangsaan</strong><span>Budi Utomo, Sarekat Islam, Indische Partij, Perhimpunan Indonesia, Sumpah Pemuda dan organisasi nasional.</span></button>
+    <button class="timeline-item" data-era="Kemerdekaan" data-key="jepang bpupki ppki proklamasi kemerdekaan perjuangan"><div class="timeline-year">1942–1949</div><strong>Pendudukan Jepang dan Kemerdekaan</strong><span>BPUPKI, PPKI, Proklamasi, tokoh proklamasi, peristiwa sekitar kemerdekaan dan perjuangan mempertahankan kemerdekaan.</span></button>
+    <button class="timeline-item" data-era="Modern" data-key="demokrasi awal orde lama orde baru reformasi"><div class="timeline-year">PASCAKEMERDEKAAN</div><strong>Dari demokrasi awal menuju Reformasi</strong><span>Demokrasi awal, Orde Lama, Orde Baru, Reformasi dan peristiwa penting nasional.</span></button>
+  </div>
+  <div class="section-head"><h2>Jelajah Sejarah</h2><button onclick="showHistoryDirectory()">Semua</button></div>
+  <div class="history-grid">
+    <button class="history-card" onclick="historyCategory('Prasejarah')"><strong>Prasejarah</strong><span>Fosil · manusia purba · zaman batu · situs · artefak</span></button>
+    <button class="history-card" onclick="historyCategory('Kerajaan')"><strong>Kerajaan Nusantara</strong><span>Hindu-Buddha · kesultanan · raja · wilayah · peninggalan</span></button>
+    <button class="history-card" onclick="historyCategory('Kolonial')"><strong>Kolonialisme</strong><span>Eropa · VOC · pemerintahan kolonial · tanam paksa</span></button>
+    <button class="history-card" onclick="historyCategory('Perlawanan')"><strong>Perlawanan Daerah</strong><span>Diponegoro · Padri · Aceh · Pattimura · Bali · Banjar</span></button>
+    <button class="history-card" onclick="historyCategory('Nasional')"><strong>Pergerakan Nasional</strong><span>Organisasi · Sumpah Pemuda · tokoh pergerakan</span></button>
+    <button class="history-card" onclick="historyCategory('Kemerdekaan')"><strong>Kemerdekaan</strong><span>Jepang · BPUPKI · PPKI · Proklamasi · perjuangan</span></button>
+    <button class="history-card" onclick="historyCategory('Presiden')"><strong>Presiden & Wakil Presiden</strong><span>Masa jabatan · profil · kebijakan · kabinet</span></button>
+    <button class="history-card" onclick="historyCategory('Kabinet')"><strong>Kabinet Indonesia</strong><span>Periode · pimpinan · menteri · program</span></button>
+    <button class="history-card" onclick="historyCategory('Prasasti')"><strong>Prasasti & Manuskrip</strong><span>Aksara · bahasa · lokasi · periode · isi · makna</span></button>
+    <button class="history-card" onclick="historyCategory('Agama')"><strong>Sejarah Agama</strong><span>Masuknya agama · komunitas · tokoh · peninggalan</span></button>
+  </div>
+  <div class="section-head"><h2>Tokoh Nusantara</h2><button onclick="showHistoryDirectory()">Jelajah</button></div>
+  <div class="data-list">
+    <button class="data-row" data-key="pahlawan nasional tokoh perjuangan" onclick="historyCategory('Pahlawan')"><div><strong>Pahlawan & Pahlawan Nasional</strong><span>Perjuangan, daerah asal, jasa dan warisan sejarah.</span></div><b>›</b></button>
+    <button class="data-row" data-key="ilmuwan penemu pendidikan" onclick="historyCategory('Ilmuwan')"><div><strong>Ilmuwan, Penemu & Pendidikan</strong><span>Tokoh ilmu pengetahuan, penemuan dan kontribusi pendidikan.</span></div><b>›</b></button>
+    <button class="data-row" data-key="sastrawan seniman budayawan" onclick="historyCategory('Sastrawan')"><div><strong>Sastrawan, Seniman & Budayawan</strong><span>Karya, periode, kontribusi dan pengaruh kebudayaan.</span></div><b>›</b></button>
+  </div>
+</section>
 <section id="explore" class="page">
   <div class="page-title"><div class="eyebrow">Jelajah</div><h1>Semua Pengetahuan</h1><p>Tujuh pusat pengetahuan KHATULISTARA yang menjadi fondasi navigasi utama.</p></div>
   <div class="menu-grid">
@@ -423,6 +467,7 @@ main{padding:0 18px 98px}
 <nav class="bottom">
   <button class="nav-item active" data-page="home" onclick="go('home')"><svg fill="none" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V10Z"/><path d="M9 21v-7h6v7"/></svg>Beranda</button>
   <button class="nav-item" data-page="explore" onclick="go('explore')"><svg fill="none" viewBox="0 0 24 24"><path d="M4 5h16v14H4z"/><path d="M8 9h8M8 13h6M8 17h3"/></svg>Jelajah</button>
+  <button class="nav-item" data-page="history" onclick="go('history')"><svg fill="none" viewBox="0 0 24 24"><path d="M4 5h16v14H4z"/><path d="M8 9h8M8 13h5M8 17h7"/></svg>Sejarah</button>
   <button class="nav-item" data-page="map" onclick="go('map')"><svg fill="none" viewBox="0 0 24 24"><path d="m9 18-6 3V6l6-3 6 3 6-3v15l-6 3-6-3Z"/><path d="M9 3v15m6-12v15"/></svg>Peta</button>
   <button class="nav-item" data-page="collection" onclick="go('collection')"><svg fill="none" viewBox="0 0 24 24"><path d="m12 17-5 3 1.5-5.7L4 10.5l5.8-.4L12 4l2.2 6.1 5.8.4-4.5 3.8L17 20l-5-3Z"/></svg>Koleksi</button>
   <button class="nav-item" data-page="settings" onclick="go('settings')"><svg fill="none" viewBox="0 0 24 24"><path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/><path d="m19.4 15 .1.1-1.7 2.9-.2-.1a7.5 7.5 0 0 1-2.1 1.2l-.1.2H10l-.1-.2a7.5 7.5 0 0 1-2.1-1.2l-.2.1-1.7-2.9.1-.1a7.4 7.4 0 0 1 0-2.4l-.1-.1 1.7-2.9.2.1A7.5 7.5 0 0 1 9.9 8l.1-.2h5.4l.1.2a7.5 7.5 0 0 1 2.1 1.2l.2-.1 1.7 2.9-.1.1a7.4 7.4 0 0 1 0 2.4Z"/></svg>Atur</button>
@@ -441,7 +486,7 @@ main{padding:0 18px 98px}
 </div>
 
 <script>
-const pages = ['home','explore','map','searchPage','collection','settings'];
+const pages = ['home','explore','history','map','searchPage','collection','settings'];
 function go(page){
   pages.forEach(p=>document.getElementById(p)?.classList.remove('active'));
   document.getElementById(page)?.classList.add('active');
@@ -476,6 +521,11 @@ function openProvince(name,region){
     <div class="info-block open"><div class="info-head"><strong>Struktur halaman provinsi</strong><span>⌄</span></div><div class="info-body">Profil wilayah · Peta · Kabupaten/kota · Sejarah · Suku · Bahasa · Rumah adat · Pakaian adat · Senjata · Tari · Alat musik · Lagu daerah · Makanan · Minuman · Permainan · Flora · Fauna · Tempat wisata · Tempat bersejarah · Tokoh · Tradisi · Upacara adat · Data praktis.</div></div>`;
   document.getElementById('modal').classList.add('show');
 }
+
+function historyEra(btn,era){document.querySelectorAll('.era-chip').forEach(x=>x.classList.remove('active'));btn.classList.add('active');document.querySelectorAll('#historyTimeline .timeline-item').forEach(x=>x.style.display=(era==='Semua'||x.dataset.era===era)?'block':'none')}
+function filterHistory(q){q=q.toLowerCase().trim();document.querySelectorAll('#historyTimeline .timeline-item,#history .data-row').forEach(x=>{const t=(x.dataset.key||'')+' '+x.innerText.toLowerCase();x.style.display=!q||t.includes(q)?(x.classList.contains('data-row')?'flex':'block'):'none'})}
+function historyCategory(cat){const d={Prasejarah:['Prasejarah','Zaman batu, paleolitikum, mesolitikum, neolitikum, megalitikum, perundagian, fosil, manusia purba, situs dan lukisan gua.'],Kerajaan:['Kerajaan Nusantara','Kerajaan Hindu-Buddha dan kesultanan Islam; memuat pendiri, silsilah, wilayah, raja, ekonomi, agama, budaya, peninggalan dan kemunduran.'],Kolonial:['Kolonialisme','Portugis, Spanyol, VOC, pemerintahan kolonial, tanam paksa, politik kolonial, perubahan sosial dan perlawanan rakyat.'],Perlawanan:['Perlawanan Daerah','Perang Diponegoro, Padri, Aceh, Pattimura, Bali, Banjar dan perlawanan daerah lainnya.'],Nasional:['Pergerakan Nasional','Budi Utomo, Sarekat Islam, Indische Partij, Perhimpunan Indonesia, Sumpah Pemuda dan tokoh pergerakan.'],Kemerdekaan:['Kemerdekaan','Pendudukan Jepang, BPUPKI, PPKI, Proklamasi, tokoh proklamasi dan perjuangan mempertahankan kemerdekaan.'],Presiden:['Presiden & Wakil Presiden','Profil, masa jabatan, peristiwa penting, kebijakan utama dan kabinet setiap periode pemerintahan.'],Kabinet:['Kabinet Indonesia','Nama kabinet, periode, pimpinan pemerintahan, menteri, program dan peristiwa penting.'],Prasasti:['Prasasti & Manuskrip','Prasasti, naskah kuno, manuskrip, kitab, aksara, bahasa, lokasi, periode, isi dan makna.'],Agama:['Sejarah Agama di Indonesia','Masuknya agama, perkembangan komunitas, kerajaan terkait, tokoh, peninggalan, tempat ibadah dan pengaruh budaya.'],Pahlawan:['Pahlawan Nusantara','Pahlawan nasional, pahlawan daerah, tokoh perjuangan, jasa dan warisan sejarah.'],Ilmuwan:['Ilmuwan & Penemu','Tokoh ilmu pengetahuan, penemuan, pendidikan dan kontribusi bagi Indonesia.'],Sastrawan:['Sastrawan & Budayawan','Sastrawan, seniman, budayawan, karya, periode dan pengaruh kebudayaan.']};const a=d[cat]||[cat,'Koleksi sejarah Nusantara yang terhubung dengan periode, tokoh, tempat, budaya, peninggalan dan sumber referensi.'];document.getElementById('modalTitle').textContent=a[0];document.getElementById('modalDesc').textContent='Lorong Waktu · '+a[0];document.getElementById('modalContent').innerHTML='<div class="detail-hero"><div class="detail-label">ENSIKLOPEDIA SEJARAH</div><h2>'+a[0]+'</h2><p>'+a[1]+'</p><div class="pills"><span class="pill">Periode</span><span class="pill">Tokoh</span><span class="pill">Tempat</span><span class="pill">Peristiwa</span><span class="pill">Peninggalan</span></div></div><div class="sheet-list"><button class="sheet-item" onclick="showToast('Materi dibuka')"><div><strong>Materi utama</strong><span>Daftar entri ensiklopedia sesuai kategori.</span></div><span>›</span></button><button class="sheet-item" onclick="showToast('Timeline dibuka')"><div><strong>Timeline & hubungan</strong><span>Kronologi serta hubungan tokoh, tempat dan peristiwa.</span></div><span>›</span></button><button class="sheet-item" onclick="showToast('Sumber dibuka')"><div><strong>Sumber & verifikasi</strong><span>Referensi, tahun sumber, status verifikasi dan pembaruan.</span></div><span>›</span></button></div>';document.getElementById('modal').classList.add('show')}
+function showHistoryDirectory(){historyCategory('Semua Sejarah')}
 function closeModal(){document.getElementById('modal').classList.remove('show')}
 function selectRegion(btn,region){
   document.querySelectorAll('.region-chip').forEach(x=>x.classList.remove('active'));
